@@ -1,15 +1,211 @@
-import Image from "next/image";
+"use client";
 
-export default function Admin() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-gray-900">
-      <Image
-        alt="logo"
-        src="/images/architects-logo.webp"
-        width={300}
-        height={300}
-      />
-      <h1 className="text-gray-300">admin</h1>
-    </main>
+import { ContentWrapper } from "@/features/UI/content-wrapper";
+import { useAdmin } from "@/hooks/admin";
+import { NextPage } from "next";
+import { ITab, Tabs } from "@/features/UI/tabs/tabs";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import SharedHead from "@/features/UI/head";
+import { ItemsList } from "@/features/admin/items/items-list";
+import { TraitsList } from "@/features/admin/traits/traits-list";
+import { CommunitiesList } from "@/features/admin/communities/communities-list";
+import { NftCollectionsList } from "@/features/admin/nft-collections/nfts-collection-list";
+import Link from "next/link";
+import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
+import { ToolsList } from "@/features/admin/tools/tools-list";
+import { UsersList } from "@/features/admin/users/users-list";
+
+const primaryTabs: ITab[] = [
+  {
+    name: "Items",
+    value: "items",
+  },
+  {
+    name: "Creatures",
+    value: "creatures",
+  },
+  {
+    name: "Users & Tools",
+    value: "users-tools",
+  },
+];
+
+const creaturesTabs: ITab[] = [
+  {
+    name: "Vampires",
+    value: "vampires",
+    parent: "creatures",
+  },
+  {
+    name: "Mounts",
+    value: "mounts",
+    parent: "creatures",
+  },
+  {
+    name: "Pets",
+    value: "pets",
+    parent: "creatures",
+  },
+];
+
+const itemsTabs: ITab[] = [
+  {
+    name: "Items",
+    value: "items",
+    parent: "items",
+  },
+  {
+    name: "Traits",
+    value: "traits",
+    parent: "items",
+  },
+];
+
+const communityTabs: ITab[] = [
+  {
+    name: "Communities",
+    value: "communities",
+    parent: "users-tools",
+  },
+  {
+    name: "Nft Collections",
+    value: "nft-collections",
+    parent: "users-tools",
+  },
+  {
+    name: "Tools",
+    value: "tools",
+    parent: "users-tools",
+  },
+  {
+    name: "Users",
+    value: "users",
+    parent: "users-tools",
+  },
+];
+
+const subTabs = [...creaturesTabs, ...itemsTabs, ...communityTabs];
+
+const Admin: NextPage = () => {
+  const { isAdmin } = useAdmin();
+  const router = useRouter();
+
+  const [activeTab, setActiveTab] = useState(primaryTabs[0]);
+  const [activeSubTab, setActiveSubTab] = useState<ITab>(itemsTabs[0]);
+  const searchParams = useSearchParams();
+
+  const updateUrl = useCallback(
+    (tab: ITab) => {
+      router.push(`/admin?tab=${tab.value}`);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeSubTab]
   );
-}
+
+  const handleSetSubTab = useCallback(
+    (tab: ITab) => {
+      setActiveSubTab(tab);
+
+      updateUrl(tab);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [setActiveSubTab]
+  );
+
+  const handleSetPrimaryTab = (tab: ITab) => {
+    setActiveTab(tab);
+    switch (tab.value) {
+      case "items":
+        handleSetSubTab(itemsTabs[0]);
+        break;
+      case "creatures":
+        handleSetSubTab(creaturesTabs[0]);
+        break;
+      case "communities":
+      default:
+        handleSetSubTab(communityTabs[0]);
+        break;
+    }
+  };
+
+  const getCreateLink = () => {
+    switch (activeSubTab.value) {
+      case "items":
+        return "/admin/item/create";
+      default:
+        return "";
+    }
+  };
+
+  useEffect(() => {
+    const searchParam = searchParams.get("tab");
+    if (searchParam) {
+      const subTab = subTabs.find((tab) => tab.value === searchParam);
+      const primaryTab = primaryTabs.find(
+        (tab) => subTab?.parent === tab.value
+      );
+      if (primaryTab) setActiveTab(primaryTab);
+      if (subTab) handleSetSubTab(subTab);
+    }
+  }, [handleSetSubTab, searchParams]);
+
+  if (!isAdmin) return <NotAdminBlocker />;
+
+  return (
+    <ContentWrapper className="flex flex-col items-center justify-center text-stone-300">
+      <SharedHead title="SoDead Admin" />
+      <div className="text-3xl mb-4">Admin</div>
+      <div className="px-2 lg:px-0 pb-4 w-full">
+        <Tabs
+          tabs={primaryTabs}
+          activeTab={activeTab}
+          handleSetTab={(tab) => handleSetPrimaryTab(tab)}
+        />
+        {activeTab.value === "creatures" && (
+          <Tabs
+            tabs={creaturesTabs}
+            activeTab={activeSubTab}
+            handleSetTab={(tab) => handleSetSubTab(tab)}
+          />
+        )}
+        {activeTab.value === "items" && (
+          <Tabs
+            tabs={itemsTabs}
+            activeTab={activeSubTab}
+            handleSetTab={(tab) => handleSetSubTab(tab)}
+          />
+        )}
+        {activeTab.value === "users-tools" && (
+          <Tabs
+            tabs={communityTabs}
+            activeTab={activeSubTab}
+            handleSetTab={(tab) => handleSetSubTab(tab)}
+          />
+        )}
+      </div>
+
+      {/* Creatures */}
+
+      {/* Items */}
+      {activeSubTab.value === "items" && <ItemsList />}
+      {activeSubTab.value === "traits" && <TraitsList />}
+
+      {/* Users/NFTs */}
+      {activeSubTab.value === "users" && <UsersList />}
+      {activeSubTab.value === "tools" && <ToolsList />}
+      {activeSubTab.value === "communities" && <CommunitiesList />}
+      {activeSubTab.value === "nft-communities" && <NftCollectionsList />}
+      {activeSubTab.value === "items" && (
+        <Link href={getCreateLink()}>
+          <button className="bottom-4 right-4">
+            <PlusCircleIcon className="w-12 h-12 absolute bottom-8 right-16 text-stone-300 hover:text-stone-900 hover:bg-stone-300 rounded-full bg-stone-900 shadow-deep hover:shadow-deep-float" />
+          </button>
+        </Link>
+      )}
+    </ContentWrapper>
+  );
+};
+
+export default Admin;
