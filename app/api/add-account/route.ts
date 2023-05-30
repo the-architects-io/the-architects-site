@@ -45,7 +45,7 @@ type Data =
       error: unknown;
     };
 
-export default async function handler(req: NextRequest) {
+export async function POST(req: NextRequest) {
   logError({
     error: {
       code: 2,
