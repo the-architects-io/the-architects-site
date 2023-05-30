@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
 
     console.log("insert_items_one: ", insert_items_one);
 
-    return NextResponse.json(insert_items_one);
+    return NextResponse.json(insert_items_one, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });

@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import axios from "axios";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export type NoopResponse = {
   noop: true;
@@ -53,17 +54,20 @@ type Data =
       error: unknown;
     };
 
-export async function POST(req: NextApiRequest, res: NextApiResponse<Data>) {
-  const { mintAddress, noop } = req.body;
+export async function POST(req: NextRequest) {
+  const { mintAddress, noop } = await req.json();
 
   if (noop)
-    return res.status(200).json({
-      noop: true,
-      endpoint: "get-token-metadata-from-helius",
-    });
+    return NextResponse.json(
+      {
+        noop: true,
+        endpoint: "get-token-metadata-from-helius",
+      },
+      { status: 200 }
+    );
 
   if (!mintAddress || !process.env.HELIUS_API_KEY) {
-    res.status(500).json({ error: "Required fields not set" });
+    NextResponse.json({ error: "Required fields not set" }, { status: 500 });
     return;
   }
 
@@ -91,27 +95,28 @@ export async function POST(req: NextApiRequest, res: NextApiResponse<Data>) {
     }
   }
 
-  const metadata = {
-    imageUrl: offChainMetadata?.image || tokenMetadata?.legacyMetadata?.logoURI,
-    name:
-      tokenMetadata?.onChainMetadata?.metadata?.data?.name ||
-      tokenMetadata?.legacyMetadata?.name,
-    symbol:
-      tokenMetadata?.onChainMetadata?.metadata?.data?.symbol ||
-      tokenMetadata?.legacyMetadata?.symbol,
-    decimals:
-      tokenMetadata?.onChainAccountInfo?.accountInfo?.data?.parsed?.info
-        ?.decimals ||
-      tokenMetadata?.legacyMetadata?.decimals ||
-      0,
-  };
-
-  console.log("~~metadata: ", metadata);
-
-  res.status(200).json(metadata);
   try {
+    const metadata = {
+      imageUrl:
+        offChainMetadata?.image || tokenMetadata?.legacyMetadata?.logoURI,
+      name:
+        tokenMetadata?.onChainMetadata?.metadata?.data?.name ||
+        tokenMetadata?.legacyMetadata?.name,
+      symbol:
+        tokenMetadata?.onChainMetadata?.metadata?.data?.symbol ||
+        tokenMetadata?.legacyMetadata?.symbol,
+      decimals:
+        tokenMetadata?.onChainAccountInfo?.accountInfo?.data?.parsed?.info
+          ?.decimals ||
+        tokenMetadata?.legacyMetadata?.decimals ||
+        0,
+    };
+
+    console.log("~~metadata: ", metadata);
+
+    NextResponse.json(metadata, { status: 200 });
   } catch (error) {
     console.log("~~error: ", error);
-    res.status(500).json({ error: "No metadata found" });
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
