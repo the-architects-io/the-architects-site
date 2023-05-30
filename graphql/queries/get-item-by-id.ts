@@ -8,17 +8,6 @@ export const GET_ITEM_BY_ID = gql`
         id
         name
       }
-      baseStatModifier {
-        id
-        name
-        effectAmount
-        affectedBaseStat {
-          name
-          id
-          max
-          min
-        }
-      }
       imageUrl
       id
       isConsumable
@@ -36,7 +25,7 @@ export const GET_ITEM_BY_ID = gql`
           name
         }
       }
-      itemCollections {
+      collections {
         name
         id
         imageUrl

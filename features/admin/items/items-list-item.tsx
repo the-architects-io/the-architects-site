@@ -18,16 +18,16 @@ export interface Item {
     id: string;
     name: string;
   };
-  baseStatModifier: {
-    id: string;
-    name: string;
-    effectAmount: number;
-    createdAt: string;
-    affectedBaseStat: {
-      id: string;
-      name: string;
-    };
-  };
+  // baseStatModifier: {
+  //   id: string;
+  //   name: string;
+  //   effectAmount: number;
+  //   createdAt: string;
+  //   affectedBaseStat: {
+  //     id: string;
+  //     name: string;
+  //   };
+  // };
 }
 
 export const ItemsListItem = ({ item }: { item: Item }) => {
@@ -65,7 +65,7 @@ export const ItemsListItem = ({ item }: { item: Item }) => {
           {<div className="flex">{item.category.name}</div>}
         </div>
       )}
-      {!!item.baseStatModifier && (
+      {/* {!!item.baseStatModifier && (
         <div className="my-4 w-1/4 flex items-center space-x-4">
           <div>Affected Stat:</div>
           <div
@@ -79,7 +79,7 @@ export const ItemsListItem = ({ item }: { item: Item }) => {
             {`${item.baseStatModifier.effectAmount}`}
           </div>
         </div>
-      )}
+      )} */}
       <div className="flex flex-grow"></div>
       <Link
         className="bg-stone-800 text-stone-300 px-4 py-2 rounded-lg uppercase text-sm"

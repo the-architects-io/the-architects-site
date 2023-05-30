@@ -25,17 +25,6 @@ export type Item = {
       imageUrl: string;
     };
   };
-  baseStatModifier: {
-    id: string;
-    name: string;
-    effectAmount: number;
-    affectedBaseStat: {
-      name: string;
-      id: string;
-      max: number;
-      min: number;
-    };
-  };
   imageUrl: string;
   id: string;
   createdAt: string;
@@ -56,7 +45,7 @@ export type Item = {
       name: string;
     };
   };
-  itemCollections: {
+  collections: {
     name: string;
     id: string;
     imageUrl: string;
@@ -93,8 +82,7 @@ export async function POST(req: NextRequest) {
     });
 
   if (!name) {
-    NextResponse.json({ error: "Required fields not set", status: 500 });
-    return;
+    return NextResponse.json({ error: "Required fields not set", status: 500 });
   }
 
   try {

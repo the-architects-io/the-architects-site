@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "@apollo/client";
-import { useRouter } from "next/router";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { BackButton } from "@/features/UI/buttons/back-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { GET_ITEM_BY_ID } from "@/graphql/queries/get-item-by-id";
@@ -27,21 +27,22 @@ import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 
-const ItemDetailPage = () => {
+export default function ItemDetailPage({ params }: { params: any }) {
   const [showBindToTokenInput, setShowBindToTokenInput] = useState(false);
   const [hasBeenFetched, setHasBeenFetched] = useState(false);
   const [item, setItem] = useState<Item | null>(null);
+  const [id, setId] = useState(null);
   const router = useRouter();
   const { isAdmin } = useAdmin();
-  const { id } = router.query;
+  const searchParams = useSearchParams();
 
   const { data, loading, error, refetch } = useQuery(GET_ITEM_BY_ID, {
-    variables: { id },
-    skip: !id,
+    variables: { id: params?.id },
+    skip: !params?.id,
     onCompleted: (data) => {
       console.log("data", data);
-      const { sodead_items_by_pk } = data;
-      setItem(sodead_items_by_pk);
+      const { items_by_pk } = data;
+      setItem(items_by_pk);
       setHasBeenFetched(true);
     },
   });
@@ -54,7 +55,7 @@ const ItemDetailPage = () => {
       try {
         await axios.post("/api/bind-item-to-token", {
           mintAddress,
-          itemId: id,
+          itemId: params?.id,
         });
         showToast({
           primaryMessage: "Item updated",
@@ -211,6 +212,4 @@ const ItemDetailPage = () => {
       )}
     </div>
   );
-};
-
-export default ItemDetailPage;
+}

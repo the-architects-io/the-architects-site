@@ -86,19 +86,18 @@ export async function POST(req: NextRequest) {
   for (let nft of nfts) {
     const { mintAddress, imageUrl, symbol, traits, name } = nft;
     try {
-      const { sodead_creatures }: { sodead_creatures: Creature[] } =
-        await client.request({
-          document: GET_CREATURE_BY_TOKEN_MINT_ADDRESS,
-          variables: {
-            mintAddress,
-          },
-        });
+      const { creatures }: { creatures: Creature[] } = await client.request({
+        document: GET_CREATURE_BY_TOKEN_MINT_ADDRESS,
+        variables: {
+          mintAddress,
+        },
+      });
 
-      const creature = sodead_creatures?.[0];
+      const creature = creatures?.[0];
 
       if (creature) continue;
 
-      const { insert_sodead_tokens_one }: { insert_sodead_tokens_one: Token } =
+      const { insert_tokens_one }: { insert_tokens_one: Token } =
         await client.request({
           document: ADD_TOKEN,
           variables: {
@@ -110,57 +109,55 @@ export async function POST(req: NextRequest) {
           },
         });
 
-      const {
-        insert_sodead_creatures_one,
-      }: { insert_sodead_creatures_one: Creature } = await client.request({
-        document: ADD_CREATURE,
-        variables: {
-          name,
-          tokenId: insert_sodead_tokens_one.id,
-          imageUrl,
-          creatureCategoryId: "28ea2cc8-7fbc-4599-a93d-73a34f00ddfe", // Vampire
-        },
-      });
+      const { insert_creatures_one }: { insert_creatures_one: Creature } =
+        await client.request({
+          document: ADD_CREATURE,
+          variables: {
+            name,
+            tokenId: insert_tokens_one.id,
+            imageUrl,
+            creatureCategoryId: "28ea2cc8-7fbc-4599-a93d-73a34f00ddfe", // Vampire
+          },
+        });
 
       // TODO add trait hash
       traits.forEach(async (trait: Trait) => {
         console.log("```````````trait: ", trait);
-        const { sodead_traits }: { sodead_traits: Trait[] } =
-          await client.request({
-            document: GET_TRAIT_BY_NAME,
-            variables: {
-              name: trait.name,
-            },
-          });
-        console.log("```````````sodead_traits: ", sodead_traits);
+        const { traits }: { traits: Trait[] } = await client.request({
+          document: GET_TRAIT_BY_NAME,
+          variables: {
+            name: trait.name,
+          },
+        });
+        console.log("```````````traits: ", traits);
 
-        const traitId = sodead_traits[0].id;
+        const traitId = traits[0].id;
         console.log("```````````traitId: ", traitId);
         const {
-          insert_sodead_traitInstances_one,
-        }: { insert_sodead_traitInstances_one: Data } = await client.request({
+          insert_traitInstances_one,
+        }: { insert_traitInstances_one: Data } = await client.request({
           document: ADD_TRAIT_INSTANCE,
           variables: {
             traitId,
-            creatureId: insert_sodead_creatures_one.id,
+            creatureId: insert_creatures_one.id,
             value: trait.value,
           },
         });
         console.log(
-          "```````````insert_sodead_traitInstances_one: ",
-          insert_sodead_traitInstances_one
+          "```````````insert_traitInstances_one: ",
+          insert_traitInstances_one
         );
       });
 
       console.log("Token added: ", {
-        mintAddress: insert_sodead_tokens_one.mintAddress,
-        name: insert_sodead_tokens_one.name,
-        imageUrl: insert_sodead_tokens_one.imageUrl,
+        mintAddress: insert_tokens_one.mintAddress,
+        name: insert_tokens_one.name,
+        imageUrl: insert_tokens_one.imageUrl,
       });
       console.log("Creature added: ", {
-        name: insert_sodead_creatures_one.name,
+        name: insert_creatures_one.name,
       });
-      response.push(insert_sodead_creatures_one);
+      response.push(insert_creatures_one);
     } catch (error) {
       console.log("```````````FAIL error: ", error);
       return NextResponse.json({ error }, { status: 500 });

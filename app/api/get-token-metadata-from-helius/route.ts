@@ -67,7 +67,10 @@ export async function POST(req: NextRequest) {
     );
 
   if (!mintAddress || !process.env.HELIUS_API_KEY) {
-    NextResponse.json({ error: "Required fields not set" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Required fields not set" },
+      { status: 500 }
+    );
     return;
   }
 
@@ -114,7 +117,7 @@ export async function POST(req: NextRequest) {
 
     console.log("~~metadata: ", metadata);
 
-    NextResponse.json(metadata, { status: 200 });
+    return NextResponse.json(metadata, { status: 200 });
   } catch (error) {
     console.log("~~error: ", error);
     return NextResponse.json({ error }, { status: 500 });

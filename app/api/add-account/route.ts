@@ -103,8 +103,10 @@ export async function POST(req: NextRequest) {
         }),
       },
     });
-    NextResponse.json({ error: "Required fields not set" }, { status: 500 });
-    return;
+    return NextResponse.json(
+      { error: "Required fields not set" },
+      { status: 500 }
+    );
   }
 
   const variables = {
@@ -164,7 +166,7 @@ export async function POST(req: NextRequest) {
 
     console.log("insert_accounts_one: ", insert_accounts_one);
 
-    NextResponse.json(
+    return NextResponse.json(
       {
         account: insert_accounts_one,
         user: update_users_by_pk,
@@ -182,6 +184,6 @@ export async function POST(req: NextRequest) {
         }),
       },
     });
-    NextResponse.json({ error }, { status: 500 });
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
