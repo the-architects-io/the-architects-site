@@ -1,7 +1,7 @@
-import { Creature } from "@/app/api/add-creatures-from-nfts/route";
+import { Character } from "@/app/api/add-character-from-nfts/route";
 
 export const getTraitsFromTraitInstances = (
-  traitInstances: Creature["traitInstances"]
+  traitInstances: Character["traitInstances"]
 ) => {
   return traitInstances.map(({ id, value, trait }) => {
     console.log({ id, trait, value });

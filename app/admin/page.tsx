@@ -23,8 +23,8 @@ const primaryTabs: ITab[] = [
     value: "items",
   },
   {
-    name: "Creatures",
-    value: "creatures",
+    name: "Characters",
+    value: "characters",
   },
   {
     name: "Users & Tools",
@@ -32,21 +32,21 @@ const primaryTabs: ITab[] = [
   },
 ];
 
-const creaturesTabs: ITab[] = [
+const charactersTabs: ITab[] = [
   {
     name: "FunGuys",
     value: "funguys",
-    parent: "creatures",
+    parent: "characters",
   },
   {
     name: "FunGuys 3D",
     value: "funguys-3d",
-    parent: "creatures",
+    parent: "characters",
   },
   {
     name: "Fungies",
     value: "fungies",
-    parent: "creatures",
+    parent: "characters",
   },
 ];
 
@@ -86,7 +86,7 @@ const communityTabs: ITab[] = [
   },
 ];
 
-const subTabs = [...creaturesTabs, ...itemsTabs, ...communityTabs];
+const subTabs = [...charactersTabs, ...itemsTabs, ...communityTabs];
 
 const Admin: NextPage = () => {
   const { isAdmin } = useAdmin();
@@ -120,8 +120,8 @@ const Admin: NextPage = () => {
       case "items":
         handleSetSubTab(itemsTabs[0]);
         break;
-      case "creatures":
-        handleSetSubTab(creaturesTabs[0]);
+      case "characters":
+        handleSetSubTab(charactersTabs[0]);
         break;
       case "communities":
       default:
@@ -163,9 +163,9 @@ const Admin: NextPage = () => {
           activeTab={activeTab}
           handleSetTab={(tab) => handleSetPrimaryTab(tab)}
         />
-        {activeTab.value === "creatures" && (
+        {activeTab.value === "characters" && (
           <Tabs
-            tabs={creaturesTabs}
+            tabs={charactersTabs}
             activeTab={activeSubTab}
             handleSetTab={(tab) => handleSetSubTab(tab)}
           />
@@ -186,7 +186,7 @@ const Admin: NextPage = () => {
         )}
       </div>
 
-      {/* Creatures */}
+      {/* characters */}
 
       {/* Items */}
       {activeSubTab.value === "items" && <ItemsList />}

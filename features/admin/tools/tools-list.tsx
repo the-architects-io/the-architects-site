@@ -81,7 +81,7 @@ export const ToolsList = () => {
         className="p-3 rounded-2xl bg-gray-900 flex items-center justify-center w-full text-stone-300 text-xl"
       >
         <PlusCircleIcon className="w-6 h-6 mr-2" />
-        Add creature
+        Add characters
       </Link>
       {/* <button
         onClick={() => pokeEndpoints({ shouldFetchConcurrently: true })}

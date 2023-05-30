@@ -1,15 +1,15 @@
 import { client } from "@/graphql/backend-client";
 import { ADD_TOKEN } from "@/graphql/mutations/add-token";
-import { ADD_CREATURE } from "@/graphql/mutations/add-creature";
+import { ADD_CHARACTER } from "@/graphql/mutations/add-character";
 import { ADD_TRAIT_INSTANCE } from "@/graphql/mutations/add-trait-instance";
 import { Token } from "@/features/admin/tokens/tokens-list-item";
 import { GET_TRAIT_BY_NAME } from "@/graphql/queries/get-trait-by-name";
-import { GET_CREATURE_BY_TOKEN_MINT_ADDRESS } from "@/graphql/queries/get-creature-by-token-mint-address";
+import { GET_CHARACTER_BY_TOKEN_MINT_ADDRESS } from "@/graphql/queries/get-character-by-token-mint-address";
 import { NoopResponse } from "@/app/api/add-account/route";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export type Creature = {
+export type Character = {
   id: string;
   name: string;
   imageUrl: string;
@@ -45,14 +45,14 @@ export type Trait = {
   value: string;
 };
 
-type CreaturesResponse = {
-  creatures?: Creature[];
+type CharacterResponse = {
+  characters?: Character[];
   success: boolean;
   message: string;
 };
 
 type Data =
-  | CreaturesResponse
+  | CharacterResponse
   | NoopResponse
   | {
       error: unknown;
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         noop: true,
-        endpoint: "add-creatures-from-nfts",
+        endpoint: "add-character-from-nfts",
       },
       {
         status: 200,
@@ -86,16 +86,16 @@ export async function POST(req: NextRequest) {
   for (let nft of nfts) {
     const { mintAddress, imageUrl, symbol, traits, name } = nft;
     try {
-      const { creatures }: { creatures: Creature[] } = await client.request({
-        document: GET_CREATURE_BY_TOKEN_MINT_ADDRESS,
+      const { characters }: { characters: Character[] } = await client.request({
+        document: GET_CHARACTER_BY_TOKEN_MINT_ADDRESS,
         variables: {
           mintAddress,
         },
       });
 
-      const creature = creatures?.[0];
+      const character = characters?.[0];
 
-      if (creature) continue;
+      if (character) continue;
 
       const { insert_tokens_one }: { insert_tokens_one: Token } =
         await client.request({
@@ -109,14 +109,13 @@ export async function POST(req: NextRequest) {
           },
         });
 
-      const { insert_creatures_one }: { insert_creatures_one: Creature } =
+      const { insert_characters_one }: { insert_characters_one: Character } =
         await client.request({
-          document: ADD_CREATURE,
+          document: ADD_CHARACTER,
           variables: {
             name,
             tokenId: insert_tokens_one.id,
             imageUrl,
-            creatureCategoryId: "28ea2cc8-7fbc-4599-a93d-73a34f00ddfe", // Vampire
           },
         });
 
@@ -139,7 +138,7 @@ export async function POST(req: NextRequest) {
           document: ADD_TRAIT_INSTANCE,
           variables: {
             traitId,
-            creatureId: insert_creatures_one.id,
+            characterId: insert_characters_one.id,
             value: trait.value,
           },
         });
@@ -154,10 +153,10 @@ export async function POST(req: NextRequest) {
         name: insert_tokens_one.name,
         imageUrl: insert_tokens_one.imageUrl,
       });
-      console.log("Creature added: ", {
-        name: insert_creatures_one.name,
+      console.log("Character added: ", {
+        name: insert_characters_one.name,
       });
-      response.push(insert_creatures_one);
+      response.push(insert_characters_one);
     } catch (error) {
       console.log("```````````FAIL error: ", error);
       return NextResponse.json({ error }, { status: 500 });
@@ -167,12 +166,12 @@ export async function POST(req: NextRequest) {
   if (!response?.length) {
     return NextResponse.json({
       success: true,
-      message: "Creature already exists",
+      message: "Character already exists",
     });
   }
 
   return NextResponse.json(
-    { success: true, message: "Creature added", creatures: response },
+    { success: true, message: "Character added", chatacter: response },
     { status: 200 }
   );
 }

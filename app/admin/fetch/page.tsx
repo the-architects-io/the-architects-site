@@ -68,7 +68,7 @@ export default function FetchPage() {
     let returnData;
 
     try {
-      const { data } = await axios.post("/api/add-creatures-from-nfts", {
+      const { data } = await axios.post("/api/add-characters-from-nfts", {
         nfts: nftsWithMetadata,
       });
 
@@ -82,7 +82,7 @@ export default function FetchPage() {
     } catch (error) {
       console.log(error);
       showToast({
-        primaryMessage: "Error adding creature to db",
+        primaryMessage: "Error adding character to db",
       });
     } finally {
       setIsLoading(false);

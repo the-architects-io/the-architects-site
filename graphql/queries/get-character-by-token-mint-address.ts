@@ -1,14 +1,10 @@
 import { gql } from "@apollo/client";
 
-export const GET_CREATURE_BY_TOKEN_MINT_ADDRESS = gql`
-  query GET_CREATURE_BY_TOKEN_MINT_ADDRESS($mintAddress: String!) {
-    creatures(where: { token: { mintAddress: { _eq: $mintAddress } } }) {
+export const GET_CHARACTER_BY_TOKEN_MINT_ADDRESS = gql`
+  query GET_CHARACTER_BY_TOKEN_MINT_ADDRESS($mintAddress: String!) {
+    characters(where: { token: { mintAddress: { _eq: $mintAddress } } }) {
       name
       id
-      creatureCollections {
-        name
-        id
-      }
       imageUrl
       rarity {
         name
