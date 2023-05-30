@@ -24,7 +24,7 @@ export const ImageWithFallback = ({ src, alt, className, ...props }: Props) => {
           <PhotoIcon
             className={classNames([
               "h-12 w-12 text-stone-500",
-              props.width && props.width > 100 && "h-24 w-24",
+              props.width && Number(props.width) > 100 && "h-24 w-24",
             ])}
           />
         </div>
