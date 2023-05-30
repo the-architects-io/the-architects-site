@@ -1,4 +1,4 @@
-import { Trait } from "@/pages/api/add-creatures-from-nfts";
+import { Trait } from "@/app/api/add-creatures-from-nfts";
 
 export type Attribute = {
   trait_type: string;
