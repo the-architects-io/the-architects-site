@@ -1,4 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import { client } from "@/graphql/backend-client";
 import { ADD_TOKEN } from "@/graphql/mutations/add-token";
 import { ADD_CREATURE } from "@/graphql/mutations/add-creature";
@@ -7,6 +6,8 @@ import { Token } from "@/features/admin/tokens/tokens-list-item";
 import { GET_TRAIT_BY_NAME } from "@/graphql/queries/get-trait-by-name";
 import { GET_CREATURE_BY_TOKEN_MINT_ADDRESS } from "@/graphql/queries/get-creature-by-token-mint-address";
 import { NoopResponse } from "@/app/api/add-account/route";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export type Creature = {
   id: string;
@@ -57,23 +58,27 @@ type Data =
       error: unknown;
     };
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
-  const { nfts, noop } = req.body;
+export async function POST(req: NextRequest) {
+  const { nfts, noop } = await req.json();
 
   if (noop)
-    return res.status(200).json({
-      noop: true,
-      endpoint: "add-creatures-from-nfts",
-    });
+    return NextResponse.json(
+      {
+        noop: true,
+        endpoint: "add-creatures-from-nfts",
+      },
+      {
+        status: 200,
+      }
+    );
 
   console.log({ nfts });
 
   if (!nfts) {
-    res.status(500).json({ error: "Required fields not set" });
-    return;
+    return NextResponse.json(
+      { error: "Required fields not set" },
+      { status: 500 }
+    );
   }
 
   const response = [];
@@ -158,16 +163,19 @@ export default async function handler(
       response.push(insert_sodead_creatures_one);
     } catch (error) {
       console.log("```````````FAIL error: ", error);
-      res.status(500).json({ error });
+      return NextResponse.json({ error }, { status: 500 });
     }
   }
 
   if (!response?.length) {
-    res.status(200).json({ success: true, message: "Creature already exists" });
-    return;
+    return NextResponse.json({
+      success: true,
+      message: "Creature already exists",
+    });
   }
 
-  res
-    .status(200)
-    .json({ success: true, message: "Creature added", creatures: response });
+  return NextResponse.json(
+    { success: true, message: "Creature added", creatures: response },
+    { status: 200 }
+  );
 }
