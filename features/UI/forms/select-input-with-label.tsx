@@ -25,11 +25,11 @@ export const SelectInputWithLabel = ({
   hideLabel,
 }: Props) => {
   return (
-    <label htmlFor={name} className="text-stone-900 flex flex-col w-full">
+    <label htmlFor={name} className="flex flex-col w-full">
       {hideLabel ? null : label}
       <select
         className={classNames(
-          "p-2 rounded-xl w-full text-stone-300 bg-gray-900",
+          "p-2 rounded-xl w-full text-gray-300 bg-gray-500",
           hideLabel ? "mt-0" : "mt-2"
         )}
         name={name}

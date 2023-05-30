@@ -12,10 +12,7 @@ export const FormInputWithLabel = ({
   ...props
 }: Props) => {
   return (
-    <label
-      htmlFor={props.name}
-      className="flex flex-col w-full text-stone-900 font-bold"
-    >
+    <label htmlFor={props.name} className="flex flex-col w-full">
       {label}
       <FormInput
         className="mt-2"

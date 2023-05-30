@@ -37,7 +37,7 @@ export const ItemsListItem = ({ item }: { item: Item }) => {
         src={item.imageUrl}
         height={60}
         width={60}
-        className="w-12"
+        className="w-8"
         alt={item.name}
       />
       <div className="my-4 flex items-center space-x-12">

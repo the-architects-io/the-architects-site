@@ -63,7 +63,7 @@ export const ToolsList = () => {
           }}
         />
       </div>
-      <button
+      {/* <button
         onClick={() => setIsDebugMode(!isDebugMode)}
         className="p-3 rounded-2xl bg-gray-900 flex items-center justify-center w-full text-stone-300 text-xl"
       >
@@ -75,7 +75,7 @@ export const ToolsList = () => {
         className="p-3 rounded-2xl bg-gray-900 flex items-center justify-center w-full text-stone-300 text-xl"
       >
         {isLoggingTestError ? "Logging..." : "Log test error"}
-      </button>
+      </button> */}
       <Link
         href="/admin/fetch"
         className="p-3 rounded-2xl bg-gray-900 flex items-center justify-center w-full text-stone-300 text-xl"
@@ -83,7 +83,7 @@ export const ToolsList = () => {
         <PlusCircleIcon className="w-6 h-6 mr-2" />
         Add creature
       </Link>
-      <button
+      {/* <button
         onClick={() => pokeEndpoints({ shouldFetchConcurrently: true })}
         className="p-3 rounded-2xl bg-gray-900 flex items-center justify-center w-full text-stone-300 text-xl"
         disabled={isPoking}
@@ -98,7 +98,7 @@ export const ToolsList = () => {
       >
         <HandRaisedIcon className="w-6 h-6 mr-2" />
         {isPoking ? "Poking..." : "Poke endpoints (Sequentially)"}
-      </button>
+      </button> */}
     </Panel>
   );
 };

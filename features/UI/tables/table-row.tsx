@@ -12,7 +12,7 @@ export const TableRow = ({
   return (
     <div
       className={classNames([
-        "px-4 py-2 rounded-lg border border-stone-700 shadow-2xl bg-stone-800 text-stone-300 w-full flex text-xl items-center space-x-12",
+        "px-4 py-1 rounded-lg shadow-2xl bg-gray-800 text-stone-300 w-full flex items-center space-x-12 overflow-x-auto",
         className,
       ])}
       key={keyId}
