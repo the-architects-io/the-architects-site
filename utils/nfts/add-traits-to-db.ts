@@ -6,7 +6,6 @@ export const addTraitsToDb = async (nfts: any[], nftCollectionId: string) => {
   const { data } = await client.query({
     query: GET_TRAITS_BY_NFT_COLLECTION,
     variables: {
-      // nftCollectionId: "334a2b4f-b0c6-4128-94b5-0123cb1bff0a", // SoDead
       nftCollectionId,
     },
   });
@@ -42,7 +41,6 @@ export const addTraitsToDb = async (nfts: any[], nftCollectionId: string) => {
       mutation: ADD_TRAIT,
       variables: {
         name,
-        // nftCollectionId: "334a2b4f-b0c6-4128-94b5-0123cb1bff0a", // SoDead
         nftCollectionId,
       },
     });

@@ -12,7 +12,7 @@ export const SecondaryButton = ({ disabled, children, ...props }: Props) => {
       onClick={props?.onClick}
       disabled={disabled}
       className={classNames([
-        "bg-red-800 hover:bg-red-500 rounded-xl p-4 py-2 uppercase text-stone-300 border border-stone-600",
+        "bg-cyan-600 hover:bg-cyan-400 rounded-xl p-4 py-2 uppercase text-stone-300 hover:text-stone-600 border hover:font-bold border-stone-600 tracking-wider",
         disabled ? "opacity-50 cursor-not-allowed" : "",
         props.className,
       ])}

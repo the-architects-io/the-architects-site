@@ -78,10 +78,12 @@ export const AddItemForm = () => {
           onChange={formik.handleChange}
         />
       </div>
-      <SubmitButton
-        isSubmitting={formik.isSubmitting}
-        onClick={formik.handleSubmit}
-      />
+      <div className="flex justify-center w-full">
+        <SubmitButton
+          isSubmitting={formik.isSubmitting}
+          onClick={formik.handleSubmit}
+        />
+      </div>
     </FormWrapper>
   );
 };
