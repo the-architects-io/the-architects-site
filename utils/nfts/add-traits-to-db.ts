@@ -1,7 +1,6 @@
 import client from "@/graphql/apollo/client";
 import { ADD_TRAIT } from "@/graphql/mutations/add-trait";
 import { GET_TRAITS_BY_NFT_COLLECTION } from "@/graphql/queries/get-traits-by-nft-collection";
-import { Trait } from "@/pages/api/add-creatures-from-nfts";
 
 export const addTraitsToDb = async (nfts: any[], nftCollectionId: string) => {
   const { data } = await client.query({
