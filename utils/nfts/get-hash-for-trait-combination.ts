@@ -1,5 +1,11 @@
-import { ModeledTrait } from "@/pages/profile/[id]";
 const crypto = require("crypto").webcrypto;
+
+export type ModeledTrait = {
+  id?: string;
+  name?: string;
+  trait_type?: string;
+  value: string;
+};
 
 export const getHashForTraitCombination = async (traits: ModeledTrait[]) => {
   const traitValues = traits.map(({ value }) => value).sort();

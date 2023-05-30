@@ -1,4 +1,4 @@
-import { Creature } from "@/features/creatures/creature-list";
+import { Creature } from "@/app/api/add-creatures-from-nfts/route";
 
 export const getTraitsFromTraitInstances = (
   traitInstances: Creature["traitInstances"]
