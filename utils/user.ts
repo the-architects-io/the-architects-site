@@ -1,5 +1,4 @@
 import { User } from "@/features/admin/users/users-list-item";
-import { Account } from "@/pages/api/add-account";
 
 export const getUserDiscordAccount = (user: User) => {
   if (!user?.accounts || user?.accounts?.length === 0) return null;

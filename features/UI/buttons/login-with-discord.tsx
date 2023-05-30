@@ -3,7 +3,7 @@ import { BASE_URL } from "@/constants/constants";
 import Image from "next/image";
 import { User } from "@/features/admin/users/users-list-item";
 import { useEffect, useState } from "react";
-import { Account } from "@/pages/api/add-account";
+import { Account } from "@/app/api/add-account/route";
 import { getUserDiscordAccount } from "@/utils/user";
 import { useWallet } from "@solana/wallet-adapter-react";
 
