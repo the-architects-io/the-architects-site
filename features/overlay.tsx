@@ -19,17 +19,6 @@ const Overlay = ({ onClick, isVisible }: Props) => {
           })}
         />
       </ScrollLock>
-      <style>
-        {`
-          .bg-opaque {
-            background-color: rgba(0,0,0,0.6);
-          }
-          .centered {
-            transform: translate(-50%, -50%);
-
-          }
-        `}
-      </style>
     </>
   );
 };

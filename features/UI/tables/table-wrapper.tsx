@@ -13,7 +13,7 @@ export const TableWrapper = ({
   return (
     <div
       className={classNames([
-        "w-full bg-stone-900 text-stone-300 mx-auto max-w-6xl p-4 overflow-y-scroll rounded-2xl shadow-2xl",
+        "w-full bg-gray-900 text-stone-300 mx-auto max-w-6xl p-4 overflow-y-scroll rounded-2xl shadow-2xl",
         isTruncated && "h-[55vh] ",
       ])}
     >

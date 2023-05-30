@@ -1,7 +1,7 @@
 "use client";
 import { ADMIN_WALLETS, ENV } from "@/constants/constants";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import React, { ReactNode, useContext, useEffect, useState } from "react";
 
 type AdminContextType = {
@@ -25,10 +25,10 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
           }
         }
       };
-      router.events.on("routeChangeStart", handleRouteChange);
-      return () => {
-        router.events.off("routeChangeStart", handleRouteChange);
-      };
+      // router.events.on("routeChangeStart", handleRouteChange);
+      // return () => {
+      //   router.events.off("routeChangeStart", handleRouteChange);
+      // };
     }
   }, [isAdmin, router]);
 

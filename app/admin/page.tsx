@@ -34,18 +34,18 @@ const primaryTabs: ITab[] = [
 
 const creaturesTabs: ITab[] = [
   {
-    name: "Vampires",
-    value: "vampires",
+    name: "FunGuys",
+    value: "funguys",
     parent: "creatures",
   },
   {
-    name: "Mounts",
-    value: "mounts",
+    name: "FunGuys 3D",
+    value: "funguys-3d",
     parent: "creatures",
   },
   {
-    name: "Pets",
-    value: "pets",
+    name: "Fungies",
+    value: "fungies",
     parent: "creatures",
   },
 ];
@@ -155,7 +155,7 @@ const Admin: NextPage = () => {
 
   return (
     <ContentWrapper className="flex flex-col items-center justify-center text-stone-300">
-      <SharedHead title="SoDead Admin" />
+      <SharedHead title="Admin" />
       <div className="text-3xl mb-4">Admin</div>
       <div className="px-2 lg:px-0 pb-4 w-full">
         <Tabs
@@ -200,7 +200,7 @@ const Admin: NextPage = () => {
       {activeSubTab.value === "items" && (
         <Link href={getCreateLink()}>
           <button className="bottom-4 right-4">
-            <PlusCircleIcon className="w-12 h-12 absolute bottom-8 right-16 text-stone-300 hover:text-stone-900 hover:bg-stone-300 rounded-full bg-stone-900 shadow-deep hover:shadow-deep-float" />
+            <PlusCircleIcon className="w-12 h-12 absolute bottom-8 right-16 text-stone-300 hover:text-stone-900 hover:bg-stone-300 rounded-full bg-gray-900 shadow-deep hover:shadow-deep-float" />
           </button>
         </Link>
       )}

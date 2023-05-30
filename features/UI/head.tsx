@@ -6,8 +6,8 @@ interface Props {
 }
 
 export default function SharedHead({
-  title = "SoDead",
-  description = "SoDead",
+  title = "Architects",
+  description = "Building Web 3",
 }: Props) {
   return (
     <Head>

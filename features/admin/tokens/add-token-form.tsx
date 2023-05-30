@@ -3,13 +3,12 @@ import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { useFormik } from "formik";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import showToast from "@/features/toasts/show-toast";
 import { useState } from "react";
-import { TokenMetadata } from "@/pages/api/get-token-metadata-from-helius";
+import { TokenMetadata } from "@/app/api/get-token-metadata-from-helius/route";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import Spinner from "@/features/UI/spinner";
-import Image from "next/image";
 import SharedHead from "@/features/UI/head";
 import { BASE_URL } from "@/constants/constants";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
@@ -69,7 +68,7 @@ export const AddTokenForm = () => {
 
   return (
     <FormWrapper onSubmit={formik.handleSubmit}>
-      <SharedHead title="SoDead Admin" />
+      <SharedHead title="Admin" />
 
       {!tokenMetadata ? (
         <FormInputWithLabel

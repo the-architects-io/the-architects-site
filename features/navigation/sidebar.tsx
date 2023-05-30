@@ -1,24 +1,17 @@
+"use client";
+
 import classNames from "classnames";
-import ClientOnly from "@/features/client-only";
-import Overlay from "@/features/overlay";
+
 import Link from "next/link";
 import { KeyIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import Overlay from "@/features/overlay";
 
-type Props = {
-  isOpenSidebar: boolean;
-  toggleSidebar: () => void;
-};
-
-export const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
-  const handleCloseSidebar = () => {
-    if (isOpenSidebar) {
-      toggleSidebar();
-    }
-  };
-
+export const Sidebar = () => {
+  const isOpenSidebar = false;
+  const handleCloseSidebar = () => {};
   return (
-    <ClientOnly>
+    <>
       <Overlay onClick={handleCloseSidebar} isVisible={isOpenSidebar} />
       <div
         className={classNames({
@@ -38,7 +31,7 @@ export const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
             <WalletMultiButton />
             <Link
               href="/admin"
-              className="p-3 rounded-2xl bg-stone-900 hidden md:block"
+              className="p-3 rounded-2xl bg-gray-900 hidden md:block"
             >
               <KeyIcon className="w-6 h-6 text-stone-300" />
             </Link>
@@ -63,7 +56,7 @@ export const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
           </div>
         </div>
       </div>
-    </ClientOnly>
+    </>
   );
 };
 

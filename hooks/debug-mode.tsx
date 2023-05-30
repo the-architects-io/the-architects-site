@@ -1,6 +1,6 @@
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useRouter } from "next/router";
-import React, { ReactNode, useContext, useEffect, useState } from "react";
+"use client";
+
+import React, { ReactNode, useContext, useState } from "react";
 
 type DebugModeContextType = {
   isDebugMode: boolean;

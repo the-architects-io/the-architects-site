@@ -1,3 +1,4 @@
+"use client";
 import { useQuery } from "@apollo/client";
 import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-label";
 import { FormikHandlers } from "formik";
@@ -48,7 +49,7 @@ export const ItemCategoriesSelectInput = ({
         <SelectInputWithLabel
           value={value}
           label="Item category"
-          name="itemCategoryId"
+          name="categoryId"
           options={categoryOptions}
           onChange={(ev) => {
             handleChange(ev);

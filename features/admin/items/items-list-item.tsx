@@ -1,3 +1,5 @@
+"use client";
+
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { TableRow } from "@/features/UI/tables/table-row";
 import { CheckCircleIcon, MinusCircleIcon } from "@heroicons/react/24/outline";

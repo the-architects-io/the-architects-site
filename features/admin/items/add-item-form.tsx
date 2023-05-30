@@ -1,9 +1,11 @@
+"use client";
+
 import axios from "axios";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { useFormik } from "formik";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import showToast from "@/features/toasts/show-toast";
 import SharedHead from "@/features/UI/head";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
@@ -19,7 +21,7 @@ export const AddItemForm = () => {
       description: "",
       isConsumable: false,
       isCraftable: false,
-      itemCategoryId: "",
+      categoryId: "",
     },
     onSubmit: async (values) => {
       try {
@@ -38,7 +40,7 @@ export const AddItemForm = () => {
 
   return (
     <FormWrapper onSubmit={formik.handleSubmit}>
-      <SharedHead title="SoDead Admin" />
+      <SharedHead title="Admin" />
       <FormInputWithLabel
         label="Name"
         name="name"
@@ -58,7 +60,7 @@ export const AddItemForm = () => {
         onChange={formik.handleChange}
       />
       <ItemCategoriesSelectInput
-        value={formik.values.itemCategoryId}
+        value={formik.values.categoryId}
         handleBlur={formik.handleBlur}
         handleChange={formik.handleChange}
       />

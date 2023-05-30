@@ -1,9 +1,8 @@
-import { ENV } from "@/constants/constants";
 import { User } from "@/features/admin/users/users-list-item";
 import { GET_USER_BY_WALLET_ADDRESS } from "@/graphql/queries/get-user-by-wallet-address";
 import { useLazyQuery, useQuery } from "@apollo/client";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import React, { ReactNode, useContext, useEffect, useState } from "react";
 
 type UserContextType = {

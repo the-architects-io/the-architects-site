@@ -14,9 +14,9 @@ export const Tab = ({
     <button
       key={tab.value}
       className={classNames([
-        "text-center py-3 hover:bg-stone-900 hover:text-stone-300 px-4 rounded-xl cursor-pointer",
+        "text-center py-3 hover:bg-gray-900 hover:text-stone-300 px-4 rounded-xl cursor-pointer",
         tab.value === activeTab.value
-          ? "bg-stone-900 text-stone-300"
+          ? "bg-gray-900 text-stone-300"
           : "text-stone-900",
       ])}
       onClick={() => handleSetTab(tab)}

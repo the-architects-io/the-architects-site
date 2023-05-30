@@ -10,8 +10,8 @@ export const UserWithoutAccountBlocker = () => {
     <ContentWrapperYAxisCenteredContent>
       <ImageWithFallback
         className="mb-8"
-        src="/images/sodead-logo.png"
-        alt="SoDead Logo"
+        src="/images/architects-logo.webp"
+        alt="Logo"
         width={200}
         height={200}
       />

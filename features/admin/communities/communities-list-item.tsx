@@ -1,7 +1,6 @@
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { TableRow } from "@/features/UI/tables/table-row";
-import { KeyIcon, UserGroupIcon } from "@heroicons/react/24/outline";
-import Image from "next/image";
+import { UserGroupIcon } from "@heroicons/react/24/outline";
 
 import Link from "next/link";
 
