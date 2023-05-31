@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
       const character = characters?.[0];
 
       if (character) continue;
-
+      // TODO: check if token exists
       const { insert_tokens_one }: { insert_tokens_one: Token } =
         await client.request({
           document: ADD_TOKEN,
@@ -122,13 +122,18 @@ export async function POST(req: NextRequest) {
       // TODO add trait hash
       traits.forEach(async (trait: Trait) => {
         console.log("```````````trait: ", trait);
-        const { traits }: { traits: Trait[] } = await client.request({
-          document: GET_TRAIT_BY_NAME,
-          variables: {
-            name: trait.name,
-          },
-        });
-        console.log("```````````traits: ", traits);
+        try {
+          const { traits }: { traits: Trait[] } = await client.request({
+            document: GET_TRAIT_BY_NAME,
+            variables: {
+              name: trait.name,
+            },
+          });
+          console.log("```````````traits: ", traits);
+        } catch (error) {
+          console.log("```````````FAIL error: ", error);
+          return NextResponse.json({ error }, { status: 500 });
+        }
 
         const traitId = traits[0].id;
         console.log("```````````traitId: ", traitId);
