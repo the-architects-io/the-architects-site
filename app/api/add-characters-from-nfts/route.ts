@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
         });
 
       // TODO add trait hash
-      traits.forEach(async (trait: Trait) => {
+      for (let trait of traits) {
         console.log("```````````trait: ", trait);
         try {
           const { traits }: { traits: Trait[] } = await client.request({
@@ -151,7 +151,8 @@ export async function POST(req: NextRequest) {
           "```````````insert_traitInstances_one: ",
           insert_traitInstances_one
         );
-      });
+      }
+      traits.forEach(async (trait: Trait) => {});
 
       console.log("Token added: ", {
         mintAddress: insert_tokens_one.mintAddress,
