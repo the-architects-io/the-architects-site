@@ -24,15 +24,18 @@ export default function FetchPage() {
   const [mintAddress, setMintAddress] = useState("");
   const { user, setUser } = useUser();
   const [isLoading, setIsLoading] = useState(false);
-  const [hashList, setHashList] = useState<string[]>([]);
+  const [hashList, setHashList] = useState<string>("");
 
-  const fetchCollection = async (mintAddress: string) => {
+  const fetchCollection = async (hashList: string) => {
     // get first 10 items from hashList
     // const START = 6000;
     // const END = hashList.length;
     // const selection = hashList.slice(START, END);
-    if (!mintAddress.length) return;
-    const selection = [mintAddress];
+    const jsonHashlist = JSON.parse(hashList);
+    console.log("jsonHashlist", jsonHashlist);
+    debugger;
+    if (!jsonHashlist.length) return;
+    const selection = jsonHashlist;
     if (!selection.length) return;
     console.log({
       selection: selection.length,
@@ -42,7 +45,7 @@ export default function FetchPage() {
 
     const metaplex = Metaplex.make(connection);
 
-    const mints = selection.map((address) => new PublicKey(address));
+    const mints = selection.map((address: string) => new PublicKey(address));
 
     const nftMetasFromMetaplex: any[] = await metaplex
       .nfts()
@@ -60,7 +63,7 @@ export default function FetchPage() {
 
     await addTraitsToDb(
       nftsWithMetadata,
-      "334a2b4f-b0c6-4128-94b5-0123cb1bff0a" // sodead
+      "a7dfa466-88ba-4b6e-8ce5-1470d9896794" // 3D FunGuyz
     );
     console.log({ nftsWithMetadata });
     console.log(nftMetasFromMetaplex.length, nftsWithMetadata.length);
@@ -93,12 +96,12 @@ export default function FetchPage() {
 
   const formik = useFormik({
     initialValues: {
-      hashList: [],
+      hashList: "",
     },
     onSubmit: async ({ hashList }) => {
       setIsLoading(true);
-      setMintAddress(mintAddress);
-      await fetchCollection(mintAddress);
+      setHashList(hashList);
+      await fetchCollection(hashList);
     },
   });
 
@@ -116,8 +119,8 @@ export default function FetchPage() {
     <ContentWrapper>
       <FormWrapper onSubmit={formik.handleSubmit}>
         <FormTextareaWithLabel
-          label="Hash list"
-          name="hashlist"
+          label="Hashlist"
+          name="hashList"
           value={formik.values.hashList}
           onChange={formik.handleChange}
         />

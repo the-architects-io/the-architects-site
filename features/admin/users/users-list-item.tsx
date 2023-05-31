@@ -1,4 +1,3 @@
-import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { TableRow } from "@/features/UI/tables/table-row";
 import showToast from "@/features/toasts/show-toast";

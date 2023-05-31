@@ -23,7 +23,7 @@ const Navbar = () => {
             width={40}
           />
         </Link>
-        <div className="space-x-2 md:space-x-8 items-center text-base md:text-xl tracking-wider hidden md:flex font-strange-dreams">
+        <div className="space-x-2 md:space-x-8 items-center text-base md:text-xl tracking-wider hidden md:flex">
           <Link href="/" className="flex items-center justify-center flex-none">
             <Image
               className="h-12 hidden md:block mr-2 md:mr-8"

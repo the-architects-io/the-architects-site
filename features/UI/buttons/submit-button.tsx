@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
+import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import Spinner from "@/features/UI/spinner";
 
 interface Props extends React.HTMLAttributes<HTMLButtonElement> {
@@ -20,14 +20,14 @@ export const SubmitButton = ({
   onClick,
 }: Props) => {
   return (
-    <SecondaryButton
+    <PrimaryButton
       onClick={(e) => {
         e.preventDefault();
         onClick && onClick();
       }}
       disabled={isSubmitting || disabled}
       className={classNames([
-        "font-strange-dreams tracking-widest",
+        "tracking-widest",
         isSubmitting
           ? "opacity-50 cursor-not-allowed"
           : "opacity-100 cursor-pointer",
@@ -43,6 +43,6 @@ export const SubmitButton = ({
       ) : (
         <>{children ? children : buttonText || "Save"}</>
       )}
-    </SecondaryButton>
+    </PrimaryButton>
   );
 };

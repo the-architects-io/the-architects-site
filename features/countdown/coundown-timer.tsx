@@ -29,7 +29,7 @@ const CountdownTimer = ({ endsAt }: { endsAt: number | string }) => {
 
   if (days <= 0 && hours <= 0 && minutes <= 0 && seconds <= 0) {
     return (
-      <div className="flex justify-center text-sm md:text-xl font-strange-dreams tracking-widest mt-4">
+      <div className="flex justify-center text-sm md:text-xl tracking-widest mt-4">
         Complete
       </div>
     );

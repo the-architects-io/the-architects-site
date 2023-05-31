@@ -15,7 +15,7 @@ export const Sidebar = () => {
       <Overlay onClick={handleCloseSidebar} isVisible={isOpenSidebar} />
       <div
         className={classNames({
-          "fixed top-0 right-0 bottom-0 w-full sm:w-[380px] h-screen transition-position duration-500 ease-in-out py-4 z-50 bg-black font-strange-dreams text-3xl sm:text-4xl":
+          "fixed top-0 right-0 bottom-0 w-full sm:w-[380px] h-screen transition-position duration-500 ease-in-out py-4 z-50 bg-black text-3xl sm:text-4xl":
             true,
           "-mr-[1000px]": !isOpenSidebar,
         })}

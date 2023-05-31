@@ -3,14 +3,17 @@ import classNames from "classnames";
 interface Props extends React.HTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode | string;
   type?: "submit" | undefined;
+  disabled?: boolean;
 }
 
-export const PrimaryButton = ({ children, ...props }: Props) => {
+export const PrimaryButton = ({ disabled, children, ...props }: Props) => {
   return (
     <button
       onClick={props?.onClick}
+      disabled={disabled}
       className={classNames([
-        "bg-stone-300 hover:bg-stone-400 rounded-xl p-4 py-2 uppercase text-stone-900",
+        "bg-sky-400 hover:bg-sky-300 text-gray-800 rounded-xl p-4 py-2 uppercase border border-gray-800 hover:border-gray-800 font-bold transition-colors duration-300 ease-in-out",
+        disabled ? "opacity-50 cursor-not-allowed" : "",
         props.className,
       ])}
       type={props.type}

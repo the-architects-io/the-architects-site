@@ -1,4 +1,4 @@
-import { Character } from "@/app/api/add-character-from-nfts/route";
+import { Character } from "@/app/api/add-characters-from-nfts/route";
 
 export const getTraitsFromTraitInstances = (
   traitInstances: Character["traitInstances"]

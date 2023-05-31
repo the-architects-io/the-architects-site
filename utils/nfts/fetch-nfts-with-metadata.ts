@@ -1,4 +1,4 @@
-import { Trait } from "@/app/api/add-character-from-nfts/route";
+import { Trait } from "@/app/api/add-characters-from-nfts/route";
 
 export type Attribute = {
   trait_type: string;

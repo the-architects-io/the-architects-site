@@ -31,10 +31,7 @@ export default function ItemDetailPage({ params }: { params: any }) {
   const [showBindToTokenInput, setShowBindToTokenInput] = useState(false);
   const [hasBeenFetched, setHasBeenFetched] = useState(false);
   const [item, setItem] = useState<Item | null>(null);
-  const [id, setId] = useState(null);
-  const router = useRouter();
   const { isAdmin } = useAdmin();
-  const searchParams = useSearchParams();
 
   const { data, loading, error, refetch } = useQuery(GET_ITEM_BY_ID, {
     variables: { id: params?.id },
