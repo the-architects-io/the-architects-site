@@ -12,7 +12,7 @@ export const FormTextareaWithLabel = ({
 }: Props) => {
   return (
     <label htmlFor={props.name} className="flex flex-col w-full ">
-      {label}
+      <div className="mb-2">{label}</div>
       <textarea
         rows={props.rows || 3}
         cols={props.cols || 50}

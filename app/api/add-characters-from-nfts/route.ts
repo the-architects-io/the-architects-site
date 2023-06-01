@@ -137,8 +137,11 @@ export async function POST(req: NextRequest) {
 
       const character = characters?.[0];
 
-      if (character) continue;
-      // TODO: check if token exists
+      if (character) {
+        console.log(`Character ${character.name} already exists, skipping`);
+        continue;
+      }
+
       const { tokens }: { tokens: Token[] } = await client.request({
         document: GET_TOKEN_BY_MINT_ADDRESS,
         variables: {
@@ -173,6 +176,7 @@ export async function POST(req: NextRequest) {
             imageUrl,
           },
         });
+      console.log(`Character ${name} added`);
 
       // TODO add trait hash
       for (let trait of traits) {
