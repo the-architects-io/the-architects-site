@@ -44,5 +44,6 @@ export const addTraitsToDb = async (nfts: any[], nftCollectionId: string) => {
         nftCollectionId,
       },
     });
+    console.log(`Added trait ${name} to db`);
   }
 };

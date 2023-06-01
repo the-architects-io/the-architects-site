@@ -27,52 +27,14 @@ export default function FetchPage() {
   const [hashList, setHashList] = useState<string>("");
 
   const fetchCollection = async (hashList: string) => {
-    // get first 10 items from hashList
-    // const START = 6000;
-    // const END = hashList.length;
-    // const selection = hashList.slice(START, END);
-    const jsonHashlist = JSON.parse(hashList);
-    console.log("jsonHashlist", jsonHashlist);
-    debugger;
-    if (!jsonHashlist.length) return;
-    const selection = jsonHashlist;
-    if (!selection.length) return;
-    console.log({
-      selection: selection.length,
-      total: hashList.length,
-    });
     if (!publicKey || !connection) return;
-
-    const metaplex = Metaplex.make(connection);
-
-    const mints = selection.map((address: string) => new PublicKey(address));
-
-    const nftMetasFromMetaplex: any[] = await metaplex
-      .nfts()
-      .findAllByMintList({ mints });
-
-    if (!nftMetasFromMetaplex.length) {
-      console.log("No nfts fetched from metaplex");
-      return;
-    }
-
-    const nftsWithMetadata = await fetchNftsWithMetadata(
-      nftMetasFromMetaplex,
-      metaplex
-    );
-
-    await addTraitsToDb(
-      nftsWithMetadata,
-      "a7dfa466-88ba-4b6e-8ce5-1470d9896794" // 3D FunGuyz
-    );
-    console.log({ nftsWithMetadata });
-    console.log(nftMetasFromMetaplex.length, nftsWithMetadata.length);
 
     let returnData;
 
     try {
       const { data } = await axios.post("/api/add-characters-from-nfts", {
-        nfts: nftsWithMetadata,
+        hashList,
+        nftCollectionId: "a7dfa466-88ba-4b6e-8ce5-1470d9896794", // 3D FunGuyz
       });
 
       returnData = data;
@@ -91,7 +53,7 @@ export default function FetchPage() {
       setIsLoading(false);
     }
 
-    console.log(nftMetasFromMetaplex, nftsWithMetadata, returnData);
+    console.log(returnData);
   };
 
   const formik = useFormik({

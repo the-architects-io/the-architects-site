@@ -8,6 +8,12 @@ import { GET_CHARACTER_BY_TOKEN_MINT_ADDRESS } from "@/graphql/queries/get-chara
 import { NoopResponse } from "@/app/api/add-account/route";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address";
+import { Metaplex, PublicKey } from "@metaplex-foundation/js";
+import { Connection } from "@solana/web3.js";
+import { RPC_ENDPOINT } from "@/constants/constants";
+import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
+import { addTraitsToDb } from "@/utils/nfts/add-traits-to-db";
 
 export type Character = {
   id: string;
@@ -59,7 +65,7 @@ type Data =
     };
 
 export async function POST(req: NextRequest) {
-  const { nfts, noop } = await req.json();
+  const { hashList, noop, nftCollectionId } = await req.json();
 
   if (noop)
     return NextResponse.json(
@@ -72,19 +78,55 @@ export async function POST(req: NextRequest) {
       }
     );
 
-  console.log({ nfts });
-
-  if (!nfts) {
+  if (!hashList.length || !nftCollectionId) {
     return NextResponse.json(
       { error: "Required fields not set" },
       { status: 500 }
     );
   }
 
+  const jsonHashList = JSON.parse(hashList);
+  console.log("jsonHashList", jsonHashList);
+  if (!jsonHashList.length) {
+    return NextResponse.json(
+      { error: "Could not resolve hash list" },
+      { status: 500 }
+    );
+  }
+
   const response = [];
 
-  for (let nft of nfts) {
+  // save traits
+  const connection = new Connection(RPC_ENDPOINT);
+  const metaplex = Metaplex.make(connection);
+  const mints = jsonHashList.map((address: string) => new PublicKey(address));
+  const nftMetasFromMetaplex: any[] = await metaplex
+    .nfts()
+    .findAllByMintList({ mints });
+
+  if (!nftMetasFromMetaplex.length) {
+    console.log("No nfts fetched from metaplex");
+    return;
+  }
+
+  const nftsWithMetadata = await fetchNftsWithMetadata(
+    nftMetasFromMetaplex,
+    metaplex
+  );
+
+  // move to endpoint?
+  await addTraitsToDb(nftsWithMetadata, nftCollectionId);
+  console.log("traits saved");
+
+  for (let nft of nftsWithMetadata) {
     const { mintAddress, imageUrl, symbol, traits, name } = nft;
+    if (!traits?.length) {
+      return NextResponse.json(
+        { error: "Could not resolve traits" },
+        { status: 500 }
+      );
+    }
+
     try {
       const { characters }: { characters: Character[] } = await client.request({
         document: GET_CHARACTER_BY_TOKEN_MINT_ADDRESS,
@@ -97,24 +139,37 @@ export async function POST(req: NextRequest) {
 
       if (character) continue;
       // TODO: check if token exists
-      const { insert_tokens_one }: { insert_tokens_one: Token } =
-        await client.request({
-          document: ADD_TOKEN,
-          variables: {
-            decimals: 0,
-            imageUrl,
-            mintAddress,
-            symbol,
-            name,
-          },
-        });
+      const { tokens }: { tokens: Token[] } = await client.request({
+        document: GET_TOKEN_BY_MINT_ADDRESS,
+        variables: {
+          mintAddress,
+        },
+      });
+
+      let token = tokens?.[0];
+
+      if (!token) {
+        const { insert_tokens_one }: { insert_tokens_one: Token } =
+          await client.request({
+            document: ADD_TOKEN,
+            variables: {
+              decimals: 0,
+              imageUrl,
+              mintAddress,
+              symbol,
+              name,
+            },
+          });
+
+        token = insert_tokens_one;
+      }
 
       const { insert_characters_one }: { insert_characters_one: Character } =
         await client.request({
           document: ADD_CHARACTER,
           variables: {
             name,
-            tokenId: insert_tokens_one.id,
+            tokenId: token.id,
             imageUrl,
           },
         });
@@ -122,6 +177,7 @@ export async function POST(req: NextRequest) {
       // TODO add trait hash
       for (let trait of traits) {
         console.log("```````````trait: ", trait);
+        let traitId;
         try {
           const { traits }: { traits: Trait[] } = await client.request({
             document: GET_TRAIT_BY_NAME,
@@ -130,12 +186,12 @@ export async function POST(req: NextRequest) {
             },
           });
           console.log("```````````traits: ", traits);
+          traitId = traits[0].id;
         } catch (error) {
           console.log("```````````FAIL error: ", error);
           return NextResponse.json({ error }, { status: 500 });
         }
 
-        const traitId = traits[0].id;
         console.log("```````````traitId: ", traitId);
         const {
           insert_traitInstances_one,
@@ -155,9 +211,9 @@ export async function POST(req: NextRequest) {
       traits.forEach(async (trait: Trait) => {});
 
       console.log("Token added: ", {
-        mintAddress: insert_tokens_one.mintAddress,
-        name: insert_tokens_one.name,
-        imageUrl: insert_tokens_one.imageUrl,
+        mintAddress: token.mintAddress,
+        name: token.name,
+        imageUrl: token.imageUrl,
       });
       console.log("Character added: ", {
         name: insert_characters_one.name,
