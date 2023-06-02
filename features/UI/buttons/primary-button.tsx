@@ -12,7 +12,7 @@ export const PrimaryButton = ({ disabled, children, ...props }: Props) => {
       onClick={props?.onClick}
       disabled={disabled}
       className={classNames([
-        "bg-sky-400 hover:bg-sky-300 text-gray-800 rounded-xl p-4 py-2 uppercase border border-gray-800 hover:border-gray-800 font-bold transition-colors duration-300 ease-in-out",
+        "bg-sky-300 hover:bg-sky-200 text-gray-800 rounded-xl p-4 py-2 uppercase border border-gray-800 hover:border-gray-800 font-bold transition-colors duration-300 ease-in-out",
         disabled ? "opacity-50 cursor-not-allowed" : "",
         props.className,
       ])}

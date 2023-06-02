@@ -12,31 +12,25 @@ export const addTraitsToDb = async (nfts: any[], nftCollectionId: string) => {
 
   const { traits: traitsFromDb } = data;
 
-  let collectionTraits = nfts.map(({ traits }) => traits).flat();
-
-  let collectionTraitsNotInDb: { name: string }[] = [];
-
-  for (const trait of collectionTraits) {
-    const { name } = trait;
-
-    const traitFromDb = traitsFromDb.find(
-      (traitFromDb: { name: string }) => traitFromDb.name === name
-    );
-
-    if (!traitFromDb) {
-      collectionTraitsNotInDb.push(trait);
-    }
-  }
-
-  // get unique names
-  collectionTraitsNotInDb = collectionTraitsNotInDb.filter(
-    (thing, index, self) =>
-      index === self.findIndex((t) => t.name === thing.name)
+  let traitsFromNfts = nfts.map(({ traits }) => traits).flat();
+  const traitNamesFromNfts = traitsFromNfts.map(
+    (trait: { name: string }) => trait.name
+  );
+  const traitNamesFromDb = traitsFromDb.map(
+    (trait: { name: string }) => trait.name
   );
 
-  for (const trait of collectionTraitsNotInDb) {
-    const { name } = trait;
+  const traitNamesNotInDb = traitNamesFromNfts.filter(
+    (traitName) => !traitNamesFromDb.includes(traitName)
+  );
 
+  console.log({
+    traitNamesFromNfts,
+    traitNamesFromDb,
+    traitNamesNotInDb,
+  });
+
+  for (const name of traitNamesNotInDb) {
     await client.mutate({
       mutation: ADD_TRAIT,
       variables: {

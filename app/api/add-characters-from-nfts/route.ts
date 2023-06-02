@@ -94,6 +94,34 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  if (jsonHashList.length === 1) {
+    const { characters }: { characters: Character[] } = await client.request({
+      document: GET_CHARACTER_BY_TOKEN_MINT_ADDRESS,
+      variables: {
+        mintAddress: jsonHashList[0],
+      },
+    });
+
+    const { tokens }: { tokens: Token[] } = await client.request({
+      document: GET_TOKEN_BY_MINT_ADDRESS,
+      variables: {
+        mintAddress: jsonHashList[0],
+      },
+    });
+
+    let token = tokens?.[0];
+
+    const character = characters?.[0];
+    if (character && token) {
+      return NextResponse.json(
+        {
+          message: `Character ${character.name} already exists, skipping`,
+        },
+        { status: 200 }
+      );
+    }
+  }
+
   const response = [];
 
   // save traits
@@ -114,7 +142,6 @@ export async function POST(req: NextRequest) {
     metaplex
   );
 
-  // move to endpoint?
   await addTraitsToDb(nftsWithMetadata, nftCollectionId);
   console.log("traits saved");
 
@@ -137,11 +164,6 @@ export async function POST(req: NextRequest) {
 
       const character = characters?.[0];
 
-      if (character) {
-        console.log(`Character ${character.name} already exists, skipping`);
-        continue;
-      }
-
       const { tokens }: { tokens: Token[] } = await client.request({
         document: GET_TOKEN_BY_MINT_ADDRESS,
         variables: {
@@ -150,6 +172,11 @@ export async function POST(req: NextRequest) {
       });
 
       let token = tokens?.[0];
+
+      if (character && token) {
+        console.log(`Character ${character.name} already exists, skipping`);
+        continue;
+      }
 
       if (!token) {
         const { insert_tokens_one }: { insert_tokens_one: Token } =
@@ -180,7 +207,6 @@ export async function POST(req: NextRequest) {
 
       // TODO add trait hash
       for (let trait of traits) {
-        console.log("```````````trait: ", trait);
         let traitId;
         try {
           const { traits }: { traits: Trait[] } = await client.request({
@@ -189,14 +215,11 @@ export async function POST(req: NextRequest) {
               name: trait.name,
             },
           });
-          console.log("```````````traits: ", traits);
-          traitId = traits[0].id;
+          traitId = traits[0]?.id;
         } catch (error) {
           console.log("```````````FAIL error: ", error);
           return NextResponse.json({ error }, { status: 500 });
         }
-
-        console.log("```````````traitId: ", traitId);
         const {
           insert_traitInstances_one,
         }: { insert_traitInstances_one: Data } = await client.request({
@@ -207,21 +230,21 @@ export async function POST(req: NextRequest) {
             value: trait.value,
           },
         });
-        console.log(
-          "```````````insert_traitInstances_one: ",
-          insert_traitInstances_one
-        );
+        // console.log(
+        //   "```````````insert_traitInstances_one: ",
+        //   insert_traitInstances_one
+        // );
       }
       traits.forEach(async (trait: Trait) => {});
 
-      console.log("Token added: ", {
-        mintAddress: token.mintAddress,
-        name: token.name,
-        imageUrl: token.imageUrl,
-      });
-      console.log("Character added: ", {
-        name: insert_characters_one.name,
-      });
+      // console.log("Token added: ", {
+      //   mintAddress: token.mintAddress,
+      //   name: token.name,
+      //   imageUrl: token.imageUrl,
+      // });
+      // console.log("Character added: ", {
+      //   name: insert_characters_one.name,
+      // });
       response.push(insert_characters_one);
     } catch (error) {
       console.log("```````````FAIL error: ", error);
