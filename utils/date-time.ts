@@ -17,6 +17,8 @@ export const formatDateTime = (date: string) =>
 export const diff = (date: string) => dayjs(date).diff(dayjs());
 export const diffInHours = (date: string | number) =>
   dayjs().diff(dayjs(date), "hour");
+export const diffInSeconds = (date: string | number) =>
+  dayjs().diff(dayjs(date), "second");
 export const diffInDays = (date: string | number) =>
   dayjs().diff(dayjs(date), "day");
 export const convertSecondsToHours = (seconds: number) => seconds / 60 / 60;

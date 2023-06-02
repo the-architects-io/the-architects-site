@@ -129,6 +129,16 @@ export default function FetchPage() {
     },
   });
 
+  const retryFailedAdditions = async (
+    failedHashlist: string[],
+    nftCollectionId: string
+  ) => {
+    setIsSaving(true);
+    clearReport();
+    fetchNftsInCollection(JSON.stringify(failedHashlist), nftCollectionId);
+    formik.setFieldValue("hashList", "");
+  };
+
   useEffect(() => {
     if (!user) return;
     if (user && !isAdmin) {
@@ -161,6 +171,22 @@ export default function FetchPage() {
             />
             <div className="text-sm text-gray-300 mt-4">
               {Math.floor(((currentNftToAdd + 1) / totalNftsToAdd) * 100)}%
+            </div>
+            <div className="text-sm text-gray-300 mt-2">
+              Est. time remaining&nbsp;
+              <>
+                {(totalNftsToAdd - currentNftToAdd) * 3 >= 60 && (
+                  <>
+                    {Math.floor(((totalNftsToAdd - currentNftToAdd) * 3) / 60)}{" "}
+                    minutes
+                  </>
+                )}
+                {(totalNftsToAdd - currentNftToAdd) * 3 < 60 && (
+                  <>
+                    {Math.floor((totalNftsToAdd - currentNftToAdd) * 3)} seconds
+                  </>
+                )}
+              </>
             </div>
           </div>
         </Panel>
@@ -222,6 +248,16 @@ export default function FetchPage() {
                 {failedAdditions.map((mint) => (
                   <div key={mint}>{mint}</div>
                 ))}
+                <PrimaryButton
+                  onClick={() =>
+                    retryFailedAdditions(
+                      failedAdditions,
+                      formik.values.nftCollectionId
+                    )
+                  }
+                >
+                  Retry Failed
+                </PrimaryButton>
               </div>
             </>
           )}
