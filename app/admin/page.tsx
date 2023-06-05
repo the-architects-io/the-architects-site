@@ -16,6 +16,7 @@ import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import { ToolsList } from "@/features/admin/tools/tools-list";
 import { UsersList } from "@/features/admin/users/users-list";
+import { DispensersList } from "@/features/admin/dispensers/dispensers-list";
 
 const primaryTabs: ITab[] = [
   {
@@ -57,8 +58,8 @@ const itemsTabs: ITab[] = [
     parent: "items",
   },
   {
-    name: "Traits",
-    value: "traits",
+    name: "Dispensers",
+    value: "dispensers",
     parent: "items",
   },
 ];
@@ -95,6 +96,9 @@ const Admin: NextPage = () => {
   const [activeTab, setActiveTab] = useState(primaryTabs[0]);
   const [activeSubTab, setActiveSubTab] = useState<ITab>(itemsTabs[0]);
   const searchParams = useSearchParams();
+
+  const showCreateLink =
+    activeSubTab.value === "items" || activeSubTab.value === "dispensers";
 
   const updateUrl = useCallback(
     (tab: ITab) => {
@@ -134,6 +138,8 @@ const Admin: NextPage = () => {
     switch (activeSubTab.value) {
       case "items":
         return "/admin/item/create";
+      case "dispensers":
+        return "/admin/dispenser/create";
       default:
         return "";
     }
@@ -190,14 +196,14 @@ const Admin: NextPage = () => {
 
       {/* Items */}
       {activeSubTab.value === "items" && <ItemsList />}
-      {activeSubTab.value === "traits" && <TraitsList />}
+      {activeSubTab.value === "dispensers" && <DispensersList />}
 
       {/* Users/NFTs */}
       {activeSubTab.value === "users" && <UsersList />}
       {activeSubTab.value === "tools" && <ToolsList />}
       {activeSubTab.value === "communities" && <CommunitiesList />}
       {activeSubTab.value === "nft-communities" && <NftCollectionsList />}
-      {activeSubTab.value === "items" && (
+      {!!showCreateLink && (
         <Link href={getCreateLink()}>
           <button className="bottom-4 right-4">
             <PlusCircleIcon className="w-12 h-12 absolute bottom-8 right-16 text-stone-300 hover:text-stone-900 hover:bg-stone-300 rounded-full bg-gray-900 shadow-deep hover:shadow-deep-float" />
