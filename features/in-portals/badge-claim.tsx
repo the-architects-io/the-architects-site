@@ -93,7 +93,7 @@ export const BadgeClaim = ({
   return (
     <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
       <div className="text-2xl">Quest Completed!</div>
-      <div className="text-slate-500">
+      <div className="text-slate-500 max-w-sm mb-6">
         Good job! You solved the murder case of MOTO-3. Here&apos;s your&nbsp;
         <span className="text-stone-300">Detective Badge</span>!
       </div>
@@ -102,8 +102,8 @@ export const BadgeClaim = ({
           src={dispenser?.imageUrl || ""}
           alt="Portals badge"
           width="200"
-          height="500"
-          className="rounded mb-8"
+          height="600"
+          className="rounded mb-8 -rotate-6"
         />
       </div>
       {!!dispenser && (
