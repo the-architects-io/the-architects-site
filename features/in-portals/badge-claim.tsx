@@ -9,6 +9,7 @@ import { BadgeClaimButton } from "@/features/UI/buttons/badge-claim-button";
 import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
+import ConfettiBackground from "@/features/animations/confetti-background";
 
 export interface ITokenClaim {
   id: string;
@@ -78,9 +79,9 @@ export const BadgeClaim = ({
   if (wasClaimSucessful) {
     return (
       <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
-        {/* <div className="-mt-16">
+        <div className="-mt-16">
           <ConfettiBackground />
-        </div> */}
+        </div>
         <div className="text-6xl uppercase flex flex-col items-center justify-center space-y-2 font-bold tracking-wider text-center leading-normal">
           Claim
           <br /> Successful!

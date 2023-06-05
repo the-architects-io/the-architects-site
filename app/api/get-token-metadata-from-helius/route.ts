@@ -1,4 +1,3 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import axios from "axios";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";

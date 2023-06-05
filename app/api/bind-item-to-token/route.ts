@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
       token = newToken;
     } catch (error: any) {
       console.error({ error: error?.response?.data?.error?.response });
+      console.error({ error: JSON.stringify(error) });
       return NextResponse.json(
         {
           error:

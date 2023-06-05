@@ -6,7 +6,6 @@ import {
   Transaction,
   TransactionInstructionCtorFields,
 } from "@solana/web3.js";
-import type { NextApiRequest, NextApiResponse } from "next";
 import bs58 from "bs58";
 import { client } from "@/graphql/backend-client";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
