@@ -7,6 +7,37 @@ import { PublicKey } from "@solana/web3.js";
 import { useEffect, useState } from "react";
 import PortalsSdk from "@/utils/portals-sdk-v2";
 import { BadgeClaim } from "@/features/in-portals/badge-claim";
+import localFont from "next/font/local";
+
+const graphik = localFont({
+  src: [
+    {
+      path: "./fonts/GraphikRegular.otf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./fonts/GraphikRegularItalic.otf",
+      weight: "400",
+      style: "italic",
+    },
+    {
+      path: "./fonts/GraphikSemibold.otf",
+      weight: "600",
+      style: "semibold",
+    },
+    {
+      path: "./fonts/GraphikBold.otf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "./fonts/GraphikBoldItalic.otf",
+      weight: "700",
+      style: "italic",
+    },
+  ],
+});
 
 export default function BadgeClaimPage({ params }: { params: any }) {
   const { publicKey: walletAdapterWalletAddress } = useWallet();
@@ -34,7 +65,7 @@ export default function BadgeClaimPage({ params }: { params: any }) {
   //   );
 
   return (
-    <div>
+    <div className={graphik.className}>
       {!walletAdapterWalletAddress && !inPortalsWalletAddress ? (
         <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
           <Spinner />

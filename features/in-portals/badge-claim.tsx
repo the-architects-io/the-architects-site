@@ -69,7 +69,7 @@ export const BadgeClaim = ({
 
   if (isClaiming) {
     return (
-      <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
+      <div className="flex flex-col justify-center items-center w-full min-h-screen text-white">
         <Spinner />
         <div className="text-4xl uppercase animate-pulse mt-4">Claiming</div>
       </div>
@@ -78,7 +78,7 @@ export const BadgeClaim = ({
 
   if (wasClaimSucessful) {
     return (
-      <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
+      <div className="flex flex-col justify-center items-center w-full min-h-screen text-white">
         <div className="-mt-16">
           <ConfettiBackground />
         </div>
@@ -91,21 +91,19 @@ export const BadgeClaim = ({
   }
 
   return (
-    <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
-      <div className="text-2xl">Quest Completed!</div>
-      <div className="text-slate-500 max-w-sm mb-6">
+    <div className="flex flex-col justify-center items-center w-full min-h-screen">
+      <div className="text-5xl text-white mb-2">Quest Completed!</div>
+      <div className="text-slate-500 max-w-sm mb-8 text-center font-semibold text-lg tracking-wide">
         Good job! You solved the murder case of MOTO-3. Here&apos;s your&nbsp;
-        <span className="text-stone-300">Detective Badge</span>!
+        <span className="text-white">Detective Badge</span>!
       </div>
-      <div className="-mt-10">
-        <Image
-          src={dispenser?.imageUrl || ""}
-          alt="Portals badge"
-          width="200"
-          height="600"
-          className="rounded mb-8 -rotate-6"
-        />
-      </div>
+      <Image
+        src={dispenser?.imageUrl || ""}
+        alt="Portals badge"
+        width="300"
+        height="420"
+        className="rounded mb-10"
+      />
       {!!dispenser && (
         <>
           <BadgeClaimButton
