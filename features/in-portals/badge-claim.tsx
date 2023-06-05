@@ -71,7 +71,7 @@ export const BadgeClaim = ({
     return (
       <div className="flex flex-col justify-center items-center w-full min-h-screen text-white">
         <Spinner />
-        <div className="text-4xl uppercase animate-pulse mt-4">Claiming</div>
+        <div className="text-4xl uppercase animate-pulse mt-4">Minting</div>
       </div>
     );
   }
@@ -83,7 +83,7 @@ export const BadgeClaim = ({
           <ConfettiBackground />
         </div>
         <div className="text-6xl uppercase flex flex-col items-center justify-center space-y-2 font-bold tracking-wider text-center leading-normal">
-          Claim
+          Mint
           <br /> Successful!
         </div>
       </div>
