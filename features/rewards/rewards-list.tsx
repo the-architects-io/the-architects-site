@@ -1,10 +1,18 @@
 import { TokenBalance } from "@/app/api/get-token-balances-from-helius/route";
 import { BASE_URL, REWARD_WALLET_ADDRESS } from "@/constants/constants";
 import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
+import { round } from "@/utils/formatting";
 import axios from "axios";
+import classNames from "classnames";
 import { Fragment, useCallback, useEffect, useState } from "react";
 
-export const RewardsList = ({ dispenser }: { dispenser: Dispenser }) => {
+export const RewardsList = ({
+  dispenser,
+  className,
+}: {
+  dispenser: Dispenser;
+  className?: string;
+}) => {
   const [rewardCollections, setRewardCollections] = useState<
     Dispenser["rewardCollections"]
   >([]);
@@ -42,7 +50,7 @@ export const RewardsList = ({ dispenser }: { dispenser: Dispenser }) => {
   }, [getLootBoxTokenBalances, dispenser, tokenBalances?.length]);
 
   return (
-    <div className="w-full">
+    <div className={classNames([className, "w-full"])}>
       <div className="flex w-full flex-1 justify-between rounded-lg p-2 my-2 text-lg uppercase">
         <div>Reward</div>
         <div>Chance</div>
@@ -120,7 +128,7 @@ export const RewardsList = ({ dispenser }: { dispenser: Dispenser }) => {
                         )}
                     </div>
                     <div className="w-full hidden lg:w-1/5 lg:flex justify-end order-1">
-                      {!!payoutChance && payoutChance * 100}%
+                      {!!payoutChance && round(payoutChance * 100, 2)}%
                     </div>
                   </>
                 )}

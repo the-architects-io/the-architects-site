@@ -1,5 +1,4 @@
 import classNames from "classnames";
-import Spinner from "@/features/UI/spinner";
 import ScrollLock from "react-scrolllock";
 
 type Props = {

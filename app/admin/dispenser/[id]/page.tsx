@@ -19,6 +19,7 @@ import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
 import { RewardsList } from "@/features/rewards/rewards-list";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { Divider } from "@/features/UI/divider";
+import { AddRewardForm } from "@/features/admin/rewards/add-reward-form";
 
 export type RewardCollection = {
   id: string;
@@ -40,39 +41,15 @@ export default function DispenserDetailPage({ params }: { params: any }) {
   const { isAdmin } = useAdmin();
   const [rewardCollection, setRewardCollection] =
     useState<RewardCollection | null>(null);
+  const [isAddingReward, setIsAddingReward] = useState(false);
 
-  const { data, loading, error } = useQuery(GET_DISPENSER_BY_ID, {
+  const { data, loading, error, refetch } = useQuery(GET_DISPENSER_BY_ID, {
     variables: { id: params?.id },
     skip: !params?.id,
     onCompleted: (data) => {
       const { dispensers_by_pk } = data;
       setDispenser(dispensers_by_pk);
       setHasBeenFetched(true);
-    },
-  });
-
-  const formik = useFormik({
-    initialValues: {
-      mintAddress: "",
-    },
-    onSubmit: async ({ mintAddress }) => {
-      // try {
-      //   await axios.post("/api/bind-item-to-token", {
-      //     mintAddress,
-      //     itemId: params?.id,
-      //   });
-      //   showToast({
-      //     primaryMessage: "Item updated",
-      //   });
-      //   refetch();
-      //   formik.setValues({ mintAddress: "" });
-      // } catch (error: any) {
-      //   console.log("error", error);
-      //   showToast({
-      //     primaryMessage: "Error updating token",
-      //     secondaryMessage: error?.response?.data?.error,
-      //   });
-      // }
     },
   });
 
@@ -107,9 +84,18 @@ export default function DispenserDetailPage({ params }: { params: any }) {
                 <Divider />
                 <h2 className="text-xl uppercase mb-4">Rewards</h2>
                 {!!dispenser.rewardCollections?.length && (
-                  <RewardsList dispenser={dispenser} />
+                  <RewardsList dispenser={dispenser} className="mb-4" />
                 )}
-                <PrimaryButton>Add reward</PrimaryButton>
+                {!!isAddingReward && (
+                  <AddRewardForm dispenserId={dispenser.id} refetch={refetch} />
+                )}
+                {!isAddingReward && (
+                  <PrimaryButton
+                    onClick={() => setIsAddingReward(!isAddingReward)}
+                  >
+                    Add reward
+                  </PrimaryButton>
+                )}
                 {!!dispenser.rarity && (
                   <div className="text-xl mb-2 flex items-center space-x-4">
                     <div>Rarity:</div>

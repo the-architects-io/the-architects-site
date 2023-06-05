@@ -19,6 +19,7 @@ export const GET_DISPENSER_BY_ID = gql`
         }
       }
       rewardCollections {
+        payoutChance
         itemCollection {
           id
           amount
