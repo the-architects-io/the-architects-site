@@ -40,10 +40,12 @@ export default function BadgeClaimPage({ params }: { params: any }) {
           <Spinner />
         </div>
       ) : (
-        <BadgeClaim
-          dispenserId={"9851135d-7c7a-41f1-91ad-cc6a56ab565c"}
-          walletAddress={walletAdapterWalletAddress || inPortalsWalletAddress}
-        />
+        <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300 bg-slate-800">
+          <BadgeClaim
+            dispenserId={"9851135d-7c7a-41f1-91ad-cc6a56ab565c"}
+            walletAddress={walletAdapterWalletAddress || inPortalsWalletAddress}
+          />
+        </div>
       )}
     </div>
   );

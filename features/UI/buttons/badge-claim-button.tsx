@@ -49,7 +49,12 @@ export const BadgeClaimButton = ({
         </div>
       )}
       {isEnabledClaim && (
-        <PrimaryButton onClick={handleClaimToken}>Claim</PrimaryButton>
+        <button
+          className="bg-green-500 hover:bg-green-600 text-slate-800 rounded-xl p-4 py-2 uppercase border border-slate-800 hover:border-slate-800 font-bold transition-colors duration-300 ease-in-out"
+          onClick={handleClaimToken}
+        >
+          Claim
+        </button>
       )}
     </div>
   );

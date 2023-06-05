@@ -13,6 +13,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        slate: {
+          500: '#6e7c7d',
+          800: '#182022'
+        },
         gray: {
           300: '#b6b6b6',
           500: '#2d2d2d',

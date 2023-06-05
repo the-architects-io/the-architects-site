@@ -92,6 +92,11 @@ export const BadgeClaim = ({
 
   return (
     <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
+      <div className="text-2xl">Quest Completed!</div>
+      <div className="text-slate-500">
+        Good job! You solved the murder case of MOTO-3. Here&apos;s your&nbsp;
+        <span className="text-stone-300">Detective Badge</span>!
+      </div>
       <div className="-mt-10">
         <Image
           src={dispenser?.imageUrl || ""}
