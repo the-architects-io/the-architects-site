@@ -100,8 +100,8 @@ export const BadgeClaim = ({
       <Image
         src={dispenser?.imageUrl || ""}
         alt="Portals badge"
-        width="300"
-        height="420"
+        width="270"
+        height="400"
         className="rounded mb-10"
       />
       {!!dispenser && (

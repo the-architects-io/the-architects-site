@@ -50,7 +50,7 @@ export const BadgeClaimButton = ({
       )}
       {isEnabledClaim && (
         <button
-          className="bg-green-500 hover:bg-green-600 text-slate-800 rounded-xl px-16 py-4 border border-slate-800 hover:border-slate-800 transition-colors duration-300 ease-in-out text-xl font-semibold"
+          className="bg-green-500 hover:bg-green-600 text-slate-800 rounded-xl px-16 py-3 border border-green-500 hover:border-green-500 transition-colors duration-300 ease-in-out text-xl font-semibold shadow-green-500 shadow-md"
           onClick={handleClaimToken}
         >
           Mint Badge
