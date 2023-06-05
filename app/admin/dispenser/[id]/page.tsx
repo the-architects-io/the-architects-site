@@ -62,7 +62,7 @@ export default function DispenserDetailPage({ params }: { params: any }) {
       {!dispenser && hasBeenFetched && <div>Dispenser not found</div>}
       {!!dispenser && (
         <>
-          <ContentWrapper>
+          <ContentWrapper className="mb-8">
             <div className="flex w-full mb-8 px-4">
               <BackButton />
             </div>

@@ -17,7 +17,7 @@ type Data =
       error: unknown;
     };
 
-export default async function POST(req: NextRequest) {
+export async function POST(req: NextRequest) {
   const { walletAddress, mintAddresses, noop } = await req.json();
 
   if (noop)
