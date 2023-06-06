@@ -76,15 +76,19 @@ export const BadgeClaim = ({
     );
   }
 
-  if (wasClaimSucessful) {
+  if (!wasClaimSucessful) {
     return (
       <div className="flex flex-col justify-center items-center w-full min-h-screen text-white">
         <div className="-mt-16">
           <ConfettiBackground />
         </div>
-        <div className="text-6xl uppercase flex flex-col items-center justify-center space-y-2 font-bold tracking-wider text-center leading-normal">
+        <div className="text-6xl uppercase flex flex-col items-center justify-center space-y-2 font-bold tracking-wider text-center leading-normal mb-4">
           Mint
           <br /> Successful!
+        </div>
+        <div className="text-slate-500 max-w-xs mb-8 text-center text-sm tracking-wide italic leading-6">
+          You might find your badge in the Hidden Collection section of your
+          wallet
         </div>
       </div>
     );
