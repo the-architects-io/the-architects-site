@@ -64,6 +64,7 @@ export default function BadgeClaimPage({ params }: { params: any }) {
     requestRoomId();
     if (!inPortalsWalletAddress) {
       setTimeout(() => {
+        console.log({ inPortalsWalletAddress });
         !inPortalsWalletAddress && requestPublicKey();
       }, 5000);
     }
@@ -80,8 +81,8 @@ export default function BadgeClaimPage({ params }: { params: any }) {
   return (
     <div className={graphik.className}>
       {!walletAdapterWalletAddress && !inPortalsWalletAddress ? (
-        <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300 max-w-xs">
-          <div>
+        <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
+          <div className="max-w-xs">
             Please allow your wallet to be connected in the popup above.
           </div>
           <Spinner />
