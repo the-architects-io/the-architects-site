@@ -44,6 +44,7 @@ export default function BadgeClaimPage({ params }: { params: any }) {
   const [inPortalsWalletAddress, setInPortalsWalletAddress] =
     useState<PublicKey | null>(null);
   const [roomId, setRoomId] = useState<string | null>(null);
+  const [showReloadButton, setShowReloadButton] = useState(false);
 
   const requestPublicKey = () => {
     PortalsSdk.requestPublicKey("https://theportal.to", (publicKey: string) => {
@@ -62,6 +63,9 @@ export default function BadgeClaimPage({ params }: { params: any }) {
   useEffect(() => {
     requestPublicKey();
     requestRoomId();
+    setTimeout(() => {
+      if (!inPortalsWalletAddress) setShowReloadButton(true);
+    }, 15000);
   }, [inPortalsWalletAddress]);
 
   // if (!walletAdapterWalletAddress && !inPortalsWalletAddress)
@@ -75,11 +79,19 @@ export default function BadgeClaimPage({ params }: { params: any }) {
   return (
     <div className={graphik.className}>
       {!walletAdapterWalletAddress && !inPortalsWalletAddress ? (
-        <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300 mb-4">
-          <div className="max-w-xs text-center">
+        <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
+          <div className="max-w-xs text-center mb-4">
             Please allow your wallet to be connected in the popup above.
           </div>
           <Spinner />
+          {showReloadButton && (
+            <button
+              className="bg-green-500 hover:bg-green-600 text-slate-800 rounded-xl px-16 py-3 border border-green-500 hover:border-green-500 transition-colors duration-300 ease-in-out text-xl font-semibold shadow-green-500 shadow-md"
+              onClick={() => window.location.reload()}
+            >
+              Reload
+            </button>
+          )}
         </div>
       ) : (
         <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300 bg-slate-800">
