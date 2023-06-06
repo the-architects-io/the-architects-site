@@ -61,12 +61,12 @@ export default function BadgeClaimPage({ params }: { params: any }) {
   };
 
   useEffect(() => {
-    requestPublicKey();
-    requestRoomId();
+    if (!inPortalsWalletAddress) requestPublicKey();
+    if (!roomId) requestRoomId();
     setTimeout(() => {
       if (!inPortalsWalletAddress) setShowReloadButton(true);
     }, 15000);
-  }, [inPortalsWalletAddress]);
+  }, [inPortalsWalletAddress, roomId]);
 
   // if (!walletAdapterWalletAddress && !inPortalsWalletAddress)
   //   return (
