@@ -1,8 +1,6 @@
 "use client";
-import { ENV } from "@/constants/constants";
 import Spinner from "@/features/UI/spinner";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { PublicKey } from "@solana/web3.js";
 import { useEffect, useState } from "react";
 import PortalsSdk from "@/utils/portals-sdk-v2";
@@ -79,7 +77,7 @@ export default function BadgeClaimPage({ params }: { params: any }) {
   return (
     <div className={graphik.className}>
       {!walletAdapterWalletAddress && !inPortalsWalletAddress ? (
-        <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
+        <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300 bg-slate-800">
           <div className="max-w-xs text-center mb-4">
             Please allow your wallet to be connected in the popup above.
           </div>
