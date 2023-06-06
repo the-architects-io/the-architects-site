@@ -86,7 +86,7 @@ export default function BadgeClaimPage({ params }: { params: any }) {
           <Spinner />
           {showReloadButton && (
             <button
-              className="bg-green-500 hover:bg-green-600 text-slate-800 rounded-xl px-16 py-3 border border-green-500 hover:border-green-500 transition-colors duration-300 ease-in-out text-xl font-semibold shadow-green-500 shadow-md"
+              className="bg-green-500 hover:bg-green-600 text-slate-800 rounded-xl px-16 py-3 border border-green-500 hover:border-green-500 transition-colors duration-300 ease-in-out text-xl font-semibold shadow-green-500 shadow-md mt-16"
               onClick={() => window.location.reload()}
             >
               Reload
