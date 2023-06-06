@@ -45,16 +45,29 @@ export default function BadgeClaimPage({ params }: { params: any }) {
     useState<PublicKey | null>(null);
   const [roomId, setRoomId] = useState<string | null>(null);
 
-  useEffect(() => {
+  const requestPublicKey = () => {
     PortalsSdk.requestPublicKey("https://theportal.to", (publicKey: string) => {
       console.log("publicKey", publicKey);
       setInPortalsWalletAddress(new PublicKey(publicKey));
     });
+  };
+
+  const requestRoomId = () => {
     PortalsSdk.getRoomId(({ roomId }: { roomId: string }) => {
       console.log("roomId", roomId);
       setRoomId(roomId);
     });
-  }, []);
+  };
+
+  useEffect(() => {
+    requestPublicKey();
+    requestRoomId();
+    if (!inPortalsWalletAddress) {
+      setTimeout(() => {
+        !inPortalsWalletAddress && requestPublicKey();
+      }, 5000);
+    }
+  }, [inPortalsWalletAddress]);
 
   // if (!walletAdapterWalletAddress && !inPortalsWalletAddress)
   //   return (
