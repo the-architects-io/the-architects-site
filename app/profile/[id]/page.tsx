@@ -27,8 +27,8 @@ import { useEffect, useState } from "react";
 export type Payout = {
   id: string;
   amount: number;
+  createdAt: string;
   txAddress: string;
-  createdAtWithTimezone: string;
   item: {
     id: string;
     name: string;
@@ -265,31 +265,29 @@ export default function ProfilePage({ params }: { params: any }) {
             Payouts
           </h2>
           {!!payouts?.length &&
-            payouts.map(
-              ({ id, token, amount, createdAtWithTimezone, txAddress }) => (
-                <div
-                  key={id}
-                  className="flex w-full justify-between text-base leading-8"
+            payouts.map(({ id, token, amount, createdAt, txAddress }) => (
+              <div
+                key={id}
+                className="flex w-full justify-between text-base leading-8"
+              >
+                <div>{formatDateTime(createdAt)}</div>
+                <div>{token?.items?.[0]?.name}</div>
+                <div>{amount}</div>
+                <a
+                  className="flex justify-center items-center underline"
+                  href={`https://explorer.solana.com/tx/${txAddress}`}
+                  target="_blank"
+                  rel="noreferrer"
                 >
-                  <div>{formatDateTime(createdAtWithTimezone)}</div>
-                  <div>{token?.items?.[0]?.name}</div>
-                  <div>{amount}</div>
-                  <a
-                    className="flex justify-center items-center underline"
-                    href={`https://explorer.solana.com/tx/${txAddress}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <Image
-                      src="/images/solana-logo.svg"
-                      width={12}
-                      height={12}
-                      alt="Solana"
-                    />
-                  </a>
-                </div>
-              )
-            )}
+                  <Image
+                    src="/images/solana-logo.svg"
+                    width={12}
+                    height={12}
+                    alt="Solana"
+                  />
+                </a>
+              </div>
+            ))}
         </div>
       </div>
     </ContentWrapper>

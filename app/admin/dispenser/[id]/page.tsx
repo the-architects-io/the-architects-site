@@ -20,6 +20,8 @@ import { RewardsList } from "@/features/rewards/rewards-list";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { Divider } from "@/features/UI/divider";
 import { AddRewardForm } from "@/features/admin/rewards/add-reward-form";
+import Link from "next/link";
+import { BASE_URL } from "@/constants/constants";
 
 export type RewardCollection = {
   id: string;
@@ -78,6 +80,15 @@ export default function DispenserDetailPage({ params }: { params: any }) {
               </div>
               <Panel className="flex flex-col items-center justify-center">
                 <h1 className="text-3xl mb-8">{dispenser.name}</h1>
+                <div className="flex w-full justify-center mb-4">
+                  <PrimaryButton>
+                    <Link
+                      href={`${BASE_URL}/admin/dispenser/${dispenser.id}/payouts`}
+                    >
+                      Payouts
+                    </Link>
+                  </PrimaryButton>
+                </div>
                 {!!dispenser.description && (
                   <div className="italic text-lg">{dispenser.description}</div>
                 )}

@@ -6,6 +6,7 @@ export const GET_PAYOUTS_BY_DISPENSER_ID = gql`
       where: { dispenserId: { _eq: $id } }
       order_by: { createdAt: desc }
     ) {
+      createdAt
       id
       amount
       txAddress

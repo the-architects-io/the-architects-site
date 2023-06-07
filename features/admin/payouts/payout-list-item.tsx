@@ -7,7 +7,7 @@ export const PayoutListItem = ({ payout }: { payout: Payout }) => {
   return (
     <TableRow keyId={payout.id}>
       <div className="flex items-center space-x-12 justify-between w-full">
-        <div>{formatDateTime(payout.createdAtWithTimezone)}</div>
+        <div>{formatDateTime(payout.createdAt)}</div>
         <div className="flex items-center space-x-4">
           <div>{payout.amount}x</div>
           <div>{payout.item.name}</div>
