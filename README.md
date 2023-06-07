@@ -1,3 +1,3 @@
 # The Architects
 
-### Building Web 3
+## Building Web 3
