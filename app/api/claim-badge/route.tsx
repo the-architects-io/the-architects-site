@@ -19,7 +19,13 @@ import {
   getAssociatedTokenAddress,
 } from "@solana/spl-token";
 import { NextRequest, NextResponse } from "next/server";
-// import { GET_USER_BY_WALLET_ADDRESS } from "graphql/queries/get-user-by-wallet-address";
+import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
+import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
+
+export type Wallet = {
+  address: string;
+  id: string;
+};
 
 type Data =
   | {
@@ -124,12 +130,44 @@ export async function POST(req: NextRequest) {
       }
     );
 
+    // find wallet from db
+    // add if not exists
+
+    let wallet;
+    try {
+      const { wallets }: { wallets: Wallet[] } = await client.request({
+        document: GET_WALLET_BY_ADDRESS,
+        variables: {
+          address,
+        },
+      });
+
+      if (wallets?.[0]) {
+        wallet = wallets[0];
+      } else {
+        const { insert_wallets_one }: { insert_wallets_one: Wallet } =
+          await client.request({
+            document: ADD_WALLET,
+            variables: {
+              address,
+            },
+          });
+        wallet = insert_wallets_one;
+      }
+    } catch (error) {
+      console.log(error);
+      return NextResponse.json(
+        { error, message: "Failed to add wallet" },
+        { status: 400 }
+      );
+    }
+
     let payout;
     try {
       const { token, id: itemId } =
         dispenser.rewardCollections[0].itemCollection.item;
 
-      const { insert_payouts_one }: { insert_payouts_one: any } =
+      const { insert_payouts_one }: { insert_payouts_one: Wallet } =
         await client.request({
           document: ADD_ITEM_PAYOUT,
           variables: {
@@ -138,6 +176,7 @@ export async function POST(req: NextRequest) {
             tokenId: token.id,
             itemId,
             dispenserId,
+            walletId: wallet.id,
           },
         });
       payout = insert_payouts_one;

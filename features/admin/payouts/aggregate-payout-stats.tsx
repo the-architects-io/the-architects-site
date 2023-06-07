@@ -1,4 +1,5 @@
 import { Payout } from "@/app/profile/[id]/page";
+import { round } from "@/utils/formatting";
 import { useEffect, useState } from "react";
 
 export const AggregatePayoutStats = ({ payouts }: { payouts: Payout[] }) => {
@@ -39,9 +40,7 @@ export const AggregatePayoutStats = ({ payouts }: { payouts: Payout[] }) => {
             >
               <div>{reward.name}:</div>
               <div>{reward.count}</div>
-              <div>
-                {Number((reward.count / payouts.length) * 100).toFixed(2)}%
-              </div>
+              <div>{round((reward.count / payouts.length) * 100, 2)}%</div>
             </div>
           ))}
         </div>

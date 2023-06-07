@@ -5,15 +5,6 @@ export const GET_WALLET_BY_ADDRESS = gql`
     wallets(where: { address: { _eq: $address } }) {
       address
       id
-      user {
-        id
-        name
-        imageUrl
-        email
-        accounts {
-          id
-        }
-      }
     }
   }
 `;

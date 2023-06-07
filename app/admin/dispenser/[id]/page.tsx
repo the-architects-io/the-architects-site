@@ -79,7 +79,7 @@ export default function DispenserDetailPage({ params }: { params: any }) {
                 />
               </div>
               <Panel className="flex flex-col items-center justify-center">
-                <h1 className="text-3xl mb-8">{dispenser.name}</h1>
+                <h1 className="text-3xl mb-8 text-center">{dispenser.name}</h1>
                 <div className="flex w-full justify-center mb-4">
                   <PrimaryButton>
                     <Link

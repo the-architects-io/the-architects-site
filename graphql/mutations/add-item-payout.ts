@@ -7,6 +7,7 @@ export const ADD_ITEM_PAYOUT = gql`
     $itemId: uuid!
     $tokenId: uuid!
     $dispenserId: uuid!
+    $walletId: uuid!
   ) {
     insert_payouts_one(
       object: {
@@ -15,6 +16,7 @@ export const ADD_ITEM_PAYOUT = gql`
         itemId: $itemId
         tokenId: $tokenId
         dispenserId: $dispenserId
+        walletId: $walletId
       }
     ) {
       id
