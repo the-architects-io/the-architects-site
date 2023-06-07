@@ -53,85 +53,94 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { dispensers_by_pk: dispenser }: { dispensers_by_pk: Dispenser } =
-      await client.request(GET_DISPENSER_BY_ID, {
-        id: dispenserId,
-      });
+    let dispenser: Dispenser | null = null;
+    let rewardTxAddress: string | null = null;
+    let payoutAmount;
 
-    const { rewardCollections } = dispenser;
-    const rewardMintAddress = new PublicKey(
-      rewardCollections[0].itemCollection.item.token.mintAddress
-    );
+    try {
+      const { dispensers_by_pk }: { dispensers_by_pk: Dispenser } =
+        await client.request(GET_DISPENSER_BY_ID, {
+          id: dispenserId,
+        });
 
-    const connection = new Connection(RPC_ENDPOINT);
-    let payoutAmount = 1;
+      dispenser = dispensers_by_pk;
 
-    const rewardKeypair = Keypair.fromSecretKey(
-      bs58.decode(process.env.REWARD_PRIVATE_KEY)
-    );
-    const rewardPublicKey = new PublicKey(rewardKeypair.publicKey.toString());
-
-    let rewardTxAddress;
-
-    const fromUserAccount = new PublicKey(address);
-
-    const fromTokenAccountAddress = await getAssociatedTokenAddress(
-      rewardMintAddress,
-      rewardPublicKey
-    );
-
-    const toTokenAccountAddress = await getAssociatedTokenAddress(
-      rewardMintAddress,
-      new PublicKey(fromUserAccount)
-    );
-
-    const receiverAccount = await connection.getAccountInfo(
-      toTokenAccountAddress
-    );
-
-    const latestBlockhash2 = await connection.getLatestBlockhash();
-    const rewardTransaction = new Transaction({ ...latestBlockhash2 });
-
-    const rewardInstructions: TransactionInstructionCtorFields[] = [];
-    if (!receiverAccount) {
-      rewardInstructions.push(
-        createAssociatedTokenAccountInstruction(
-          rewardPublicKey,
-          toTokenAccountAddress,
-          new PublicKey(fromUserAccount),
-          rewardMintAddress
-        )
+      const { rewardCollections } = dispenser;
+      const rewardMintAddress = new PublicKey(
+        rewardCollections[0].itemCollection.item.token.mintAddress
       );
-    }
 
-    rewardInstructions.push(
-      createTransferInstruction(
-        fromTokenAccountAddress,
-        toTokenAccountAddress,
-        rewardPublicKey,
-        payoutAmount
-      ),
-      createFreezeAccountInstruction(
-        toTokenAccountAddress,
+      const connection = new Connection(RPC_ENDPOINT);
+      payoutAmount = 1;
+
+      const rewardKeypair = Keypair.fromSecretKey(
+        bs58.decode(process.env.REWARD_PRIVATE_KEY)
+      );
+      const rewardPublicKey = new PublicKey(rewardKeypair.publicKey.toString());
+
+      const fromUserAccount = new PublicKey(address);
+
+      const fromTokenAccountAddress = await getAssociatedTokenAddress(
         rewardMintAddress,
         rewardPublicKey
-      )
-    );
+      );
 
-    rewardTransaction.add(...rewardInstructions);
+      const toTokenAccountAddress = await getAssociatedTokenAddress(
+        rewardMintAddress,
+        new PublicKey(fromUserAccount)
+      );
 
-    rewardTxAddress = await sendAndConfirmTransaction(
-      connection,
-      rewardTransaction,
-      [rewardKeypair],
-      {
-        commitment: "confirmed",
-        maxRetries: 2,
+      const receiverAccount = await connection.getAccountInfo(
+        toTokenAccountAddress
+      );
+
+      const latestBlockhash2 = await connection.getLatestBlockhash();
+      const rewardTransaction = new Transaction({ ...latestBlockhash2 });
+
+      const rewardInstructions: TransactionInstructionCtorFields[] = [];
+      if (!receiverAccount) {
+        rewardInstructions.push(
+          createAssociatedTokenAccountInstruction(
+            rewardPublicKey,
+            toTokenAccountAddress,
+            new PublicKey(fromUserAccount),
+            rewardMintAddress
+          )
+        );
       }
-    );
 
-    // find wallet from db
-    // add if not exists
+      rewardInstructions.push(
+        createTransferInstruction(
+          fromTokenAccountAddress,
+          toTokenAccountAddress,
+          rewardPublicKey,
+          payoutAmount
+        ),
+        createFreezeAccountInstruction(
+          toTokenAccountAddress,
+          rewardMintAddress,
+          rewardPublicKey
+        )
+      );
+
+      rewardTransaction.add(...rewardInstructions);
+
+      rewardTxAddress = await sendAndConfirmTransaction(
+        connection,
+        rewardTransaction,
+        [rewardKeypair],
+        {
+          commitment: "confirmed",
+          maxRetries: 2,
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      return NextResponse.json(
+        { error, message: "Failed to send reward" },
+        { status: 400 }
+      );
+    }
 
     let wallet;
     try {
