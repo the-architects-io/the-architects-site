@@ -130,7 +130,8 @@ export async function POST(req: NextRequest) {
         dispenser.rewardCollections[0].itemCollection.item;
 
       const { insert_payouts_one }: { insert_payouts_one: any } =
-        await client.request(ADD_ITEM_PAYOUT, {
+        await client.request({
+          document: ADD_ITEM_PAYOUT,
           variables: {
             txAddress: rewardTxAddress,
             amount: payoutAmount,
