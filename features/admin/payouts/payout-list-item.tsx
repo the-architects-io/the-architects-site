@@ -16,7 +16,7 @@ export const PayoutListItem = ({ payout }: { payout: Payout }) => {
           <div>Token:</div>
           <div>{getAbbreviatedAddress(payout.token.mintAddress)}</div>
         </div>
-        {!!payout?.wallet.address && (
+        {!!payout?.wallet?.address && (
           <div className="flex flex-col items-center space-x-4">
             <div>Wallet:</div>
             <div>{getAbbreviatedAddress(payout.wallet.address)}</div>
