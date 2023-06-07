@@ -198,6 +198,7 @@ export async function POST(req: NextRequest) {
             amount: payoutAmount,
             tokenId: token.id,
             itemId,
+            dispenserId,
           },
         });
       payout = insert_payouts_one;

@@ -1,4 +1,5 @@
 "use client";
+import { Payout } from "@/app/profile/[id]/page";
 import { BASE_URL } from "@/constants/constants";
 import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { RewardsList } from "@/features/rewards/rewards-list";
@@ -28,38 +29,6 @@ import {
 import axios from "axios";
 import { NextPage } from "next";
 import { useCallback, useEffect, useState } from "react";
-
-export type Payout = {
-  id: string;
-  amount: number;
-  txAddress: string;
-  createdAtWithTimezone: string;
-  item: {
-    id: string;
-    name: string;
-    imageUrl: string;
-  };
-  wallet: {
-    id: string;
-    address: string;
-  };
-  token: {
-    id: string;
-    name: string;
-    imageUrl: string;
-    mintAddress: string;
-    items: {
-      id: string;
-      name: string;
-      imageUrl: string;
-    }[];
-    creatures: {
-      id: string;
-      name: string;
-      imageUrl: string;
-    };
-  };
-};
 
 export default function LootBoxDetailPage({ params }: { params: any }) {
   const wallet = useWallet();
