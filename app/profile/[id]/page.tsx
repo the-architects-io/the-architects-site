@@ -122,7 +122,6 @@ export default function ProfilePage({ params }: { params: any }) {
       characters_by_pk: Character;
     }) => {
       console.log({ characters_by_pk });
-      debugger;
       updateDisplayedCharacterInfo(characters_by_pk);
     },
   });

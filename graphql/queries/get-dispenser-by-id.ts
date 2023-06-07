@@ -15,6 +15,11 @@ export const GET_DISPENSER_BY_ID = gql`
             name
             id
             imageUrl
+            token {
+              id
+              name
+              mintAddress
+            }
           }
         }
       }
@@ -24,13 +29,13 @@ export const GET_DISPENSER_BY_ID = gql`
           id
           amount
           item {
-            id
             name
+            id
             imageUrl
             token {
+              id
               name
               mintAddress
-              id
             }
           }
         }

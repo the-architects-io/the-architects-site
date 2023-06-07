@@ -36,7 +36,7 @@
     "eslint-config-next": "13.4.4",
     "formik": "^2.4.0",
     "graphql": "^16.6.0",
-    "graphql-request": "^6.1.0",
+    "graphql-request": "5.2.0",
     "lokijs": "^1.5.12",
     "next": "13.4.4",
     "notistack": "^3.0.1",

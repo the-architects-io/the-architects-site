@@ -73,13 +73,13 @@ export const RewardsList = ({
                 {!!itemCollection?.name && (
                   <>
                     <div className="font-bold">{itemCollection?.name}</div>
-                    <div>{!!payoutChance && payoutChance * 100}%</div>
+                    <div>{!!payoutChance && round(payoutChance * 100, 2)}%</div>
                   </>
                 )}
                 {!!hashListCollection?.id && (
                   <>
                     <div>{hashListCollection?.name}</div>
-                    <div>{!!payoutChance && payoutChance * 100}%</div>
+                    <div>{!!payoutChance && round(payoutChance * 100, 2)}%</div>
                   </>
                 )}
                 {!!parentName && !itemCollection?.name && (
@@ -87,7 +87,7 @@ export const RewardsList = ({
                     <div className="w-full flex justify-between lg:w-2/5 font-bold mb-2">
                       <div>{parentName}</div>
                       <div className="lg:hidden">
-                        {!!payoutChance && payoutChance * 100}%
+                        {!!payoutChance && round(payoutChance * 100, 2)}%
                       </div>
                     </div>
                     <div className="flex flex-col justify-end w-full lg:w-2/5 flex-wrap">
@@ -105,7 +105,7 @@ export const RewardsList = ({
                                   ) && (
                                     <div>
                                       {itemCollection?.name.replace("1", "")}
-                                      <div className="text-red-500">
+                                      <div className="text-sky-500">
                                         {getItemBalance(
                                           itemCollection.item.token.mintAddress
                                         )}

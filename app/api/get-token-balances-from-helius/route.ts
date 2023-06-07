@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
 
-  if (!walletAddress || !process.env.HELIUS_API_KEY) {
+  if (!walletAddress?.length || !process.env.HELIUS_API_KEY) {
     return NextResponse.json(
       {
         error: "No wallet address or Helius API key found",

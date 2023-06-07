@@ -10,7 +10,7 @@ export const Card = ({ className, children, imageUrl }: CardProps) => {
     <div
       className={classNames([
         className,
-        "bg-black rounded-xl shadow-deep border-2 border-red-500 border-opacity-50 cursor-pointer hover:shadow-deep-float hover:scale-[1.02] transition-all duration-300 ease-in-out",
+        "bg-black rounded-xl shadow-deep border-2 border-sky-300 border-opacity-50 cursor-pointer hover:shadow-deep-float hover:scale-[1.02] transition-all duration-300 ease-in-out",
       ])}
     >
       {!!imageUrl && (

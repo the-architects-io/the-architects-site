@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import PortalsSdk from "@/utils/portals-sdk-v2";
 import { BadgeClaim } from "@/features/in-portals/badge-claim";
 import localFont from "next/font/local";
+import { usePathname } from "next/navigation";
+import { ENV } from "@/constants/constants";
 
 const graphik = localFont({
   src: [
@@ -38,6 +40,8 @@ const graphik = localFont({
 });
 
 export default function BadgeClaimPage({ params }: { params: any }) {
+  const pathname = usePathname();
+  console.log({ pathname });
   const { publicKey: walletAdapterWalletAddress } = useWallet();
   const [inPortalsWalletAddress, setInPortalsWalletAddress] =
     useState<PublicKey | null>(null);
@@ -95,7 +99,11 @@ export default function BadgeClaimPage({ params }: { params: any }) {
         <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300 bg-slate-800">
           <BadgeClaim
             dispenserId={"9851135d-7c7a-41f1-91ad-cc6a56ab565c"}
-            walletAddress={walletAdapterWalletAddress || inPortalsWalletAddress}
+            walletAddress={
+              ENV === "local"
+                ? walletAdapterWalletAddress || inPortalsWalletAddress
+                : inPortalsWalletAddress
+            }
           />
         </div>
       )}
