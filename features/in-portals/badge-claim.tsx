@@ -66,7 +66,7 @@ export const BadgeClaim = ({
     } else {
       setIsEnabledClaim(true);
     }
-  }, [isClaiming, isFetchingDispenser, wasClaimSucessful]);
+  }, [isClaiming, isFetchingDispenser, wasClaimSucessful, isClaimed]);
 
   if (isClaiming) {
     return (
