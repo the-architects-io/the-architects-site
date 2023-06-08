@@ -139,12 +139,12 @@ export async function POST(req: NextRequest) {
       const { logs }: { logs: string[] } = error;
       if (logs.includes("Program log: Error: Account is frozen")) {
         return NextResponse.json(
-          { error, info: "Badge already claimed" },
+          { error, message: "Badge already claimed" },
           { status: 400 }
         );
       } else {
         return NextResponse.json(
-          { error, info: "Failed to send reward" },
+          { error, message: "Failed to send reward" },
           { status: 400 }
         );
       }
@@ -174,7 +174,7 @@ export async function POST(req: NextRequest) {
     } catch (error) {
       console.log(error);
       return NextResponse.json(
-        { error, info: "Failed to add wallet" },
+        { error, message: "Failed to add wallet" },
         { status: 400 }
       );
     }
@@ -200,7 +200,7 @@ export async function POST(req: NextRequest) {
     } catch (error) {
       console.log(error);
       return NextResponse.json(
-        { error, info: "Failed to add payout" },
+        { error, message: "Failed to add payout" },
         { status: 400 }
       );
     }

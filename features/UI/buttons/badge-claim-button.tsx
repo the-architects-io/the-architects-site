@@ -35,8 +35,8 @@ export const BadgeClaimButton = ({
       setWasClaimSucessful && setWasClaimSucessful(true);
     } catch (error: any) {
       console.log("error", error);
-      console.log("error message", error?.error?.info);
-      if (error?.error?.info === "Badge already claimed") {
+      console.log("error message", error?.response?.data?.message);
+      if (error?.response?.data?.message === "Badge already claimed") {
         setIsClaimed(true);
       }
     } finally {
