@@ -134,12 +134,20 @@ export async function POST(req: NextRequest) {
           maxRetries: 2,
         }
       );
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
-      return NextResponse.json(
-        { error, message: "Failed to send reward" },
-        { status: 400 }
-      );
+      const { logs }: { logs: string[] } = error;
+      if (logs.includes("Program log: Error: Account is frozen")) {
+        return NextResponse.json(
+          { error, message: "Badge already claimed" },
+          { status: 400 }
+        );
+      } else {
+        return NextResponse.json(
+          { error, message: "Failed to send reward" },
+          { status: 400 }
+        );
+      }
     }
 
     let wallet;

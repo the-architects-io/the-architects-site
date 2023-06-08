@@ -9,6 +9,7 @@ interface Props extends React.HTMLAttributes<HTMLButtonElement> {
   walletAddress: PublicKey | null;
   isEnabledClaim: boolean;
   dispenserId?: string;
+  setIsClaimed: (isClaimed: boolean) => void;
 }
 
 export const BadgeClaimButton = ({
@@ -17,6 +18,7 @@ export const BadgeClaimButton = ({
   walletAddress,
   isEnabledClaim,
   dispenserId,
+  setIsClaimed,
 }: Props) => {
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -29,25 +31,23 @@ export const BadgeClaimButton = ({
         dispenserId,
       });
       setWasClaimSucessful && setWasClaimSucessful(true);
-    } catch (e) {
-      setErrorMessage(
-        "There was an error claiming your token. Please try again later."
-      );
+    } catch (error: any) {
+      if (error?.message === "Badge already claimed") {
+        setIsClaimed(true);
+      }
     } finally {
       setIsClaiming(false);
     }
-  }, [walletAddress, setIsClaiming, dispenserId, setWasClaimSucessful]);
+  }, [
+    walletAddress,
+    setIsClaiming,
+    dispenserId,
+    setWasClaimSucessful,
+    setIsClaimed,
+  ]);
 
   return (
     <div className="flex flex-col">
-      {!!errorMessage.length && (
-        <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-          role="alert"
-        >
-          <span className="block sm:inline">{errorMessage}!!!</span>
-        </div>
-      )}
       {isEnabledClaim && (
         <button
           className="bg-green-500 hover:bg-green-600 text-slate-800 rounded-xl px-16 py-3 border border-green-500 hover:border-green-500 transition-colors duration-300 ease-in-out text-xl font-semibold shadow-green-500 shadow-md"
