@@ -123,6 +123,7 @@ export const BadgeClaim = ({
       {!!dispenser && (
         <>
           <BadgeClaimButton
+            isClaimed={isClaimed}
             setIsClaimed={setIsClaimed}
             dispenserId={dispenser?.id}
             walletAddress={walletAddress}

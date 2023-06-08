@@ -10,6 +10,7 @@ interface Props extends React.HTMLAttributes<HTMLButtonElement> {
   isEnabledClaim: boolean;
   dispenserId?: string;
   setIsClaimed: (isClaimed: boolean) => void;
+  isClaimed: boolean;
 }
 
 export const BadgeClaimButton = ({
@@ -19,6 +20,7 @@ export const BadgeClaimButton = ({
   isEnabledClaim,
   dispenserId,
   setIsClaimed,
+  isClaimed,
 }: Props) => {
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -32,6 +34,7 @@ export const BadgeClaimButton = ({
       });
       setWasClaimSucessful && setWasClaimSucessful(true);
     } catch (error: any) {
+      console.log("error message", error?.message);
       if (error?.message === "Badge already claimed") {
         setIsClaimed(true);
       }
@@ -48,7 +51,12 @@ export const BadgeClaimButton = ({
 
   return (
     <div className="flex flex-col">
-      {isEnabledClaim && (
+      {!!isClaimed && (
+        <div className="text-center text-green-500 font-semibold">
+          Badge already claimed
+        </div>
+      )}
+      {!isClaimed && isEnabledClaim && (
         <button
           className="bg-green-500 hover:bg-green-600 text-slate-800 rounded-xl px-16 py-3 border border-green-500 hover:border-green-500 transition-colors duration-300 ease-in-out text-xl font-semibold shadow-green-500 shadow-md"
           onClick={handleClaimToken}
