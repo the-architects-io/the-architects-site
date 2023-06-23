@@ -80,9 +80,11 @@ export const BadgeClaim = ({
   if (isClaimed) {
     return (
       <div className="flex flex-col justify-center items-center w-full min-h-screen text-white">
-        <div className="text-2xl mt-4 max-w-sm">
-          You have already successfully claimed the Detective Badge. If you do
-          not see it in your wallet, please check under Hidden Collections.
+        <div className="text-2xl mt-4 max-w-sm text-center">
+          You have already successfully claimed the Detective Badge.
+          <br /> <br />
+          If you do not see it in your wallet, please check under Hidden
+          Collections.
         </div>
       </div>
     );
