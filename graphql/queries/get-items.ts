@@ -9,7 +9,7 @@ export const GET_ITEMS = gql`
       isConsumable
       isCraftable
       name
-      category {
+      itemCategory {
         id
         name
       }

@@ -85,7 +85,15 @@ export const RewardsList = ({
                 {!!parentName && !itemCollection?.name && (
                   <>
                     <div className="w-full flex justify-between lg:w-2/5 font-bold mb-2">
-                      <div>{parentName}</div>
+                      <div className="flex flex-col">
+                        <div>{parentName}</div>
+                        <div>
+                          Stock:{" "}
+                          {getItemBalance(
+                            itemCollection.item.token.mintAddress
+                          )}
+                        </div>
+                      </div>
                       <div className="lg:hidden">
                         {!!payoutChance && round(payoutChance * 100, 2)}%
                       </div>

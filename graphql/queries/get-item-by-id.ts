@@ -13,19 +13,19 @@ export const GET_ITEM_BY_ID = gql`
       isConsumable
       isCraftable
       name
-      category {
+      itemCategory {
         id
         name
-        parentCategory {
+        parentItemCategory {
           name
           id
         }
-        childCategories {
+        childItemCategories {
           id
           name
         }
       }
-      collections {
+      itemCollections {
         name
         id
         imageUrl

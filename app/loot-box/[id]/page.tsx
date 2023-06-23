@@ -374,7 +374,7 @@ export default function LootBoxDetailPage({ params }: { params: any }) {
               key={payout.id}
               className="flex items-center justify-center space-x-12 text-lg"
             >
-              <div>{formatDateTime(payout.createdAtWithTimezone)}</div>
+              <div>{formatDateTime(payout.createdAt)}</div>
               <div className="uppercase">
                 {payout.amount == 1 ? "" : payout.amount / 1000000000}{" "}
                 {payout?.item?.name ? payout?.item?.name : payout?.token?.name}
