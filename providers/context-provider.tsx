@@ -28,9 +28,9 @@ import {
   AutoConnectProvider,
   useAutoConnect,
 } from "@/providers/auto-connect-provider";
-import { ApolloProvider } from "@apollo/client";
-import client from "@/graphql/apollo/client";
 import showToast from "@/features/toasts/show-toast";
+import { NhostClient, NhostProvider } from "@nhost/nextjs";
+import { NhostApolloProvider } from "@nhost/react-apollo";
 require("@solana/wallet-adapter-react-ui/styles.css");
 
 const theme = createTheme({
@@ -66,6 +66,11 @@ const theme = createTheme({
       },
     },
   },
+});
+
+const nhost = new NhostClient({
+  subdomain: "nmsqqirmpjgdbtloninj",
+  region: "us-east-1",
 });
 
 const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
@@ -122,18 +127,19 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
 export const ContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
   return (
-    <ApolloProvider client={client}>
-      {/* <Provider store={store}> */}
-      <StyledEngineProvider injectFirst>
-        <ThemeProvider theme={theme}>
-          <SnackbarProvider>
-            <AutoConnectProvider>
-              <WalletContextProvider>{children}</WalletContextProvider>
-            </AutoConnectProvider>
-          </SnackbarProvider>
-        </ThemeProvider>
-      </StyledEngineProvider>
-      {/* </Provider> */}
-    </ApolloProvider>
+    // <NhostProvider nhost={nhost} initial={pageProps.nhostSession}>
+    <NhostProvider nhost={nhost}>
+      <NhostApolloProvider nhost={nhost}>
+        <StyledEngineProvider injectFirst>
+          <ThemeProvider theme={theme}>
+            <SnackbarProvider>
+              <AutoConnectProvider>
+                <WalletContextProvider>{children}</WalletContextProvider>
+              </AutoConnectProvider>
+            </SnackbarProvider>
+          </ThemeProvider>
+        </StyledEngineProvider>
+      </NhostApolloProvider>
+    </NhostProvider>
   );
 };
