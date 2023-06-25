@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
         }
       );
     } catch (error: any) {
-      console.log(error);
+      console.log("1!!", error);
       const { logs }: { logs: string[] } = error;
 
       // TODO: check if stock is empty
@@ -175,7 +175,7 @@ export async function POST(req: NextRequest) {
         wallet = insert_wallets_one;
       }
     } catch (error) {
-      console.log(error);
+      console.log("2!!", error);
       return NextResponse.json(
         { error, message: "Failed to add wallet" },
         { status: 400 }
@@ -201,7 +201,7 @@ export async function POST(req: NextRequest) {
         });
       payout = insert_payouts_one;
     } catch (error) {
-      console.log(error);
+      console.log("3!!", error);
       return NextResponse.json(
         { error, message: "Failed to add payout" },
         { status: 400 }
@@ -210,7 +210,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ rewardTxAddress, payout }, { status: 200 });
   } catch (error: any) {
-    console.log(error);
+    console.log("4!!", error);
     return NextResponse.json({ error: error?.message }, { status: 400 });
   }
 }
