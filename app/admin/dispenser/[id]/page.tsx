@@ -46,11 +46,6 @@ export default function DispenserDetailPage({ params }: { params: any }) {
   const [isAddingReward, setIsAddingReward] = useState(false);
 
   const { data, loading, error, refetch } = useQuery(GET_DISPENSER_BY_ID, {
-    context: {
-      headers: {
-        "x-hasura-role": "jimbo",
-      },
-    },
     variables: { id: params?.id },
     skip: !params?.id,
     onCompleted: (data) => {

@@ -32,7 +32,7 @@ export const AddItemForm = () => {
         router.push("/admin?tab=items");
       } catch (error) {
         showToast({
-          primaryMessage: "Error adding token",
+          primaryMessage: "Error adding item",
         });
       }
     },

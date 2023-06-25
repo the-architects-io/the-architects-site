@@ -33,14 +33,14 @@ export type Item = {
   name: string;
 
   description: string;
-  category: {
+  itemCategory: {
     id: string;
     name: string;
-    parentCategory: {
+    parentItemCategory: {
       name: string;
       id: string;
     };
-    childCategories: {
+    childItemCategories: {
       id: string;
       name: string;
     };
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
           name,
           isConsumable,
           isCraftable,
-          categoryId,
+          itemCategoryId: categoryId,
           description,
         },
       });

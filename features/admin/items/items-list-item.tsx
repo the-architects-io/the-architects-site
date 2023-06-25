@@ -1,34 +1,12 @@
 "use client";
 
+import { Item } from "@/app/api/add-item/route";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { TableRow } from "@/features/UI/tables/table-row";
 import { CheckCircleIcon, MinusCircleIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 
 import Link from "next/link";
-
-export interface Item {
-  id: string;
-  name: string;
-  imageUrl: string;
-  isConsumable: boolean;
-  isCraftable: boolean;
-  createdAt: string;
-  category: {
-    id: string;
-    name: string;
-  };
-  // baseStatModifier: {
-  //   id: string;
-  //   name: string;
-  //   effectAmount: number;
-  //   createdAt: string;
-  //   affectedBaseStat: {
-  //     id: string;
-  //     name: string;
-  //   };
-  // };
-}
 
 export const ItemsListItem = ({ item }: { item: Item }) => {
   return (
@@ -60,9 +38,9 @@ export const ItemsListItem = ({ item }: { item: Item }) => {
           <div>Craftable</div>
         </div>
       </div>
-      {!!item?.category?.name && (
+      {!!item?.itemCategory?.name && (
         <div className="flex justify-center w-full italic">
-          {<div className="flex">{item.category.name}</div>}
+          {<div className="flex">{item.itemCategory.name}</div>}
         </div>
       )}
       {/* {!!item.baseStatModifier && (

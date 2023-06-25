@@ -1,5 +1,4 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { ADD_ITEM } from "@/graphql/mutations/add-item";
 import { client } from "@/graphql/backend-client";
 import { NoopResponse } from "@/app/api/get-token-metadata-from-helius/route";
 import { NextResponse } from "next/server";

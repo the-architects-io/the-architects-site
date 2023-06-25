@@ -46,7 +46,7 @@ export const AddRewardForm = ({
         refetch();
       } catch (error) {
         showToast({
-          primaryMessage: "Error adding token",
+          primaryMessage: "Error adding reward",
         });
       }
     },

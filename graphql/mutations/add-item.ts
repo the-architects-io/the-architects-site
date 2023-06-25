@@ -5,7 +5,7 @@ export const ADD_ITEM = gql`
     $imageUrl: String = ""
     $isConsumable: Boolean!
     $isCraftable: Boolean!
-    $categoryId: uuid!
+    $itemCategoryId: uuid!
     $name: String!
     $description: String = ""
   ) {
@@ -14,20 +14,12 @@ export const ADD_ITEM = gql`
         imageUrl: $imageUrl
         isConsumable: $isConsumable
         isCraftable: $isCraftable
-        categoryId: $categoryId
+        itemCategoryId: $itemCategoryId
         name: $name
         description: $description
       }
     ) {
       id
-      imageUrl
-      isConsumable
-      isCraftable
-      description
-      category {
-        id
-        name
-      }
       name
     }
   }

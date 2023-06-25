@@ -12,7 +12,7 @@ interface Props extends React.HTMLAttributes<HTMLButtonElement> {
   isClaimed: boolean;
 }
 
-export const BadgeClaimButton = ({
+export const DispenserClaimButton = ({
   setIsClaiming,
   setWasClaimSucessful,
   walletAddress,
@@ -35,7 +35,7 @@ export const BadgeClaimButton = ({
     } catch (error: any) {
       console.log("error", error);
       console.log("error message", error?.response?.data?.message);
-      if (error?.response?.data?.message === "Badge already claimed") {
+      if (error?.response?.data?.message === "Dispenser empty") {
         setIsClaimed(true);
       }
     } finally {
