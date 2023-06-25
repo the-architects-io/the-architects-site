@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
     const { data: tokenBalances }: { data: TokenBalance[] } = await axios.post(
       `${BASE_URL}/api/get-token-balances-from-helius`,
       {
-        walletAddress: process.env.REWARD_WALLET_ADDRESS,
+        walletAddress: process.env.NEXT_PUBLIC_REWARD_WALLET_ADDRESS,
       }
     );
 

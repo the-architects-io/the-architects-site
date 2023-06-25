@@ -22,6 +22,7 @@ import { Divider } from "@/features/UI/divider";
 import { AddRewardForm } from "@/features/admin/rewards/add-reward-form";
 import Link from "next/link";
 import { BASE_URL } from "@/constants/constants";
+import { ClipboardIcon, LinkIcon } from "@heroicons/react/24/outline";
 
 export type RewardCollection = {
   id: string;
@@ -55,6 +56,13 @@ export default function DispenserDetailPage({ params }: { params: any }) {
     },
   });
 
+  const copyTextToClipboard = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    showToast({
+      primaryMessage: "Copied to clipboard",
+    });
+  };
+
   if (!isAdmin) return <NotAdminBlocker />;
 
   return (
@@ -80,13 +88,23 @@ export default function DispenserDetailPage({ params }: { params: any }) {
               </div>
               <Panel className="flex flex-col items-center justify-center">
                 <h1 className="text-3xl mb-8 text-center">{dispenser.name}</h1>
-                <div className="flex w-full justify-center mb-4">
+                <div className="flex flex-col w-full justify-center mb-4 gap-y-4">
                   <PrimaryButton>
                     <Link
                       href={`${BASE_URL}/admin/dispenser/${dispenser.id}/payouts`}
                     >
                       Payouts
                     </Link>
+                  </PrimaryButton>
+                  <PrimaryButton
+                    onClick={() =>
+                      copyTextToClipboard(
+                        `https://preview.the-architects.io/in-portals/dispenser-claim?id=${dispenser.id}`
+                      )
+                    }
+                  >
+                    <ClipboardIcon className="h-5 w-5 inline-block" /> Portals
+                    Interaction <LinkIcon className="h-5 w-5 inline-block" />
                   </PrimaryButton>
                 </div>
                 {!!dispenser.description && (
