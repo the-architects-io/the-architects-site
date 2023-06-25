@@ -95,6 +95,7 @@ export const DispenserClaim = ({
   return (
     <div className="flex flex-col justify-center items-center w-full min-h-screen">
       <div className="text-5xl text-white mb-2">You found it!</div>
+      <div>dispenser id: {dispenserId}</div>
       <Image
         src="https://aznyagtolfcupkolhaqtyj47626i6lz6yzzdq57royxn7kvymowa.arweave.net/BluAGm5ZRUepyzghPCef9ryPLz7Gcjh38XYu36q4Y6w?ext=png"
         alt="FunGuyz NFT"

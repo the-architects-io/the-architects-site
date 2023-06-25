@@ -71,7 +71,7 @@ export default function DispenserClaimPage({ params }: { params: any }) {
         <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300 bg-slate-800">
           {!!id && (
             <DispenserClaim
-              dispenserId={id || "2d7ac48a-5228-42df-9372-fd9325bc9741"}
+              dispenserId={id}
               walletAddress={
                 ENV === "local"
                   ? walletAdapterWalletAddress || inPortalsWalletAddress

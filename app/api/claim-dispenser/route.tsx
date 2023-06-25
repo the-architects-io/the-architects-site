@@ -44,6 +44,8 @@ export async function POST(req: NextRequest) {
     dispenserId: string;
   } = await req.json();
 
+  console.log({ address, dispenserId });
+
   if (!process.env.REWARD_PRIVATE_KEY || !address || !dispenserId) {
     return NextResponse.json(
       { error: "Missing required parameters" },
