@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
         rewardCollections[0].itemCollection.item.token.mintAddress
       );
 
-      console.log({ rewardMintAddress });
+      console.log({ rewardMintAddress: rewardMintAddress.toString() });
 
       const connection = new Connection(RPC_ENDPOINT);
       payoutAmount = 1;
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
         bs58.decode(process.env.REWARD_PRIVATE_KEY)
       );
       const rewardPublicKey = new PublicKey(rewardKeypair.publicKey.toString());
-      console.log({ rewardPublicKey });
+      console.log({ rewardPublicKey: rewardPublicKey.toString() });
       const fromUserAccount = new PublicKey(address);
 
       const fromTokenAccountAddress = await getAssociatedTokenAddress(
