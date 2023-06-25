@@ -14,7 +14,6 @@ import { RPC_ENDPOINT } from "@/constants/constants";
 import { ADD_ITEM_PAYOUT } from "@/graphql/mutations/add-item-payout";
 import {
   createAssociatedTokenAccountInstruction,
-  createFreezeAccountInstruction,
   createTransferInstruction,
   getAssociatedTokenAddress,
 } from "@solana/spl-token";
@@ -115,12 +114,12 @@ export async function POST(req: NextRequest) {
           toTokenAccountAddress,
           rewardPublicKey,
           payoutAmount
-        ),
-        createFreezeAccountInstruction(
-          toTokenAccountAddress,
-          rewardMintAddress,
-          rewardPublicKey
         )
+        // createFreezeAccountInstruction(
+        //   toTokenAccountAddress,
+        //   rewardMintAddress,
+        //   rewardPublicKey
+        // )
       );
 
       rewardTransaction.add(...rewardInstructions);

@@ -53,7 +53,7 @@ export const DispenserClaimButton = ({
     <div className="flex flex-col">
       {!!isClaimed && (
         <div className="text-center text-green-500 font-semibold">
-          Badge already claimed
+          Already claimed
         </div>
       )}
       {!isClaimed && isEnabledClaim && (
@@ -61,7 +61,7 @@ export const DispenserClaimButton = ({
           className="bg-green-500 hover:bg-green-600 text-slate-800 rounded-xl px-16 py-3 border border-green-500 hover:border-green-500 transition-colors duration-300 ease-in-out text-xl font-semibold shadow-green-500 shadow-md"
           onClick={handleClaimToken}
         >
-          Mint Badge
+          Claim
         </button>
       )}
     </div>
