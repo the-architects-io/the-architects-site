@@ -7,7 +7,6 @@ export const BIND_ITEM_TO_TOKEN = gql`
       _set: { tokenId: $tokenId }
     ) {
       id
-      name
       token {
         id
         mintAddress

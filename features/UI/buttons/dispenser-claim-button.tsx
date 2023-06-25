@@ -27,7 +27,7 @@ export const DispenserClaimButton = ({
     if (!walletAddress) return;
     setIsClaiming(true);
     try {
-      const res = await axios.post("/api/claim-badge", {
+      const res = await axios.post("/api/claim-dispenser", {
         address: walletAddress,
         dispenserId,
       });

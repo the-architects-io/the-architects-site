@@ -54,7 +54,9 @@ type Data =
     };
 
 export async function POST(req: NextRequest) {
+  console.log("asdf");
   const { mintAddress, noop } = await req.json();
+  console.log({ mintAddress, noop }, process.env.HELIUS_API_KEY);
 
   if (noop)
     return NextResponse.json(
@@ -70,17 +72,26 @@ export async function POST(req: NextRequest) {
       { error: "Required fields not set" },
       { status: 500 }
     );
-    return;
   }
 
-  const { data } = await axios.post(
-    `https://api.helius.xyz/v0/token-metadata?api-key=${process.env.HELIUS_API_KEY}`,
-    {
-      mintAccounts: [mintAddress],
-    }
-  );
+  let metadata;
+  try {
+    const { data } = await axios.post(
+      `https://api.helius.xyz/v0/token-metadata?api-key=${process.env.HELIUS_API_KEY}`,
+      {
+        mintAccounts: [mintAddress],
+      }
+    );
+    metadata = data?.[0];
+  } catch (error) {
+    console.log("Error fetching token metadata from Helius: ", error);
+    return NextResponse.json(
+      { error: "Error fetching token metadata from Helius" },
+      { status: 500 }
+    );
+  }
 
-  const tokenMetadata: TokenMetadataFromHelius = data?.[0];
+  const tokenMetadata: TokenMetadataFromHelius = metadata;
 
   console.log("tokenMetadata: ", tokenMetadata);
 
