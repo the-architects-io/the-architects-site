@@ -10,6 +10,7 @@ interface Props extends React.HTMLAttributes<HTMLButtonElement> {
   dispenserId?: string;
   setIsClaimed: (isClaimed: boolean) => void;
   isClaimed: boolean;
+  setTxAddress: (txAddress: string | null) => void;
 }
 
 export const DispenserClaimButton = ({
@@ -20,6 +21,7 @@ export const DispenserClaimButton = ({
   dispenserId,
   setIsClaimed,
   isClaimed,
+  setTxAddress,
 }: Props) => {
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -27,15 +29,16 @@ export const DispenserClaimButton = ({
     if (!walletAddress) return;
     setIsClaiming(true);
     try {
-      const res = await axios.post("/api/claim-dispenser", {
+      const { data } = await axios.post("/api/claim-dispenser", {
         address: walletAddress,
         dispenserId,
       });
+      setTxAddress(data?.rewardTxAddress);
       setWasClaimSucessful && setWasClaimSucessful(true);
     } catch (error: any) {
       console.log("error", error);
       console.log("error message", error?.response?.data?.message);
-      if (error?.response?.data?.message === "Dispenser empty") {
+      if (error?.response?.data?.message === "Stock empty") {
         setIsClaimed(true);
       }
     } finally {
@@ -45,6 +48,7 @@ export const DispenserClaimButton = ({
     walletAddress,
     setIsClaiming,
     dispenserId,
+    setTxAddress,
     setWasClaimSucessful,
     setIsClaimed,
   ]);

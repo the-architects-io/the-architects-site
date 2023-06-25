@@ -54,7 +54,6 @@ type Data =
     };
 
 export async function POST(req: NextRequest) {
-  console.log("asdf");
   const { mintAddress, noop } = await req.json();
   console.log({ mintAddress, noop }, process.env.HELIUS_API_KEY);
 

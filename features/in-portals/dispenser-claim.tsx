@@ -9,6 +9,10 @@ import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
 import ConfettiBackground from "@/features/animations/confetti-background";
 import { DispenserClaimButton } from "@/features/UI/buttons/dispenser-claim-button";
+import { fetchNftsByHashList } from "@/utils/nfts/fetch-nfts-by-hash-list";
+import { BASE_URL, REWARD_WALLET_ADDRESS } from "@/constants/constants";
+import axios from "axios";
+import { FaceFrownIcon } from "@heroicons/react/24/outline";
 
 export interface ITokenClaim {
   id: string;
@@ -33,29 +37,48 @@ export const DispenserClaim = ({
   const [isEnabledClaim, setIsEnabledClaim] = useState(false);
   const [dispenser, setDispenser] = useState<Dispenser | null>(null);
   const [isClaimed, setIsClaimed] = useState(false);
+  const [txAddress, setTxAddress] = useState<string | null>(null);
 
-  const { loading: isFetchingDispenser } = useQuery(GET_DISPENSER_BY_ID, {
+  useQuery(GET_DISPENSER_BY_ID, {
     variables: { id: dispenserId },
     skip: !dispenserId,
-    onCompleted: ({ dispensers_by_pk }) => {
-      if (!dispensers_by_pk) return;
-      setDispenser(dispensers_by_pk);
+    onCompleted: async ({ dispensers_by_pk: dispenser }) => {
+      if (!dispenser) return;
+      try {
+        setDispenser(dispenser);
+        const { rewardCollections } = dispenser;
+        const { mintAddress } = rewardCollections[0].itemCollection.item.token;
+        const { data } = await axios.post(
+          `${BASE_URL}/api/get-token-balances-from-helius`,
+          {
+            walletAddress: REWARD_WALLET_ADDRESS?.toString(),
+            mintAddresses: [mintAddress],
+          }
+        );
+        const amount = data?.[0]?.amount || 0;
+        setIsClaimed(amount === 0);
+        setIsEnabledClaim(amount > 0);
+      } catch (error) {
+        console.log({ error });
+      } finally {
+        setIsLoading(false);
+      }
     },
   });
 
   useEffect(() => {
-    if (isClaiming || isFetchingDispenser) {
-      setIsLoading(true);
-    } else {
-      setIsLoading(false);
-    }
-
-    if (isFetchingDispenser || wasClaimSucessful) {
+    if (wasClaimSucessful) {
       setIsEnabledClaim(false);
-    } else {
-      setIsEnabledClaim(true);
     }
-  }, [isClaiming, isFetchingDispenser, wasClaimSucessful, isClaimed]);
+  }, [wasClaimSucessful]);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col justify-center items-center w-full min-h-screen text-white">
+        <Spinner />
+      </div>
+    );
+  }
 
   if (isClaiming) {
     return (
@@ -71,8 +94,10 @@ export const DispenserClaim = ({
   if (isClaimed) {
     return (
       <div className="flex flex-col justify-center items-center w-full min-h-screen text-white">
-        <div className="text-2xl mt-4 max-w-sm text-center">
-          The NFT has already been found.
+        <FaceFrownIcon className="w-16 h-16 text-white mb-4" />
+        <div className="text-6xl mb-2">Sorry!</div>
+        <div className="text-2xl mt-4 text-center">
+          The NFT has already been claimed.
         </div>
       </div>
     );
@@ -87,6 +112,14 @@ export const DispenserClaim = ({
         <div className="text-6xl uppercase flex flex-col items-center justify-center space-y-2 font-bold tracking-wider text-center leading-normal mb-4">
           Transfer
           <br /> Successful!
+          <a
+            href={`https://explorer.solana.com/tx/${txAddress}`}
+            target="_blank"
+            rel="noreferrer"
+            className="underline text-sm pt-8"
+          >
+            View transaction
+          </a>
         </div>
       </div>
     );
@@ -112,6 +145,7 @@ export const DispenserClaim = ({
             setIsClaiming={setIsClaiming}
             setWasClaimSucessful={setWasClaimSucessful}
             isEnabledClaim={isEnabledClaim}
+            setTxAddress={setTxAddress}
           />
         </>
       )}

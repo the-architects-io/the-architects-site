@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
       const nft = await metaplex
         .nfts()
         .findByMint({ mintAddress: rewardMintAddress });
-      console.log({ nft });
+
       const txBuilder = metaplex
         .nfts()
         .builders()
@@ -117,8 +117,8 @@ export async function POST(req: NextRequest) {
       console.log("1!!", error);
       const { logs }: { logs: string[] } = error;
 
-      // TODO: check if stock is empty
-      if (logs.includes("Program log: Error: Account is frozen")) {
+      // only handles NFTs, not SFTs
+      if (logs.includes("Program log: Incorrect account owner")) {
         return NextResponse.json(
           { error, message: "Stock empty" },
           { status: 400 }
@@ -156,6 +156,13 @@ export async function POST(req: NextRequest) {
       console.log("2!!", error);
       return NextResponse.json(
         { error, message: "Failed to add wallet" },
+        { status: 400 }
+      );
+    }
+
+    if (!rewardTxAddress) {
+      return NextResponse.json(
+        { error: "Missing reward tx address" },
         { status: 400 }
       );
     }
