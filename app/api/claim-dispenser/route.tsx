@@ -20,6 +20,7 @@ import {
 import { NextRequest, NextResponse } from "next/server";
 import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
+import { keypairIdentity, Metaplex, token } from "@metaplex-foundation/js";
 
 export type Wallet = {
   address: string;
@@ -81,56 +82,31 @@ export async function POST(req: NextRequest) {
       );
       const rewardPublicKey = new PublicKey(rewardKeypair.publicKey.toString());
       console.log({ rewardPublicKey: rewardPublicKey.toString() });
-      const fromUserAccount = new PublicKey(address);
 
-      const fromTokenAccountAddress = await getAssociatedTokenAddress(
-        rewardMintAddress,
-        rewardPublicKey
-      );
+      const metaplex = Metaplex.make(connection);
+      metaplex.use(keypairIdentity(rewardKeypair));
+      const nft = await metaplex
+        .nfts()
+        .findByMint({ mintAddress: rewardMintAddress });
+      console.log({ nft });
+      const txBuilder = metaplex
+        .nfts()
+        .builders()
+        .transfer({
+          nftOrSft: nft,
+          fromOwner: rewardPublicKey,
+          toOwner: new PublicKey(address),
+          amount: token(1),
+          authority: rewardKeypair,
+        });
 
-      const toTokenAccountAddress = await getAssociatedTokenAddress(
-        rewardMintAddress,
-        new PublicKey(fromUserAccount)
-      );
+      const blockhash = await connection.getLatestBlockhash();
 
-      const receiverAccount = await connection.getAccountInfo(
-        toTokenAccountAddress
-      );
-
-      const latestBlockhash2 = await connection.getLatestBlockhash();
-      const rewardTransaction = new Transaction({ ...latestBlockhash2 });
-
-      const rewardInstructions: TransactionInstructionCtorFields[] = [];
-      if (!receiverAccount) {
-        rewardInstructions.push(
-          createAssociatedTokenAccountInstruction(
-            rewardPublicKey,
-            toTokenAccountAddress,
-            new PublicKey(fromUserAccount),
-            rewardMintAddress
-          )
-        );
-      }
-
-      rewardInstructions.push(
-        createTransferInstruction(
-          fromTokenAccountAddress,
-          toTokenAccountAddress,
-          rewardPublicKey,
-          payoutAmount
-        )
-        // createFreezeAccountInstruction(
-        //   toTokenAccountAddress,
-        //   rewardMintAddress,
-        //   rewardPublicKey
-        // )
-      );
-
-      rewardTransaction.add(...rewardInstructions);
+      const transaction = await txBuilder.toTransaction(blockhash);
 
       rewardTxAddress = await sendAndConfirmTransaction(
         connection,
-        rewardTransaction,
+        transaction,
         [rewardKeypair],
         {
           commitment: "confirmed",
@@ -186,17 +162,15 @@ export async function POST(req: NextRequest) {
 
     let payout;
     try {
-      const { token, id: itemId } =
-        dispenser.rewardCollections[0].itemCollection.item;
-
       const { insert_payouts_one }: { insert_payouts_one: Wallet } =
         await client.request({
           document: ADD_ITEM_PAYOUT,
           variables: {
             txAddress: rewardTxAddress,
             amount: payoutAmount,
-            tokenId: token.id,
-            itemId,
+            tokenId:
+              dispenser?.rewardCollections[0].itemCollection.item.token.id,
+            itemId: dispenser?.rewardCollections[0].itemCollection.item.id,
             dispenserId,
             walletId: wallet.id,
           },
