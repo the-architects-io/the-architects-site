@@ -18,10 +18,17 @@ import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
 import { RewardsList } from "@/features/rewards/rewards-list";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { Divider } from "@/features/UI/divider";
-import { AddRewardForm } from "@/features/admin/rewards/add-reward-form";
+import { AddRewardForm } from "@/features/admin/dispensers/rewards/add-reward-form";
 import Link from "next/link";
 import { BASE_URL } from "@/constants/constants";
 import { ClipboardIcon, LinkIcon } from "@heroicons/react/24/outline";
+import { ITab, Tabs } from "@/features/UI/tabs/tabs";
+import { RewardsSettingsPanel } from "@/features/admin/dispensers/rewards/rewards-settings-panel";
+import { CostsSettingsPanel } from "@/features/admin/dispensers/costs/cost-settings-panel";
+import { GatesSettingsPanel } from "@/features/admin/dispensers/gates/gates-settings-panel";
+import { RestrictionsSettingsPanel } from "@/features/admin/dispensers/restrictions/restrictions-settings-panel";
+import { ConfigSettingsPanel } from "@/features/admin/dispensers/config/config-settings-panel";
+import { StatsPanel } from "@/features/admin/dispensers/stats/stats-panel";
 
 export type RewardCollection = {
   id: string;
@@ -38,13 +45,21 @@ export type RewardCollection = {
 };
 
 export default function DispenserDetailPage({ params }: { params: any }) {
+  const tabs: ITab[] = [
+    { name: "Rewards", value: "rewards" },
+    { name: "Costs", value: "costs" },
+    { name: "Gates", value: "gates" },
+    { name: "Restrictions", value: "restrictions" },
+    { name: "Stats", value: "stats" },
+    { name: "Config", value: "config" },
+  ];
+
   const [hasBeenFetched, setHasBeenFetched] = useState(false);
   const [dispenser, setDispenser] = useState<Dispenser | null>(null);
   const { isAdmin } = useAdmin();
   const [rewardCollection, setRewardCollection] =
     useState<RewardCollection | null>(null);
-  const [isAddingReward, setIsAddingReward] = useState(false);
-
+  const [activeTab, setActiveTab] = useState<ITab>(tabs[0]);
   const { data, loading, error, refetch } = useQuery(GET_DISPENSER_BY_ID, {
     variables: { id: params?.id },
     skip: !params?.id,
@@ -54,13 +69,6 @@ export default function DispenserDetailPage({ params }: { params: any }) {
       setHasBeenFetched(true);
     },
   });
-
-  const copyTextToClipboard = async (text: string) => {
-    await navigator.clipboard.writeText(text);
-    showToast({
-      primaryMessage: "Copied to clipboard",
-    });
-  };
 
   if (!isAdmin) return <NotAdminBlocker />;
 
@@ -85,50 +93,52 @@ export default function DispenserDetailPage({ params }: { params: any }) {
                   alt={dispenser.name}
                 />
               </div>
-              <Panel className="flex flex-col items-center justify-center">
+              <Panel className="flex flex-col items-center justify-center max-w-2xl w-full">
                 <h1 className="text-3xl mb-8 text-center">{dispenser.name}</h1>
-                <div className="flex flex-col w-full justify-center mb-4 gap-y-4">
-                  <PrimaryButton>
-                    <Link
-                      href={`${BASE_URL}/admin/dispenser/${dispenser.id}/payouts`}
-                    >
-                      View Payouts
-                    </Link>
-                  </PrimaryButton>
-                  <PrimaryButton
-                    onClick={() =>
-                      copyTextToClipboard(
-                        `https://preview.the-architects.io/in-portals/dispenser-claim?id=${dispenser.id}`
-                      )
-                    }
-                  >
-                    <ClipboardIcon className="h-5 w-5 inline-block" /> Portals
-                    Interaction <LinkIcon className="h-5 w-5 inline-block" />
-                  </PrimaryButton>
-                </div>
-                {!!dispenser.description && (
-                  <div className="italic text-lg">{dispenser.description}</div>
-                )}
-                <Divider />
-                <h2 className="text-xl uppercase mb-4">Rewards</h2>
-                {!!dispenser.rewardCollections?.length && (
-                  <RewardsList dispenser={dispenser} className="mb-4" />
-                )}
-                {!!isAddingReward && (
-                  <AddRewardForm dispenserId={dispenser.id} refetch={refetch} />
-                )}
-                {!isAddingReward && (
-                  <PrimaryButton
-                    onClick={() => setIsAddingReward(!isAddingReward)}
-                  >
-                    Add reward
-                  </PrimaryButton>
-                )}
                 {!!dispenser.rarity && (
                   <div className="text-xl mb-2 flex items-center space-x-4">
                     <div>Rarity:</div>
                     <div>{dispenser.rarity.name}</div>
                   </div>
+                )}
+                {!!dispenser.description && (
+                  <div className="italic text-lg">{dispenser.description}</div>
+                )}
+                <Divider />
+                <div className="py-4">
+                  <Tabs
+                    tabs={tabs}
+                    activeTab={activeTab}
+                    handleSetTab={(tab) => setActiveTab(tab)}
+                  />
+                </div>
+                {!!activeTab && activeTab.value === "rewards" && (
+                  <RewardsSettingsPanel
+                    dispenser={dispenser}
+                    refetch={refetch}
+                  />
+                )}
+                {!!activeTab && activeTab.value === "costs" && (
+                  <CostsSettingsPanel dispenser={dispenser} refetch={refetch} />
+                )}
+                {!!activeTab && activeTab.value === "gates" && (
+                  <GatesSettingsPanel dispenser={dispenser} refetch={refetch} />
+                )}
+                {!!activeTab && activeTab.value === "restrictions" && (
+                  <RestrictionsSettingsPanel
+                    dispenser={dispenser}
+                    refetch={refetch}
+                  />
+                )}
+                {!!activeTab && activeTab.value === "stats" && (
+                  <StatsPanel dispenser={dispenser} />
+                )}
+
+                {!!activeTab && activeTab.value === "config" && (
+                  <ConfigSettingsPanel
+                    dispenser={dispenser}
+                    refetch={refetch}
+                  />
                 )}
               </Panel>
             </div>

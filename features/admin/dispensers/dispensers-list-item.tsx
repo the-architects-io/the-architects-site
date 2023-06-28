@@ -77,7 +77,7 @@ export type Dispenser = {
         name: string;
       };
     };
-  };
+  }[];
   updatedAt: string;
   createdAt: string;
   description: string;

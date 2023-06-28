@@ -9,7 +9,6 @@ import SharedHead from "@/features/UI/head";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
 import { ItemSelectInput } from "@/features/admin/items/item-select-input";
 import { useQuery } from "@apollo/client";
-import { GET_ITEMS } from "@/graphql/queries/get-items";
 import { Item } from "@/app/api/add-item/route";
 import { useState } from "react";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
