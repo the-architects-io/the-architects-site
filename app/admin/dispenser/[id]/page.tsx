@@ -1,13 +1,12 @@
 "use client";
 
 import { useQuery } from "@apollo/client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BackButton } from "@/features/UI/buttons/back-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { useAdmin } from "@/hooks/admin";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { Panel } from "@/features/UI/panel";
-import { useFormik } from "formik";
 import showToast from "@/features/toasts/show-toast";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import {
@@ -93,7 +92,7 @@ export default function DispenserDetailPage({ params }: { params: any }) {
                     <Link
                       href={`${BASE_URL}/admin/dispenser/${dispenser.id}/payouts`}
                     >
-                      Payouts
+                      View Payouts
                     </Link>
                   </PrimaryButton>
                   <PrimaryButton

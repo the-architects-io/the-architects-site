@@ -13,6 +13,15 @@ import { GET_ITEMS } from "@/graphql/queries/get-items";
 import { Item } from "@/app/api/add-item/route";
 import { useState } from "react";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
+import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-label";
+import { GET_REWARD_CATEGORIES } from "@/graphql/queries/get-reward-types";
+import { GET_ITEMS_BY_REWARD_CATEGORY_ID } from "@/graphql/queries/get-items-by-reward-category-id";
+
+export const REWARD_CATEGORY_IDS = {
+  Item: "7322c862-f67c-4778-b950-6d26f7229c5d",
+  Currency: "f2a682e2-9871-4fc0-99ab-7607547c435b",
+  SOL: "194de0c0-d651-41b3-a8b1-0c110dc69cea",
+};
 
 export const AddRewardForm = ({
   dispenserId,
@@ -22,8 +31,13 @@ export const AddRewardForm = ({
   refetch: () => void;
 }) => {
   const [items, setItems] = useState<Item[]>([]);
+  const [rewardCategories, setrewardCategories] = useState<
+    { id: string; name: string }[]
+  >([]);
+
   const formik = useFormik({
     initialValues: {
+      rewardCategoryId: "",
       amount: 0,
       payoutChance: 0,
       isFreezeOnDelivery: false,
@@ -52,16 +66,39 @@ export const AddRewardForm = ({
     },
   });
 
-  useQuery(GET_ITEMS, {
+  useQuery(GET_ITEMS_BY_REWARD_CATEGORY_ID, {
+    variables: {
+      rewardCategoryId: formik.values.rewardCategoryId,
+    },
     onCompleted: ({ items }) => {
       console.log({ items });
       setItems(items);
     },
   });
 
+  useQuery(GET_REWARD_CATEGORIES, {
+    onCompleted: ({ rewardCategories }) => {
+      console.log({ rewardCategories });
+      setrewardCategories(rewardCategories);
+    },
+  });
+
   return (
     <FormWrapper onSubmit={formik.handleSubmit}>
       <SharedHead title="Admin" />
+      <SelectInputWithLabel
+        value={formik.values.rewardCategoryId}
+        label="Reward Type"
+        name="rewardCategoryId"
+        options={rewardCategories.map(({ name, id }) => ({
+          label: name,
+          value: id,
+        }))}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        placeholder="Select a reward type"
+        hideLabel={false}
+      />
       <ItemSelectInput
         items={items}
         value={formik.values.itemId}
