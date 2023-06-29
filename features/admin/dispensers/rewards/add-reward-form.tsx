@@ -19,7 +19,6 @@ import { GET_ITEMS_BY_REWARD_CATEGORY_ID } from "@/graphql/queries/get-items-by-
 export const REWARD_CATEGORY_IDS = {
   Item: "7322c862-f67c-4778-b950-6d26f7229c5d",
   Currency: "f2a682e2-9871-4fc0-99ab-7607547c435b",
-  SOL: "194de0c0-d651-41b3-a8b1-0c110dc69cea",
 };
 
 export const AddRewardForm = ({
@@ -42,11 +41,20 @@ export const AddRewardForm = ({
       isFreezeOnDelivery: false,
       itemId: "",
     },
-    onSubmit: async ({ amount, itemId, payoutChance, isFreezeOnDelivery }) => {
+    onSubmit: async ({
+      amount,
+      itemId,
+      payoutChance,
+      isFreezeOnDelivery,
+      rewardCategoryId,
+    }) => {
       try {
         await axios.post("/api/add-item-reward-collection", {
           amount,
-          isFreezeOnDelivery,
+          isFreezeOnDelivery:
+            rewardCategoryId === REWARD_CATEGORY_IDS.Currency
+              ? false
+              : isFreezeOnDelivery,
           dispenserId,
           imageUrl: items.find((item) => item.id === itemId)?.imageUrl,
           name: `${amount}x ${items.find((item) => item.id === itemId)?.name}`,
@@ -118,14 +126,16 @@ export const AddRewardForm = ({
         value={formik.values.payoutChance}
         onChange={formik.handleChange}
       />
-      <div className="flex w-full p-2 space-x-8">
-        <FormCheckboxWithLabel
-          label="Freeze on delivery"
-          name="isFreezeOnDelivery"
-          value={formik.values.isFreezeOnDelivery}
-          onChange={formik.handleChange}
-        />
-      </div>
+      {formik.values.rewardCategoryId !== REWARD_CATEGORY_IDS.Currency && (
+        <div className="flex w-full p-2 space-x-8">
+          <FormCheckboxWithLabel
+            label="Freeze on delivery"
+            name="isFreezeOnDelivery"
+            value={formik.values.isFreezeOnDelivery}
+            onChange={formik.handleChange}
+          />
+        </div>
+      )}
       <div className="flex justify-center w-full">
         <SubmitButton
           isSubmitting={formik.isSubmitting}

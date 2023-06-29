@@ -4,6 +4,7 @@ import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { round } from "@/utils/formatting";
 import axios from "axios";
 import classNames from "classnames";
+import Image from "next/image";
 import { Fragment, useCallback, useEffect, useState } from "react";
 
 export const RewardsList = ({
@@ -59,6 +60,7 @@ export const RewardsList = ({
         rewardCollections.map(
           (
             {
+              isFreezeOnDelivery,
               itemCollection,
               hashListCollection,
               childRewardCollections,
@@ -88,7 +90,18 @@ export const RewardsList = ({
                     <>
                       <div className="w-full flex justify-between lg:w-2/5 font-bold mb-2">
                         <div className="flex flex-col">
-                          <div className="mb-2">{parentName}</div>
+                          <div className="mb-2 flex">
+                            {parentName}{" "}
+                            {isFreezeOnDelivery && (
+                              <Image
+                                className="bg-sky-300 rounded-lg ml-4"
+                                src="/images/ice.png"
+                                width={24}
+                                height={20}
+                                alt="ice"
+                              />
+                            )}
+                          </div>
                           <div>
                             Stock:{" "}
                             {getItemBalance(

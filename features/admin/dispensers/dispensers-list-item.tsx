@@ -38,6 +38,7 @@ export type Dispenser = {
     itemCollection: ItemCollection;
   }[];
   rewardCollections: {
+    isFreezeOnDelivery: boolean;
     childRewardCollections?: {
       id: string;
       name: string;

@@ -7,7 +7,6 @@ import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { useAdmin } from "@/hooks/admin";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { Panel } from "@/features/UI/panel";
-import showToast from "@/features/toasts/show-toast";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import {
   Dispenser,
@@ -15,13 +14,7 @@ import {
   ItemCollection,
 } from "@/features/admin/dispensers/dispensers-list-item";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
-import { RewardsList } from "@/features/rewards/rewards-list";
-import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { Divider } from "@/features/UI/divider";
-import { AddRewardForm } from "@/features/admin/dispensers/rewards/add-reward-form";
-import Link from "next/link";
-import { BASE_URL } from "@/constants/constants";
-import { ClipboardIcon, LinkIcon } from "@heroicons/react/24/outline";
 import { ITab, Tabs } from "@/features/UI/tabs/tabs";
 import { RewardsSettingsPanel } from "@/features/admin/dispensers/rewards/rewards-settings-panel";
 import { CostsSettingsPanel } from "@/features/admin/dispensers/costs/cost-settings-panel";
