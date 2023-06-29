@@ -30,7 +30,7 @@ export const AddRewardForm = ({
   refetch: () => void;
 }) => {
   const [items, setItems] = useState<Item[]>([]);
-  const [rewardCategories, setrewardCategories] = useState<
+  const [rewardCategories, setRewardCategories] = useState<
     { id: string; name: string }[]
   >([]);
 
@@ -78,7 +78,7 @@ export const AddRewardForm = ({
   useQuery(GET_REWARD_CATEGORIES, {
     onCompleted: ({ rewardCategories }) => {
       console.log({ rewardCategories });
-      setrewardCategories(rewardCategories);
+      setRewardCategories(rewardCategories);
     },
   });
 

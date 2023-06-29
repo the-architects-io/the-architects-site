@@ -25,6 +25,7 @@ export default function Page() {
     useSignInEmailPasswordless({
       allowedRoles: ["user"],
       metadata: {},
+      redirectTo: "http://localhost:3000/me",
     });
   const formik = useFormik({
     initialValues: {
