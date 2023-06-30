@@ -325,7 +325,7 @@ export default function LootBoxDetailPage({ params }: { params: any }) {
             <div className="text-center uppercase text-3xl mb-2">
               Possible Rewards
             </div>
-            {!!lootBox && <RewardsList dispenser={lootBox} />}
+            {!!lootBox && <RewardsList dispenserId={lootBox.id} />}
           </div>
         </div>
       </div>
