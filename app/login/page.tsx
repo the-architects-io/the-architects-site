@@ -1,4 +1,5 @@
 "use client";
+import { BASE_URL } from "@/constants/constants";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
@@ -25,7 +26,7 @@ export default function Page() {
     useSignInEmailPasswordless({
       allowedRoles: ["user"],
       metadata: {},
-      redirectTo: "http://localhost:3000/me",
+      redirectTo: `${BASE_URL}/me`,
     });
   const formik = useFormik({
     initialValues: {
