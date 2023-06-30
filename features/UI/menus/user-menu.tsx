@@ -85,14 +85,15 @@ export default function UserMenu() {
               {!!publicKey ? (
                 <Menu.Item>
                   {({ active }) => (
-                    <button
+                    <Link
+                      href="/me"
                       className={`${
                         active ? "bg-sky-300 text-black" : "text-stone-300"
                       } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                     >
                       <WalletIcon className="mr-3 h-5 w-5 text-stone-300 group-hover:text-black" />
                       {getAbbreviatedAddress(publicKey?.toString() || "")}
-                    </button>
+                    </Link>
                   )}
                 </Menu.Item>
               ) : (
