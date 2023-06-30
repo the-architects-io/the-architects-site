@@ -6,6 +6,18 @@ export type CostCollection = {
   itemCollection: ItemCollection;
 };
 
+export type MappedCosts = {
+  name: string;
+  amount: number;
+  id: string;
+  imageUrl: string;
+  token: {
+    id: string;
+    mintAddress: string;
+    name: string;
+  };
+};
+
 export const mapCost = (cost: CostCollection) => {
   if (!cost) return null;
   const { name, id } = cost;
@@ -16,7 +28,6 @@ export const mapCost = (cost: CostCollection) => {
     amount,
   } = cost.itemCollection;
   const { token } = item;
-  debugger;
   return {
     name: name || itemCollectionName,
     amount,

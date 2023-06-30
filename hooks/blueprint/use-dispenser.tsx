@@ -2,11 +2,11 @@
 
 import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
-import { mapCost } from "@/utils/mappers/cost";
+import { MappedCosts, mapCost } from "@/utils/mappers/cost";
+import { mapRewards } from "@/utils/mappers/rewards";
 import { useQuery } from "@apollo/client";
 import { useState } from "react";
 
-type MappedCosts = any;
 type MappedRewards = any;
 type MappedGates = any;
 type MappedRestrictions = any;
@@ -31,7 +31,7 @@ const useDispenser = (dispenserId: string) => {
       if (!dispenser) return;
       setDispenser(dispenser);
       setCost(mapCost(dispenser.costCollections?.[0]));
-      setRewards(dispenser.rewardCollections);
+      setRewards(mapRewards(dispenser.rewardCollections));
       setGates(dispenser.gateCollections);
       setRestrictions(dispenser.restrictionCollections);
     },
