@@ -17,7 +17,7 @@ export const RewardsSettingsPanel = ({
     <>
       <h2 className="text-xl uppercase mb-4">Rewards</h2>
       {!!dispenser.rewardCollections?.length && (
-        <RewardsList dispenser={dispenser} className="mb-4 max-w-md" />
+        <RewardsList dispenserId={dispenser.id} className="mb-4 max-w-md" />
       )}
       {!!isAddingReward && (
         <AddRewardForm dispenserId={dispenser.id} refetch={refetch} />

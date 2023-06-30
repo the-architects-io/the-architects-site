@@ -13,7 +13,6 @@ export type DispenserReward = {
     name: string;
   };
   hashList?: string;
-  childRewardCollections?: Dispenser["rewardCollections"];
   childRewards?: DispenserReward[];
 };
 

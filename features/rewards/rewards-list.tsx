@@ -1,6 +1,6 @@
 import { TokenBalance } from "@/app/api/get-token-balances-from-helius/route";
 import { BASE_URL, REWARD_WALLET_ADDRESS } from "@/constants/constants";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
+import useDispenser from "@/hooks/blueprint/use-dispenser";
 import { round } from "@/utils/formatting";
 import axios from "axios";
 import classNames from "classnames";
@@ -8,15 +8,14 @@ import Image from "next/image";
 import { Fragment, useCallback, useEffect, useState } from "react";
 
 export const RewardsList = ({
-  dispenser,
+  dispenserId,
   className,
 }: {
-  dispenser: Dispenser;
+  dispenserId: string;
   className?: string;
 }) => {
-  const [rewardCollections, setRewardCollections] = useState<
-    Dispenser["rewardCollections"]
-  >([]);
+  const { rewards } = useDispenser(dispenserId);
+
   const [isFetchingTokenBalances, setIsFetchingTokenBalances] =
     useState<boolean>(false);
   const [tokenBalances, setTokenBalances] = useState<TokenBalance[]>([]);
@@ -39,16 +38,9 @@ export const RewardsList = ({
   };
 
   useEffect(() => {
-    const { rewardCollections } = dispenser;
-    if (!rewardCollections) return;
+    if (!rewards) return;
     if (!tokenBalances?.length) getLootBoxTokenBalances();
-    const sortedRewards = [...rewardCollections].sort((a, b) => {
-      if (!a.payoutChance) return 1;
-      if (!b.payoutChance) return -1;
-      return b.payoutChance - a.payoutChance;
-    });
-    setRewardCollections(sortedRewards);
-  }, [getLootBoxTokenBalances, dispenser, tokenBalances?.length]);
+  }, [getLootBoxTokenBalances, rewards, tokenBalances?.length]);
 
   return (
     <div className={classNames([className, "w-full"])}>
@@ -56,40 +48,24 @@ export const RewardsList = ({
         <div>Reward</div>
         <div>Chance</div>
       </div>
-      {!!rewardCollections &&
-        rewardCollections.map(
-          (
-            {
-              isFreezeOnDelivery,
-              itemCollection,
-              hashListCollection,
-              childRewardCollections,
-              payoutChance,
-              name: parentName,
-            },
-            i
-          ) => (
-            <Fragment key={itemCollection?.id}>
+      {!!rewards &&
+        rewards.map(
+          ({
+            isFreezeOnDelivery,
+            token,
+            id,
+            childRewards,
+            payoutChance,
+            name,
+          }) => (
+            <Fragment key={id}>
               <div className="flex flex-wrap w-full flex-1 justify-between rounded-lg p-2">
-                {/* Top level name */}
-                {!!itemCollection?.name && (
-                  <>
-                    <div className="font-bold">{itemCollection?.name}</div>
-                    <div>{!!payoutChance && round(payoutChance * 100, 2)}%</div>
-                  </>
-                )}
-                {!!hashListCollection?.id && (
-                  <>
-                    <div>{hashListCollection?.name}</div>
-                    <div>{!!payoutChance && round(payoutChance * 100, 2)}%</div>
-                  </>
-                )}
-                {!!parentName && !itemCollection?.name && (
+                {!!name && (
                   <>
                     <div className="w-full flex justify-between lg:w-2/5 font-bold mb-2">
                       <div className="flex flex-col">
                         <div className="mb-2 flex">
-                          {parentName}{" "}
+                          {name}{" "}
                           {isFreezeOnDelivery && (
                             <Image
                               className="bg-sky-300 rounded-lg ml-4"
@@ -100,13 +76,8 @@ export const RewardsList = ({
                             />
                           )}
                         </div>
-                        {!!itemCollection?.item?.token?.mintAddress && (
-                          <div>
-                            Stock:{" "}
-                            {getItemBalance(
-                              itemCollection.item.token.mintAddress
-                            )}
-                          </div>
+                        {!!token?.mintAddress && (
+                          <div>Stock: {getItemBalance(token.mintAddress)}</div>
                         )}
                       </div>
                       <div className="lg:hidden">
@@ -114,41 +85,27 @@ export const RewardsList = ({
                       </div>
                     </div>
                     <div className="flex flex-col justify-end w-full lg:w-2/5 flex-wrap">
-                      {!!childRewardCollections &&
-                        childRewardCollections.map(
-                          ({ itemCollection, hashListCollection }) => (
-                            <>
-                              {!!itemCollection?.id && (
-                                <div
-                                  key={itemCollection?.id}
-                                  className="mb-2 rounded-lg lg:text-right"
-                                >
-                                  {!!getItemBalance(
-                                    itemCollection.item.token.mintAddress
-                                  ) && (
-                                    <div>
-                                      {itemCollection?.name.replace("1", "")}
-                                      <div className="text-sky-500">
-                                        {getItemBalance(
-                                          itemCollection.item.token.mintAddress
-                                        )}
-                                        x Remaining
-                                      </div>
+                      {!!childRewards &&
+                        childRewards.map(({ id, token }) => (
+                          <>
+                            {!!id && (
+                              <div
+                                key={id}
+                                className="mb-2 rounded-lg lg:text-right"
+                              >
+                                {!!token?.mintAddress && (
+                                  <div>
+                                    {name.replace("1", "")}
+                                    <div className="text-sky-500">
+                                      {getItemBalance(token.mintAddress)}x
+                                      Remaining
                                     </div>
-                                  )}
-                                </div>
-                              )}
-                              {!!hashListCollection?.id && (
-                                <div
-                                  key={hashListCollection?.id}
-                                  className="mb-2 rounded-lg"
-                                >
-                                  <div>{hashListCollection?.name}</div>
-                                </div>
-                              )}
-                            </>
-                          )
-                        )}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </>
+                        ))}
                     </div>
                     <div className="w-full hidden lg:w-1/5 lg:flex justify-end order-1">
                       {!!payoutChance && round(payoutChance * 100, 2)}%
