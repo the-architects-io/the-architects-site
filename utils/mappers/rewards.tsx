@@ -17,6 +17,18 @@ export type DispenserReward = {
   childRewards?: DispenserReward[];
 };
 
+const sortRewards = (rewards: DispenserReward[]) => {
+  return rewards.sort((a, b) => {
+    if (a.payoutChance > b.payoutChance) {
+      return -1;
+    }
+    if (a.payoutChance < b.payoutChance) {
+      return 1;
+    }
+    return 0;
+  });
+};
+
 const mapRewardCollection = (rewards: Dispenser["rewardCollections"]) => {
   return rewards.map(
     ({
@@ -93,5 +105,5 @@ export const mapRewards = (
 ): DispenserReward[] | null => {
   if (!rewards) return null;
 
-  return mapRewardCollection(rewards);
+  return sortRewards(mapRewardCollection(rewards));
 };
