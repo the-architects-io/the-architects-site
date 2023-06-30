@@ -6,7 +6,7 @@ export type CostCollection = {
   itemCollection: ItemCollection;
 };
 
-export type MappedCosts = {
+export type DispenserCost = {
   name: string;
   amount: number;
   id: string;

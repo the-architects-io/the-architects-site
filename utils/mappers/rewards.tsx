@@ -1,6 +1,6 @@
 import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 
-export type MappedRewards = {
+export type DispenserReward = {
   name: string;
   amount?: number;
   id: string;
@@ -15,11 +15,13 @@ export type MappedRewards = {
   hashList?: string;
 };
 
-export const mapRewards = (rewards: Dispenser["rewardCollections"]) => {
+export const mapRewards = (
+  rewards: Dispenser["rewardCollections"]
+): DispenserReward[] | null => {
   if (!rewards) return null;
 
-  return {
-    rewards: rewards.map(
+  return (
+    rewards.map(
       ({
         name,
         id,
@@ -48,7 +50,7 @@ export const mapRewards = (rewards: Dispenser["rewardCollections"]) => {
           };
         }
 
-        let mappedRewards: MappedRewards = {
+        let mappedReward: DispenserReward = {
           name,
           amount: itemCollection?.amount || hashListCollection?.amount,
           imageUrl: item?.imageUrl || "",
@@ -58,21 +60,21 @@ export const mapRewards = (rewards: Dispenser["rewardCollections"]) => {
         };
 
         if (hashList) {
-          mappedRewards = {
-            ...mappedRewards,
+          mappedReward = {
+            ...mappedReward,
             hashList,
           };
         }
 
         if (token) {
-          mappedRewards = {
-            ...mappedRewards,
+          mappedReward = {
+            ...mappedReward,
             token,
           };
         }
 
-        return mappedRewards;
+        return mappedReward;
       }
-    ),
-  };
+    ) || []
+  );
 };

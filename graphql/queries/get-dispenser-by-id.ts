@@ -42,6 +42,42 @@ export const GET_DISPENSER_BY_ID = gql`
         }
         id
         name
+        childRewardCollections {
+          id
+          hashListCollection {
+            amount
+            id
+            hashList {
+              id
+              rawHashList
+            }
+            name
+            imageUrl
+          }
+          imageUrl
+          isFreezeOnDelivery
+          name
+          payoutChance
+          itemCollection {
+            amount
+            id
+            imageUrl
+            name
+            item {
+              description
+              id
+              imageUrl
+              isConsumable
+              isCraftable
+              name
+              token {
+                id
+                name
+                mintAddress
+              }
+            }
+          }
+        }
       }
       restrictionCollections {
         id
