@@ -33,7 +33,7 @@ export const CostsSettingsPanel = ({
     <>
       <h2 className="text-xl uppercase mb-4">Costs</h2>
       {!!dispenser.costCollections?.length && (
-        <CostsList dispenser={dispenser} className="mb-4" />
+        <CostsList dispenserId={dispenser.id} className="mb-4" />
       )}
       {!!isAddingCost && !dispenser?.costCollections?.[0]?.id && (
         <AddCostForm

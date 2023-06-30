@@ -21,7 +21,7 @@ const useDispenser = (dispenserId: string) => {
 
   const { loading } = useQuery(GET_DISPENSER_BY_ID, {
     variables: { id: dispenserId },
-    fetchPolicy: "network-only",
+    // fetchPolicy: "network-only",
     onCompleted: ({
       dispensers_by_pk: dispenser,
     }: {
