@@ -13,6 +13,79 @@ export type DispenserReward = {
     name: string;
   };
   hashList?: string;
+  childRewardCollections?: Dispenser["rewardCollections"];
+  childRewards?: DispenserReward[];
+};
+
+const mapRewardCollection = (rewards: Dispenser["rewardCollections"]) => {
+  return rewards.map(
+    ({
+      name,
+      id,
+      itemCollection,
+      hashListCollection,
+      payoutChance,
+      isFreezeOnDelivery,
+      childRewardCollections,
+    }) => {
+      let hashList;
+      let item;
+      let token;
+      let childRewards;
+
+      if (hashListCollection?.id) {
+        hashList = hashListCollection.hashList.rawHashList;
+      }
+
+      if (itemCollection?.id) {
+        item = itemCollection.item;
+      }
+
+      if (childRewardCollections) {
+        childRewards = mapRewardCollection(childRewardCollections);
+      }
+
+      if (item) {
+        token = {
+          id: item.token.id,
+          mintAddress: item.token.mintAddress,
+          name: item.token.name,
+        };
+      }
+
+      let mappedReward: DispenserReward = {
+        name,
+        amount: itemCollection?.amount || hashListCollection?.amount,
+        imageUrl: item?.imageUrl || "",
+        id,
+        payoutChance,
+        isFreezeOnDelivery,
+      };
+
+      if (hashList) {
+        mappedReward = {
+          ...mappedReward,
+          hashList,
+        };
+      }
+
+      if (token) {
+        mappedReward = {
+          ...mappedReward,
+          token,
+        };
+      }
+
+      if (!!childRewards && childRewards.length > 0) {
+        mappedReward = {
+          ...mappedReward,
+          childRewards,
+        };
+      }
+
+      return mappedReward;
+    }
+  );
 };
 
 export const mapRewards = (
@@ -20,61 +93,5 @@ export const mapRewards = (
 ): DispenserReward[] | null => {
   if (!rewards) return null;
 
-  return (
-    rewards.map(
-      ({
-        name,
-        id,
-        itemCollection,
-        hashListCollection,
-        payoutChance,
-        isFreezeOnDelivery,
-      }) => {
-        let hashList;
-        let item;
-        let token;
-
-        if (hashListCollection?.id) {
-          hashList = hashListCollection.hashList.rawHashList;
-        }
-
-        if (itemCollection?.id) {
-          item = itemCollection.item;
-        }
-
-        if (item) {
-          token = {
-            id: item.token.id,
-            mintAddress: item.token.mintAddress,
-            name: item.token.name,
-          };
-        }
-
-        let mappedReward: DispenserReward = {
-          name,
-          amount: itemCollection?.amount || hashListCollection?.amount,
-          imageUrl: item?.imageUrl || "",
-          id,
-          payoutChance,
-          isFreezeOnDelivery,
-        };
-
-        if (hashList) {
-          mappedReward = {
-            ...mappedReward,
-            hashList,
-          };
-        }
-
-        if (token) {
-          mappedReward = {
-            ...mappedReward,
-            token,
-          };
-        }
-
-        return mappedReward;
-      }
-    ) || []
-  );
+  return mapRewardCollection(rewards);
 };

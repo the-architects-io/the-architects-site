@@ -22,6 +22,7 @@ import { GatesSettingsPanel } from "@/features/admin/dispensers/gates/gates-sett
 import { RestrictionsSettingsPanel } from "@/features/admin/dispensers/restrictions/restrictions-settings-panel";
 import { ConfigSettingsPanel } from "@/features/admin/dispensers/config/config-settings-panel";
 import { StatsPanel } from "@/features/admin/dispensers/stats/stats-panel";
+import useDispenser from "@/hooks/blueprint/use-dispenser";
 
 export type RewardCollection = {
   id: string;
@@ -38,6 +39,7 @@ export type RewardCollection = {
 };
 
 export default function DispenserDetailPage({ params }: { params: any }) {
+  const { rewards } = useDispenser(params?.id);
   const tabs: ITab[] = [
     { name: "Rewards", value: "rewards" },
     { name: "Costs", value: "costs" },
@@ -88,6 +90,7 @@ export default function DispenserDetailPage({ params }: { params: any }) {
               </div>
               <Panel className="flex flex-col items-center justify-center max-w-2xl w-full">
                 <h1 className="text-3xl mb-8 text-center">{dispenser.name}</h1>
+                {JSON.stringify(rewards)}
                 {!!dispenser.rarity && (
                   <div className="text-xl mb-2 flex items-center space-x-4">
                     <div>Rarity:</div>

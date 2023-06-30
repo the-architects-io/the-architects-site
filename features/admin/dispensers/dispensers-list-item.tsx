@@ -40,13 +40,15 @@ export type Dispenser = {
     itemCollection: ItemCollection;
   }[];
   rewardCollections: {
-    isFreezeOnDelivery: boolean;
     childRewardCollections?: {
+      isFreezeOnDelivery: boolean;
+      hashListCollection: HashListCollection;
+      payoutChance: number;
+      itemCollection: ItemCollection;
       id: string;
       name: string;
-      hashListCollection: HashListCollection;
-      itemCollection: ItemCollection;
     }[];
+    isFreezeOnDelivery: boolean;
     hashListCollection: HashListCollection;
     payoutChance: number;
     itemCollection: ItemCollection;
