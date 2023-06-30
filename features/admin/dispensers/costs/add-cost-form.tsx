@@ -6,8 +6,6 @@ import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { useFormik } from "formik";
 import showToast from "@/features/toasts/show-toast";
 import SharedHead from "@/features/UI/head";
-import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
-import { ItemSelectInput } from "@/features/admin/items/item-select-input";
 import { useQuery } from "@apollo/client";
 import { Item } from "@/app/api/add-item/route";
 import { useState } from "react";

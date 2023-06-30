@@ -1,13 +1,13 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 
-import Sidebar from "@/features/navigation/sidebar";
 import { ContextProvider } from "@/providers/context-provider";
 import { SidebarProvider } from "@/hooks/sidebar";
 import { AdminProvider } from "@/hooks/admin";
 import dynamic from "next/dynamic";
 import classNames from "classnames";
 import Toaster from "@/features/toasts/toaster";
+import { DebugModeProvider } from "@/hooks/debug-mode";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,14 +28,16 @@ export default function RootLayout({
     <html lang="en">
       <body className={classNames([inter.className, "relative"])}>
         <ContextProvider>
-          <SidebarProvider>
-            <AdminProvider>
-              {children}
-              <Navbar />
-              <Toaster />
-              {/* <Sidebar /> */}
-            </AdminProvider>
-          </SidebarProvider>
+          <DebugModeProvider>
+            <SidebarProvider>
+              <AdminProvider>
+                {children}
+                <Navbar />
+                <Toaster />
+                {/* <Sidebar /> */}
+              </AdminProvider>
+            </SidebarProvider>
+          </DebugModeProvider>
         </ContextProvider>
       </body>
     </html>
