@@ -5,13 +5,13 @@ import { Divider } from "@/features/UI/divider";
 import { Panel } from "@/features/UI/panel";
 import Spinner from "@/features/UI/spinner";
 import WalletConnector from "@/features/wallets/wallet-connector";
+import useDispenser from "@/hooks/blueprint/use-dispenser";
 import {
   useAuthenticationStatus,
   useProviderLink,
   useSignOut,
   useUserData,
 } from "@nhost/nextjs";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -19,6 +19,9 @@ import { useEffect } from "react";
 export default function Page() {
   const { isAuthenticated, isLoading } = useAuthenticationStatus();
   const { discord } = useProviderLink();
+  const { dispenser, cost } = useDispenser(
+    "e9f9f8cf-1c31-4601-8129-c774b42c4ba3"
+  );
 
   const user = useUserData();
   const { signOut } = useSignOut();

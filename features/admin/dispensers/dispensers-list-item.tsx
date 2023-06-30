@@ -25,6 +25,7 @@ export type ItemCollection = {
     name: string;
     imageUrl: string;
     token: {
+      name: string;
       id: string;
       mintAddress: string;
     };
@@ -35,6 +36,7 @@ export type Dispenser = {
   costCollections: {
     id: string;
     name: string;
+    amount: number;
     itemCollection: ItemCollection;
   }[];
   rewardCollections: {
