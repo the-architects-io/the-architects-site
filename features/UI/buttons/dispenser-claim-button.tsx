@@ -1,4 +1,4 @@
-import useDispenser from "@/hooks/blueprint/use-dispenser";
+import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import { PublicKey } from "@solana/web3.js";
 import axios from "axios";
 import { useCallback, useState } from "react";

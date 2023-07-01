@@ -1,6 +1,6 @@
 import { TokenBalance } from "@/app/api/get-token-balances-from-helius/route";
 import { BASE_URL, REWARD_WALLET_ADDRESS } from "@/constants/constants";
-import useDispenser from "@/hooks/blueprint/use-dispenser";
+import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import { round } from "@/utils/formatting";
 import axios from "axios";
 import classNames from "classnames";

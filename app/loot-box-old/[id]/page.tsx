@@ -11,7 +11,7 @@ import Spinner from "@/features/UI/spinner";
 import { UserWithoutAccountBlocker } from "@/features/UI/user-without-account-blocker";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
 import { useAdmin } from "@/hooks/admin";
-import useDispenser from "@/hooks/blueprint/use-dispenser";
+import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import { useUser } from "@/hooks/user";
 import { formatDateTime } from "@/utils/date-time";
 import { fetchNftsByHashList } from "@/utils/nfts/fetch-nfts-by-hash-list";

@@ -1,7 +1,6 @@
 "use client";
 
 import { Payout } from "@/app/profile/[id]/page";
-import { BASE_URL } from "@/constants/constants";
 import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
 import { DispenserCost, mapCost } from "@/utils/mappers/cost";
@@ -70,42 +69,32 @@ const useDispenser = (dispenserId?: string) => {
     });
   };
 
-  const getCostBalance = async (
-    cost: DispenserCost,
-    walletAddress: string
-  ): Promise<number> => {
-    debugger;
-    if (!cost) return Promise.reject("No cost");
-    const mintAddress = cost.token.mintAddress;
+  if (!dispenser)
+    return {
+      isLoading: false,
+      dispenser: null,
+      cost: null,
+      rewards: null,
+      gates: null,
+      restrictions: null,
+      claimReward: () => Promise.reject("No dispenser"),
+    };
 
-    return new Promise(async (resolve, reject) => {
-      try {
-        const { data } = await axios.post(
-          `${BASE_URL}/api/get-token-balances-from-helius`,
-          {
-            walletAddress,
-            mintAddresses: [mintAddress],
-          }
-        );
-        resolve(data?.[0]?.amount || 0);
-      } catch (error: any) {
-        return reject({
-          success: false,
-          message: error?.response?.data?.message,
-        });
-      }
-    });
-  };
+  const { imageUrl, description, id, isEnabled, name } = dispenser;
 
   return {
     dispenser,
+    imageUrl,
+    description,
+    name,
+    id,
+    isEnabled,
     isLoading: loading,
     cost,
     rewards,
     gates,
     restrictions,
     claimReward,
-    getCostBalance,
   };
 };
 

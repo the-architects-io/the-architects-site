@@ -1,5 +1,5 @@
 import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
-import useDispenser from "@/hooks/blueprint/use-dispenser";
+import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import classNames from "classnames";
 import { Fragment, useEffect, useState } from "react";
 

@@ -22,7 +22,7 @@ import { GatesSettingsPanel } from "@/features/admin/dispensers/gates/gates-sett
 import { RestrictionsSettingsPanel } from "@/features/admin/dispensers/restrictions/restrictions-settings-panel";
 import { ConfigSettingsPanel } from "@/features/admin/dispensers/config/config-settings-panel";
 import { StatsPanel } from "@/features/admin/dispensers/stats/stats-panel";
-import useDispenser from "@/hooks/blueprint/use-dispenser";
+import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 
 export type RewardCollection = {
   id: string;
