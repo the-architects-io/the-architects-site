@@ -8,19 +8,31 @@ import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Image from "next/image";
 import useRewards from "@/app/blueprint/hooks/use-rewards";
+import { PrimaryButton } from "@/features/UI/buttons/primary-button";
+import showToast from "@/features/toasts/show-toast";
 
 export default function LootBoxPage({ params }: { params: any }) {
   const { publicKey } = useWallet();
-  const { name, cost, id, imageUrl, rewards } = useDispenser(params.id);
+  const { name, cost, id, imageUrl, rewards, claimReward, isClaiming } =
+    useDispenser(params.id);
   const { balance, isLoading } = useCostBalance(cost, publicKey);
   const { rewardsWithBalances, isLoading: isLoadingBalances } =
     useRewards(rewards);
+
+  const handleClaim = async () => {
+    if (!publicKey) return;
+    const { txAddress, payout } = await claimReward(publicKey.toString());
+    showToast({
+      primaryMessage: "Claimed!",
+      secondaryMessage: `You received ${payout?.amount} tokens`,
+    });
+  };
 
   if (!id)
     return (
       <ContentWrapper>
         <Panel className="flex flex-col justify-center items-center">
-          <h1>Not found</h1>
+          {isLoading ? <Spinner /> : "No dispenser found"}
         </Panel>
       </ContentWrapper>
     );
@@ -55,6 +67,9 @@ export default function LootBoxPage({ params }: { params: any }) {
             </>
           )}
         </>
+        <PrimaryButton onClick={isClaiming ? () => {} : handleClaim}>
+          {isClaiming ? <Spinner /> : "Claim"}
+        </PrimaryButton>
       </Panel>
     </ContentWrapper>
   );

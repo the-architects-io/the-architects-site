@@ -18,13 +18,18 @@ import axios from "axios";
 import { useState } from "react";
 
 export type ClaimRewardResponse = {
-  rewardTxAddress?: string;
+  txAddress?: string;
   payout?: Payout;
   message?: string;
   success: boolean;
 };
 
+export type ClaimRewardOptions = {
+  burnTxAddress?: string;
+};
+
 const useDispenser = (dispenserId?: string) => {
+  const [isClaiming, setIsClaiming] = useState(false);
   const [dispenser, setDispenser] = useState<Dispenser | null>(null);
   const [cost, setCost] = useState<DispenserCost | null>(null);
   const [rewards, setRewards] = useState<DispenserReward[] | null>(null);
@@ -51,15 +56,20 @@ const useDispenser = (dispenserId?: string) => {
     },
   });
 
-  const claimReward = async (address: string): Promise<ClaimRewardResponse> => {
+  const claimReward = async (
+    address: string,
+    options?: ClaimRewardOptions
+  ): Promise<ClaimRewardResponse> => {
     return new Promise(async (resolve, reject) => {
+      // TODO: Add burnTxAddress to the request for gated dispensers
       try {
+        setIsClaiming(true);
         const { data } = await axios.post("/api/claim-dispenser", {
           address,
           dispenserId,
         });
         resolve({
-          rewardTxAddress: data?.rewardTxAddress,
+          txAddress: data?.rewardTxAddress,
           payout: data?.payout,
           success: true,
         });
@@ -68,6 +78,8 @@ const useDispenser = (dispenserId?: string) => {
           success: false,
           message: error?.response?.data?.message,
         });
+      } finally {
+        setIsClaiming(false);
       }
     });
   };
@@ -100,6 +112,7 @@ const useDispenser = (dispenserId?: string) => {
     gates,
     restrictions,
     claimReward,
+    isClaiming,
   };
 };
 

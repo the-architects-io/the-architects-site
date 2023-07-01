@@ -30,13 +30,15 @@ import {
 import axios from "axios";
 import { NextPage } from "next";
 import { useCallback, useEffect, useState } from "react";
+import useCostBalance from "@/app/blueprint/hooks/use-cost-balance";
 
 export default function LootBoxDetailPage({ params }: { params: any }) {
   const wallet = useWallet();
   const { connection } = useConnection();
   const { user, loadingUser, setUser } = useUser();
   const { isAdmin } = useAdmin();
-  const { claimReward, cost, getCostBalance } = useDispenser(params?.id);
+  const { claimReward, cost } = useDispenser(params?.id);
+  const { balance } = useCostBalance(cost, wallet.publicKey?.toString() || "");
 
   const [lootBox, setLootBox] = useState<Dispenser | null>(null);
   const [rewardHashList, setRewardHashList] = useState<string[]>([]);
@@ -88,8 +90,6 @@ export default function LootBoxDetailPage({ params }: { params: any }) {
       setCostAmount(costAmount);
       setCostTokenImageUrl(imageUrl);
       if (!wallet?.publicKey || !cost) return;
-      const balance = await getCostBalance(cost, wallet.publicKey.toString());
-      setAmountOfUserHeldCostTokens(balance);
     },
   });
 
@@ -155,7 +155,8 @@ export default function LootBoxDetailPage({ params }: { params: any }) {
         secondaryMessage: "Please do not close this window.",
       });
 
-      const { rewardTxAddress, payout } = await claimReward(
+      // hanldeCostPayment()
+      const { txAddress, payout } = await claimReward(
         wallet.publicKey.toString()
       );
 
@@ -171,7 +172,7 @@ export default function LootBoxDetailPage({ params }: { params: any }) {
 
       console.log({
         burnTxAddress,
-        rewardTxAddress,
+        txAddress,
         lootBoxId: lootBox?.id,
       });
     } catch (error) {
