@@ -12,11 +12,6 @@ import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
 import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { RPC_ENDPOINT } from "@/constants/constants";
 import { ADD_ITEM_PAYOUT } from "@/graphql/mutations/add-item-payout";
-import {
-  createAssociatedTokenAccountInstruction,
-  createTransferInstruction,
-  getAssociatedTokenAddress,
-} from "@solana/spl-token";
 import { NextRequest, NextResponse } from "next/server";
 import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { ADD_WALLET } from "@/graphql/mutations/add-wallet";

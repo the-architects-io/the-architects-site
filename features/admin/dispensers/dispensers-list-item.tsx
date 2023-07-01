@@ -64,6 +64,7 @@ export type Dispenser = {
       };
       id: string;
       name: string;
+      value: string;
     };
     hashListCollection: {
       name: string;
@@ -74,9 +75,11 @@ export type Dispenser = {
     };
   }[];
   gateCollections: {
+    id: string;
     traitCollection: {
       id: string;
       name: string;
+      value: string;
       trait: {
         id: string;
         name: string;

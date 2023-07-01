@@ -1,3 +1,4 @@
+import useDispenser from "@/hooks/blueprint/use-dispenser";
 import { PublicKey } from "@solana/web3.js";
 import axios from "axios";
 import { useCallback, useState } from "react";
@@ -24,34 +25,16 @@ export const DispenserClaimButton = ({
   setTxAddress,
 }: Props) => {
   const [errorMessage, setErrorMessage] = useState("");
+  const { claimReward } = useDispenser(dispenserId);
 
   const handleClaimToken = useCallback(async () => {
-    if (!walletAddress) return;
+    if (!walletAddress || !dispenserId) return;
     setIsClaiming(true);
-    try {
-      const { data } = await axios.post("/api/claim-dispenser", {
-        address: walletAddress,
-        dispenserId,
-      });
-      setTxAddress(data?.rewardTxAddress);
-      setWasClaimSucessful && setWasClaimSucessful(true);
-    } catch (error: any) {
-      console.log("error", error);
-      console.log("error message", error?.response?.data?.message);
-      if (error?.response?.data?.message === "Stock empty") {
-        setIsClaimed(true);
-      }
-    } finally {
-      setIsClaiming(false);
-    }
-  }, [
-    walletAddress,
-    setIsClaiming,
-    dispenserId,
-    setTxAddress,
-    setWasClaimSucessful,
-    setIsClaimed,
-  ]);
+    const { rewardTxAddress, success, message } = await claimReward(
+      walletAddress.toString()
+    );
+    setIsClaiming(false);
+  }, [walletAddress, dispenserId, setIsClaiming, claimReward]);
 
   return (
     <div className="flex flex-col">

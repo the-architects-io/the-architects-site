@@ -5,7 +5,6 @@ import { Divider } from "@/features/UI/divider";
 import { Panel } from "@/features/UI/panel";
 import Spinner from "@/features/UI/spinner";
 import WalletConnector from "@/features/wallets/wallet-connector";
-import useDispenser from "@/hooks/blueprint/use-dispenser";
 import {
   useAuthenticationStatus,
   useProviderLink,
@@ -19,10 +18,6 @@ import { useEffect } from "react";
 export default function Page() {
   const { isAuthenticated, isLoading } = useAuthenticationStatus();
   const { discord } = useProviderLink();
-  const { dispenser, cost, rewards } = useDispenser(
-    "e9f9f8cf-1c31-4601-8129-c774b42c4ba3"
-  );
-
   const user = useUserData();
   const { signOut } = useSignOut();
   const router = useRouter();
@@ -59,7 +54,6 @@ export default function Page() {
           className="mb-4"
         />
         <h1 className="text-3xl font-bold mb-4">{displayName}</h1>
-        <div className="mb-4 break-all">{JSON.stringify(rewards)}</div>
         {/* <a
           href={discord}
           className="bg-purple-700 text-white p-2 px-4 rounded-lg mb-4 uppercase"
