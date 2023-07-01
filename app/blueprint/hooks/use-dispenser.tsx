@@ -83,9 +83,11 @@ const useDispenser = (dispenserId?: string) => {
       claimReward: () => Promise.reject("No dispenser"),
     };
 
-  const { imageUrl, description, id, isEnabled, name } = dispenser;
+  const { imageUrl, description, id, isEnabled, name, collectionWallet } =
+    dispenser;
 
   return {
+    collectionWallet,
     dispenser,
     imageUrl,
     description,

@@ -3,7 +3,12 @@ import { gql } from "@apollo/client";
 export const GET_DISPENSER_BY_ID = gql`
   query GET_DISPENSER_BY_ID($id: uuid!) {
     dispensers_by_pk(id: $id) {
+      collectionWallet {
+        id
+        address
+      }
       costCollections {
+        dispenserId
         id
         name
         itemCollection {
@@ -24,6 +29,7 @@ export const GET_DISPENSER_BY_ID = gql`
         }
       }
       rewardCollections {
+        dispenserId
         payoutChance
         isFreezeOnDelivery
         itemCollection {
@@ -43,6 +49,7 @@ export const GET_DISPENSER_BY_ID = gql`
         id
         name
         childRewardCollections {
+          dispenserId
           id
           hashListCollection {
             amount
@@ -80,6 +87,7 @@ export const GET_DISPENSER_BY_ID = gql`
         }
       }
       restrictionCollections {
+        dispenserId
         id
         traitCollection {
           trait {
@@ -98,6 +106,7 @@ export const GET_DISPENSER_BY_ID = gql`
         }
       }
       gateCollections {
+        dispenserId
         traitCollection {
           id
           name

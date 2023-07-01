@@ -23,6 +23,7 @@ const mapRewardCollection = (rewards: Dispenser["rewardCollections"]) => {
       payoutChance,
       isFreezeOnDelivery,
       childRewardCollections,
+      dispenserId,
     }) => {
       let hashList;
       let item;
@@ -56,6 +57,7 @@ const mapRewardCollection = (rewards: Dispenser["rewardCollections"]) => {
         id,
         payoutChance,
         isFreezeOnDelivery,
+        dispenserId,
       };
 
       if (hashList) {

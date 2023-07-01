@@ -14,23 +14,25 @@ export const RewardsList = ({
   dispenserId: string;
   className?: string;
 }) => {
-  const { rewards } = useDispenser(dispenserId);
+  const { rewards, collectionWallet } = useDispenser(dispenserId);
 
   const [isFetchingTokenBalances, setIsFetchingTokenBalances] =
     useState<boolean>(false);
   const [tokenBalances, setTokenBalances] = useState<TokenBalance[]>([]);
 
   const getLootBoxTokenBalances = useCallback(async () => {
+    if (!collectionWallet?.address) return;
+
     setIsFetchingTokenBalances(true);
     const { data } = await axios.post(
       `${BASE_URL}/api/get-token-balances-from-helius`,
       {
-        walletAddress: REWARD_WALLET_ADDRESS,
+        walletAddress: collectionWallet?.address,
       }
     );
     setTokenBalances(data);
     setIsFetchingTokenBalances(false);
-  }, [setIsFetchingTokenBalances, setTokenBalances]);
+  }, [collectionWallet?.address]);
 
   const getItemBalance = (mintAddress: string) => {
     if (!tokenBalances?.length) return 0;

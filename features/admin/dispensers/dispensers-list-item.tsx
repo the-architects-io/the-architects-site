@@ -17,14 +17,21 @@ export type HashListCollection = {
 };
 
 export type Dispenser = {
+  collectionWallet: {
+    id: string;
+    address: string;
+  };
   costCollections: {
+    dispenserId: string;
     id: string;
     name: string;
     amount: number;
     itemCollection: ItemCollection;
   }[];
   rewardCollections: {
+    dispenserId: string;
     childRewardCollections?: {
+      dispenserId: string;
       isFreezeOnDelivery: boolean;
       hashListCollection: HashListCollection;
       payoutChance: number;

@@ -1,13 +1,14 @@
-import { ErrorResponse } from "@/app/blueprint/types";
+import { TokenBalance } from "@/app/api/get-token-balances-from-helius/route";
 import { BASE_URL } from "@/constants/constants";
 import { PublicKey } from "@metaplex-foundation/js";
 import axios from "axios";
 
-const fetchTokenBalance = async (
-  mintAddress: string,
+const fetchTokenBalances = async (
+  mintAddresses: string[],
   walletAddress: PublicKey | string
-): Promise<number | ErrorResponse> => {
-  if (!mintAddress || !walletAddress) return Promise.reject("No cost");
+): Promise<TokenBalance[]> => {
+  if (!mintAddresses?.length || !walletAddress)
+    return Promise.reject("No cost");
 
   return new Promise(async (resolve, reject) => {
     try {
@@ -18,17 +19,19 @@ const fetchTokenBalance = async (
             typeof walletAddress === "string"
               ? walletAddress
               : walletAddress.toString(),
-          mintAddresses: [mintAddress],
+          mintAddresses,
         }
       );
-      resolve(data?.[0]?.amount || 0);
+      console.log({ data });
+      return resolve(data);
     } catch (error: any) {
-      return reject({
+      console.log({
         success: false,
         message: error?.response?.data?.message,
       });
+      return reject([]);
     }
   });
 };
 
-export default fetchTokenBalance;
+export default fetchTokenBalances;

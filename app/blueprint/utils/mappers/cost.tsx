@@ -2,7 +2,7 @@ import { CostCollection } from "@/app/blueprint/types";
 
 export const mapCost = (cost: CostCollection) => {
   if (!cost) return null;
-  const { name, id } = cost;
+  const { name, id, dispenserId } = cost;
   const {
     item,
     name: itemCollectionName,
@@ -15,6 +15,7 @@ export const mapCost = (cost: CostCollection) => {
     amount,
     id,
     imageUrl: item?.imageUrl || itemCollectionImageUrl,
+    dispenserId,
     token: {
       id: token.id,
       mintAddress: token.mintAddress,

@@ -31,11 +31,13 @@ export type DispenserRestriction = {
 
 export type DispenserReward = {
   name: string;
+  balance?: number;
   amount?: number;
   id: string;
   imageUrl?: string;
   payoutChance: number;
   isFreezeOnDelivery: boolean;
+  dispenserId: string;
   token?: {
     id: string;
     mintAddress: string;
@@ -57,6 +59,7 @@ export type DispenserGate = {
 export type CostCollection = {
   id: string;
   name: string;
+  dispenserId: string;
   itemCollection: ItemCollection;
 };
 

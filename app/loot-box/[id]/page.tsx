@@ -7,11 +7,14 @@ import useCostBalance from "@/app/blueprint/hooks/use-cost-balance";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Image from "next/image";
+import useRewards from "@/app/blueprint/hooks/use-rewards";
 
 export default function LootBoxPage({ params }: { params: any }) {
   const { publicKey } = useWallet();
-  const { name, cost, id, imageUrl } = useDispenser(params.id);
+  const { name, cost, id, imageUrl, rewards } = useDispenser(params.id);
   const { balance, isLoading } = useCostBalance(cost, publicKey);
+  const { rewardsWithBalances, isLoading: isLoadingBalances } =
+    useRewards(rewards);
 
   if (!id)
     return (
@@ -32,7 +35,26 @@ export default function LootBoxPage({ params }: { params: any }) {
           width={200}
           height={200}
         />
-        <>{isLoading ? <Spinner /> : <>balance: {balance}</>}</>
+        <>
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            <>your balance: {JSON.stringify(balance)}</>
+          )}
+        </>
+        <>
+          {isLoadingBalances ? (
+            <Spinner />
+          ) : (
+            <>
+              {rewardsWithBalances?.map(({ name, balance }) => (
+                <div key={name}>
+                  {name}: {balance}
+                </div>
+              ))}
+            </>
+          )}
+        </>
       </Panel>
     </ContentWrapper>
   );

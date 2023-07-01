@@ -1,7 +1,7 @@
 import { DispenserCost } from "@/app/blueprint/types";
-import fetchTokenBalance from "@/app/blueprint/utils/fetch-token-balance";
+import fetchTokenBalances from "@/app/blueprint/utils/fetch-token-balances";
 import { PublicKey } from "@solana/web3.js";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const useCostBalance = (
   cost: DispenserCost | null,
@@ -11,27 +11,30 @@ const useCostBalance = (
   const [isLoading, setIsLoading] = useState(false);
   const [hasBeenFetched, setHasBeenFetched] = useState(false);
 
-  const getCostBalance = async (
-    mintAddress: string,
-    walletAddress: PublicKey | string
-  ) => {
-    setIsLoading(true);
-    const balance = await fetchTokenBalance(mintAddress, walletAddress);
-    if (typeof balance === "number") {
-      setBalance(balance);
-    } else {
-      console.error(balance);
-    }
-    setHasBeenFetched(true);
-    setIsLoading(false);
-  };
+  const getCostBalance = useCallback(
+    async (mintAddress: string, walletAddress: PublicKey | string) => {
+      setIsLoading(true);
+      const balances = await fetchTokenBalances([mintAddress], walletAddress);
+      const balance = balances?.[0].amount;
+      console.log(balances);
+
+      if (typeof balance === "number") {
+        setBalance(balance);
+      } else {
+        console.error(balances);
+      }
+      setHasBeenFetched(true);
+      setIsLoading(false);
+    },
+    [setBalance, setIsLoading, setHasBeenFetched]
+  );
 
   useEffect(() => {
     if (hasBeenFetched) return;
     if (!walletAddress || !cost?.token) return;
     const mintAddress = cost?.token?.mintAddress;
     getCostBalance(mintAddress, walletAddress);
-  }, [cost?.token, hasBeenFetched, walletAddress]);
+  }, [cost?.token, getCostBalance, hasBeenFetched, walletAddress]);
 
   return {
     balance,
