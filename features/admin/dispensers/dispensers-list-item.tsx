@@ -1,3 +1,4 @@
+import { ItemCollection } from "@/app/blueprint/types";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { TableRow } from "@/features/UI/tables/table-row";
 import { UserGroupIcon } from "@heroicons/react/24/outline";
@@ -12,23 +13,6 @@ export type HashListCollection = {
     id: string;
     name: string;
     rawHashList: string;
-  };
-};
-
-export type ItemCollection = {
-  amount: number;
-  id: string;
-  name: string;
-  imageUrl: string;
-  item: {
-    id: string;
-    name: string;
-    imageUrl: string;
-    token: {
-      name: string;
-      id: string;
-      mintAddress: string;
-    };
   };
 };
 

@@ -1,10 +1,7 @@
+import { DispenserCost } from "@/app/blueprint/types";
 import fetchTokenBalance from "@/app/blueprint/utils/fetch-token-balance";
-import { BASE_URL } from "@/constants/constants";
-import { DispenserCost } from "@/utils/mappers/cost";
 import { PublicKey } from "@solana/web3.js";
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { ErrorResponse } from "@/app/blueprint/types";
 
 const useCostBalance = (
   cost: DispenserCost | null,

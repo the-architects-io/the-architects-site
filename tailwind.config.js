@@ -8,6 +8,7 @@ module.exports = {
     "./features/**/*.{js,ts,jsx,tsx}",
     "./layouts/**/*.{js,ts,jsx,tsx}",
     "./hooks/**/*.{js,ts,jsx,tsx}",
+    "./blueprint/**/*.{js,ts,jsx,tsx}",
     "./providers/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {

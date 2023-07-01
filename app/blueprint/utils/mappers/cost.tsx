@@ -1,22 +1,4 @@
-import { ItemCollection } from "@/features/admin/dispensers/dispensers-list-item";
-
-export type CostCollection = {
-  id: string;
-  name: string;
-  itemCollection: ItemCollection;
-};
-
-export type DispenserCost = {
-  name: string;
-  amount: number;
-  id: string;
-  imageUrl: string;
-  token: {
-    id: string;
-    mintAddress: string;
-    name: string;
-  };
-};
+import { CostCollection } from "@/app/blueprint/types";
 
 export const mapCost = (cost: CostCollection) => {
   if (!cost) return null;

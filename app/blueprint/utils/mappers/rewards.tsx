@@ -1,20 +1,5 @@
+import { DispenserReward } from "@/app/blueprint/types";
 import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
-
-export type DispenserReward = {
-  name: string;
-  amount?: number;
-  id: string;
-  imageUrl?: string;
-  payoutChance: number;
-  isFreezeOnDelivery: boolean;
-  token?: {
-    id: string;
-    mintAddress: string;
-    name: string;
-  };
-  hashList?: string;
-  childRewards?: DispenserReward[];
-};
 
 const sortRewards = (rewards: DispenserReward[]) => {
   return rewards.sort((a, b) => {
