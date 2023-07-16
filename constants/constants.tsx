@@ -19,3 +19,5 @@ export const REWARD_WALLET_ADDRESS =
 export const NHOST_SUBDOMAIN =
   process.env.NEXT_PUBLIC_NHOST_SUBDOMAIN || "nmsqqirmpjgdbtloninj";
 export const NHOST_REGION = process.env.NEXT_PUBLIC_NHOST_REGION || "us-east-1";
+export const DISPENSER_PROGRAM_ID =
+  process.env.NEXT_PUBLIC_DISPENSER_PROGRAM_ID;
