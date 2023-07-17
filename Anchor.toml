@@ -1,0 +1,15 @@
+[features]
+seeds = false
+skip-lint = false
+[programs.devnet]
+architects = "3WpsCAduMxrcQtAJ3QeWpcAzoEfDqniFSxdMLw1HFkU3"
+
+[registry]
+url = "https://explorer-api.devnet.solana.com/"
+
+[provider]
+cluster = "devnet"
+wallet = "/Users/warly/.config/solana/id.json"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

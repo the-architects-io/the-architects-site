@@ -30,12 +30,13 @@ import showToast from "@/features/toasts/show-toast";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
+  createMint,
 } from "@solana/spl-token";
 
 export default function Page() {
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
-  const { publicKey, sendTransaction } = useWallet();
+  const { publicKey, sendTransaction, signTransaction } = useWallet();
 
   const clusterOptions = [
     { label: "Devnet", value: "devnet" },
@@ -49,6 +50,7 @@ export default function Page() {
   const [dispenserId, setDispenserId] = useState<string | null>(
     "2d7ac48a-5228-42df-9372-fd9325bc9741"
   );
+  const program = anchor.workspace.Architects;
 
   const handleTransaction = async () => {
     if (
@@ -61,6 +63,14 @@ export default function Page() {
     )
       throw new Error("Missing required data.");
     const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    const mintAuthority = anchor.web3.Keypair.generate();
+    let mintA = new PublicKey("AAbLJZ581QeCrWTZCq4aMgT7MzHnJodaF8hV5hDW5W5Q");
+    let mintB = new PublicKey("DbsAqTEannHh9A5Yv2S5rCorTGu9VS73e2d5A62pXqc2");
+    let initializerTokenAccountA = null as unknown as PublicKey;
+    let initializerTokenAccountB = null as unknown as PublicKey;
+    let takerTokenAccountA = null as unknown as PublicKey;
+    let takerTokenAccountB = null as unknown as PublicKey;
+
     const programId = new PublicKey(DISPENSER_PROGRAM_ID);
     const provider = anchor.AnchorProvider.env();
     anchor.setProvider(provider);
