@@ -10,7 +10,8 @@ module.exports = {
     "./hooks/**/*.{js,ts,jsx,tsx}",
     "./blueprint/**/*.{js,ts,jsx,tsx}",
     "./providers/**/*.{js,ts,jsx,tsx}",
-    "./idls/**/*.{js,ts,jsx,tsx}"
+    "./idls/**/*.{js,ts,jsx,tsx}",
+    "./target/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {

@@ -1,11 +1,13 @@
 "use client";
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-label";
 import { Panel } from "@/features/UI/panel";
 import { useFormik } from "formik";
 import { useCallback, useEffect, useState } from "react";
 import {
+  AnchorWallet,
   useAnchorWallet,
   useConnection,
   useWallet,
@@ -15,28 +17,24 @@ import {
   DISPENSER_PROGRAM_ID,
   REWARD_WALLET_ADDRESS,
 } from "@/constants/constants";
-import idl from "@/idls/architects_dispensers.json";
-import {
-  Connection,
-  SystemProgram,
-  Transaction,
-  TransactionInstruction,
-  clusterApiUrl,
-  sendAndConfirmTransaction,
-} from "@solana/web3.js";
-import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
+import IDL from "@/target/idl/architects_token_dispenser.json";
+// import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import showToast from "@/features/toasts/show-toast";
+import { AnchorProvider } from "@coral-xyz/anchor";
+import { executeTransaction } from "@/utils/transactions/execute-transaction";
 import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  TOKEN_PROGRAM_ID,
-  createMint,
-} from "@solana/spl-token";
+  BlockheightBasedTransactionConfirmationStrategy,
+  Transaction,
+  TransactionInstructionCtorFields,
+} from "@solana/web3.js";
+import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 export default function Page() {
+  const DISPENSER_AUTHORITY_SEED = "dispenser_authority";
+
   const { connection } = useConnection();
-  const wallet = useAnchorWallet();
-  const { publicKey, sendTransaction, signTransaction } = useWallet();
+  const anchorWallet = useAnchorWallet();
 
   const clusterOptions = [
     { label: "Devnet", value: "devnet" },
@@ -48,66 +46,106 @@ export default function Page() {
     useState<PublicKey | null>(null);
   const [dispenserBump, setDispenserBump] = useState<number | null>(null);
   const [dispenserId, setDispenserId] = useState<string | null>(
-    "2d7ac48a-5228-42df-9372-fd9325bc9741"
+    "237ac48a-5228-42df-9372-fd9325bc9741"
   );
-  const program = anchor.workspace.Architects;
 
-  const handleTransaction = async () => {
+  // const provider = new AnchorProvider(
+  //   connection,
+  //   wallet as unknown as AnchorWallet,
+  //   {}
+  // );
+
+  const handleCreateTransaction = async () => {
     if (
-      !wallet ||
-      !publicKey ||
       !DISPENSER_PROGRAM_ID ||
-      !dispenserBump ||
-      !dispenserPublicKey ||
-      !dispenserId
+      !dispenserId ||
+      !anchorWallet ||
+      !anchorWallet?.signTransaction
     )
       throw new Error("Missing required data.");
-    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-    const mintAuthority = anchor.web3.Keypair.generate();
-    let mintA = new PublicKey("AAbLJZ581QeCrWTZCq4aMgT7MzHnJodaF8hV5hDW5W5Q");
-    let mintB = new PublicKey("DbsAqTEannHh9A5Yv2S5rCorTGu9VS73e2d5A62pXqc2");
-    let initializerTokenAccountA = null as unknown as PublicKey;
-    let initializerTokenAccountB = null as unknown as PublicKey;
-    let takerTokenAccountA = null as unknown as PublicKey;
-    let takerTokenAccountB = null as unknown as PublicKey;
 
     const programId = new PublicKey(DISPENSER_PROGRAM_ID);
-    const provider = anchor.AnchorProvider.env();
+
+    const provider = new anchor.AnchorProvider(
+      connection,
+      anchorWallet,
+      AnchorProvider.defaultOptions()
+    );
     anchor.setProvider(provider);
+    const program = new anchor.Program(IDL as anchor.Idl, programId, provider);
 
-    const authoritySeed = "arch-authority";
-    const stateSeed = "state";
-    const randomSeed: anchor.BN = new anchor.BN(
-      Math.floor(Math.random() * 100000000)
+    const destination = new PublicKey(
+      "9k9jNHg5qHKxTtRqEBsfvytRri7qjk3kzUL6J7od9XtZ"
     );
 
-    // Derive PDAs: escrowStateKey, vaultKey, vaultAuthorityKey
-    const [escrowStateKey] = PublicKey.findProgramAddressSync(
-      [
-        Buffer.from(anchor.utils.bytes.utf8.encode(stateSeed)),
-        randomSeed.toArrayLike(Buffer, "le", 8),
-      ],
-      programId
+    const dispenserAuthoritySeed = new Uint8Array(
+      Buffer.from(DISPENSER_AUTHORITY_SEED)
+    );
+    const dispenserIdSeed = new Uint8Array(Buffer.from(dispenserId));
+    const seeds = [dispenserAuthoritySeed];
+
+    const [dispenserPda, bump] = await PublicKey.findProgramAddressSync(
+      seeds,
+      new PublicKey(DISPENSER_PROGRAM_ID)
     );
 
-    const [authorityAddress] = await findProgramAddressSync(
-      [Buffer.from(authoritySeed), Buffer.from(dispenserId)],
-      programId
-    );
+    const transaction = new Transaction();
 
-    const [vaultKey] = PublicKey.findProgramAddressSync(
-      [
-        authorityAddress.toBuffer(),
-        TOKEN_PROGRAM_ID.toBuffer(),
-        Buffer.from(dispenserId),
-      ],
-      ASSOCIATED_TOKEN_PROGRAM_ID
-    );
-
-    // const txHash = await sendTransaction(transaction, connection, {
-    //   skipPreflight: false,
-    //   preflightCommitment: "confirmed",
+    const ix = await program.methods
+      .initialize(dispenserIdSeed)
+      .accounts({
+        dispenserAccount: dispenserPda,
+        user: anchorWallet.publicKey,
+      })
+      .instruction();
+    // const ix = program.instruction.initialize(dispenserIdSeed, {
+    //   accounts: {
+    //     dispenserAccount: dispenserPda,
+    //     user: anchorWallet.publicKey,
+    //     systemProgram: anchor.web3.SystemProgram.programId,
+    //     tokenProgram: TOKEN_PROGRAM_ID,
+    //     rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+    //   },
     // });
+
+    // const latestBlockhash = await connection.getLatestBlockhash();
+
+    // transaction.recentBlockhash = latestBlockhash.blockhash;
+    // transaction.feePayer = anchorWallet.publicKey;
+
+    // transaction.add(ix);
+    // // sign transaction
+    // let signedTx;
+
+    // try {
+    //   signedTx = await anchorWallet.signTransaction(transaction);
+    // } catch (error) {
+    //   console.log({ error });
+    // }
+
+    // if (!signedTx) throw new Error("No signed transaction");
+
+    // let result;
+    // try {
+    //   result = await await provider.sendAndConfirm(signedTx);
+    // } catch (error) {
+    //   console.log({ error });
+    // }
+
+    // const signedTx = await anchorWallet.signTransaction(tx);
+
+    // const txHash = await connection.sendRawTransaction(signedTx.serialize());
+
+    // const result = await connection.confirmTransaction({
+    //   blockhash: latestBlockhash.blockhash,
+    //   lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+    //   signature: txHash,
+    // });
+
+    const result = await provider.sendAndConfirm(transaction, [anchorWallet]);
+
+    console.log({ result });
+
     showToast({
       primaryMessage: "Transaction sent",
       // secondaryMessage: txHash,
@@ -133,15 +171,15 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    if (dispenserPublicKey || !publicKey) return;
+    if (dispenserPublicKey) return;
     getDispenserAccount();
-  }, [dispenserPublicKey, getDispenserAccount, publicKey]);
+  }, [dispenserPublicKey, getDispenserAccount]);
 
   return (
     <ContentWrapper>
       <Panel className="flex flex-col items-center">
         <h1 className="text-2xl mb-4">Lab</h1>
-        <SelectInputWithLabel
+        {/* <SelectInputWithLabel
           value={formik.values.cluster}
           label="Cluster"
           name="cluster"
@@ -153,13 +191,13 @@ export default function Page() {
           onBlur={formik.handleBlur}
           placeholder="Select a cluster"
           hideLabel={false}
-        />
+        /> */}
         {dispenserPublicKey && (
           <p className="text-sm text-gray-400">
             Dispenser address: {dispenserPublicKey.toString()}
           </p>
         )}
-        <PrimaryButton onClick={handleTransaction}>Create</PrimaryButton>
+        <PrimaryButton onClick={handleCreateTransaction}>Create</PrimaryButton>
       </Panel>
     </ContentWrapper>
   );

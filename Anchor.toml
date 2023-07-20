@@ -1,14 +1,14 @@
 [features]
 seeds = false
 skip-lint = false
-[programs.devnet]
-architects = "3WpsCAduMxrcQtAJ3QeWpcAzoEfDqniFSxdMLw1HFkU3"
+[programs.Localnet]
+architects = "9xsHhKFyrUM5qYUHJzNhKtWzwbyo1UFythXmjKzTfVCM"
 
 [registry]
-url = "https://explorer-api.devnet.solana.com/"
+url = "https://registry.solana.com"
 
 [provider]
-cluster = "devnet"
+cluster = "localnet"
 wallet = "/Users/warly/.config/solana/id.json"
 
 [scripts]
