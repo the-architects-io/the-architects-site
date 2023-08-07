@@ -15,7 +15,7 @@ import {
   DISPENSER_PROGRAM_ID,
   REWARD_WALLET_ADDRESS,
 } from "@/constants/constants";
-import idl from "@/idls/architects_dispensers.json";
+// import idl from "@/idls/architects_dispensers.json";
 import {
   Connection,
   SystemProgram,

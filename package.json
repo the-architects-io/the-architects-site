@@ -12,6 +12,7 @@
     "@apollo/client": "^3.7.14",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
+    "@google/model-viewer": "^3.2.1",
     "@headlessui/react": "^1.7.15",
     "@heroicons/react": "^2.0.18",
     "@metaplex-foundation/js": "^0.19.4",
@@ -53,6 +54,7 @@
     "react-particles": "^2.10.1",
     "react-scrolllock": "^5.0.1",
     "tailwindcss": "3.3.2",
+    "three": "^0.155.0",
     "tsparticles": "^2.10.1",
     "tsparticles-engine": "^2.10.1",
     "typescript": "5.0.4"
