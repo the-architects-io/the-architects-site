@@ -30,9 +30,7 @@ export const DispenserClaimButton = ({
   const handleClaimToken = useCallback(async () => {
     if (!walletAddress || !dispenserId) return;
     setIsClaiming(true);
-    const { rewardTxAddress, success, message } = await claimReward(
-      walletAddress.toString()
-    );
+    const { success, message } = await claimReward(walletAddress.toString());
     setIsClaiming(false);
   }, [walletAddress, dispenserId, setIsClaiming, claimReward]);
 

@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
 import { ADD_ITEM_REWARD_COLLECTION } from "@/graphql/mutations/add-item-reward-collection";
 import { RewardCollection } from "@/app/admin/dispenser/[id]/page";
 import { ADD_ITEM_COLLECTION } from "@/graphql/mutations/add-item-collection";
-impimport { ItemCollection } from "@/app/blueprint/types";
+import { ItemCollection } from "@/app/blueprint/types";
 import { ADD_COST_COLLECTION } from "@/graphql/mutations/add-cost-collection";
 
 type Data =
