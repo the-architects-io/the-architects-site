@@ -1,8 +1,10 @@
 "use client";
+import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
+import { ArrowDownCircleIcon } from "@heroicons/react/24/outline";
 import { useFormik } from "formik";
 import Script from "next/script";
 import { useEffect, useState } from "react";
@@ -50,16 +52,25 @@ export default function Page() {
           </FormWrapper>
         </div>
         <div className="w-full md:w-2/3 flex flex-col items-center justify-center">
-          {glbSrc && <div className="text-3xl">3D FunGuyz #{nftNumber}</div>}
-          {/* @ts-ignore */}
-          <model-viewer
-            class="h-[70vh] w-[50vw]"
-            src={glbSrc}
-            alt="A 3D model of an astronaut"
-            shadow-intensity="1"
-            auto-rotate
-            camera-controls
-          />
+          {glbSrc && (
+            <>
+              <div className="flex space-x-6 items-center">
+                <div className="text-3xl">3D FunGuyz #{nftNumber}</div>
+                <a href={glbSrc} download>
+                  <ArrowDownCircleIcon className="h-8 w-8 text-white" />
+                </a>
+              </div>
+              {/* @ts-ignore */}
+              <model-viewer
+                class="h-[70vh] w-[50vw]"
+                src={glbSrc}
+                alt="A 3D model of an astronaut"
+                shadow-intensity="1"
+                auto-rotate
+                camera-controls
+              />
+            </>
+          )}
         </div>
       </div>
     </ContentWrapper>
