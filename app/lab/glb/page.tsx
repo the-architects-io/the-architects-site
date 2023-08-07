@@ -53,7 +53,7 @@ export default function Page() {
           {glbSrc && <div className="text-3xl">3D FunGuyz #{nftNumber}</div>}
           {/* @ts-ignore */}
           <model-viewer
-            class="h-[80vh] w-[50vw]"
+            class="h-[70vh] w-[50vw]"
             src={glbSrc}
             alt="A 3D model of an astronaut"
             shadow-intensity="1"
