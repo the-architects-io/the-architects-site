@@ -1,8 +1,6 @@
 "use client";
 import * as anchor from "@coral-xyz/anchor";
-import { Program } from "@coral-xyz/anchor";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
-import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-label";
 import { Panel } from "@/features/UI/panel";
 import { useFormik } from "formik";
 import { useCallback, useEffect, useState } from "react";
@@ -17,7 +15,7 @@ import {
   DISPENSER_PROGRAM_ID,
   REWARD_WALLET_ADDRESS,
 } from "@/constants/constants";
-import IDL from "@/target/idl/architects_token_dispenser.json";
+// import idl from "@/idls/architects_dispensers.json";
 // import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import showToast from "@/features/toasts/show-toast";
@@ -72,7 +70,7 @@ export default function Page() {
       AnchorProvider.defaultOptions()
     );
     anchor.setProvider(provider);
-    const program = new anchor.Program(IDL as anchor.Idl, programId, provider);
+    // const program = new anchor.Program(IDL as anchor.Idl, programId, provider);
 
     const destination = new PublicKey(
       "9k9jNHg5qHKxTtRqEBsfvytRri7qjk3kzUL6J7od9XtZ"
@@ -91,13 +89,13 @@ export default function Page() {
 
     const transaction = new Transaction();
 
-    const ix = await program.methods
-      .initialize(dispenserIdSeed)
-      .accounts({
-        dispenserAccount: dispenserPda,
-        user: anchorWallet.publicKey,
-      })
-      .instruction();
+    // const ix = await program.methods
+    //   .initialize(dispenserIdSeed)
+    //   .accounts({
+    //     dispenserAccount: dispenserPda,
+    //     user: anchorWallet.publicKey,
+    //   })
+    //   .instruction();
     // const ix = program.instruction.initialize(dispenserIdSeed, {
     //   accounts: {
     //     dispenserAccount: dispenserPda,
@@ -142,7 +140,9 @@ export default function Page() {
     //   signature: txHash,
     // });
 
-    const result = await provider.sendAndConfirm(transaction, [anchorWallet]);
+    const result = await provider.sendAndConfirm(transaction, [
+      // anchorWallet
+    ]);
 
     console.log({ result });
 
