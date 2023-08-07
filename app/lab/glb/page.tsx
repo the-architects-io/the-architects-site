@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 
 export default function Page() {
   const [glbSrc, setGlbSrc] = useState<string | null>(null);
+  const [nftNumber, setNftNumber] = useState<string>("");
 
   const formik = useFormik({
     initialValues: {
@@ -18,6 +19,7 @@ export default function Page() {
       setGlbSrc(
         `https://shdw-drive.genesysgo.net/6YJQWqyCFo4Uecniqwkupy3DZTqwN5BXrCPp2yDxtzwS/_${nftNumber}.glb`
       );
+      setNftNumber(nftNumber);
       formik.setValues({ nftNumber: "" });
     },
   });
@@ -48,6 +50,7 @@ export default function Page() {
           </FormWrapper>
         </div>
         <div className="w-full md:w-2/3 flex flex-col items-center justify-center">
+          {glbSrc && <div className="text-3xl">3D FunGuyz #{nftNumber}</div>}
           {/* @ts-ignore */}
           <model-viewer
             class="h-[80vh] w-[50vw]"

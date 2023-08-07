@@ -11,7 +11,6 @@ import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import {
   Dispenser,
   HashListCollection,
-  ItemCollection,
 } from "@/features/admin/dispensers/dispensers-list-item";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
 import { Divider } from "@/features/UI/divider";
@@ -23,6 +22,7 @@ import { RestrictionsSettingsPanel } from "@/features/admin/dispensers/restricti
 import { ConfigSettingsPanel } from "@/features/admin/dispensers/config/config-settings-panel";
 import { StatsPanel } from "@/features/admin/dispensers/stats/stats-panel";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
+import { ItemCollection } from "@/app/blueprint/types";
 
 export type RewardCollection = {
   id: string;
