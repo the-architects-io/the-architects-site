@@ -12,7 +12,7 @@ export default function Page() {
 
   const formik = useFormik({
     initialValues: {
-      nftNumber: "1",
+      nftNumber: "",
     },
     onSubmit: async ({ nftNumber }) => {
       setGlbSrc(
