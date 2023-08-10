@@ -64,15 +64,21 @@ const useDispenser = (dispenserId?: string) => {
       // TODO: Add burnTxAddress to the request for gated dispensers
       try {
         setIsClaiming(true);
-        const { data } = await axios.post("/api/claim-dispenser", {
-          address,
-          dispenserId,
-        });
-        resolve({
-          txAddress: data?.rewardTxAddress,
-          payout: data?.payout,
-          success: true,
-        });
+
+        if (dispenserId === "dd078f38-e4d5-47fa-a571-8786029e324e") {
+          // is BUILD dispenser, use vesting strategy
+          console.log("is BUILD dispenser, use vesting strategy");
+        } else {
+          const { data } = await axios.post("/api/claim-dispenser", {
+            address,
+            dispenserId,
+          });
+          resolve({
+            txAddress: data?.rewardTxAddress,
+            payout: data?.payout,
+            success: true,
+          });
+        }
       } catch (error: any) {
         return reject({
           success: false,

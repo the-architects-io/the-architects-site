@@ -2,17 +2,18 @@
 import { useQuery } from "@apollo/client";
 import { PublicKey } from "@solana/web3.js";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import Spinner from "@/features/UI/spinner";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
+import {
+  Dispenser,
+  TokenClaimPayoutStrategies,
+} from "@/features/admin/dispensers/dispensers-list-item";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
 import ConfettiBackground from "@/features/animations/confetti-background";
 import { DispenserClaimButton } from "@/features/UI/buttons/dispenser-claim-button";
-import { fetchNftsByHashList } from "@/utils/nfts/fetch-nfts-by-hash-list";
 import { BASE_URL, REWARD_WALLET_ADDRESS } from "@/constants/constants";
 import axios from "axios";
-import { FaceFrownIcon } from "@heroicons/react/24/outline";
+import { BuildTokenVestingDetails } from "@/features/dispensers/details/build-token-vesting-details";
 
 export interface ITokenClaim {
   id: string;
@@ -27,17 +28,60 @@ export interface ITokenClaim {
 export const DispenserClaim = ({
   walletAddress,
   dispenserId,
+  numberOfDaoNftsHeld,
 }: {
   walletAddress: PublicKey | null;
   dispenserId: string;
+  numberOfDaoNftsHeld?: number;
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isClaiming, setIsClaiming] = useState(false);
   const [wasClaimSucessful, setWasClaimSucessful] = useState(false);
   const [isEnabledClaim, setIsEnabledClaim] = useState(false);
   const [dispenser, setDispenser] = useState<Dispenser | null>(null);
-  const [isClaimed, setIsClaimed] = useState(false);
+  const [isDispenserEmpty, setIsDispenserEmpty] = useState(false);
   const [txAddress, setTxAddress] = useState<string | null>(null);
+
+  const setupDispenser = async (
+    dispenser: Dispenser,
+    isBuildVestingDispenser = false
+  ) => {
+    if (isBuildVestingDispenser) {
+      dispenser = {
+        ...dispenser,
+        tokenClaimPayoutStrategy:
+          TokenClaimPayoutStrategies.VESTING_BUILD_TOKEN,
+      };
+    }
+    const { rewardCollections } = dispenser;
+    const { mintAddress } = rewardCollections[0].itemCollection.item.token;
+    const { data } = await axios.post(
+      `${BASE_URL}/api/get-token-balances-from-helius`,
+      {
+        walletAddress: REWARD_WALLET_ADDRESS,
+        mintAddresses: [mintAddress],
+      }
+    );
+    const amount = data?.[0]?.amount || 0;
+    setIsDispenserEmpty(amount === 0);
+    setIsEnabledClaim(amount > 0);
+  };
+
+  const setupBuildVestingDispenser = async (dispenser: Dispenser) => {
+    const { rewardCollections } = dispenser;
+    const { mintAddress } = rewardCollections[0].itemCollection.item.token;
+    const { data } = await axios.post(
+      `${BASE_URL}/api/get-token-balances-from-helius`,
+      {
+        walletAddress: REWARD_WALLET_ADDRESS,
+        mintAddresses: [mintAddress],
+      }
+    );
+    const amount = data?.[0]?.amount || 0;
+    setIsDispenserEmpty(amount === 0);
+    // setIsEnabledClaim(amount > 0);
+    setIsEnabledClaim(true);
+  };
 
   useQuery(GET_DISPENSER_BY_ID, {
     variables: { id: dispenserId },
@@ -46,18 +90,14 @@ export const DispenserClaim = ({
       if (!dispenser) return;
       try {
         setDispenser(dispenser);
-        const { rewardCollections } = dispenser;
-        const { mintAddress } = rewardCollections[0].itemCollection.item.token;
-        const { data } = await axios.post(
-          `${BASE_URL}/api/get-token-balances-from-helius`,
-          {
-            walletAddress: REWARD_WALLET_ADDRESS?.toString(),
-            mintAddresses: [mintAddress],
-          }
-        );
-        const amount = data?.[0]?.amount || 0;
-        setIsClaimed(amount === 0);
-        setIsEnabledClaim(amount > 0);
+        if (dispenserId === "dd078f38-e4d5-47fa-a571-8786029e324e") {
+          // is BUILD dispenser, use vesting strategy
+          console.log("BUILD dispenser, use vesting strategy");
+          setIsEnabledClaim(true);
+          setupBuildVestingDispenser(dispenser);
+          return;
+        }
+        setupDispenser(dispenser);
       } catch (error) {
         console.log({ error });
       } finally {
@@ -91,18 +131,6 @@ export const DispenserClaim = ({
     );
   }
 
-  if (isClaimed) {
-    return (
-      <div className="flex flex-col justify-center items-center w-full min-h-screen text-white">
-        <FaceFrownIcon className="w-16 h-16 text-white mb-4" />
-        <div className="text-6xl mb-2">Sorry!</div>
-        <div className="text-2xl mt-4 text-center">
-          The NFT has already been claimed.
-        </div>
-      </div>
-    );
-  }
-
   if (wasClaimSucessful) {
     return (
       <div className="flex flex-col justify-center items-center w-full min-h-screen text-white">
@@ -127,19 +155,19 @@ export const DispenserClaim = ({
 
   return (
     <div className="flex flex-col justify-center items-center w-full min-h-screen">
-      <div className="text-5xl text-white mb-10 uppercase">You found it!</div>
-      <Image
-        src="https://aznyagtolfcupkolhaqtyj47626i6lz6yzzdq57royxn7kvymowa.arweave.net/BluAGm5ZRUepyzghPCef9ryPLz7Gcjh38XYu36q4Y6w?ext=png"
-        alt="FunGuyz NFT"
-        width="300"
-        height="300"
-        className="mb-10 rounded-lg"
-      />
       {!!dispenser && (
         <>
+          <BuildTokenVestingDetails
+            walletAddress={walletAddress}
+            numberOfDaoNftsHeld={numberOfDaoNftsHeld || 0}
+            lastClaimTime={undefined}
+            hasBeenFetched={true}
+            tokenClaimSource={dispenser}
+            isEnabledClaim={isEnabledClaim}
+            isLoading={false}
+          />
           <DispenserClaimButton
-            isClaimed={isClaimed}
-            setIsClaimed={setIsClaimed}
+            isClaimed={false}
             dispenserId={dispenser?.id}
             walletAddress={walletAddress}
             setIsClaiming={setIsClaiming}

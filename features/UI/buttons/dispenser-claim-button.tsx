@@ -1,4 +1,5 @@
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
+import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { PublicKey } from "@solana/web3.js";
 import axios from "axios";
 import { useCallback, useState } from "react";
@@ -9,20 +10,16 @@ interface Props extends React.HTMLAttributes<HTMLButtonElement> {
   walletAddress: PublicKey | null;
   isEnabledClaim: boolean;
   dispenserId?: string;
-  setIsClaimed: (isClaimed: boolean) => void;
   isClaimed: boolean;
   setTxAddress: (txAddress: string | null) => void;
 }
 
 export const DispenserClaimButton = ({
   setIsClaiming,
-  setWasClaimSucessful,
   walletAddress,
   isEnabledClaim,
   dispenserId,
-  setIsClaimed,
   isClaimed,
-  setTxAddress,
 }: Props) => {
   const [errorMessage, setErrorMessage] = useState("");
   const { claimReward } = useDispenser(dispenserId);
@@ -42,12 +39,7 @@ export const DispenserClaimButton = ({
         </div>
       )}
       {!isClaimed && isEnabledClaim && (
-        <button
-          className="bg-green-500 hover:bg-green-600 text-slate-800 rounded-xl px-16 py-3 border border-green-500 hover:border-green-500 transition-colors duration-300 ease-in-out text-xl font-semibold shadow-green-500 shadow-md"
-          onClick={handleClaimToken}
-        >
-          Claim
-        </button>
+        <PrimaryButton onClick={handleClaimToken}>Claim</PrimaryButton>
       )}
     </div>
   );

@@ -4,7 +4,7 @@ export const RPC_ENDPOINT: string = process.env.NEXT_PUBLIC_RPC_ENDPOINT || "";
 export const GRAPHQL_API_ENDPOINT: string =
   process.env.NEXT_PUBLIC_GRAPHQL_API_ENDPOINT || "";
 export const ADMIN_WALLETS = process.env.NEXT_PUBLIC_ADMIN_WALLETS || "[]";
-export const ENV = process.env.NEXT_PUBLIC_ENV || "";
+export const ENV = process.env.NEXT_PUBLIC_ENV || "local";
 export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "";
 export const BURNING_WALLET_ADDRESS =
   process.env.NEXT_PUBLIC_BURNING_WALLET_ADDRESS || "";
@@ -21,3 +21,4 @@ export const NHOST_SUBDOMAIN =
 export const NHOST_REGION = process.env.NEXT_PUBLIC_NHOST_REGION || "us-east-1";
 export const DISPENSER_PROGRAM_ID =
   process.env.NEXT_PUBLIC_DISPENSER_PROGRAM_ID;
+export const CREATOR_ADDRESS = process.env.NEXT_PUBLIC_CREATOR_ADDRESS;

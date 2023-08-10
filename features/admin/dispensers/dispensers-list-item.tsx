@@ -16,7 +16,13 @@ export type HashListCollection = {
   };
 };
 
+export enum TokenClaimPayoutStrategies {
+  VESTING_BUILD_TOKEN = "VESTING_BUILD_TOKEN",
+  BASIC_CLAIM = "BASIC_CLAIM",
+}
+
 export type Dispenser = {
+  tokenClaimPayoutStrategy: TokenClaimPayoutStrategies;
   collectionWallet: {
     id: string;
     address: string;

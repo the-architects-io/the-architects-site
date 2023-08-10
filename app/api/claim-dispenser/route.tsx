@@ -3,8 +3,6 @@ import {
   Keypair,
   PublicKey,
   sendAndConfirmTransaction,
-  Transaction,
-  TransactionInstructionCtorFields,
 } from "@solana/web3.js";
 import bs58 from "bs58";
 import { client } from "@/graphql/backend-client";
