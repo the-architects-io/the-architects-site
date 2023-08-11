@@ -14,6 +14,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
 import { keypairIdentity, Metaplex, token } from "@metaplex-foundation/js";
+import { Token } from "@/features/admin/tokens/tokens-list-item";
+import { ADD_LAST_CLAIM_TIME } from "@/graphql/mutations/add-last-claim-time";
 
 export type Wallet = {
   address: string;
@@ -177,9 +179,30 @@ export async function POST(req: NextRequest) {
         });
       payout = insert_payouts_one;
     } catch (error) {
-      console.log("3!!", error);
+      console.log("ADD PAYOUT ERROR", error);
       return NextResponse.json(
         { error, message: "Failed to add payout" },
+        { status: 400 }
+      );
+    }
+
+    let updatedToken;
+
+    try {
+      const { update_tokens_by_pk }: { update_tokens_by_pk: Token } =
+        await client.request({
+          document: ADD_LAST_CLAIM_TIME,
+          variables: {
+            tokenId:
+              dispenser?.rewardCollections[0].itemCollection.item.token.id,
+            lastClaimId: payout.id,
+          },
+        });
+      updatedToken = update_tokens_by_pk;
+    } catch (error) {
+      console.log("LAST CLAIM TIME ERROR", error);
+      return NextResponse.json(
+        { error, message: "Failed to add last claim time" },
         { status: 400 }
       );
     }
