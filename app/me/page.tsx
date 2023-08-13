@@ -46,13 +46,17 @@ export default function Page() {
   return (
     <ContentWrapper>
       <Panel className="flex flex-col items-center mb-8 w-full">
-        <Image
-          alt="avatar"
-          src={user?.avatarUrl}
-          width={30}
-          height={30}
-          className="mb-4"
-        />
+        {!!user?.avatarUrl ? (
+          <Image
+            alt="avatar"
+            src={user?.avatarUrl}
+            width={30}
+            height={30}
+            className="mb-4"
+          />
+        ) : (
+          <div className="w-16 h-16 rounded-full bg-stone-700 mb-8" />
+        )}
         <h1 className="text-3xl font-bold mb-4">{displayName}</h1>
         {/* <a
           href={discord}

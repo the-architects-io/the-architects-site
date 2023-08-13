@@ -15,7 +15,7 @@ export const FormWrapper = ({
   return (
     <form
       className={classNames(
-        "flex flex-wrap max-w-lg bg-gray-800 text-gray-300 rounded-xl shadow-2xl mx-auto p-4 space-y-4 min-w-[400px]",
+        "flex flex-wrap max-w-lg bg-gray-800 text-gray-300 rounded-xl mx-auto p-4 space-y-4 min-w-[400px]",
         className
       )}
       onSubmit={onSubmit}
