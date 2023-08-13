@@ -144,18 +144,6 @@ export default function DispenserClaimPage({ params }: { params: any }) {
               <WalletButton />
             </div>
           )}
-          <div className="absolute top-4 left-4 text-white">
-            <div>isFetching:</div>
-            <div className="text-sm">{isFetchingNfts.toString()}</div>
-            <div>hasBeenFetched:</div>
-            <div className="text-sm">{hasBeenFetched.toString()}</div>
-            <div>numberOfDaoNftsHeld:</div>
-            <div className="text-sm">{numberOfDaoNftsHeld}</div>
-            <div>lastClaimTime:</div>
-            <div className="text-sm">{JSON.stringify(lastClaimTime)}</div>
-            <div>isFetchingLastClaimTime:</div>
-            <div className="text-sm">{isFetchingLastClaimTime.toString()}</div>
-          </div>
           <DispenserClaim
             lastClaimTime={lastClaimTime}
             isFetching={isFetchingNfts || isFetchingLastClaimTime}
