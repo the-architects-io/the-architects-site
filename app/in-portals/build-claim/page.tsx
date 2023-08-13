@@ -145,14 +145,6 @@ export default function DispenserClaimPage({ params }: { params: any }) {
             </div>
           )}
           <div className="absolute top-4 left-4 text-white">
-            <div>Wallet address:</div>
-            <div className="text-sm">
-              <>
-                {ENV === "local"
-                  ? walletAdapterWalletAddress || inPortalsWalletAddress
-                  : inPortalsWalletAddress}
-              </>
-            </div>
             <div>isFetching:</div>
             <div className="text-sm">{isFetchingNfts.toString()}</div>
             <div>hasBeenFetched:</div>
@@ -160,7 +152,7 @@ export default function DispenserClaimPage({ params }: { params: any }) {
             <div>numberOfDaoNftsHeld:</div>
             <div className="text-sm">{numberOfDaoNftsHeld}</div>
             <div>lastClaimTime:</div>
-            <div className="text-sm">{lastClaimTime}</div>
+            <div className="text-sm">{JSON.stringify(lastClaimTime)}</div>
             <div>isFetchingLastClaimTime:</div>
             <div className="text-sm">{isFetchingLastClaimTime.toString()}</div>
           </div>
