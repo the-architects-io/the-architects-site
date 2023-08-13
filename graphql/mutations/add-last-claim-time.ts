@@ -1,12 +1,15 @@
 import { gql } from "@apollo/client";
 
-export const ADD_LAST_CLAIM_TIME = gql`
-  mutation ADD_LAST_CLAIM_TIME($lastClaimId: uuid!, $tokenId: uuid!) {
-    update_tokens_by_pk(
-      pk_columns: { id: $tokenId }
+export const ADD_LAST_CLAIM_TIMES = gql`
+  mutation ADD_LAST_CLAIM_TIMES(
+    $mintAddresses: [String!]!
+    $lastClaimId: uuid!
+  ) {
+    update_tokens(
+      where: { mintAddress: { _in: $mintAddresses } }
       _set: { lastClaimId: $lastClaimId }
     ) {
-      id
+      affected_rows
     }
   }
 `;

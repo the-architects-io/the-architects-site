@@ -64,8 +64,6 @@ export const fetchDaoNfts = async ({
         nftsWithMetadata.push(metadata);
       }
 
-      debugger;
-
       resolve(nftsWithMetadata);
     } catch (error) {
       console.log("fetchDaoNfts error", error);

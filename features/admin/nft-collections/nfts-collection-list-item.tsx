@@ -14,7 +14,7 @@ export interface NftCollection {
   firstVerifiedCreator: string;
   verifiedCollectionAddress: string;
   imageUrl: string;
-  associatedCommunity: {
+  community: {
     id: string;
     name: string;
     imageUrl: string;

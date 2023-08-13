@@ -11,9 +11,15 @@ import {
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
 import ConfettiBackground from "@/features/animations/confetti-background";
 import { DispenserClaimButton } from "@/features/UI/buttons/dispenser-claim-button";
-import { BASE_URL, REWARD_WALLET_ADDRESS } from "@/constants/constants";
+import {
+  BASE_URL,
+  BUILD_REWARD_WALLET,
+  REWARD_WALLET_ADDRESS,
+} from "@/constants/constants";
 import axios from "axios";
 import { BuildTokenVestingDetails } from "@/features/dispensers/details/build-token-vesting-details";
+import { ModeledNftMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
+import { calculateTokenClaimRewardAmount } from "@/utils/dispensers/calculate-token-claim-reward-amount";
 
 export interface ITokenClaim {
   id: string;
@@ -29,58 +35,39 @@ export const DispenserClaim = ({
   walletAddress,
   dispenserId,
   numberOfDaoNftsHeld,
+  isFetching,
+  lastClaimTime,
+  collectionNfts,
 }: {
   walletAddress: PublicKey | null;
   dispenserId: string;
   numberOfDaoNftsHeld?: number;
+  isFetching?: boolean;
+  lastClaimTime?: string;
+  collectionNfts?: ModeledNftMetadata[];
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isClaiming, setIsClaiming] = useState(false);
+  const [isClaimed, setIsClaimed] = useState(false);
   const [wasClaimSucessful, setWasClaimSucessful] = useState(false);
   const [isEnabledClaim, setIsEnabledClaim] = useState(false);
   const [dispenser, setDispenser] = useState<Dispenser | null>(null);
   const [isDispenserEmpty, setIsDispenserEmpty] = useState(false);
   const [txAddress, setTxAddress] = useState<string | null>(null);
 
-  const setupDispenser = async (
-    dispenser: Dispenser,
-    isBuildVestingDispenser = false
-  ) => {
-    if (isBuildVestingDispenser) {
-      dispenser = {
-        ...dispenser,
-        tokenClaimPayoutStrategy:
-          TokenClaimPayoutStrategies.VESTING_BUILD_TOKEN,
-      };
-    }
+  const setupDispenser = async (dispenser: Dispenser) => {
     const { rewardCollections } = dispenser;
     const { mintAddress } = rewardCollections[0].itemCollection.item.token;
     const { data } = await axios.post(
       `${BASE_URL}/api/get-token-balances-from-helius`,
       {
-        walletAddress: REWARD_WALLET_ADDRESS,
+        walletAddress: BUILD_REWARD_WALLET,
         mintAddresses: [mintAddress],
       }
     );
     const amount = data?.[0]?.amount || 0;
     setIsDispenserEmpty(amount === 0);
-    setIsEnabledClaim(amount > 0);
-  };
-
-  const setupBuildVestingDispenser = async (dispenser: Dispenser) => {
-    const { rewardCollections } = dispenser;
-    const { mintAddress } = rewardCollections[0].itemCollection.item.token;
-    const { data } = await axios.post(
-      `${BASE_URL}/api/get-token-balances-from-helius`,
-      {
-        walletAddress: REWARD_WALLET_ADDRESS,
-        mintAddresses: [mintAddress],
-      }
-    );
-    const amount = data?.[0]?.amount || 0;
-    setIsDispenserEmpty(amount === 0);
-    // setIsEnabledClaim(amount > 0);
-    setIsEnabledClaim(true);
+    if (amount === 0) setIsEnabledClaim(false);
   };
 
   useQuery(GET_DISPENSER_BY_ID, {
@@ -90,13 +77,6 @@ export const DispenserClaim = ({
       if (!dispenser) return;
       try {
         setDispenser(dispenser);
-        if (dispenserId === "dd078f38-e4d5-47fa-a571-8786029e324e") {
-          // is BUILD dispenser, use vesting strategy
-          console.log("BUILD dispenser, use vesting strategy");
-          setIsEnabledClaim(true);
-          setupBuildVestingDispenser(dispenser);
-          return;
-        }
         setupDispenser(dispenser);
       } catch (error) {
         console.log({ error });
@@ -160,20 +140,23 @@ export const DispenserClaim = ({
           <BuildTokenVestingDetails
             walletAddress={walletAddress}
             numberOfDaoNftsHeld={numberOfDaoNftsHeld || 0}
-            lastClaimTime={undefined}
+            lastClaimTime={lastClaimTime}
             hasBeenFetched={true}
             tokenClaimSource={dispenser}
             isEnabledClaim={isEnabledClaim}
-            isLoading={false}
+            isLoading={isLoading || !!isFetching}
+            setIsEnabledClaim={setIsEnabledClaim}
           />
           <DispenserClaimButton
-            isClaimed={false}
+            isClaimed={isClaimed}
+            setIsClaimed={setIsClaimed}
             dispenserId={dispenser?.id}
             walletAddress={walletAddress}
             setIsClaiming={setIsClaiming}
             setWasClaimSucessful={setWasClaimSucessful}
             isEnabledClaim={isEnabledClaim}
             setTxAddress={setTxAddress}
+            mintAddresses={collectionNfts?.map((nft) => nft.mintAddress)}
           />
         </>
       )}

@@ -9,6 +9,9 @@ import { DispenserClaim } from "@/features/in-portals/dispenser-claim";
 import { fetchDaoNfts } from "@/utils/nfts/fetch-dao-nfts";
 import { ModeledNftMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import WalletButton from "@/features/UI/buttons/wallet-button";
+import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
+import { useLazyQuery, useQuery } from "@apollo/client";
+import { Token } from "@/features/admin/tokens/tokens-list-item";
 
 export default function DispenserClaimPage({ params }: { params: any }) {
   const { publicKey: walletAdapterWalletAddress } = useWallet();
@@ -23,6 +26,27 @@ export default function DispenserClaimPage({ params }: { params: any }) {
   const [collectionNfts, setCollectionNfts] = useState<ModeledNftMetadata[]>(
     []
   );
+  const [lastClaimTime, setLastClaimTime] = useState<string | undefined>(
+    undefined
+  );
+  const [isFetchingLastClaimTime, setIsFetchingLastClaimTime] = useState(true);
+
+  const { loading } = useQuery(GET_TOKENS_BY_MINT_ADDRESSES, {
+    skip: !collectionNfts?.length,
+    variables: {
+      mintAddresses: collectionNfts?.map((nft) => nft.mintAddress),
+    },
+    onCompleted: ({ tokens }: { tokens: Token[] }) => {
+      console.log({ tokens });
+      const lastClaimTimeToken = tokens.reduce((prev, current) => {
+        return prev?.lastClaim?.createdAt > current?.lastClaim?.createdAt
+          ? prev
+          : current;
+      });
+      setLastClaimTime(lastClaimTimeToken?.lastClaim?.createdAt);
+      setIsFetchingLastClaimTime(false);
+    },
+  });
 
   const handleFetchDaoNfts = useCallback(async () => {
     const walletAddress = inPortalsWalletAddress || walletAdapterWalletAddress;
@@ -39,7 +63,6 @@ export default function DispenserClaimPage({ params }: { params: any }) {
     setCollectionNfts(nfts);
     setIsFetchingNfts(false);
     setHasBeenFetched(true);
-
     setNumberOfDaoNftsHeld(nfts?.length || 0);
   }, [connection, inPortalsWalletAddress, walletAdapterWalletAddress]);
 
@@ -122,7 +145,10 @@ export default function DispenserClaimPage({ params }: { params: any }) {
             </div>
           )}
           <DispenserClaim
+            lastClaimTime={lastClaimTime}
+            isFetching={isFetchingNfts || isFetchingLastClaimTime}
             numberOfDaoNftsHeld={numberOfDaoNftsHeld}
+            collectionNfts={collectionNfts}
             dispenserId={"dd078f38-e4d5-47fa-a571-8786029e324e"}
             walletAddress={
               ENV === "local"

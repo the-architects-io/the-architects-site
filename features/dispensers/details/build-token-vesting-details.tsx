@@ -21,6 +21,7 @@ interface Props {
   isEnabledClaim: boolean;
   hasBeenFetched: boolean;
   isLoading: boolean;
+  setIsEnabledClaim?: (isEnabledClaim: boolean) => void;
 }
 
 export const BuildTokenVestingDetails = ({
@@ -31,18 +32,26 @@ export const BuildTokenVestingDetails = ({
   tokenClaimSource,
   isEnabledClaim,
   isLoading,
+  setIsEnabledClaim,
 }: Props) => {
   const [rewardAmount, setRewardAmount] = useState(0);
 
   const calculateRewardAmount = useCallback(() => {
-    setRewardAmount(
-      calculateTokenClaimRewardAmount(
-        lastClaimTime,
-        tokenClaimSource,
-        numberOfDaoNftsHeld || 0
-      )
+    const amount = calculateTokenClaimRewardAmount(
+      lastClaimTime,
+      tokenClaimSource,
+      numberOfDaoNftsHeld || 0
     );
-  }, [lastClaimTime, numberOfDaoNftsHeld, setRewardAmount, tokenClaimSource]);
+    setRewardAmount(amount);
+    setIsEnabledClaim && setIsEnabledClaim(rewardAmount > 0);
+  }, [
+    lastClaimTime,
+    numberOfDaoNftsHeld,
+    setRewardAmount,
+    tokenClaimSource,
+    setIsEnabledClaim,
+    rewardAmount,
+  ]);
 
   useEffect(() => {
     if (!walletAddress) return;
@@ -52,6 +61,7 @@ export const BuildTokenVestingDetails = ({
     }
   }, [
     walletAddress,
+    setIsEnabledClaim,
     hasBeenFetched,
     numberOfDaoNftsHeld,
     calculateRewardAmount,
@@ -89,14 +99,10 @@ export const BuildTokenVestingDetails = ({
           </div>
         )}
 
-        {!!lastClaimTime &&
-          tokenClaimSource.tokenClaimPayoutStrategy ===
-            TokenClaimPayoutStrategies.VESTING_BUILD_TOKEN && (
-            <div className="flex space-x-2">
-              <div>Days of accrued earnings:</div>
-              <div>{dayjs().diff(dayjs(lastClaimTime), "day")}</div>
-            </div>
-          )}
+        <div className="flex space-x-2">
+          <div>Days of accrued earnings:</div>
+          <div>{dayjs().diff(dayjs(lastClaimTime), "day")}</div>
+        </div>
 
         <LastClaimTimeDetails
           cooldownInHours={24}

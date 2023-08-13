@@ -46,7 +46,11 @@ export default function FetchPage() {
       let returnData;
 
       try {
-        const { data } = await axios.post("/api/add-characters-from-nfts", {
+        // const { data } = await axios.post("/api/add-characters-from-nfts", {
+        //   hashList,
+        //   nftCollectionId,
+        // });
+        const { data } = await axios.post("/api/add-nfts", {
           hashList,
           nftCollectionId,
         });

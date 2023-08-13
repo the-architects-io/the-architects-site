@@ -26,6 +26,7 @@ export type ClaimRewardResponse = {
 
 export type ClaimRewardOptions = {
   burnTxAddress?: string;
+  mintAddresses?: string[];
 };
 
 const useDispenser = (dispenserId?: string) => {
@@ -65,20 +66,16 @@ const useDispenser = (dispenserId?: string) => {
       try {
         setIsClaiming(true);
 
-        if (dispenserId === "dd078f38-e4d5-47fa-a571-8786029e324e") {
-          // is BUILD dispenser, use vesting strategy
-          console.log("is BUILD dispenser, use vesting strategy");
-        } else {
-          const { data } = await axios.post("/api/claim-dispenser", {
-            address,
-            dispenserId,
-          });
-          resolve({
-            txAddress: data?.rewardTxAddress,
-            payout: data?.payout,
-            success: true,
-          });
-        }
+        const { data } = await axios.post("/api/claim-dispenser", {
+          address,
+          dispenserId,
+          mintAddresses: options?.mintAddresses,
+        });
+        resolve({
+          txAddress: data?.rewardTxAddress,
+          payout: data?.payout,
+          success: true,
+        });
       } catch (error: any) {
         return reject({
           success: false,

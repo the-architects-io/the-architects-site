@@ -4,7 +4,7 @@ export const GET_NFT_COLLECTIONS = gql`
   query GET_NFT_COLLECTIONS {
     nftCollections {
       createdAt
-      associatedCommunity {
+      community {
         id
         name
         imageUrl

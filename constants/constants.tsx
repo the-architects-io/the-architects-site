@@ -22,3 +22,4 @@ export const NHOST_REGION = process.env.NEXT_PUBLIC_NHOST_REGION || "us-east-1";
 export const DISPENSER_PROGRAM_ID =
   process.env.NEXT_PUBLIC_DISPENSER_PROGRAM_ID;
 export const CREATOR_ADDRESS = process.env.NEXT_PUBLIC_CREATOR_ADDRESS;
+export const BUILD_REWARD_WALLET = process.env.NEXT_PUBLIC_BUILD_REWARD_WALLET;

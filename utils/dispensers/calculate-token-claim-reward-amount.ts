@@ -10,8 +10,6 @@ export const caluclateBuildVestingRewardAmount = (
   numberOfDaoNftsHeld: number,
   lastClaimTime: string | undefined
 ) => {
-  if (!numberOfDaoNftsHeld) return 0;
-
   const baseClaimAmount = 1000; // 10.00 $BUILD
 
   if (!lastClaimTime) return baseClaimAmount * numberOfDaoNftsHeld;
@@ -44,9 +42,10 @@ export const caluclateBuildVestingRewardAmount = (
 export const calculateTokenClaimRewardAmount = (
   lastClaimTime: string | undefined,
   dispenser: Dispenser,
-  numberOfDaoNftsHeld?: number
+  numberOfDaoNftsHeld?: number,
+  strategy = TokenClaimPayoutStrategies.VESTING_BUILD_TOKEN
 ) => {
-  switch (dispenser.tokenClaimPayoutStrategy) {
+  switch (strategy) {
     case TokenClaimPayoutStrategies.VESTING_BUILD_TOKEN:
       if (!numberOfDaoNftsHeld) return 0;
       return caluclateBuildVestingRewardAmount(

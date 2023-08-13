@@ -15,7 +15,9 @@ import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
 import { keypairIdentity, Metaplex, token } from "@metaplex-foundation/js";
 import { Token } from "@/features/admin/tokens/tokens-list-item";
-import { ADD_LAST_CLAIM_TIME } from "@/graphql/mutations/add-last-claim-time";
+import { ADD_LAST_CLAIM_TIMES } from "@/graphql/mutations/add-last-claim-time";
+import { caluclateBuildVestingRewardAmount } from "@/utils/dispensers/calculate-token-claim-reward-amount";
+import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
 
 export type Wallet = {
   address: string;
@@ -35,24 +37,43 @@ export async function POST(req: NextRequest) {
   const {
     address,
     dispenserId,
+    mintAddresses,
   }: {
     address: string;
     dispenserId: string;
+    mintAddresses?: string[];
   } = await req.json();
 
-  console.log({ address, dispenserId });
+  console.log({ address, dispenserId, mintAddresses });
 
-  if (!process.env.REWARD_PRIVATE_KEY || !address || !dispenserId) {
+  if (!process.env.BUILD_REWARD_PRIVATE_KEY || !address || !dispenserId) {
     return NextResponse.json(
       { error: "Missing required parameters" },
       { status: 400 }
     );
   }
 
+  const { tokens }: { tokens: Token[] } = await client.request({
+    document: GET_TOKENS_BY_MINT_ADDRESSES,
+    variables: {
+      mintAddresses,
+    },
+  });
+
+  const lastClaimTimeToken = tokens.reduce((prev, current) => {
+    return prev?.lastClaim?.createdAt > current?.lastClaim?.createdAt
+      ? prev
+      : current;
+  });
+
   try {
     let dispenser: Dispenser | null = null;
     let rewardTxAddress: string | null = null;
-    let payoutAmount;
+
+    let payoutAmount = caluclateBuildVestingRewardAmount(
+      mintAddresses?.length || 0,
+      lastClaimTimeToken?.lastClaim?.createdAt
+    );
 
     try {
       const { dispensers_by_pk }: { dispensers_by_pk: Dispenser } =
@@ -66,14 +87,18 @@ export async function POST(req: NextRequest) {
       const rewardMintAddress = new PublicKey(
         rewardCollections[0].itemCollection.item.token.mintAddress
       );
+      const rewardDecimals =
+        rewardCollections[0].itemCollection.item.token.decimals;
 
-      console.log({ rewardMintAddress: rewardMintAddress.toString() });
+      console.log({
+        rewardMintAddress: rewardMintAddress.toString(),
+        rewardDecimals,
+      });
 
       const connection = new Connection(RPC_ENDPOINT);
-      payoutAmount = 1;
 
       const rewardKeypair = Keypair.fromSecretKey(
-        bs58.decode(process.env.REWARD_PRIVATE_KEY)
+        bs58.decode(process.env.BUILD_REWARD_PRIVATE_KEY)
       );
       const rewardPublicKey = new PublicKey(rewardKeypair.publicKey.toString());
       console.log({ rewardPublicKey: rewardPublicKey.toString() });
@@ -91,7 +116,7 @@ export async function POST(req: NextRequest) {
           nftOrSft: nft,
           fromOwner: rewardPublicKey,
           toOwner: new PublicKey(address),
-          amount: token(1),
+          amount: token(payoutAmount, rewardDecimals),
           authority: rewardKeypair,
         });
 
@@ -191,10 +216,9 @@ export async function POST(req: NextRequest) {
     try {
       const { update_tokens_by_pk }: { update_tokens_by_pk: Token } =
         await client.request({
-          document: ADD_LAST_CLAIM_TIME,
+          document: ADD_LAST_CLAIM_TIMES,
           variables: {
-            tokenId:
-              dispenser?.rewardCollections[0].itemCollection.item.token.id,
+            mintAddresses,
             lastClaimId: payout.id,
           },
         });

@@ -21,6 +21,10 @@ export type Token = {
     name: string;
   };
   isFungible: boolean;
+  lastClaim: {
+    id: string;
+    createdAt: string;
+  };
 };
 
 export const TokensListItem = ({ token }: { token: Token }) => {

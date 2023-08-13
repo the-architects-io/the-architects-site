@@ -16,6 +16,7 @@ export type ItemCollection = {
       name: string;
       id: string;
       mintAddress: string;
+      decimals: number;
     };
   };
 };
