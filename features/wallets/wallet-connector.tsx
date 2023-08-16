@@ -1,16 +1,17 @@
 import { Wallet } from "@/app/api/claim-dispenser/route";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
-import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
-import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { GET_WALLETS_BY_USER_ID } from "@/graphql/queries/get-wallets-by-user-id";
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { getAbbreviatedAddress } from "@/utils/formatting";
+import { useQuery } from "@apollo/client";
+import { PublicKey } from "@metaplex-foundation/js";
 import { User, useUserData } from "@nhost/nextjs";
 import { WalletName } from "@solana/wallet-adapter-base";
 import { useWallet } from "@solana/wallet-adapter-react";
 import axios from "axios";
 import classNames from "classnames";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 export default function WalletConnector({ className }: { className?: string }) {
@@ -22,59 +23,110 @@ export default function WalletConnector({ className }: { className?: string }) {
     disconnect,
     connected,
     connecting,
+    connect,
   } = useWallet();
 
   const user = useUserData();
-
+  const router = useRouter();
+  const [cachedUserAddress, setCachedUserAddress] = useState<string | null>(
+    null
+  );
+  const [cachedAdaptor, setCachedAdaptor] = useState<string | null>(null);
   const [userWallets, setUserWallets] = useState<Wallet[]>([]);
+  const [isLinkingWallet, setIsLinkingWallet] = useState(false);
+  const [isWalletSelected, setIsWalletSelected] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [pubKey, setPubKey] = useState<PublicKey | null>(null);
 
-  const { loading: loadingUserWallets } = useQuery(GET_WALLETS_BY_USER_ID, {
-    variables: {
-      id: user?.id,
-    },
-    skip: !user?.id,
-    onCompleted: ({ wallets }) => {
-      console.log({ wallets });
-      setUserWallets(wallets);
-    },
-  });
+  const { loading: loadingUserWallets, refetch } = useQuery(
+    GET_WALLETS_BY_USER_ID,
+    {
+      variables: {
+        id: user?.id,
+      },
+      skip: !user?.id,
+      onCompleted: ({ wallets }) => {
+        console.log({ wallets });
+        setUserWallets(wallets);
+      },
+    }
+  );
 
   const handleSelectWallet = (name: WalletName) => {
     if (!name || loadingUserWallets) return;
     select(name);
+    connect();
+    setIsWalletSelected(true);
   };
 
   const linkWalletToUser = useCallback(
     async (user: User) => {
       console.log(user);
-      debugger;
+      setIsLinkingWallet(true);
       if (!user?.id || !publicKey) return;
-      const { data } = await axios.post("/api/link-wallet-to-user", {
+      const { data, status } = await axios.post("/api/link-wallet-to-user", {
         userId: user?.id,
         walletAddress: publicKey?.toString(),
       });
+      debugger;
+      if (status === 200) {
+        showToast({
+          primaryMessage: "Wallet linked",
+          secondaryMessage: "Your wallet has been linked to your account",
+        });
+        refetch();
+        router.push("/me");
+        setIsLinkingWallet(false);
+        return;
+      }
+
       if (data.error) {
         showToast({
           primaryMessage: "Error linking wallet",
           secondaryMessage: data.error,
         });
+        setIsLinkingWallet(false);
         return;
       }
-      showToast({
-        primaryMessage: "Wallet linked",
-        secondaryMessage: "Your wallet has been linked to your account",
-      });
     },
-    [publicKey]
+    [publicKey, refetch]
   );
 
   useEffect(() => {
     if (connecting) {
       console.log("connecting");
+      setIsLinkingWallet(true);
     }
-    if (connected) {
+
+    if (publicKey && isInitialLoad && wallet?.adapter?.name) {
+      setCachedUserAddress(publicKey?.toString());
+      setCachedAdaptor(wallet?.adapter?.name);
+
+      setIsInitialLoad(false);
+    }
+
+    // @ts-ignore
+    const provider = window?.phantom?.solana;
+
+    if (provider) {
+      provider.on("accountChanged", () => {
+        console.log("connected!!!");
+      });
+    }
+
+    if (connected && publicKey && isWalletSelected && !isLinkingWallet) {
+      // if (cachedUserAddress === publicKey?.toString()) {
+      //   showToast({
+      //     primaryMessage: "Wallet already linked",
+      //     secondaryMessage: `Wallet ${getAbbreviatedAddress(
+      //       publicKey.toString()
+      //     )} is already linked to your account`,
+      //   });
+      //   setIsWalletSelected(false);
+      //   return;
+      // }
+
       console.log("connected");
-      // see if connected wallet is linked to user
       const walletLinkedToUser = !!userWallets.find(
         (userWallet) => userWallet.address === publicKey?.toString()
       );
@@ -82,16 +134,34 @@ export default function WalletConnector({ className }: { className?: string }) {
       if (walletLinkedToUser) {
         showToast({
           primaryMessage: "Wallet already linked",
-          secondaryMessage: "This wallet is already linked to your account",
+          secondaryMessage: `Wallet ${getAbbreviatedAddress(
+            publicKey.toString()
+          )} is already linked to your account`,
         });
+        setIsWalletSelected(false);
         return;
       }
 
-      if (user) linkWalletToUser(user);
+      if (user && !isLinkingWallet) {
+        linkWalletToUser(user);
+        setIsWalletSelected(false);
+      }
     }
-  }, [connected, connecting, linkWalletToUser, publicKey, user, userWallets]);
+  }, [
+    connecting,
+    connected,
+    isWalletSelected,
+    isLinkingWallet,
+    userWallets,
+    user,
+    linkWalletToUser,
+    publicKey,
+    isInitialLoad,
+    cachedUserAddress,
+    wallet?.adapter?.name,
+  ]);
 
-  if (connecting || loadingUserWallets) {
+  if (connecting || loadingUserWallets || isLinkingWallet) {
     return (
       <div className="flex flex-col justify-center items-center">
         <Spinner />
@@ -106,7 +176,6 @@ export default function WalletConnector({ className }: { className?: string }) {
         className,
       ])}
     >
-      <div>User: {JSON.stringify(user)}</div>
       {supportedWallets.filter((wallet) => wallet.readyState === "Installed")
         .length > 0 ? (
         supportedWallets

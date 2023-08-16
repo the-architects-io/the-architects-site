@@ -13,6 +13,7 @@ import {
   ArrowLeftOnRectangleIcon,
   BugAntIcon,
   KeyIcon,
+  UserIcon,
   WalletIcon,
 } from "@heroicons/react/24/outline";
 
@@ -79,9 +80,6 @@ export default function UserMenu() {
               </div>
             )}
             <div className="px-1 py-1">
-              <div className="flex w-full text-xs uppercase text-gray-300 mt-2">
-                Wallet
-              </div>
               {!!publicKey ? (
                 <Menu.Item>
                   {({ active }) => (
@@ -91,8 +89,8 @@ export default function UserMenu() {
                         active ? "bg-sky-300 text-black" : "text-stone-300"
                       } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                     >
-                      <WalletIcon className="mr-3 h-5 w-5 text-stone-300 group-hover:text-black" />
-                      {getAbbreviatedAddress(publicKey?.toString() || "")}
+                      <UserIcon className="mr-3 h-5 w-5 text-stone-300 group-hover:text-black" />
+                      Profile
                     </Link>
                   )}
                 </Menu.Item>

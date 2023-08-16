@@ -21,6 +21,8 @@ const showToast = ({
   link?: ToastLink;
   error?: AppError;
 }) => {
+  if (primaryMessage === "WalletNotSelectedError") return;
+
   toast.custom(
     <div className="shadow-deep-float flex max-w-sm flex-col rounded-xl bg-stone-300 p-4 text-center text-xl text-sky-700">
       <div className="text-stone-800 font-bold">{primaryMessage}</div>
