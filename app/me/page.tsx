@@ -143,7 +143,7 @@ export default function Page() {
                         <ClipboardIcon className="h-6 w-6 inline-block" />
                       </button>
                       <button
-                        className="flex items-center justify-center px-2"
+                        className="flex items-center justify-center px-2 hover:text-sky-300"
                         onClick={() => handleUnlinkWallet(wallet.address)}
                       >
                         <TrashIcon className="h-6 w-6 inline-block" />
