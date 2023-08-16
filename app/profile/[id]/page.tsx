@@ -1,7 +1,6 @@
 "use client";
 import { Character } from "@/app/api/add-characters-from-nfts/route";
 import { BASE_URL } from "@/constants/constants";
-import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import Spinner from "@/features/UI/spinner";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
@@ -10,7 +9,6 @@ import { GET_CHARACTER_BY_ID } from "@/graphql/queries/get-character-by-id";
 import { GET_CHARACTER_BY_TOKEN_MINT_ADDRESS } from "@/graphql/queries/get-character-by-token-mint-address";
 import { GET_PAYOUTS_BY_CHARACTER_ID } from "@/graphql/queries/get-payouts-by-character-id";
 import { useAdmin } from "@/hooks/admin";
-import { useUser } from "@/hooks/user";
 import { formatDateTime } from "@/utils/date-time";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { getTraitsFromTraitInstances } from "@/utils/nfts/get-traits-from-trait-instances";
@@ -66,7 +64,6 @@ export type ModeledTrait = {
 export default function ProfilePage({ params }: { params: any }) {
   const { id } = params;
   const { isAdmin } = useAdmin();
-  const { user, loadingUser } = useUser();
   const router = useRouter();
   const [character, setCharacter] = useState<Character | null>(null);
   const [payouts, setPayouts] = useState<Payout[] | null>(null);
@@ -174,7 +171,7 @@ export default function ProfilePage({ params }: { params: any }) {
 
   if (!isAdmin) return <NotAdminBlocker />;
 
-  if (loading || loadingUser || payoutsLoading || loadingByMintAddress)
+  if (loading || payoutsLoading || loadingByMintAddress)
     return (
       <ContentWrapper>
         <div className="flex s-full justify-center">

@@ -1,40 +1,16 @@
 "use client";
 
 import { Panel } from "@/features/UI/panel";
-import {
-  BugAntIcon,
-  HandRaisedIcon,
-  PlusCircleIcon,
-} from "@heroicons/react/24/outline";
+import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { useDebugMode } from "@/hooks/debug-mode";
 import Link from "next/link";
 import axios from "axios";
 import showToast from "@/features/toasts/show-toast";
 import { useState } from "react";
-import { ErrorInstance } from "@/utils/log-error";
-import { useUser } from "@/hooks/user";
 
 export const ToolsList = () => {
-  const { isDebugMode, setIsDebugMode } = useDebugMode();
   const [isPoking, setIsPoking] = useState(false);
   const [end, setEnd] = useState(2000);
-  const { user } = useUser();
-  const [isLoggingTestError, setIsLoggingTestError] = useState(false);
-
-  const logTestError = async () => {
-    setIsLoggingTestError(true);
-    await axios.post("/api/test-error", {
-      error: {
-        code: 500,
-        message: "test error",
-        rawError: JSON.stringify({ test: "test" }),
-      } as ErrorInstance,
-      walletId: user?.primaryWallet?.id || user?.wallets?.[0]?.id,
-      burnTxAddress: "test",
-    });
-    showToast({ primaryMessage: "Test error logged" });
-    setIsLoggingTestError(false);
-  };
 
   const pokeEndpoints = async ({
     shouldFetchConcurrently,

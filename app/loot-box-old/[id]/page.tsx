@@ -12,7 +12,6 @@ import { UserWithoutAccountBlocker } from "@/features/UI/user-without-account-bl
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
 import { useAdmin } from "@/hooks/admin";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
-import { useUser } from "@/hooks/user";
 import { formatDateTime } from "@/utils/date-time";
 import { fetchNftsByHashList } from "@/utils/nfts/fetch-nfts-by-hash-list";
 import { executeTransaction } from "@/utils/transactions/execute-transaction";
@@ -35,7 +34,6 @@ import useCostBalance from "@/app/blueprint/hooks/use-cost-balance";
 export default function LootBoxDetailPage({ params }: { params: any }) {
   const wallet = useWallet();
   const { connection } = useConnection();
-  const { user, loadingUser, setUser } = useUser();
   const { isAdmin } = useAdmin();
   const { claimReward, cost } = useDispenser(params?.id);
   const { balance } = useCostBalance(cost, wallet.publicKey?.toString() || "");
@@ -195,6 +193,7 @@ export default function LootBoxDetailPage({ params }: { params: any }) {
   ]);
 
   const fetchUserHeldCostTokensViaHashList = useCallback(async () => {
+    let user;
     if (
       !wallet?.publicKey ||
       !user ||
@@ -220,7 +219,6 @@ export default function LootBoxDetailPage({ params }: { params: any }) {
     }
   }, [
     wallet.publicKey,
-    user,
     connection,
     costHashList,
     hasFetchedUserHeldCostTokens,
@@ -232,16 +230,11 @@ export default function LootBoxDetailPage({ params }: { params: any }) {
       userHeldCostTokens: amountOfUserHeldCostTokens,
       costAmount,
     });
-    if (user && !wallet?.publicKey) {
-      setUser(null);
-    }
   }, [
-    user,
     wallet?.publicKey,
     amountOfUserHeldCostTokens,
     costAmount,
     fetchUserHeldCostTokensViaHashList,
-    setUser,
   ]);
 
   if (loadingLootBox) {

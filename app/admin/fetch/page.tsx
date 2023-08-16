@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import { useFormik } from "formik";
-import { useUser } from "@/hooks/user";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import showToast from "@/features/toasts/show-toast";
 import { FormTextareaWithLabel } from "@/features/UI/forms/form-textarea-with-label";
@@ -18,13 +17,14 @@ import { getAbbreviatedAddress } from "@/utils/formatting";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { Line, Circle } from "rc-progress";
 import { XCircleIcon } from "@heroicons/react/24/outline";
+import { useUserData } from "@nhost/nextjs";
 
 export default function FetchPage() {
   const { publicKey } = useWallet();
   const { connection } = useConnection();
   const { isAdmin } = useAdmin();
   const router = useRouter();
-  const { user, setUser } = useUser();
+  const user = useUserData();
   const [isSaving, setIsSaving] = useState(false);
   const [hashList, setHashList] = useState<string>("");
   const [nftCollectionId, setNftCollectionId] = useState<string>("");
