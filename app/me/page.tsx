@@ -12,6 +12,7 @@ import {
   useUserData,
 } from "@nhost/nextjs";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -65,8 +66,11 @@ export default function Page() {
           Sign in with Discord
         </a> */}
         <Divider />
-        <div className="text-lg uppercase mb-8">Wallet</div>
-        <WalletConnector className="w-full mb-4" />
+        <div className="text-lg uppercase mb-8">Wallets</div>
+        {/* User's saved wallets */}
+        <PrimaryButton>
+          <Link href="/me/manage-wallets">Link wallet</Link>
+        </PrimaryButton>
         <Divider />
         <PrimaryButton onClick={handleSignOut}>Sign out</PrimaryButton>
       </Panel>
