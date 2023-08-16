@@ -1,23 +1,24 @@
 "use client";
 import { Wallet } from "@/app/api/claim-badge/route";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
-import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Divider } from "@/features/UI/divider";
 import { Panel } from "@/features/UI/panel";
 import Spinner from "@/features/UI/spinner";
+import showToast from "@/features/toasts/show-toast";
 import WalletConnector from "@/features/wallets/wallet-connector";
 import { GET_WALLETS_BY_USER_ID } from "@/graphql/queries/get-wallets-by-user-id";
 import { copyTextToClipboard } from "@/utils/clipboard";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { useQuery } from "@apollo/client";
-import { ClipboardIcon } from "@heroicons/react/24/outline";
+import { ClipboardIcon, TrashIcon } from "@heroicons/react/24/outline";
 import {
   useAuthenticationStatus,
   useProviderLink,
   useSignOut,
   useUserData,
 } from "@nhost/nextjs";
+import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -30,12 +31,19 @@ export default function Page() {
   const { signOut } = useSignOut();
   const router = useRouter();
   const [userWallets, setUserWallets] = useState<Wallet[]>([]);
+  const [unlinkingWalletAddress, setUnlinkingWalletAddress] =
+    useState<String>("");
 
-  const { loading, data: wallets } = useQuery(GET_WALLETS_BY_USER_ID, {
+  const {
+    loading,
+    data: wallets,
+    refetch,
+  } = useQuery(GET_WALLETS_BY_USER_ID, {
     variables: {
       id: user?.id,
     },
     skip: !user?.id,
+    fetchPolicy: "network-only",
     onCompleted: ({ wallets }) => {
       console.log({ wallets });
       setUserWallets(wallets);
@@ -45,6 +53,31 @@ export default function Page() {
   const handleSignOut = async () => {
     await signOut();
     router.push("/");
+  };
+
+  const handleUnlinkWallet = async (address: string) => {
+    setUnlinkingWalletAddress(address);
+
+    try {
+      const { data, status } = await axios.post(
+        `/api/unbind-wallet-from-user`,
+        {
+          address,
+        }
+      );
+      console.log({ data });
+      if (status === 200) {
+        showToast({
+          primaryMessage: "Wallet unlinked",
+          secondaryMessage: `Wallet ${getAbbreviatedAddress(
+            address
+          )} has been unlinked from your account.`,
+        });
+        await refetch();
+      }
+    } catch (error) {
+      console.log({ error });
+    }
   };
 
   useEffect(() => {
@@ -92,17 +125,31 @@ export default function Page() {
               {userWallets?.map((wallet: Wallet) => (
                 <div
                   key={wallet.address}
-                  className="p-4 border rounded-lg text-center flex items-center w-full"
+                  className="border rounded-lg text-center flex items-center justify-center  w-full h-16 px-4"
                 >
-                  <div className="flex-1">
-                    {getAbbreviatedAddress(wallet.address)}
-                  </div>
-                  <SecondaryButton
-                    className="flex items-center justify-center px-2"
-                    onClick={() => copyTextToClipboard(wallet.address)}
-                  >
-                    <ClipboardIcon className="h-5 w-5 inline-block" />
-                  </SecondaryButton>
+                  {unlinkingWalletAddress === wallet.address ? (
+                    <div className="self-center">
+                      <Spinner />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex-1 text-lg">
+                        {getAbbreviatedAddress(wallet.address)}
+                      </div>
+                      <button
+                        className="flex items-center justify-center px-2 hover:text-sky-300"
+                        onClick={() => copyTextToClipboard(wallet.address)}
+                      >
+                        <ClipboardIcon className="h-6 w-6 inline-block" />
+                      </button>
+                      <button
+                        className="flex items-center justify-center px-2"
+                        onClick={() => handleUnlinkWallet(wallet.address)}
+                      >
+                        <TrashIcon className="h-6 w-6 inline-block" />
+                      </button>
+                    </>
+                  )}
                 </div>
               ))}
             </>

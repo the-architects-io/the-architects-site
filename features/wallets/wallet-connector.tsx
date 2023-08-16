@@ -89,7 +89,7 @@ export default function WalletConnector({ className }: { className?: string }) {
         return;
       }
     },
-    [publicKey, refetch]
+    [publicKey, refetch, router]
   );
 
   useEffect(() => {
@@ -115,17 +115,6 @@ export default function WalletConnector({ className }: { className?: string }) {
     }
 
     if (connected && publicKey && isWalletSelected && !isLinkingWallet) {
-      // if (cachedUserAddress === publicKey?.toString()) {
-      //   showToast({
-      //     primaryMessage: "Wallet already linked",
-      //     secondaryMessage: `Wallet ${getAbbreviatedAddress(
-      //       publicKey.toString()
-      //     )} is already linked to your account`,
-      //   });
-      //   setIsWalletSelected(false);
-      //   return;
-      // }
-
       console.log("connected");
       const walletLinkedToUser = !!userWallets.find(
         (userWallet) => userWallet.address === publicKey?.toString()
