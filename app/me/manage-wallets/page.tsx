@@ -15,7 +15,7 @@ export default function Page() {
           browser, then select the corresponding wallet from the list below.
         </p>
         <Divider />
-        <div className="text-lg uppercase mb-8">Installed Wallets</div>
+        <div className="text-lg uppercase mb-8">Detected Wallets</div>
         <WalletConnector />
       </Panel>
     </ContentWrapper>

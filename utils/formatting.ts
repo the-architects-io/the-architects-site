@@ -1,7 +1,13 @@
+import { PublicKey } from "@solana/web3.js";
+
 export const getAbbreviatedAddress = (
-  address: string,
+  address: string | PublicKey,
   identifierLength: number = 4
 ) => {
+  // check if it's a solana public key
+  if (typeof address !== "string") {
+    address = address.toString();
+  }
   if (!address) return "";
   return `${address.slice(0, identifierLength)}...${address.slice(
     address.length - identifierLength

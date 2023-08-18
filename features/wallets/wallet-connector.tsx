@@ -1,4 +1,5 @@
 import { Wallet } from "@/app/api/claim-dispenser/route";
+import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
 import { GET_WALLETS_BY_USER_ID } from "@/graphql/queries/get-wallets-by-user-id";
@@ -37,6 +38,7 @@ export default function WalletConnector({ className }: { className?: string }) {
   const [isWalletSelected, setIsWalletSelected] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [pubKey, setPubKey] = useState<PublicKey | null>(null);
+  const [shouldShowRestart, setShouldShowRestart] = useState(false);
 
   const { loading: loadingUserWallets, refetch } = useQuery(
     GET_WALLETS_BY_USER_ID,
@@ -72,7 +74,9 @@ export default function WalletConnector({ className }: { className?: string }) {
       if (status === 200) {
         showToast({
           primaryMessage: "Wallet linked",
-          secondaryMessage: "Your wallet has been linked to your account",
+          secondaryMessage: `Wallet ${getAbbreviatedAddress(
+            publicKey
+          )} has been linked to your account`,
         });
         refetch();
         router.push("/me");
@@ -127,6 +131,7 @@ export default function WalletConnector({ className }: { className?: string }) {
             publicKey.toString()
           )} is already linked to your account`,
         });
+        setShouldShowRestart(true);
         setIsWalletSelected(false);
         return;
       }
@@ -148,12 +153,23 @@ export default function WalletConnector({ className }: { className?: string }) {
     isInitialLoad,
     cachedUserAddress,
     wallet?.adapter?.name,
+    setShouldShowRestart,
   ]);
 
   if (connecting || loadingUserWallets || isLinkingWallet) {
     return (
       <div className="flex flex-col justify-center items-center">
         <Spinner />
+      </div>
+    );
+  }
+
+  if (shouldShowRestart) {
+    return (
+      <div className="flex flex-col justify-center items-center">
+        <PrimaryButton onClick={() => setShouldShowRestart(false)}>
+          Select a different wallet
+        </PrimaryButton>
       </div>
     );
   }
