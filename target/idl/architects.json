@@ -1,0 +1,14 @@
+{
+  "version": "0.1.0",
+  "name": "architects",
+  "instructions": [
+    {
+      "name": "initialize",
+      "accounts": [],
+      "args": []
+    }
+  ],
+  "metadata": {
+    "address": "3mE2UAhuJxCbcHBCM4gFeWkJheDFw2q9iDykf3S9RDwx"
+  }
+}

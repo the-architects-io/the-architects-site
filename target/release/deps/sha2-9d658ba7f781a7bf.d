@@ -1,0 +1,13 @@
+/Users/warly/Repos/architects/target/release/deps/sha2-9d658ba7f781a7bf.rmeta: /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/lib.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/core_api.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha256.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha512.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/consts.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha256/soft.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha512/soft.rs
+
+/Users/warly/Repos/architects/target/release/deps/libsha2-9d658ba7f781a7bf.rlib: /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/lib.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/core_api.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha256.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha512.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/consts.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha256/soft.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha512/soft.rs
+
+/Users/warly/Repos/architects/target/release/deps/sha2-9d658ba7f781a7bf.d: /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/lib.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/core_api.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha256.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha512.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/consts.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha256/soft.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha512/soft.rs
+
+/Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/lib.rs:
+/Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/core_api.rs:
+/Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha256.rs:
+/Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha512.rs:
+/Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/consts.rs:
+/Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha256/soft.rs:
+/Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.7/src/sha512/soft.rs:

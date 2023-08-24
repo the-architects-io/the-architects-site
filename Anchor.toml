@@ -3,6 +3,7 @@ seeds = false
 skip-lint = false
 [programs.localnet]
 architects = "3mE2UAhuJxCbcHBCM4gFeWkJheDFw2q9iDykf3S9RDwx"
+dispenser = "4WtotNKD2Wz7nKMjsQdkU5MyfHpJiyaVfN4KhjhNosAr"
 
 [registry]
 url = "https://api.apr.dev"

@@ -1,0 +1,13 @@
+/Users/warly/Repos/architects/target/release/deps/quote-b70d945b89878fce.rmeta: /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/lib.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/ext.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/format.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/ident_fragment.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/to_tokens.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/runtime.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/spanned.rs
+
+/Users/warly/Repos/architects/target/release/deps/libquote-b70d945b89878fce.rlib: /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/lib.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/ext.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/format.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/ident_fragment.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/to_tokens.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/runtime.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/spanned.rs
+
+/Users/warly/Repos/architects/target/release/deps/quote-b70d945b89878fce.d: /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/lib.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/ext.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/format.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/ident_fragment.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/to_tokens.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/runtime.rs /Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/spanned.rs
+
+/Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/lib.rs:
+/Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/ext.rs:
+/Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/format.rs:
+/Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/ident_fragment.rs:
+/Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/to_tokens.rs:
+/Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/runtime.rs:
+/Users/warly/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.33/src/spanned.rs:
