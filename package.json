@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.14",
+    "@coral-xyz/anchor": "0.28.1-beta.1",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@google/model-viewer": "^3.2.1",
@@ -42,6 +43,7 @@
     "formik": "^2.4.0",
     "graphql": "^16.6.0",
     "graphql-request": "5.2.0",
+    "jssha": "^3.3.1",
     "lokijs": "^1.5.12",
     "next": "13.4.16",
     "notistack": "^3.0.1",
