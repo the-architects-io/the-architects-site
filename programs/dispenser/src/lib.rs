@@ -22,10 +22,10 @@ pub mod dispenser {
 }
 
 #[derive(Accounts)]
-#[instruction(bump: u8)]
+#[instruction(seed: String, bump: u8)]
 pub struct CreateDispenser<'info> {
     #[account(
-        seeds = [b"seed".as_ref()],
+        seeds = [seed.as_bytes()],
         bump, init, payer = user, space = 8 + 40,
         owner = ID
     )]

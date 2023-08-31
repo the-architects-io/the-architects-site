@@ -1,5 +1,6 @@
 "use client";
 import { ADMIN_WALLETS, ENV } from "@/constants/constants";
+import { useUserData } from "@nhost/nextjs";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/navigation";
 import React, { ReactNode, useContext, useEffect, useState } from "react";
@@ -15,6 +16,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const { publicKey } = useWallet();
   const router = useRouter();
+  const user = useUserData();
 
   useEffect(() => {
     if (ENV === "production") {
@@ -36,7 +38,11 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     if (publicKey) {
       ADMIN_WALLETS.indexOf(publicKey.toString()) > -1 && setIsAdmin(true);
     }
-  }, [publicKey, setIsAdmin]);
+    if (user && user.roles.includes("admin")) {
+      setIsAdmin(true);
+    }
+    console.log({ user });
+  }, [publicKey, setIsAdmin, user]);
 
   return (
     <Provider

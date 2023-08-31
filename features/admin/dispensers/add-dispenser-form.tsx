@@ -9,8 +9,20 @@ import { useRouter } from "next/navigation";
 import showToast from "@/features/toasts/show-toast";
 import SharedHead from "@/features/UI/head";
 import { FormTextareaWithLabel } from "@/features/UI/forms/form-textarea-with-label";
+import { createOnChainDispenser } from "@/utils/dispensers/create-on-chain-dispenser";
+import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
+import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
+import { getAbbreviatedAddress } from "@/utils/formatting";
+
+export type DispenserResponse = {
+  id: string;
+  name: string;
+  imageUrl: string;
+};
 
 export const AddDispenserForm = () => {
+  const { connection } = useConnection();
+  const anchorWallet = useAnchorWallet();
   const router = useRouter();
   const formik = useFormik({
     initialValues: {
@@ -19,10 +31,37 @@ export const AddDispenserForm = () => {
       description: "",
     },
     onSubmit: async (values) => {
+      if (!anchorWallet) {
+        showToast({
+          primaryMessage: "Wallet not connected",
+          secondaryMessage: "Please connect your wallet",
+        });
+        return;
+      }
+
       try {
-        await axios.post("/api/add-dispenser", values);
+        const { data: dispenser } = await axios.post<Dispenser>(
+          "/api/add-dispenser",
+          values
+        );
+        const provider = getProvider();
+
+        const { txHash, dispenserAddress } = await createOnChainDispenser(
+          dispenser.id,
+          provider,
+          connection,
+          anchorWallet
+        );
+
         showToast({
           primaryMessage: "Dispenser added",
+          secondaryMessage: `Address: ${getAbbreviatedAddress(
+            dispenserAddress.toString()
+          )}`,
+          link: {
+            url: `https://explorer.solana.com/tx/${txHash}?cluster=devnet`,
+            title: "View transaction",
+          },
         });
         router.push("/admin?tab=dispensers");
       } catch (error) {
@@ -32,6 +71,14 @@ export const AddDispenserForm = () => {
       }
     },
   });
+
+  const getProvider = () => {
+    if (!anchorWallet) return null;
+
+    return new anchor.AnchorProvider(connection, anchorWallet, {
+      commitment: "processed",
+    });
+  };
 
   return (
     <FormWrapper onSubmit={formik.handleSubmit}>
