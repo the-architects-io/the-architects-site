@@ -23,6 +23,7 @@ import { ConfigSettingsPanel } from "@/features/admin/dispensers/config/config-s
 import { StatsPanel } from "@/features/admin/dispensers/stats/stats-panel";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import { ItemCollection } from "@/app/blueprint/types";
+import { getAbbreviatedAddress } from "@/utils/formatting";
 
 export type RewardCollection = {
   id: string;
@@ -89,7 +90,20 @@ export default function DispenserDetailPage({ params }: { params: any }) {
                 />
               </div>
               <Panel className="flex flex-col items-center justify-center max-w-2xl w-full">
-                <h1 className="text-3xl mb-8 text-center">{dispenser.name}</h1>
+                <h1 className="text-3xl mb-2 text-center">{dispenser.name}</h1>
+                {!!dispenser.onChainAddress && (
+                  <div className="text-xl mb-4">
+                    Wallet:{" "}
+                    <a
+                      className="text-sky-400 underline"
+                      href={`https://explorer.solana.com/account/${dispenser.onChainAddress}?cluster=devnet`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {getAbbreviatedAddress(dispenser.onChainAddress)}
+                    </a>
+                  </div>
+                )}
                 {!!dispenser.rarity && (
                   <div className="text-xl mb-2 flex items-center space-x-4">
                     <div>Rarity:</div>

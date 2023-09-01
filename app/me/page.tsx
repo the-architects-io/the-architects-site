@@ -1,6 +1,7 @@
 "use client";
 import { Wallet } from "@/app/api/claim-badge/route";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
+import WalletButton from "@/features/UI/buttons/wallet-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Divider } from "@/features/UI/divider";
 import { Panel } from "@/features/UI/panel";
@@ -118,6 +119,7 @@ export default function Page() {
           Sign in with Discord
         </a> */}
         <Divider />
+        <WalletButton />
         <div className="text-lg uppercase mb-4">Wallets</div>
         <div className="w-2/3 pb-8 space-y-2">
           {!!userWallets?.length && (

@@ -8,11 +8,7 @@ declare_id!("6QVdsMKyqw1peU6TRHTskzFH6ivRzXe22bfEoHKpiP73");
 pub mod dispenser {
     use super::*;
 
-    pub fn create_dispenser(
-        ctx: Context<CreateDispenser>,
-        _dispenser_pda: Pubkey,
-        _bump: u8,
-    ) -> Result<()> {
+    pub fn create_dispenser(ctx: Context<CreateDispenser>, _seed: String, _bump: u8) -> Result<()> {
         let dispenser_account: &mut DispenserAccount = &mut ctx.accounts.dispenser_account;
         dispenser_account.is_initialized = true;
         // ... set other fields as needed ...

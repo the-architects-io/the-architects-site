@@ -1,6 +1,7 @@
 "use client";
 
 import axios from "axios";
+import * as anchor from "@coral-xyz/anchor";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
@@ -13,6 +14,8 @@ import { createOnChainDispenser } from "@/utils/dispensers/create-on-chain-dispe
 import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { getAbbreviatedAddress } from "@/utils/formatting";
+import { useMutation } from "@apollo/client";
+import { UPDATE_DISPENSER } from "@/graphql/mutations/update-dispenser";
 
 export type DispenserResponse = {
   id: string;
@@ -24,6 +27,9 @@ export const AddDispenserForm = () => {
   const { connection } = useConnection();
   const anchorWallet = useAnchorWallet();
   const router = useRouter();
+
+  const [updateDispenser, { loading }] = useMutation(UPDATE_DISPENSER);
+
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -40,11 +46,17 @@ export const AddDispenserForm = () => {
       }
 
       try {
-        const { data: dispenser } = await axios.post<Dispenser>(
-          "/api/add-dispenser",
-          values
-        );
+        const { data: dispenser }: { data: Dispenser } =
+          await axios.post<Dispenser>("/api/add-dispenser", values);
         const provider = getProvider();
+
+        if (!provider) {
+          showToast({
+            primaryMessage: "Wallet not connected",
+            secondaryMessage: "Please connect your wallet",
+          });
+          return;
+        }
 
         const { txHash, dispenserAddress } = await createOnChainDispenser(
           dispenser.id,
@@ -52,6 +64,12 @@ export const AddDispenserForm = () => {
           connection,
           anchorWallet
         );
+
+        const { data: updatedDispenser }: { data: Dispenser } =
+          await axios.post("/api/update-dispenser", {
+            id: dispenser.id,
+            onChainAddress: dispenserAddress.toString(),
+          });
 
         showToast({
           primaryMessage: "Dispenser added",
@@ -68,6 +86,7 @@ export const AddDispenserForm = () => {
         showToast({
           primaryMessage: "Error adding dispenser",
         });
+        console.log({ error });
       }
     },
   });

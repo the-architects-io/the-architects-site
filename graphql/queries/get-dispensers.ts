@@ -9,10 +9,6 @@ export const GET_DISPENSERS = gql`
       description
       isEnabled
       imageUrl
-      rarity {
-        id
-        name
-      }
     }
   }
 `;

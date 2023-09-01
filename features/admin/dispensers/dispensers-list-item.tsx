@@ -23,6 +23,7 @@ export enum TokenClaimPayoutStrategies {
 
 export type Dispenser = {
   tokenClaimPayoutStrategy: TokenClaimPayoutStrategies;
+  onChainAddress: string;
   collectionWallet: {
     id: string;
     address: string;
