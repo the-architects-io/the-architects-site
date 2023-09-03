@@ -1,4 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { Account, NoopResponse } from "@/app/blueprint/types";
 import { User } from "@/features/admin/users/users-list-item";
 import { client } from "@/graphql/backend-client";
 import { ADD_ACCOUNT } from "@/graphql/mutations/add-account";
@@ -6,32 +7,6 @@ import { UPDATE_USER } from "@/graphql/mutations/update-user";
 import { logError } from "@/utils/log-error";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
-export type Account = {
-  email: string;
-  id: string;
-  imageUrl: string;
-  username: string;
-  provider: {
-    id: string;
-    name: string;
-  };
-  user?: {
-    email: string;
-    id: string;
-    imageUrl: string;
-    name: string;
-    primaryWallet: {
-      id: string;
-      address: string;
-    };
-  };
-};
-
-export type NoopResponse = {
-  noop: true;
-  endpoint: string;
-};
 
 export type UserAndAccountResponse = {
   account: Account;

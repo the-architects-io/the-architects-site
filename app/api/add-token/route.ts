@@ -2,9 +2,9 @@ import axios from "axios";
 import { ADD_TOKEN } from "@/graphql/mutations/add-token";
 import { BASE_URL } from "@/constants/constants";
 import { client } from "@/graphql/backend-client";
-import { NoopResponse } from "@/app/api/add-account/route";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NoopResponse } from "@/app/blueprint/types";
 
 export type TokenMetadata = {
   image: string;

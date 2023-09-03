@@ -5,7 +5,6 @@ import { ADD_TRAIT_INSTANCE } from "@/graphql/mutations/add-trait-instance";
 import { Token } from "@/features/admin/tokens/tokens-list-item";
 import { GET_TRAIT_BY_NAME } from "@/graphql/queries/get-trait-by-name";
 import { GET_CHARACTER_BY_TOKEN_MINT_ADDRESS } from "@/graphql/queries/get-character-by-token-mint-address";
-import { NoopResponse } from "@/app/api/add-account/route";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address";
@@ -14,36 +13,7 @@ import { Connection } from "@solana/web3.js";
 import { RPC_ENDPOINT } from "@/constants/constants";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import { addTraitsToDb } from "@/utils/nfts/add-traits-to-db";
-
-export type Character = {
-  id: string;
-  name: string;
-  imageUrl: string;
-  token: {
-    id: string;
-    mintAddress: string;
-  };
-  traitInstances: {
-    id: string;
-    value: string;
-    trait: {
-      id: string;
-      name: string;
-    };
-  }[];
-  traitCombinationHash?: string;
-  mainCharacterActivityInstances: {
-    id: string;
-    startTime: string;
-    endTime: string;
-    isComplete: boolean;
-    activity: {
-      id: string;
-      startTime: string;
-      endTime: string;
-    };
-  }[];
-};
+import { Character, NoopResponse } from "@/app/blueprint/types";
 
 export type Trait = {
   id: string;

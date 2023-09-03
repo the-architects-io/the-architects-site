@@ -88,3 +88,89 @@ export type TraitBasedCollection = {
     name: string;
   };
 };
+
+export type RewardCollection = {
+  id: string;
+  name: string;
+  payoutChance?: number;
+  hashListCollection: HashListCollection;
+  itemCollection: ItemCollection;
+  childRewardCollections?: {
+    id: string;
+    name: string;
+    hashListCollection: HashListCollection;
+    itemCollection: ItemCollection;
+  }[];
+};
+
+export type HashListCollection = {
+  id: string;
+  name: string;
+  amount: number;
+  hashList: {
+    id: string;
+    name: string;
+    rawHashList: string;
+  };
+};
+
+export type Account = {
+  email: string;
+  id: string;
+  imageUrl: string;
+  username: string;
+  provider: {
+    id: string;
+    name: string;
+  };
+  user?: {
+    email: string;
+    id: string;
+    imageUrl: string;
+    name: string;
+    primaryWallet: {
+      id: string;
+      address: string;
+    };
+  };
+};
+
+export type Character = {
+  id: string;
+  name: string;
+  imageUrl: string;
+  token: {
+    id: string;
+    mintAddress: string;
+  };
+  traitInstances: {
+    id: string;
+    value: string;
+    trait: {
+      id: string;
+      name: string;
+    };
+  }[];
+  traitCombinationHash?: string;
+  mainCharacterActivityInstances: {
+    id: string;
+    startTime: string;
+    endTime: string;
+    isComplete: boolean;
+    activity: {
+      id: string;
+      startTime: string;
+      endTime: string;
+    };
+  }[];
+};
+
+export type NoopResponse = {
+  noop: true;
+  endpoint: string;
+};
+
+export type Wallet = {
+  address: string;
+  id: string;
+};

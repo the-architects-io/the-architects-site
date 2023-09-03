@@ -1,5 +1,5 @@
 "use client";
-import { Character } from "@/app/api/add-characters-from-nfts/route";
+import { Character } from "@/app/blueprint/types";
 import { BASE_URL } from "@/constants/constants";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import Spinner from "@/features/UI/spinner";

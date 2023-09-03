@@ -8,10 +8,7 @@ import { useAdmin } from "@/hooks/admin";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { Panel } from "@/features/UI/panel";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
-import {
-  Dispenser,
-  HashListCollection,
-} from "@/features/admin/dispensers/dispensers-list-item";
+import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
 import { Divider } from "@/features/UI/divider";
 import { ITab, Tabs } from "@/features/UI/tabs/tabs";
@@ -22,22 +19,8 @@ import { RestrictionsSettingsPanel } from "@/features/admin/dispensers/restricti
 import { ConfigSettingsPanel } from "@/features/admin/dispensers/config/config-settings-panel";
 import { StatsPanel } from "@/features/admin/dispensers/stats/stats-panel";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
-import { ItemCollection } from "@/app/blueprint/types";
+import { RewardCollection } from "@/app/blueprint/types";
 import { getAbbreviatedAddress } from "@/utils/formatting";
-
-export type RewardCollection = {
-  id: string;
-  name: string;
-  payoutChance?: number;
-  hashListCollection: HashListCollection;
-  itemCollection: ItemCollection;
-  childRewardCollections?: {
-    id: string;
-    name: string;
-    hashListCollection: HashListCollection;
-    itemCollection: ItemCollection;
-  }[];
-};
 
 export default function DispenserDetailPage({ params }: { params: any }) {
   const { rewards } = useDispenser(params?.id);

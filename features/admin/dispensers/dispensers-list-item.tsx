@@ -1,20 +1,9 @@
-import { ItemCollection } from "@/app/blueprint/types";
+import { HashListCollection, ItemCollection } from "@/app/blueprint/types";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { TableRow } from "@/features/UI/tables/table-row";
 import { UserGroupIcon } from "@heroicons/react/24/outline";
 
 import Link from "next/link";
-
-export type HashListCollection = {
-  id: string;
-  name: string;
-  amount: number;
-  hashList: {
-    id: string;
-    name: string;
-    rawHashList: string;
-  };
-};
 
 export enum TokenClaimPayoutStrategies {
   VESTING_BUILD_TOKEN = "VESTING_BUILD_TOKEN",

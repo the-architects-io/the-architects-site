@@ -1,9 +1,8 @@
 import { client } from "@/graphql/backend-client";
-import { NoopResponse } from "@/app/api/get-token-metadata-from-helius/route";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { UNBIND_USER_FROM_WALLET } from "@/graphql/mutations/unbind-user-from-wallet";
-import { Wallet } from "@/app/api/claim-dispenser/route";
+import { Wallet } from "@/app/blueprint/types";
 
 export async function POST(req: NextRequest) {
   const { address, noop } = await req.json();

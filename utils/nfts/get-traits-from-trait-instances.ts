@@ -1,4 +1,4 @@
-import { Character } from "@/app/api/add-characters-from-nfts/route";
+import { Character } from "@/app/blueprint/types";
 
 export const getTraitsFromTraitInstances = (
   traitInstances: Character["traitInstances"]

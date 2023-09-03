@@ -1,10 +1,10 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { client } from "@/graphql/backend-client";
-import { NoopResponse } from "@/app/api/get-token-metadata-from-helius/route";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { ADD_DISPENSER } from "@/graphql/mutations/add-dispenser";
+import { NoopResponse } from "@/app/blueprint/types";
 
 type Data =
   | Dispenser

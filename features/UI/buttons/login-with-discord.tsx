@@ -3,9 +3,9 @@ import { BASE_URL } from "@/constants/constants";
 import Image from "next/image";
 import { User } from "@/features/admin/users/users-list-item";
 import { useEffect, useState } from "react";
-import { Account } from "@/app/api/add-account/route";
 import { getUserDiscordAccount } from "@/utils/user";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { Account } from "@/app/blueprint/types";
 
 /* eslint-disable @next/next/no-img-element */
 const LoginWithDiscord = ({ user }: { user?: User }) => {

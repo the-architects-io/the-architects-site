@@ -1,4 +1,4 @@
-import { Wallet } from "@/app/api/claim-dispenser/route";
+import { Wallet } from "@/app/blueprint/types";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";

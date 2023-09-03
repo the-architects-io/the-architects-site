@@ -1,9 +1,9 @@
 import { client } from "@/graphql/backend-client";
 import { Token } from "@/features/admin/tokens/tokens-list-item";
 import { UNBIND_ITEM_FROM_TOKEN } from "@/graphql/mutations/unbind-item-from-token";
-import { NoopResponse } from "@/app/api/get-token-metadata-from-helius/route";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NoopResponse } from "@/app/blueprint/types";
 
 type Data =
   | Token

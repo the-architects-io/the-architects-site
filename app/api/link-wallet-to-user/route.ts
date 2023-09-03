@@ -1,11 +1,10 @@
 import { client } from "@/graphql/backend-client";
-import { NoopResponse } from "@/app/api/add-account/route";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { ADD_WALLET_WITH_USER } from "@/graphql/mutations/add-wallet-with-user";
-import { Wallet } from "@/app/api/claim-badge/route";
 import { BIND_USER_TO_WALLET } from "@/graphql/mutations/bind-user-to-wallet";
+import { NoopResponse, Wallet } from "@/app/blueprint/types";
 
 type Data =
   | Wallet

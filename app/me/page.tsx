@@ -1,5 +1,5 @@
 "use client";
-import { Wallet } from "@/app/api/claim-badge/route";
+import { Wallet } from "@/app/blueprint/types";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import WalletButton from "@/features/UI/buttons/wallet-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";

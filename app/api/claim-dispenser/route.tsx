@@ -18,11 +18,7 @@ import { Token } from "@/features/admin/tokens/tokens-list-item";
 import { ADD_LAST_CLAIM_TIMES } from "@/graphql/mutations/add-last-claim-time";
 import { caluclateBuildVestingRewardAmount } from "@/utils/dispensers/calculate-token-claim-reward-amount";
 import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
-
-export type Wallet = {
-  address: string;
-  id: string;
-};
+import { Wallet } from "@/app/blueprint/types";
 
 type Data =
   | {

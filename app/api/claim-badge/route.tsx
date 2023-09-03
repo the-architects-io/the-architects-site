@@ -21,11 +21,7 @@ import {
 import { NextRequest, NextResponse } from "next/server";
 import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
-
-export type Wallet = {
-  address: string;
-  id: string;
-};
+import { Wallet } from "@/app/blueprint/types";
 
 type Data =
   | {

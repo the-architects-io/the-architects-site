@@ -1,11 +1,7 @@
+import { NoopResponse } from "@/app/blueprint/types";
 import axios from "axios";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
-
-export type NoopResponse = {
-  noop: true;
-  endpoint: string;
-};
 
 type TokenMetadataFromHelius = {
   account: string;
