@@ -9,7 +9,7 @@ dispenser = "4WtotNKD2Wz7nKMjsQdkU5MyfHpJiyaVfN4KhjhNosAr"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Devnet"
+cluster = "localnet"
 wallet = "/Users/warly/.config/solana/id.json"
 
 [scripts]

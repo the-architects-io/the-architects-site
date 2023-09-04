@@ -1,6 +1,5 @@
 "use client";
 import * as anchor from "@coral-xyz/anchor";
-import jsSHA from "jssha";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Panel } from "@/features/UI/panel";
 import { useFormik } from "formik";
@@ -93,12 +92,9 @@ export default function Page() {
     transaction.recentBlockhash = latestBlockhash.blockhash;
     transaction.feePayer = anchorWallet.publicKey;
 
-    // const signedTx = await anchorWallet.signTransaction(transaction);
     console.log("Anchor Wallet:", anchorWallet);
     console.log("Public Key:", anchorWallet.publicKey.toString());
     console.log("Transaction:", transaction);
-    // console.log("Signed Transaction:", signedTx);
-    // console.log(signedTx.signatures);
 
     let txHash;
     try {

@@ -1,6 +1,5 @@
 import { DISPENSER_PROGRAM_ID } from "@/constants/constants";
 import { IDL } from "@/target/types/dispenser";
-import { getAbbreviatedAddress } from "@/utils/formatting";
 import { createHash } from "@/utils/hashing";
 import * as anchor from "@coral-xyz/anchor";
 import { Provider } from "@coral-xyz/anchor";
