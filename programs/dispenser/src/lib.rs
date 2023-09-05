@@ -18,6 +18,16 @@ pub enum TokenType {
     SFT,
 }
 
+#[error_code]
+pub enum DispenserErrorCode {
+    UninitializedAccount,
+    InsufficientFunds,
+    InvalidInstruction,
+    AlreadyInitialized,
+    PdaMismatch,
+    PdaGenerationFailed,
+}
+
 #[derive(Accounts)]
 #[instruction(seed: Vec<u8>, bump: u8)]
 pub struct CreateDispenser<'info> {
@@ -86,6 +96,9 @@ pub mod dispenser {
         _bump: u8,
     ) -> Result<()> {
         let dispenser_account: &mut DispenserAccount = &mut ctx.accounts.dispenser_account;
+        if dispenser_account.is_initialized {
+            return Err(DispenserErrorCode::AlreadyInitialized.into());
+        }
         dispenser_account.is_initialized = true;
         // ... set other fields as needed ...
 
@@ -98,6 +111,19 @@ pub mod dispenser {
         bump: u8,
         amount: u64,
     ) -> Result<()> {
+        let seeds = &[&seed[..], &[bump]];
+
+        let calculated_pda = Pubkey::create_program_address(seeds, ctx.program_id)
+            .map_err(|_| DispenserErrorCode::PdaGenerationFailed)?;
+
+        if *ctx.accounts.dispenser_pda.key != calculated_pda {
+            return Err(DispenserErrorCode::PdaMismatch.into());
+        }
+
+        if ctx.accounts.sender.lamports() < amount {
+            return Err(DispenserErrorCode::InsufficientFunds.into());
+        }
+
         let cpi_accounts = token::Transfer {
             from: ctx.accounts.sender.to_account_info().clone(),
             to: ctx.accounts.recipient.to_account_info().clone(),
@@ -119,6 +145,9 @@ pub mod dispenser {
         _sender_pubkey: Pubkey,
         amount: u64,
     ) -> Result<()> {
+        if ctx.accounts.sender.lamports() < amount {
+            return Err(DispenserErrorCode::InsufficientFunds.into());
+        }
         let sender = &ctx.accounts.sender;
         let recipient = &ctx.accounts.recipient;
 
