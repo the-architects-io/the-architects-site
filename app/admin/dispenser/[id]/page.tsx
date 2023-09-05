@@ -20,9 +20,11 @@ import { StatsPanel } from "@/features/admin/dispensers/stats/stats-panel";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import { Dispenser, RewardCollection } from "@/app/blueprint/types";
 import { getAbbreviatedAddress } from "@/utils/formatting";
+import { PrimaryButton } from "@/features/UI/buttons/primary-button";
+import Link from "next/link";
 
 export default function DispenserDetailPage({ params }: { params: any }) {
-  const { rewards } = useDispenser(params?.id);
+  const { rewards, description } = useDispenser(params?.id);
   const tabs: ITab[] = [
     { name: "Rewards", value: "rewards" },
     { name: "Costs", value: "costs" },
@@ -35,8 +37,6 @@ export default function DispenserDetailPage({ params }: { params: any }) {
   const [hasBeenFetched, setHasBeenFetched] = useState(false);
   const [dispenser, setDispenser] = useState<Dispenser | null>(null);
   const { isAdmin } = useAdmin();
-  const [rewardCollection, setRewardCollection] =
-    useState<RewardCollection | null>(null);
   const [activeTab, setActiveTab] = useState<ITab>(tabs[0]);
   const { data, loading, error, refetch } = useQuery(GET_DISPENSER_BY_ID, {
     variables: { id: params?.id },
@@ -74,16 +74,23 @@ export default function DispenserDetailPage({ params }: { params: any }) {
               <Panel className="flex flex-col items-center justify-center max-w-2xl w-full">
                 <h1 className="text-3xl mb-2 text-center">{dispenser.name}</h1>
                 {!!dispenser.rewardWalletAddress && (
-                  <div className="text-xl mb-4">
-                    Wallet:{" "}
-                    <a
-                      className="text-sky-400 underline"
-                      href={`https://explorer.solana.com/account/${dispenser.rewardWalletAddress}?cluster=devnet`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {getAbbreviatedAddress(dispenser.rewardWalletAddress)}
-                    </a>
+                  <div className="flex flex-col">
+                    <div className="text-xl mb-4">
+                      Wallet:{" "}
+                      <a
+                        className="text-sky-400 underline"
+                        href={`https://explorer.solana.com/account/${dispenser.rewardWalletAddress}?cluster=devnet`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {getAbbreviatedAddress(dispenser.rewardWalletAddress)}
+                      </a>
+                    </div>
+                    <PrimaryButton className="mb-4" onClick={() => {}}>
+                      <Link href={`/lab/on-chain-tx?id=${dispenser.id}`}>
+                        Test
+                      </Link>
+                    </PrimaryButton>
                   </div>
                 )}
                 {!!dispenser.rarity && (
@@ -92,8 +99,8 @@ export default function DispenserDetailPage({ params }: { params: any }) {
                     <div>{dispenser.rarity.name}</div>
                   </div>
                 )}
-                {!!dispenser.description && (
-                  <div className="italic text-lg">{dispenser.description}</div>
+                {!!description && (
+                  <div className="italic text-lg">{description}</div>
                 )}
                 <Divider />
                 <div className="py-4">

@@ -9,12 +9,21 @@ import { IDL } from "@/target/types/dispenser";
 import { PublicKey } from "@metaplex-foundation/js";
 import { useUserData } from "@nhost/nextjs";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createHash } from "@/utils/hashing";
 import {
   createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddress,
 } from "@solana/spl-token";
+import useDispenser from "@/app/blueprint/hooks/use-dispenser";
+import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
+import { useQuery } from "@apollo/client";
+import { Dispenser } from "@/app/blueprint/types";
+import { useSearchParams } from "next/navigation";
+import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
+import { useFormik } from "formik";
+import { ImageWithFallback } from "@/features/UI/image-with-fallback";
+import { getAbbreviatedAddress } from "@/utils/formatting";
 
 export enum TokenType {
   SPL,
@@ -22,13 +31,37 @@ export enum TokenType {
   SFT,
 }
 
-export default function Page() {
+export default function Page({ params }: { params: any }) {
   const { connection } = useConnection();
   const anchorWallet = useAnchorWallet();
   const user = useUserData();
-  const [dispenserId, setDispenserId] = useState<string | null>(
-    "8be1c9ae-a9cc-4ab6-8136-6a62f0082e23"
+  const [hasBeenFetched, setHasBeenFetched] = useState(false);
+  const searchParams = useSearchParams();
+
+  const { dispenser, isLoading, name } = useDispenser(
+    searchParams.get("id") || ""
   );
+
+  const formik = useFormik({
+    initialValues: {
+      walletAddress: "",
+    },
+    onSubmit: async ({ walletAddress }) => {
+      try {
+        handleCreateSplTransaction();
+        showToast({
+          primaryMessage: "Sending!",
+        });
+        formik.setValues({ walletAddress: "" });
+      } catch (error: any) {
+        console.log("error", error);
+        showToast({
+          primaryMessage: "Error updating token",
+          secondaryMessage: error?.response?.data?.error,
+        });
+      }
+    },
+  });
 
   const getProvider = () => {
     if (!anchorWallet) return null;
@@ -52,7 +85,7 @@ export default function Page() {
       txHash = await provider.sendAndConfirm(transaction);
       showToast({
         primaryMessage: "Dispensed!",
-        secondaryMessage: `Transaction: ${txHash}`,
+        secondaryMessage: `Transaction: ${getAbbreviatedAddress(txHash)}`,
         link: {
           url: `https://explorer.solana.com/tx/${txHash}`,
           title: "View on Solana Explorer",
@@ -66,7 +99,7 @@ export default function Page() {
   const handleCreateSplTransaction = async () => {
     if (
       !DISPENSER_PROGRAM_ID ||
-      !dispenserId ||
+      !dispenser ||
       !anchorWallet ||
       !anchorWallet?.signTransaction
     )
@@ -81,19 +114,15 @@ export default function Page() {
     const programId = new PublicKey(DISPENSER_PROGRAM_ID);
     const program = new anchor.Program(IDL, programId, { connection });
 
-    const hash = createHash(dispenserId);
+    const hash = createHash(dispenser.id);
 
     const [dispenserPda, bump] = await PublicKey.findProgramAddressSync(
       [Buffer.from(hash)],
       new PublicKey(DISPENSER_PROGRAM_ID)
     );
 
-    const sender = new PublicKey(
-      "DmQQ2PVLiPYbKkYbWQ6nUGRdEAWYcJ6tUaiFKUZn6Ys5"
-    );
-    const recipient = new PublicKey(
-      "9k9jNHg5qHKxTtRqEBsfvytRri7qjk3kzUL6J7od9XtZ"
-    );
+    const sender = dispenserPda;
+    const recipient = new PublicKey(formik.values.walletAddress);
     const mint = new PublicKey("C6XSdTg4eQUUtqyCVTBeW7HooJjTjTo2VpAFnKqzLTTx");
 
     const fromTokenAccount = await getAssociatedTokenAddress(
@@ -137,7 +166,7 @@ export default function Page() {
   const handleCreateSolTransaction = async () => {
     if (
       !DISPENSER_PROGRAM_ID ||
-      !dispenserId ||
+      !dispenser ||
       !anchorWallet ||
       !anchorWallet?.signTransaction
     )
@@ -152,16 +181,17 @@ export default function Page() {
     const programId = new PublicKey(DISPENSER_PROGRAM_ID);
     const program = new anchor.Program(IDL, programId, { connection });
 
+    const hash = createHash(dispenser.id);
+
+    const [dispenserPda, bump] = await PublicKey.findProgramAddressSync(
+      [Buffer.from(hash)],
+      new PublicKey(DISPENSER_PROGRAM_ID)
+    );
     const transaction = await program.methods
-      .dispenseSol(
-        new PublicKey("A7kW1LYToYqyhK16Pk3sUJT9QSkYp7JhhgPYXCjnq6xu"),
-        new anchor.BN(1000000000)
-      )
+      .dispenseSol(dispenserPda, new anchor.BN(100000000))
       .accounts({
-        sender: new PublicKey("A7kW1LYToYqyhK16Pk3sUJT9QSkYp7JhhgPYXCjnq6xu"),
-        recipient: new PublicKey(
-          "9k9jNHg5qHKxTtRqEBsfvytRri7qjk3kzUL6J7od9XtZ"
-        ),
+        sender: dispenserPda,
+        recipient: new PublicKey(formik.values.walletAddress),
         systemProgram: anchor.web3.SystemProgram.programId,
       })
       .transaction();
@@ -171,15 +201,36 @@ export default function Page() {
 
   return (
     <ContentWrapper>
-      <Panel className="flex flex-col items-center">
-        <h1 className="text-3xl text-center mb-4">On-chain transactions</h1>
-        <PrimaryButton onClick={handleCreateSolTransaction}>
-          go SOL!
-        </PrimaryButton>
-        <PrimaryButton onClick={handleCreateSplTransaction}>
-          go SPL!
-        </PrimaryButton>
-      </Panel>
+      {!dispenser && hasBeenFetched && <div>Dispenser not found</div>}
+      {isLoading && <div>Loading...</div>}
+      {!isLoading && dispenser && (
+        <Panel className="flex flex-col items-center">
+          <ImageWithFallback
+            src={dispenser.imageUrl}
+            height={120}
+            width={120}
+            className="w-36 mb-8"
+            alt={dispenser.name}
+          />
+          <p className="text-center text-3xl mb-4">{dispenser.name} </p>
+          <p className="text-center text-xl mb-4">{dispenser.description}</p>
+          <FormInputWithLabel
+            label="Wallet address"
+            name="walletAddress"
+            value={formik.values.walletAddress}
+            onChange={formik.handleChange}
+          />
+          <PrimaryButton
+            onClick={handleCreateSolTransaction}
+            className="my-2 mt-8"
+          >
+            dispense 0.1 SOL!
+          </PrimaryButton>
+          <PrimaryButton onClick={handleCreateSplTransaction}>
+            dispense 10 C6XSdT tokens!
+          </PrimaryButton>
+        </Panel>
+      )}
     </ContentWrapper>
   );
 }

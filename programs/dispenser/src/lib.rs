@@ -66,7 +66,7 @@ pub struct DispenseTokens<'info> {
 #[derive(Accounts)]
 pub struct DispenseSol<'info> {
     /// CHECK: The `sender` (PDA) exists and has permissions to perform operations. This will represent the derived PDA.
-    #[account(mut, signer)]
+    #[account(mut)]
     pub sender: AccountInfo<'info>,
     /// CHECK: The `recipient` account exists and can accept lamports.
     #[account(mut)]
@@ -122,7 +122,6 @@ pub mod dispenser {
         let sender = &ctx.accounts.sender;
         let recipient = &ctx.accounts.recipient;
 
-        // Transfer lamports
         **recipient.lamports.borrow_mut() += amount;
         **sender.lamports.borrow_mut() -= amount;
 

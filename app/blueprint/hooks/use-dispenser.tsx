@@ -102,8 +102,8 @@ const useDispenser = (dispenserId?: string) => {
     dispenser;
 
   return {
-    collectionWallet,
     dispenser,
+    collectionWallet,
     imageUrl,
     description,
     name,
