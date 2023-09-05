@@ -17,7 +17,6 @@ import {
 import { ADD_ITEM_PAYOUT } from "@/graphql/mutations/add-item-payout";
 import {
   createAssociatedTokenAccountInstruction,
-  createFreezeAccountInstruction,
   createTransferInstruction,
   getAssociatedTokenAddress,
 } from "@solana/spl-token";

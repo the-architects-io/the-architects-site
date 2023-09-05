@@ -11,6 +11,10 @@ import { useUserData } from "@nhost/nextjs";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { useState } from "react";
 import { createHash } from "@/utils/hashing";
+import {
+  createAssociatedTokenAccountInstruction,
+  getAssociatedTokenAddress,
+} from "@solana/spl-token";
 
 export enum TokenType {
   SPL,
@@ -84,20 +88,48 @@ export default function Page() {
       new PublicKey(DISPENSER_PROGRAM_ID)
     );
 
-    console.log(dispenserPda.toBase58(), bump);
-    debugger;
+    const sender = new PublicKey(
+      "DmQQ2PVLiPYbKkYbWQ6nUGRdEAWYcJ6tUaiFKUZn6Ys5"
+    );
+    const recipient = new PublicKey(
+      "9k9jNHg5qHKxTtRqEBsfvytRri7qjk3kzUL6J7od9XtZ"
+    );
+    const mint = new PublicKey("C6XSdTg4eQUUtqyCVTBeW7HooJjTjTo2VpAFnKqzLTTx");
 
-    const transaction = await program.methods
-      .dispenseTokens(Buffer.from(hash), 255, new anchor.BN(1))
+    const fromTokenAccount = await getAssociatedTokenAddress(
+      mint,
+      sender,
+      true
+    );
+
+    const toTokenAccount = await getAssociatedTokenAddress(mint, recipient);
+    const toTokenAccountInfo = await connection.getAccountInfo(toTokenAccount);
+
+    const transaction = new anchor.web3.Transaction();
+
+    if (!toTokenAccountInfo) {
+      transaction.add(
+        createAssociatedTokenAccountInstruction(
+          anchorWallet.publicKey,
+          toTokenAccount,
+          recipient,
+          mint
+        )
+      );
+    }
+
+    const ix = await program.methods
+      .dispenseTokens(Buffer.from(hash), 255, new anchor.BN(10000000000)) // 10 tokens
       .accounts({
-        sender: new PublicKey("DmQQ2PVLiPYbKkYbWQ6nUGRdEAWYcJ6tUaiFKUZn6Ys5"),
-        recipient: new PublicKey(
-          "9k9jNHg5qHKxTtRqEBsfvytRri7qjk3kzUL6J7od9XtZ"
-        ),
-        mint: new PublicKey("C6XSdTg4eQUUtqyCVTBeW7HooJjTjTo2VpAFnKqzLTTx"),
+        sender: fromTokenAccount,
+        recipient: toTokenAccount,
+        dispenserPda: sender,
+        mint,
         systemProgram: anchor.web3.SystemProgram.programId,
       })
-      .transaction();
+      .instruction();
+
+    transaction.add(ix);
 
     sendTransaction(transaction);
   };

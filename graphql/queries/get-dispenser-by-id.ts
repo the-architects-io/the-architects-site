@@ -3,7 +3,8 @@ import { gql } from "@apollo/client";
 export const GET_DISPENSER_BY_ID = gql`
   query GET_DISPENSER_BY_ID($id: uuid!) {
     dispensers_by_pk(id: $id) {
-      onChainAddress
+      rewardWalletAddress
+      rewardWalletBump
       collectionWallet {
         id
         address
