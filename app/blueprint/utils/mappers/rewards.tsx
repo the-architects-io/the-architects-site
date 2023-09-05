@@ -1,5 +1,4 @@
-import { DispenserReward } from "@/app/blueprint/types";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
+import { Dispenser, DispenserReward } from "@/app/blueprint/types";
 
 const sortRewards = (rewards: DispenserReward[]) => {
   return rewards.sort((a, b) => {

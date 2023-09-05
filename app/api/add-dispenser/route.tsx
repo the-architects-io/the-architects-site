@@ -2,9 +2,8 @@
 import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { ADD_DISPENSER } from "@/graphql/mutations/add-dispenser";
-import { NoopResponse } from "@/app/blueprint/types";
+import { Dispenser, NoopResponse } from "@/app/blueprint/types";
 
 type Data =
   | Dispenser

@@ -1,5 +1,5 @@
+import { Dispenser } from "@/app/blueprint/types";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { useState } from "react";
 
 export const RestrictionsSettingsPanel = ({

@@ -1,5 +1,4 @@
-import { DispenserRestriction } from "@/app/blueprint/types";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
+import { Dispenser, DispenserRestriction } from "@/app/blueprint/types";
 import { mapTraitBasedCollection } from "@/app/blueprint/utils/mappers/trait-collection";
 
 export const mapRestrictions = (

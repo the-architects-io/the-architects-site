@@ -9,7 +9,6 @@ import {
 import bs58 from "bs58";
 import { client } from "@/graphql/backend-client";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import {
   BASE_URL,
   REWARD_WALLET_ADDRESS,
@@ -25,6 +24,7 @@ import {
 import { NextRequest, NextResponse } from "next/server";
 import { TokenBalance } from "@/app/api/get-token-balances-from-helius/route";
 import axios from "axios";
+import { Dispenser } from "@/app/blueprint/types";
 // import { GET_USER_BY_WALLET_ADDRESS } from "graphql/queries/get-user-by-wallet-address";
 
 type Data =

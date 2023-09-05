@@ -1,15 +1,15 @@
 [features]
 seeds = false
 skip-lint = false
-[programs.localnet]
+[programs.devnet]
 architects = "3mE2UAhuJxCbcHBCM4gFeWkJheDFw2q9iDykf3S9RDwx"
-dispenser = "4WtotNKD2Wz7nKMjsQdkU5MyfHpJiyaVfN4KhjhNosAr"
+dispenser = "29Phfb8pDz2DifXVafuDHFFmg6MrcFKCGEbQXmjoSGWL"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "Devnet"
 wallet = "/Users/warly/.config/solana/id.json"
 
 [scripts]

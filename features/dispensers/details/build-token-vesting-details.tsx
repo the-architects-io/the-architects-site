@@ -1,4 +1,4 @@
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
+import { Dispenser } from "@/app/blueprint/types";
 import { LastClaimTimeDetails } from "@/features/dispensers/details/last-claim-time-details";
 import { getAmountWithDecimals } from "@/utils/currency";
 import { calculateTokenClaimRewardAmount } from "@/utils/dispensers/calculate-token-claim-reward-amount";

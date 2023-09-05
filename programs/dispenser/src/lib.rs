@@ -1,14 +1,19 @@
 use anchor_lang::prelude::*;
 use anchor_lang::system_program::ID as system_program_id;
-use anchor_spl::token::{self, Mint, Token, TokenAccount};
+use anchor_spl::token::{self, Mint, Token};
+use borsh::{BorshDeserialize, BorshSerialize};
 
-declare_id!("29Phfb8pDz2DifXVafuDHFFmg6MrcFKCGEbQXmjoSGWL");
+declare_id!("4gWo4AXW987N93RAiuoJJF51FwFV5Yyza4CYZ9j6qSYJ");
 
 #[program]
 pub mod dispenser {
     use super::*;
 
-    pub fn create_dispenser(ctx: Context<CreateDispenser>, _seed: String, _bump: u8) -> Result<()> {
+    pub fn create_dispenser(
+        ctx: Context<CreateDispenser>,
+        _seed: Vec<u8>,
+        _bump: u8,
+    ) -> Result<()> {
         let dispenser_account: &mut DispenserAccount = &mut ctx.accounts.dispenser_account;
         dispenser_account.is_initialized = true;
         // ... set other fields as needed ...
@@ -16,15 +21,24 @@ pub mod dispenser {
         Ok(())
     }
 
-    pub fn dispense_tokens(ctx: Context<DispenseTokens>, amount: u64) -> Result<()> {
+    pub fn dispense_tokens(
+        ctx: Context<DispenseTokens>,
+        seed: Vec<u8>,
+        bump: u8,
+        amount: u64,
+    ) -> Result<()> {
         let cpi_accounts = token::Transfer {
-            from: ctx.accounts.sender_tokens.to_account_info().clone(),
-            to: ctx.accounts.recipient_tokens.to_account_info().clone(),
+            from: ctx.accounts.sender.to_account_info().clone(),
+            to: ctx.accounts.recipient.to_account_info().clone(),
             authority: ctx.accounts.sender.to_account_info().clone(),
         };
 
         let cpi_program = ctx.accounts.token_program.to_account_info().clone();
-        let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+
+        let bump_seed: &[u8] = &[bump];
+        let signer_seeds: &[&[&[u8]]] = &[&[&seed[..], bump_seed]];
+
+        let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts).with_signer(signer_seeds);
 
         token::transfer(cpi_ctx, amount)
     }
@@ -46,10 +60,10 @@ pub mod dispenser {
 }
 
 #[derive(Accounts)]
-#[instruction(seed: String, bump: u8)]
+#[instruction(seed: Vec<u8>, bump: u8)]
 pub struct CreateDispenser<'info> {
     #[account(
-        seeds = [seed.as_bytes()],
+        seeds = [seed.as_slice()],
         bump, init, payer = user, space = 8 + 40,
         owner = ID
     )]
@@ -75,15 +89,14 @@ pub struct DispenserAccount {
 }
 
 #[derive(Accounts)]
-#[instruction(amount: u64)]
+#[instruction(seed: Vec<u8>, bump: u8, amount: u64)]
 pub struct DispenseTokens<'info> {
-    /// CHECK: Ensure the sender is the transaction signer and has sufficient lamports for the transfer.
+    /// CHECK: The `sender` (PDA) exists and has permissions to perform operations. This will represent the derived PDA.
     #[account(mut)]
-    pub sender: Signer<'info>,
+    pub sender: AccountInfo<'info>,
+    /// CHECK: The `recipient` account exists and can accept lamports.
     #[account(mut)]
-    pub sender_tokens: Account<'info, TokenAccount>,
-    #[account(mut)]
-    pub recipient_tokens: Account<'info, TokenAccount>,
+    pub recipient: AccountInfo<'info>,
     #[account(mut)]
     pub mint: Account<'info, Mint>,
     /// CHECK: The system program is required to create the account.
@@ -96,13 +109,20 @@ pub struct DispenseTokens<'info> {
 
 #[derive(Accounts)]
 pub struct DispenseSol<'info> {
-    /// CHECK: The `sender` (PDA) exists and has permissions to perform operations.
+    /// CHECK: The `sender` (PDA) exists and has permissions to perform operations. This will represent the derived PDA.
     #[account(mut)]
-    pub sender: AccountInfo<'info>, // This will represent the derived PDA
+    pub sender: AccountInfo<'info>,
     /// CHECK: The `recipient` account exists and can accept lamports.
     #[account(mut)]
     pub recipient: AccountInfo<'info>,
     /// CHECK: The system program is required to create the account.
     #[account(address = system_program_id)]
     pub system_program: AccountInfo<'info>,
+}
+
+#[derive(Clone, Debug, PartialEq, BorshSerialize, BorshDeserialize)]
+pub enum TokenType {
+    SPL,
+    NFT,
+    SFT,
 }

@@ -11,11 +11,9 @@ import showToast from "@/features/toasts/show-toast";
 import SharedHead from "@/features/UI/head";
 import { FormTextareaWithLabel } from "@/features/UI/forms/form-textarea-with-label";
 import { createOnChainDispenser } from "@/utils/dispensers/create-on-chain-dispenser";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { getAbbreviatedAddress } from "@/utils/formatting";
-import { useMutation } from "@apollo/client";
-import { UPDATE_DISPENSER } from "@/graphql/mutations/update-dispenser";
+import { Dispenser } from "@/app/blueprint/types";
 
 export type DispenserResponse = {
   id: string;
@@ -27,8 +25,6 @@ export const AddDispenserForm = () => {
   const { connection } = useConnection();
   const anchorWallet = useAnchorWallet();
   const router = useRouter();
-
-  const [updateDispenser, { loading }] = useMutation(UPDATE_DISPENSER);
 
   const formik = useFormik({
     initialValues: {
@@ -58,17 +54,19 @@ export const AddDispenserForm = () => {
           return;
         }
 
-        const { txHash, dispenserAddress } = await createOnChainDispenser(
-          dispenser.id,
-          provider,
-          connection,
-          anchorWallet
-        );
+        const { txHash, dispenserAddress, dispenserBump } =
+          await createOnChainDispenser(
+            dispenser.id,
+            provider,
+            connection,
+            anchorWallet
+          );
 
         const { data: updatedDispenser }: { data: Dispenser } =
           await axios.post("/api/update-dispenser", {
             id: dispenser.id,
-            onChainAddress: dispenserAddress.toString(),
+            rewardWalletAddress: dispenserAddress.toString(),
+            rewardWalletBump: dispenserBump,
           });
 
         showToast({

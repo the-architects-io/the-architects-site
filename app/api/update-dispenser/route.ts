@@ -1,13 +1,11 @@
 import { client } from "@/graphql/backend-client";
 import { Token } from "@/features/admin/tokens/tokens-list-item";
-import { NoopResponse } from "@/app/api/get-token-metadata-from-helius/route";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { UNBIND_USER_FROM_WALLET } from "@/graphql/mutations/unbind-user-from-wallet";
 import { UPDATE_DISPENSER } from "@/graphql/mutations/update-dispenser";
 
 export async function POST(req: NextRequest) {
-  const { id, onChainAddress, noop } = await req.json();
+  const { id, rewardWalletAddress, rewardWalletBump, noop } = await req.json();
 
   if (noop)
     return NextResponse.json(
@@ -18,7 +16,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
 
-  if (!id || !onChainAddress) {
+  if (!id || !rewardWalletAddress || !rewardWalletBump) {
     return NextResponse.json(
       { error: "Required fields not set" },
       { status: 500 }
@@ -32,7 +30,8 @@ export async function POST(req: NextRequest) {
     {
       id,
       setInput: {
-        onChainAddress,
+        rewardWalletAddress,
+        rewardWalletBump,
       },
     }
   );

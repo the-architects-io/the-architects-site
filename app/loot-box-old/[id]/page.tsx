@@ -1,7 +1,6 @@
 "use client";
 import { Payout } from "@/app/profile/[id]/page";
 import { BASE_URL } from "@/constants/constants";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { RewardsList } from "@/features/rewards/rewards-list";
 import showToast from "@/features/toasts/show-toast";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
@@ -30,6 +29,7 @@ import axios from "axios";
 import { NextPage } from "next";
 import { useCallback, useEffect, useState } from "react";
 import useCostBalance from "@/app/blueprint/hooks/use-cost-balance";
+import { Dispenser } from "@/app/blueprint/types";
 
 export default function LootBoxDetailPage({ params }: { params: any }) {
   const wallet = useWallet();

@@ -1,13 +1,13 @@
 "use client";
 
 import {
+  Dispenser,
   DispenserCost,
   DispenserGate,
   DispenserRestriction,
   DispenserReward,
 } from "@/app/blueprint/types";
 import { Payout } from "@/app/profile/[id]/page";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
 import { mapCost } from "@/app/blueprint/utils/mappers/cost";
 import { mapGates } from "@/app/blueprint/utils/mappers/gates";

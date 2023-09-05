@@ -1,8 +1,7 @@
+import { Dispenser } from "@/app/blueprint/types";
 import { BASE_URL } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import Link from "next/link";
-import { useState } from "react";
 
 export const StatsPanel = ({ dispenser }: { dispenser: Dispenser }) => {
   return (

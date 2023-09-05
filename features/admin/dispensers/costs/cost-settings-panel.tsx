@@ -1,7 +1,7 @@
+import { Dispenser } from "@/app/blueprint/types";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import Spinner from "@/features/UI/spinner";
 import { AddCostForm } from "@/features/admin/dispensers/costs/add-cost-form";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { CostsList } from "@/features/dispensers/costs/costs-list";
 import showToast from "@/features/toasts/show-toast";
 import { REMOVE_COST_COLLECTION } from "@/graphql/mutations/remove-cost-collection";

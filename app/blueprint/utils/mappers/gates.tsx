@@ -1,5 +1,4 @@
-import { DispenserGate } from "@/app/blueprint/types";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
+import { Dispenser, DispenserGate } from "@/app/blueprint/types";
 import { mapTraitBasedCollection } from "@/app/blueprint/utils/mappers/trait-collection";
 
 export const mapGates = (

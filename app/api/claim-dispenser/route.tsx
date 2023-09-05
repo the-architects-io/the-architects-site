@@ -7,7 +7,6 @@ import {
 import bs58 from "bs58";
 import { client } from "@/graphql/backend-client";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { RPC_ENDPOINT } from "@/constants/constants";
 import { ADD_ITEM_PAYOUT } from "@/graphql/mutations/add-item-payout";
 import { NextRequest, NextResponse } from "next/server";
@@ -18,7 +17,7 @@ import { Token } from "@/features/admin/tokens/tokens-list-item";
 import { ADD_LAST_CLAIM_TIMES } from "@/graphql/mutations/add-last-claim-time";
 import { caluclateBuildVestingRewardAmount } from "@/utils/dispensers/calculate-token-claim-reward-amount";
 import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
-import { Wallet } from "@/app/blueprint/types";
+import { Dispenser, Wallet } from "@/app/blueprint/types";
 
 type Data =
   | {

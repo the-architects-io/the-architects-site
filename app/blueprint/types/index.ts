@@ -174,3 +174,85 @@ export type Wallet = {
   address: string;
   id: string;
 };
+
+export enum TokenClaimPayoutStrategies {
+  VESTING_BUILD_TOKEN = "VESTING_BUILD_TOKEN",
+  BASIC_CLAIM = "BASIC_CLAIM",
+}
+
+export type Dispenser = {
+  tokenClaimPayoutStrategy: TokenClaimPayoutStrategies;
+  rewardWalletAddress: string;
+  rewardWalletBump: number;
+  collectionWallet: {
+    id: string;
+    address: string;
+  };
+  costCollections: {
+    dispenserId: string;
+    id: string;
+    name: string;
+    amount: number;
+    itemCollection: ItemCollection;
+  }[];
+  rewardCollections: {
+    dispenserId: string;
+    childRewardCollections?: {
+      dispenserId: string;
+      isFreezeOnDelivery: boolean;
+      hashListCollection: HashListCollection;
+      payoutChance: number;
+      itemCollection: ItemCollection;
+      id: string;
+      name: string;
+    }[];
+    isFreezeOnDelivery: boolean;
+    hashListCollection: HashListCollection;
+    payoutChance: number;
+    itemCollection: ItemCollection;
+    id: string;
+    name: string;
+  }[];
+  restrictionCollections: {
+    id: string;
+    traitCollection: {
+      trait: {
+        name: string;
+        id: string;
+      };
+      id: string;
+      name: string;
+      value: string;
+    };
+    hashListCollection: {
+      name: string;
+      hashList: {
+        id: string;
+        name: string;
+      };
+    };
+  }[];
+  gateCollections: {
+    id: string;
+    traitCollection: {
+      id: string;
+      name: string;
+      value: string;
+      trait: {
+        id: string;
+        name: string;
+      };
+    };
+  }[];
+  updatedAt: string;
+  createdAt: string;
+  description: string;
+  id: string;
+  name: string;
+  isEnabled: boolean;
+  imageUrl: string;
+  rarity: {
+    name: string;
+    id: string;
+  };
+};

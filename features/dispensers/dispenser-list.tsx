@@ -1,7 +1,7 @@
+import { Dispenser } from "@/app/blueprint/types";
 import { Card } from "@/features/UI/card";
 import { ContentWrapperYAxisCenteredContent } from "@/features/UI/content-wrapper-y-axis-centered-content";
 import Spinner from "@/features/UI/spinner";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { GET_ENABLED_DISPENSERS } from "@/graphql/queries/get-enabled-dispensers";
 
 import { useQuery } from "@apollo/client";

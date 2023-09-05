@@ -15,6 +15,7 @@ export const createOnChainDispenser = async (
 ): Promise<{
   txHash: string;
   dispenserAddress: string;
+  dispenserBump: number;
 }> => {
   return new Promise(async (resolve, reject) => {
     anchor.setProvider(provider);
@@ -31,6 +32,9 @@ export const createOnChainDispenser = async (
     const program = new anchor.Program(IDL, programId, { connection });
 
     const hash = createHash(dispenserId);
+    if (!hash?.match) {
+      throw new Error("Invalid dispenserId");
+    }
 
     const [dispenserPda, bump] = await PublicKey.findProgramAddressSync(
       [Buffer.from(hash)],
@@ -38,7 +42,7 @@ export const createOnChainDispenser = async (
     );
 
     const transaction = await program.methods
-      .createDispenser(hash, bump)
+      .createDispenser(Buffer.from(hash), bump)
       .accounts({
         dispenserAccount: dispenserPda,
         user: anchorWallet.publicKey,
@@ -62,6 +66,7 @@ export const createOnChainDispenser = async (
       resolve({
         txHash,
         dispenserAddress: dispenserPda.toString(),
+        dispenserBump: bump,
       });
     } catch (err) {
       reject(err);

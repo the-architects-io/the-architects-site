@@ -8,7 +8,6 @@ import { useAdmin } from "@/hooks/admin";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { Panel } from "@/features/UI/panel";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
-import { Dispenser } from "@/features/admin/dispensers/dispensers-list-item";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
 import { Divider } from "@/features/UI/divider";
 import { ITab, Tabs } from "@/features/UI/tabs/tabs";
@@ -19,7 +18,7 @@ import { RestrictionsSettingsPanel } from "@/features/admin/dispensers/restricti
 import { ConfigSettingsPanel } from "@/features/admin/dispensers/config/config-settings-panel";
 import { StatsPanel } from "@/features/admin/dispensers/stats/stats-panel";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
-import { RewardCollection } from "@/app/blueprint/types";
+import { Dispenser, RewardCollection } from "@/app/blueprint/types";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 
 export default function DispenserDetailPage({ params }: { params: any }) {
@@ -74,16 +73,16 @@ export default function DispenserDetailPage({ params }: { params: any }) {
               </div>
               <Panel className="flex flex-col items-center justify-center max-w-2xl w-full">
                 <h1 className="text-3xl mb-2 text-center">{dispenser.name}</h1>
-                {!!dispenser.onChainAddress && (
+                {!!dispenser.rewardWalletAddress && (
                   <div className="text-xl mb-4">
                     Wallet:{" "}
                     <a
                       className="text-sky-400 underline"
-                      href={`https://explorer.solana.com/account/${dispenser.onChainAddress}?cluster=devnet`}
+                      href={`https://explorer.solana.com/account/${dispenser.rewardWalletAddress}?cluster=devnet`}
                       target="_blank"
                       rel="noreferrer"
                     >
-                      {getAbbreviatedAddress(dispenser.onChainAddress)}
+                      {getAbbreviatedAddress(dispenser.rewardWalletAddress)}
                     </a>
                   </div>
                 )}
