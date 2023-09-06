@@ -20,12 +20,26 @@ pub enum TokenType {
 
 #[error_code]
 pub enum DispenserErrorCode {
+    #[msg("The account is uninitialized.")]
     UninitializedAccount,
+    #[msg("Insufficient funds in the account.")]
     InsufficientFunds,
+    #[msg("Invalid instruction provided.")]
     InvalidInstruction,
-    AlreadyInitialized,
+    #[msg("Program derived address mismatch.")]
     PdaMismatch,
+    #[msg("Failed to generate program derived address.")]
     PdaGenerationFailed,
+    #[msg("Account is not owned by the dispenser.")]
+    AccountNotOwnedByDispenser,
+    #[msg("The account is already initialized.")]
+    AlreadyInitialized,
+    #[msg("Token transfer failed.")]
+    TokenTransferFailed,
+    #[msg("Invalid amount provided.")]
+    InvalidAmount,
+    #[msg("Potential underflow detected.")]
+    PotentialUnderflow,
 }
 
 #[derive(Accounts)]
@@ -74,6 +88,7 @@ pub struct DispenseTokens<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(seed: Vec<u8>, bump: u8, amount: u64)]
 pub struct DispenseSol<'info> {
     /// CHECK: The `sender` (PDA) exists and has permissions to perform operations. This will represent the derived PDA.
     #[account(mut)]
@@ -84,6 +99,9 @@ pub struct DispenseSol<'info> {
     /// CHECK: The system program is required to create the account.
     #[account(address = system_program_id)]
     pub system_program: AccountInfo<'info>,
+    /// CHECK: The `dispenser_pda` is the PDA that owns the `sender` account.
+    #[account(seeds = [seed.as_slice()], bump = bump)]
+    pub dispenser_pda: AccountInfo<'info>,
 }
 
 #[program]
@@ -100,7 +118,6 @@ pub mod dispenser {
             return Err(DispenserErrorCode::AlreadyInitialized.into());
         }
         dispenser_account.is_initialized = true;
-        // ... set other fields as needed ...
 
         Ok(())
     }
@@ -111,6 +128,10 @@ pub mod dispenser {
         bump: u8,
         amount: u64,
     ) -> Result<()> {
+        if amount == 0 {
+            return Err(DispenserErrorCode::InvalidAmount.into());
+        }
+
         let seeds = &[&seed[..], &[bump]];
 
         let calculated_pda = Pubkey::create_program_address(seeds, ctx.program_id)
@@ -118,6 +139,10 @@ pub mod dispenser {
 
         if *ctx.accounts.dispenser_pda.key != calculated_pda {
             return Err(DispenserErrorCode::PdaMismatch.into());
+        }
+
+        if ctx.accounts.sender.owner != ctx.program_id {
+            return Err(DispenserErrorCode::AccountNotOwnedByDispenser.into());
         }
 
         if ctx.accounts.sender.lamports() < amount {
@@ -137,19 +162,41 @@ pub mod dispenser {
 
         let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts).with_signer(signer_seeds);
 
-        token::transfer(cpi_ctx, amount)
+        token::transfer(cpi_ctx, amount)?;
+
+        Ok(())
     }
 
     pub fn dispense_sol(
         ctx: Context<DispenseSol>,
-        _sender_pubkey: Pubkey,
+        seed: Vec<u8>,
+        bump: u8,
         amount: u64,
     ) -> Result<()> {
-        if ctx.accounts.sender.lamports() < amount {
-            return Err(DispenserErrorCode::InsufficientFunds.into());
+        if amount == 0 {
+            return Err(DispenserErrorCode::InvalidAmount.into());
         }
+
+        let seeds = &[&seed[..], &[bump]];
+
+        let calculated_pda = Pubkey::create_program_address(seeds, ctx.program_id)
+            .map_err(|_| DispenserErrorCode::PdaGenerationFailed)?;
+
+        if *ctx.accounts.dispenser_pda.key != calculated_pda {
+            return Err(DispenserErrorCode::PdaMismatch.into());
+        }
+
+        if ctx.accounts.sender.owner != ctx.program_id {
+            return Err(DispenserErrorCode::AccountNotOwnedByDispenser.into());
+        }
+
         let sender = &ctx.accounts.sender;
         let recipient = &ctx.accounts.recipient;
+
+        // Check for potential underflow condition
+        if **sender.lamports.borrow() < amount {
+            return Err(DispenserErrorCode::PotentialUnderflow.into());
+        }
 
         **recipient.lamports.borrow_mut() += amount;
         **sender.lamports.borrow_mut() -= amount;

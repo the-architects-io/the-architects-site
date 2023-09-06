@@ -9,16 +9,13 @@ import { IDL } from "@/target/types/dispenser";
 import { PublicKey } from "@metaplex-foundation/js";
 import { useUserData } from "@nhost/nextjs";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { createHash } from "@/utils/hashing";
 import {
   createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddress,
 } from "@solana/spl-token";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
-import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
-import { useQuery } from "@apollo/client";
-import { Dispenser } from "@/app/blueprint/types";
 import { useSearchParams } from "next/navigation";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { useFormik } from "formik";
