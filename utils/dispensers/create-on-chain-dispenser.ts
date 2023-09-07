@@ -7,6 +7,8 @@ import { PublicKey } from "@metaplex-foundation/js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { AnchorWallet } from "@solana/wallet-adapter-react";
 
+const AUTHORITY_SEED = process.env.NEXT_PUBLIC_AUTHORITY_SEED || "";
+
 export const createOnChainDispenser = async (
   dispenserId: string,
   provider: Provider,
@@ -36,13 +38,15 @@ export const createOnChainDispenser = async (
       throw new Error("Invalid dispenserId");
     }
 
+    console.log({ AUTHORITY_SEED });
+
     const [dispenserPda, bump] = await PublicKey.findProgramAddressSync(
-      [Buffer.from(hash)],
+      [Buffer.from(hash), Buffer.from(AUTHORITY_SEED)],
       new PublicKey(DISPENSER_PROGRAM_ID)
     );
 
     const transaction = await program.methods
-      .createDispenser(Buffer.from(hash), bump)
+      .createDispenser(Buffer.from(hash), Buffer.from(AUTHORITY_SEED), bump)
       .accounts({
         dispenserAccount: dispenserPda,
         user: anchorWallet.publicKey,

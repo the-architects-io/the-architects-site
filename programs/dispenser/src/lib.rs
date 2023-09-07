@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_lang::system_program::ID as system_program_id;
 use anchor_spl::token::{self, Mint, Token};
-use borsh::{BorshDeserialize, BorshSerialize};
+use borsh::BorshDeserialize;
 
 declare_id!("4gWo4AXW987N93RAiuoJJF51FwFV5Yyza4CYZ9j6qSYJ");
 
@@ -11,12 +11,12 @@ pub struct DispenserAccount {
     // ... other fields ...
 }
 
-#[derive(Clone, Debug, PartialEq, BorshSerialize, BorshDeserialize)]
-pub enum TokenType {
-    SPL,
-    NFT,
-    SFT,
-}
+// #[derive(Clone, Debug, PartialEq, BorshSerialize, BorshDeserialize)]
+// pub enum TokenType {
+//     SPL,
+//     NFT,
+//     SFT,
+// }
 
 #[error_code]
 pub enum DispenserErrorCode {
@@ -30,8 +30,6 @@ pub enum DispenserErrorCode {
     PdaMismatch,
     #[msg("Failed to generate program derived address.")]
     PdaGenerationFailed,
-    #[msg("Account is not owned by the dispenser.")]
-    AccountNotOwnedByDispenser,
     #[msg("The account is already initialized.")]
     AlreadyInitialized,
     #[msg("Token transfer failed.")]
@@ -43,10 +41,10 @@ pub enum DispenserErrorCode {
 }
 
 #[derive(Accounts)]
-#[instruction(seed: Vec<u8>, bump: u8)]
+#[instruction(seed: Vec<u8>, authority_seed: Vec<u8>, bump: u8)]
 pub struct CreateDispenser<'info> {
     #[account(
-        seeds = [seed.as_slice()],
+        seeds = [seed.as_slice(), authority_seed.as_slice()],
         bump, init, payer = user, space = 8 + 40,
         owner = ID
     )]
@@ -66,7 +64,7 @@ pub struct CreateDispenser<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(seed: Vec<u8>, bump: u8, amount: u64)]
+#[instruction(seed: Vec<u8>, authority_seed: Vec<u8>, bump: u8, amount: u64)]
 pub struct DispenseTokens<'info> {
     /// CHECK: The `sender` (PDA) exists and has permissions to perform operations. This will represent the derived PDA.
     #[account(mut)]
@@ -75,7 +73,7 @@ pub struct DispenseTokens<'info> {
     #[account(mut)]
     pub recipient: AccountInfo<'info>,
     /// CHECK: The `dispenser_pda` is the PDA that owns the `sender` account.
-    #[account(seeds = [seed.as_slice()], bump = bump)]
+    #[account(seeds = [seed.as_slice(), authority_seed.as_slice()], bump = bump)]
     pub dispenser_pda: AccountInfo<'info>,
     #[account(mut)]
     pub mint: Account<'info, Mint>,
@@ -88,7 +86,7 @@ pub struct DispenseTokens<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(seed: Vec<u8>, bump: u8, amount: u64)]
+#[instruction(seed: Vec<u8>, authority_seed: Vec<u8>, bump: u8, amount: u64)]
 pub struct DispenseSol<'info> {
     /// CHECK: The `sender` (PDA) exists and has permissions to perform operations. This will represent the derived PDA.
     #[account(mut)]
@@ -96,12 +94,12 @@ pub struct DispenseSol<'info> {
     /// CHECK: The `recipient` account exists and can accept lamports.
     #[account(mut)]
     pub recipient: AccountInfo<'info>,
+    /// CHECK: The `dispenser_pda` is the PDA that owns the `sender` account.
+    #[account(seeds = [seed.as_slice(), authority_seed.as_slice()], bump = bump)]
+    pub dispenser_pda: AccountInfo<'info>,
     /// CHECK: The system program is required to create the account.
     #[account(address = system_program_id)]
     pub system_program: AccountInfo<'info>,
-    /// CHECK: The `dispenser_pda` is the PDA that owns the `sender` account.
-    #[account(seeds = [seed.as_slice()], bump = bump)]
-    pub dispenser_pda: AccountInfo<'info>,
 }
 
 #[program]
@@ -111,6 +109,7 @@ pub mod dispenser {
     pub fn create_dispenser(
         ctx: Context<CreateDispenser>,
         _seed: Vec<u8>,
+        _authority_seed: Vec<u8>,
         _bump: u8,
     ) -> Result<()> {
         let dispenser_account: &mut DispenserAccount = &mut ctx.accounts.dispenser_account;
@@ -125,6 +124,7 @@ pub mod dispenser {
     pub fn dispense_tokens(
         ctx: Context<DispenseTokens>,
         seed: Vec<u8>,
+        authority_seed: Vec<u8>,
         bump: u8,
         amount: u64,
     ) -> Result<()> {
@@ -132,17 +132,13 @@ pub mod dispenser {
             return Err(DispenserErrorCode::InvalidAmount.into());
         }
 
-        let seeds = &[&seed[..], &[bump]];
+        let seeds = &[&seed[..], &authority_seed[..], &[bump]];
 
         let calculated_pda = Pubkey::create_program_address(seeds, ctx.program_id)
             .map_err(|_| DispenserErrorCode::PdaGenerationFailed)?;
 
         if *ctx.accounts.dispenser_pda.key != calculated_pda {
             return Err(DispenserErrorCode::PdaMismatch.into());
-        }
-
-        if ctx.accounts.sender.owner != ctx.program_id {
-            return Err(DispenserErrorCode::AccountNotOwnedByDispenser.into());
         }
 
         if ctx.accounts.sender.lamports() < amount {
@@ -158,7 +154,7 @@ pub mod dispenser {
         let cpi_program = ctx.accounts.token_program.to_account_info().clone();
 
         let bump_seed: &[u8] = &[bump];
-        let signer_seeds: &[&[&[u8]]] = &[&[&seed[..], bump_seed]];
+        let signer_seeds: &[&[&[u8]]] = &[&[&seed[..], &authority_seed[..], bump_seed]];
 
         let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts).with_signer(signer_seeds);
 
@@ -170,6 +166,7 @@ pub mod dispenser {
     pub fn dispense_sol(
         ctx: Context<DispenseSol>,
         seed: Vec<u8>,
+        authority_seed: Vec<u8>,
         bump: u8,
         amount: u64,
     ) -> Result<()> {
@@ -177,17 +174,13 @@ pub mod dispenser {
             return Err(DispenserErrorCode::InvalidAmount.into());
         }
 
-        let seeds = &[&seed[..], &[bump]];
+        let seeds = &[&seed[..], &authority_seed[..], &[bump]];
 
         let calculated_pda = Pubkey::create_program_address(seeds, ctx.program_id)
             .map_err(|_| DispenserErrorCode::PdaGenerationFailed)?;
 
         if *ctx.accounts.dispenser_pda.key != calculated_pda {
             return Err(DispenserErrorCode::PdaMismatch.into());
-        }
-
-        if ctx.accounts.sender.owner != ctx.program_id {
-            return Err(DispenserErrorCode::AccountNotOwnedByDispenser.into());
         }
 
         let sender = &ctx.accounts.sender;

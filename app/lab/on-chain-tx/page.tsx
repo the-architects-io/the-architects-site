@@ -28,6 +28,8 @@ export enum TokenType {
   SFT,
 }
 
+const AUTHORITY_SEED = process.env.NEXT_PUBLIC_AUTHORITY_SEED || "";
+
 export default function Page({ params }: { params: any }) {
   const { connection } = useConnection();
   const anchorWallet = useAnchorWallet();
@@ -114,17 +116,15 @@ export default function Page({ params }: { params: any }) {
     const hash = createHash(dispenser.id);
 
     const [dispenserPda, bump] = await PublicKey.findProgramAddressSync(
-      [Buffer.from(hash)],
+      [Buffer.from(hash), Buffer.from(AUTHORITY_SEED)],
       new PublicKey(DISPENSER_PROGRAM_ID)
     );
-
-    const sender = dispenserPda;
     const recipient = new PublicKey(formik.values.walletAddress);
     const mint = new PublicKey("C6XSdTg4eQUUtqyCVTBeW7HooJjTjTo2VpAFnKqzLTTx");
 
     const fromTokenAccount = await getAssociatedTokenAddress(
       mint,
-      sender,
+      dispenserPda,
       true
     );
 
@@ -145,11 +145,16 @@ export default function Page({ params }: { params: any }) {
     }
 
     const ix = await program.methods
-      .dispenseTokens(Buffer.from(hash), 255, new anchor.BN(10000000000)) // 10 tokens
+      .dispenseTokens(
+        Buffer.from(hash),
+        Buffer.from(AUTHORITY_SEED),
+        bump,
+        new anchor.BN(100000000)
+      ) // 10 tokens
       .accounts({
         sender: fromTokenAccount,
         recipient: toTokenAccount,
-        dispenserPda: sender,
+        dispenserPda,
         mint,
         systemProgram: anchor.web3.SystemProgram.programId,
       })
@@ -181,14 +186,18 @@ export default function Page({ params }: { params: any }) {
     const hash = createHash(dispenser.id);
 
     const [dispenserPda, bump] = await PublicKey.findProgramAddressSync(
-      [Buffer.from(hash)],
+      [Buffer.from(hash), Buffer.from(AUTHORITY_SEED)],
       new PublicKey(DISPENSER_PROGRAM_ID)
     );
+
+    const amount = new anchor.BN(100000000); // 0.1 SOL
+
     const transaction = await program.methods
-      .dispenseSol(dispenserPda, new anchor.BN(100000000))
+      .dispenseSol(Buffer.from(hash), Buffer.from(AUTHORITY_SEED), bump, amount)
       .accounts({
         sender: dispenserPda,
         recipient: new PublicKey(formik.values.walletAddress),
+        dispenserPda,
         systemProgram: anchor.web3.SystemProgram.programId,
       })
       .transaction();
