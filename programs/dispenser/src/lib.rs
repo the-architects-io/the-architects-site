@@ -38,6 +38,10 @@ pub enum DispenserErrorCode {
     InvalidAmount,
     #[msg("Potential underflow detected.")]
     PotentialUnderflow,
+    #[msg("The contract is already paused.")]
+    AlreadyPaused,
+    #[msg("Cannot execute, the contract is paused.")]
+    Paused,
 }
 
 #[derive(Accounts)]
@@ -83,6 +87,7 @@ pub struct DispenseTokens<'info> {
     /// CHECK: The SPL token program is required to create the account.
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
+    pub global_state: Account<'info, GlobalState>,
 }
 
 #[derive(Accounts)]
@@ -100,6 +105,33 @@ pub struct DispenseSol<'info> {
     /// CHECK: The system program is required to create the account.
     #[account(address = system_program_id)]
     pub system_program: AccountInfo<'info>,
+    pub global_state: Account<'info, GlobalState>,
+}
+
+#[account]
+pub struct GlobalState {
+    paused: bool,
+    owner: Pubkey,
+}
+
+#[derive(Accounts)]
+pub struct PauseContract<'info> {
+    #[account(
+        mut,
+        constraint = global_state.owner == *owner.key
+    )]
+    pub global_state: Account<'info, GlobalState>,
+    pub owner: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct UnpauseContract<'info> {
+    #[account(
+        mut,
+        constraint = contract_state.owner == *owner.key
+    )]
+    pub contract_state: Account<'info, GlobalState>,
+    pub owner: Signer<'info>,
 }
 
 #[program]
@@ -128,6 +160,10 @@ pub mod dispenser {
         bump: u8,
         amount: u64,
     ) -> Result<()> {
+        if ctx.accounts.global_state.paused {
+            return Err(DispenserErrorCode::Paused.into());
+        }
+
         if amount == 0 {
             return Err(DispenserErrorCode::InvalidAmount.into());
         }
@@ -170,6 +206,10 @@ pub mod dispenser {
         bump: u8,
         amount: u64,
     ) -> Result<()> {
+        if ctx.accounts.global_state.paused {
+            return Err(DispenserErrorCode::Paused.into());
+        }
+
         if amount == 0 {
             return Err(DispenserErrorCode::InvalidAmount.into());
         }
@@ -194,6 +234,24 @@ pub mod dispenser {
         **recipient.lamports.borrow_mut() += amount;
         **sender.lamports.borrow_mut() -= amount;
 
+        Ok(())
+    }
+
+    pub fn pause_contract(ctx: Context<PauseContract>) -> Result<()> {
+        let global_state = &mut ctx.accounts.global_state;
+        if global_state.paused {
+            return Err(DispenserErrorCode::AlreadyPaused.into());
+        }
+        global_state.paused = true;
+        Ok(())
+    }
+
+    pub fn unpause_contract(ctx: Context<PauseContract>) -> Result<()> {
+        let global_state = &mut ctx.accounts.global_state;
+        if !global_state.paused {
+            return Err(DispenserErrorCode::AlreadyPaused.into());
+        }
+        global_state.paused = false;
         Ok(())
     }
 }
