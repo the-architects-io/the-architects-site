@@ -39,7 +39,7 @@ const useDispenser = (dispenserId?: string) => {
     DispenserRestriction[] | null
   >(null);
 
-  const { loading } = useQuery(GET_DISPENSER_BY_ID, {
+  const { loading, error, refetch } = useQuery(GET_DISPENSER_BY_ID, {
     variables: { id: dispenserId },
     skip: !dispenserId,
     // fetchPolicy: "network-only",
@@ -110,6 +110,8 @@ const useDispenser = (dispenserId?: string) => {
     id,
     isEnabled,
     isLoading: loading,
+    refetch,
+    error,
     cost,
     rewards,
     gates,

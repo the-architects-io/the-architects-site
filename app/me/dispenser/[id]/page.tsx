@@ -1,13 +1,7 @@
 "use client";
-
-import { useAdmin } from "@/hooks/admin";
-import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import { DispenserControlPanel } from "@/features/dispensers/dispenser-control-panel";
 
-export default function DispenserDetailPage({ params }: { params: any }) {
-  const { isAdmin } = useAdmin();
-
-  if (!isAdmin) return <NotAdminBlocker />;
+export default function DispenserControlPanelPage({ params }: { params: any }) {
   if (!params?.id) return <div>Dispenser not found</div>;
 
   return (
