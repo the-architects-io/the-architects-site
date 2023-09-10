@@ -15,6 +15,7 @@ import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { Dispenser } from "@/app/blueprint/types";
 import { useUserData } from "@nhost/nextjs";
+import { useEffect } from "react";
 
 export type DispenserResponse = {
   id: string;
@@ -92,6 +93,13 @@ export const AddDispenserForm = () => {
       }
     },
   });
+
+  useEffect(() => {
+    if (user?.id) {
+      formik.setFieldValue("ownerId", user?.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const getProvider = () => {
     if (!anchorWallet) return null;

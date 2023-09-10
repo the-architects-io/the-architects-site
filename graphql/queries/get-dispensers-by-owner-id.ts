@@ -1,9 +1,8 @@
-import { DISPENSER_DETAILS } from "@/graphql/fragments/dispensers/dispenser-details";
 import { gql } from "@apollo/client";
 
-export const GET_DISPENSER_BY_ID = gql`
-  query GET_DISPENSER_BY_ID($id: uuid!) {
-    dispensers_by_pk(id: $id) {
+export const GET_DISPENSERS_BY_OWNER_ID = gql`
+  query GET_DISPENSERS_BY_OWNER_ID($id: uuid!) {
+    dispensers(where: { ownerId: { _eq: $id } }) {
       rewardWalletAddress
       rewardWalletBump
       collectionWallet {

@@ -5,7 +5,7 @@ export const ADD_DISPENSER = gql`
     $imageUrl: String = ""
     $description: String = ""
     $name: String!
-    $ownerId: String!
+    $ownerId: uuid!
   ) {
     insert_dispensers_one(
       object: {
