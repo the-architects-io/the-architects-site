@@ -13,7 +13,6 @@ import { FormTextareaWithLabel } from "@/features/UI/forms/form-textarea-with-la
 import { NftCollectionsSelectInput } from "@/features/nft-collections/nft-collections-select-input";
 import Spinner from "@/features/UI/spinner";
 import { Panel } from "@/features/UI/panel";
-import { getAbbreviatedAddress } from "@/utils/formatting";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { Line, Circle } from "rc-progress";
 import { XCircleIcon } from "@heroicons/react/24/outline";
@@ -26,8 +25,6 @@ export default function FetchPage() {
   const router = useRouter();
   const user = useUserData();
   const [isSaving, setIsSaving] = useState(false);
-  const [hashList, setHashList] = useState<string>("");
-  const [nftCollectionId, setNftCollectionId] = useState<string>("");
   const [totalNftsToAdd, setTotalNftsToAdd] = useState<number>(0);
   const [currentNftToAdd, setCurrentNftToAdd] = useState<number>(0);
   const [numberOfSuccesses, setNumberOfSuccesses] = useState<number>(0);
@@ -173,10 +170,10 @@ export default function FetchPage() {
               // sky-400
               strokeColor="#38bdf8"
             />
-            <div className="text-sm text-gray-300 mt-4">
+            <div className="text-sm text-gray-100 mt-4">
               {Math.floor(((currentNftToAdd + 1) / totalNftsToAdd) * 100)}%
             </div>
-            <div className="text-sm text-gray-300 mt-2">
+            <div className="text-sm text-gray-100 mt-2">
               Est. time remaining&nbsp;
               <>
                 {(totalNftsToAdd - currentNftToAdd) * 3 >= 60 && (
@@ -222,7 +219,7 @@ export default function FetchPage() {
         </>
       )}
       {numberOfSuccesses + failedAdditions.length + numberOfSkips > 0 && (
-        <Panel className="flex flex-col items-center justify-center bg-gray-800 mb-8 text-gray-300 text-lg relative py-6">
+        <Panel className="flex flex-col items-center justify-center bg-gray-800 mb-8 text-gray-100 text-lg relative py-6">
           <button className="absolute right-4 top-8 cursor-pointer mr-1">
             <XCircleIcon
               className="cursor-pointer h-6 w-6"

@@ -5,9 +5,15 @@ export const ADD_DISPENSER = gql`
     $imageUrl: String = ""
     $description: String = ""
     $name: String!
+    $ownerId: String!
   ) {
     insert_dispensers_one(
-      object: { imageUrl: $imageUrl, description: $description, name: $name }
+      object: {
+        imageUrl: $imageUrl
+        description: $description
+        name: $name
+        ownerId: $ownerId
+      }
     ) {
       name
       id

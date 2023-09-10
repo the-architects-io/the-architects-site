@@ -5,7 +5,6 @@ import React, { Fragment } from "react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useSignOut, useUserData } from "@nhost/nextjs";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { getAbbreviatedAddress } from "@/utils/formatting";
 import { useAdmin } from "@/hooks/admin";
 import Link from "next/link";
 import { useDebugMode } from "@/hooks/debug-mode";
@@ -14,7 +13,6 @@ import {
   BugAntIcon,
   KeyIcon,
   UserIcon,
-  WalletIcon,
 } from "@heroicons/react/24/outline";
 
 export default function UserMenu() {
@@ -48,7 +46,7 @@ export default function UserMenu() {
           <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-sky-200 rounded-md bg-black text- shadow-lg ring-1 ring-gray-300 ring-opacity-5 focus:outline-none">
             {isAdmin && (
               <div className="px-1 py-1 ">
-                <div className="flex w-full text-xs uppercase text-gray-300 mt-2">
+                <div className="flex w-full text-xs uppercase text-gray-100 mt-2">
                   Admin
                 </div>
                 <Menu.Item>

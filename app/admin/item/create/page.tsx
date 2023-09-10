@@ -15,7 +15,7 @@ export default function CreateItemPage() {
       <div className="flex w-full mb-8 px-4">
         <BackButton />
       </div>
-      <div className="text-center text-3xl mb-8 text-gray-300">Add Item</div>
+      <div className="text-center text-3xl mb-8 text-gray-100">Add Item</div>
       <AddItemForm />
     </ContentWrapper>
   );

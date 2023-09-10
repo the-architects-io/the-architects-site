@@ -29,7 +29,7 @@ export const AggregatePayoutStats = ({ payouts }: { payouts: Payout[] }) => {
   return (
     <>
       <div className="flex flex-col items-center space-x-4 w-full mb-8">
-        <div className="flex space-x-4 text-xl mb-4 text-gray-300 uppercase">
+        <div className="flex space-x-4 text-xl mb-4 text-gray-100 uppercase">
           <div>Total Payouts:</div>
           <div>{payouts.length}</div>
         </div>

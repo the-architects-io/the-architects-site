@@ -22,7 +22,7 @@ export const Sidebar = () => {
       >
         <div className="h-full rounded-md shadow-2xl p-4 flex flex-col w-full overflow-auto">
           <button
-            className="text-gray-300 self-end text-4xl mb-8"
+            className="text-gray-100 self-end text-4xl mb-8"
             onClick={handleCloseSidebar}
           >
             <XCircleIcon className="w-8 h-8" />

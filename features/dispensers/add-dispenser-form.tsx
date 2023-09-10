@@ -14,6 +14,7 @@ import { createOnChainDispenser } from "@/utils/dispensers/create-on-chain-dispe
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { Dispenser } from "@/app/blueprint/types";
+import { useUserData } from "@nhost/nextjs";
 
 export type DispenserResponse = {
   id: string;
@@ -26,11 +27,14 @@ export const AddDispenserForm = () => {
   const anchorWallet = useAnchorWallet();
   const router = useRouter();
 
+  const user = useUserData();
+
   const formik = useFormik({
     initialValues: {
       name: "",
       imageUrl: "",
       description: "",
+      ownerId: user?.id,
     },
     onSubmit: async (values) => {
       if (!anchorWallet) {
@@ -118,7 +122,7 @@ export const AddDispenserForm = () => {
         value={formik.values.description}
         onChange={formik.handleChange}
       />
-      <div className="flex justify-center w-full">
+      <div className="flex justify-center w-full pt-4">
         <SubmitButton
           isSubmitting={formik.isSubmitting}
           onClick={formik.handleSubmit}

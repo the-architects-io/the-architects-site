@@ -29,7 +29,7 @@ export const SelectInputWithLabel = ({
       {hideLabel ? null : label}
       <select
         className={classNames(
-          "p-2 rounded-xl w-full text-gray-300 bg-gray-500",
+          "p-2 rounded-xl w-full text-gray-100 bg-gray-500",
           hideLabel ? "mt-0" : "mt-2"
         )}
         name={name}

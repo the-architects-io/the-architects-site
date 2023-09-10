@@ -1,5 +1,5 @@
 "use client";
-import { AddDispenserForm } from "@/features/admin/dispensers/add-dispenser-form";
+import { AddDispenserForm } from "@/features/dispensers/add-dispenser-form";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import { BackButton } from "@/features/UI/buttons/back-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
@@ -15,7 +15,7 @@ export default function CreateDispenserPage() {
       <div className="flex w-full mb-8 px-4">
         <BackButton />
       </div>
-      <div className="text-center text-3xl mb-8 text-gray-300">
+      <div className="text-center text-3xl mb-8 text-gray-100">
         Add Dispenser
       </div>
       <AddDispenserForm />

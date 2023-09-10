@@ -13,7 +13,7 @@ type Data =
     };
 
 export async function POST(req: NextRequest) {
-  const { imageUrl, name, description, noop } = await req.json();
+  const { imageUrl, name, description, noop, ownerId } = await req.json();
 
   if (noop)
     return NextResponse.json({
@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
         imageUrl,
         name,
         description,
+        ownerId,
       },
     });
 
