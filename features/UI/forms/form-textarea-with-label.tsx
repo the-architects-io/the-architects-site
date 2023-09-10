@@ -2,12 +2,14 @@ import classNames from "classnames";
 
 interface Props extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
+  description?: string;
 }
 
 export const FormTextareaWithLabel = ({
   onChange,
   value,
   label,
+  description,
   ...props
 }: Props) => {
   return (
@@ -25,6 +27,9 @@ export const FormTextareaWithLabel = ({
         onChange={onChange}
         value={value}
       />
+      {description && (
+        <p className="text-sm text-gray-400 my-4 italic">{description}</p>
+      )}
     </label>
   );
 };

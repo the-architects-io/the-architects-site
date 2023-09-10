@@ -1,31 +1,9 @@
+import { Token } from "@/app/blueprint/types";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { TableRow } from "@/features/UI/tables/table-row";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 
 import Link from "next/link";
-
-export type Token = {
-  id: string;
-  createdAt: string;
-  decimals: number;
-  imageUrl: string;
-  mintAddress: string;
-  name: string;
-  symbol: string;
-  items: {
-    id: string;
-    name: string;
-  };
-  nftCollection: {
-    id: string;
-    name: string;
-  };
-  isFungible: boolean;
-  lastClaim: {
-    id: string;
-    createdAt: string;
-  };
-};
 
 export const TokensListItem = ({ token }: { token: Token }) => {
   return (

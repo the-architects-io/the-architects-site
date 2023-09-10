@@ -32,7 +32,7 @@ export default function DashboardPage() {
       <div className="flex flex-col items-center">
         <h1 className="text-3xl pb-8">My Dispensers</h1>
         <PrimaryButton className="mb-4">
-          <a href="/me/dispensers/create">Create Dispenser</a>
+          <a href="/me/dispenser/create">Create Dispenser</a>
         </PrimaryButton>
         {loading || error ? (
           <div className="py-4 flex w-full justify-center">
@@ -45,7 +45,7 @@ export default function DashboardPage() {
                 <>
                   {dispensers?.map((dispenser) => (
                     <Link
-                      href={`/dispenser/${dispenser.id}`}
+                      href={`/me/dispenser/${dispenser.id}`}
                       key={dispenser.id}
                       className="w-full md:w-1/3 p-4 flex justify-center"
                     >
@@ -58,7 +58,9 @@ export default function DashboardPage() {
                   ))}
                 </>
               ) : (
-                <p>You don&apos;t have any dispensers yet.</p>
+                <p className="w-full text-center">
+                  You don&apos;t have any dispensers yet.
+                </p>
               )}
             </div>
           </>

@@ -1,14 +1,19 @@
-import { PrimaryButton } from "@/features/UI/buttons/primary-button";
+"use client";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Panel } from "@/features/UI/panel";
 import { AddDispenserForm } from "@/features/dispensers/add-dispenser-form";
+import { DispenserCostForm } from "@/features/dispensers/dispenser-cost-form";
+import { useState } from "react";
 
 export default function DashboardPage() {
+  const [step, setStep] = useState(1);
+
   return (
     <ContentWrapper>
       <Panel className="flex flex-col items-center">
         <h1 className="text-3xl my-4 text-gray-100">Create Dispenser</h1>
-        <AddDispenserForm />
+        {step === 0 && <AddDispenserForm />}
+        {step === 1 && <DispenserCostForm />}
       </Panel>
     </ContentWrapper>
   );

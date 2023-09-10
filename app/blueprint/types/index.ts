@@ -256,3 +256,42 @@ export type Dispenser = {
     id: string;
   };
 };
+
+export type Token = {
+  id: string;
+  createdAt: string;
+  decimals: number;
+  imageUrl: string;
+  mintAddress: string;
+  name: string;
+  symbol: string;
+  items: {
+    id: string;
+    name: string;
+  };
+  nftCollection: {
+    id: string;
+    name: string;
+  };
+  isFungible: boolean;
+  lastClaim: {
+    id: string;
+    createdAt: string;
+  };
+};
+
+export type HeliusToken = {
+  tokenAccount: string;
+  mint: string;
+  amount: number;
+  decimals: number;
+};
+
+export type TokenBalance = {
+  costAmount?: number;
+  costAmountString?: string;
+  tokenAccount: string;
+  mint: string;
+  amount: number;
+  decimals: number;
+};

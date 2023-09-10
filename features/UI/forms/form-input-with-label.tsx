@@ -2,6 +2,7 @@ import { FormInput } from "@/features/UI/forms/form-input";
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
+  description?: string;
 }
 
 export const FormInputWithLabel = ({
@@ -9,6 +10,7 @@ export const FormInputWithLabel = ({
   onChange,
   value,
   label,
+  description,
   ...props
 }: Props) => {
   return (
@@ -22,6 +24,10 @@ export const FormInputWithLabel = ({
         onChange={onChange}
         value={value}
       />
+      {children}
+      {description && (
+        <p className="text-sm text-gray-400 my-4 italic">{description}</p>
+      )}
     </label>
   );
 };

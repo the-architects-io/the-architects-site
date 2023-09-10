@@ -117,23 +117,32 @@ export const AddDispenserForm = () => {
         name="name"
         value={formik.values.name}
         onChange={formik.handleChange}
+        description="The name of your dispenser."
       />
       <FormInputWithLabel
         label="Image url"
         name="imageUrl"
         value={formik.values.imageUrl}
         onChange={formik.handleChange}
+        description="The url of the image for your dispenser."
       />
       <FormTextareaWithLabel
         label="Description"
         name="description"
         value={formik.values.description}
         onChange={formik.handleChange}
+        description="A description for your dispenser."
       />
       <div className="flex justify-center w-full pt-4">
         <SubmitButton
           isSubmitting={formik.isSubmitting}
           onClick={formik.handleSubmit}
+          buttonText="Continue"
+          disabled={
+            !formik.values.name ||
+            !formik.values.imageUrl ||
+            !formik.values.description
+          }
         />
       </div>
     </FormWrapper>
