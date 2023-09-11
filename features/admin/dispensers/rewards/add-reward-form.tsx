@@ -9,12 +9,12 @@ import SharedHead from "@/features/UI/head";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
 import { ItemSelectInput } from "@/features/admin/items/item-select-input";
 import { useQuery } from "@apollo/client";
-import { Item } from "@/app/api/add-item/route";
 import { useState } from "react";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-label";
 import { GET_REWARD_CATEGORIES } from "@/graphql/queries/get-reward-types";
 import { GET_ITEMS_BY_REWARD_CATEGORY_ID } from "@/graphql/queries/get-items-by-reward-category-id";
+import { Item } from "@/app/blueprint/types";
 
 export const REWARD_CATEGORY_IDS = {
   Item: "7322c862-f67c-4778-b950-6d26f7229c5d",

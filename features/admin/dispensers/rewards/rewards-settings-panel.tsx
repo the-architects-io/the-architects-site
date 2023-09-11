@@ -9,7 +9,7 @@ export const RewardsSettingsPanel = ({
   refetch,
 }: {
   dispenser: Dispenser;
-  refetch: () => void;
+  refetch: () => any;
 }) => {
   const [isAddingReward, setIsAddingReward] = useState(false);
 

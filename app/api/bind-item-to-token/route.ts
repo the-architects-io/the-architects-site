@@ -1,14 +1,12 @@
 import { client } from "@/graphql/backend-client";
 import { BIND_ITEM_TO_TOKEN } from "@/graphql/mutations/bind-item-to-token";
-import { Token } from "@/features/admin/tokens/tokens-list-item";
 import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address";
 import axios from "axios";
 import { BASE_URL } from "@/constants/constants";
 import { GET_ITEM_BY_ID } from "@/graphql/queries/get-item-by-id";
-import { Item } from "@/app/api/add-item/route";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { NoopResponse } from "@/app/blueprint/types";
+import { Item, NoopResponse, Token } from "@/app/blueprint/types";
 
 type Data =
   | Token

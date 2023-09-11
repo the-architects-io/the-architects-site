@@ -4,24 +4,17 @@ import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { Item, NoopResponse } from "@/app/blueprint/types";
+import { ADD_ITEMS } from "@/graphql/mutations/add-items";
 
 type Data =
-  | Item
+  | Item[]
   | NoopResponse
   | {
       error: unknown;
     };
 
 export async function POST(req: NextRequest) {
-  const {
-    imageUrl,
-    isConsumable = false,
-    isCraftable = false,
-    name,
-    categoryId,
-    description,
-    noop,
-  } = await req.json();
+  const { items, noop } = await req.json();
 
   if (noop)
     return NextResponse.json({
@@ -30,27 +23,22 @@ export async function POST(req: NextRequest) {
       status: 200,
     });
 
-  if (!name) {
+  if (!items?.length) {
     return NextResponse.json({ error: "Required fields not set", status: 500 });
   }
 
   try {
-    const { insert_items_one }: { insert_items_one: Data } =
+    const { insert_items: addedItems }: { insert_items: Item[] } =
       await client.request({
-        document: ADD_ITEM,
+        document: ADD_ITEMS,
         variables: {
-          imageUrl,
-          name,
-          isConsumable,
-          isCraftable,
-          itemCategoryId: categoryId,
-          description,
+          items,
         },
       });
 
-    console.log("insert_items_one: ", insert_items_one);
+    console.log("addedItems: ", addedItems);
 
-    return NextResponse.json(insert_items_one, { status: 200 });
+    return NextResponse.json(addedItems, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });

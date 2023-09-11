@@ -299,3 +299,54 @@ export type TokenBalance = {
 export enum LocalStorageKeys {
   DISPENSER_ID_BEING_CREATED = "dispenserIdBeingCreated",
 }
+
+export type Item = {
+  rarity: {
+    id: string;
+    name: string;
+  };
+  costs: {
+    amount: number;
+    id: string;
+    createdAt: string;
+    token: {
+      id: string;
+      name: string;
+      mintAddress: string;
+    };
+    item: {
+      id: string;
+      name: string;
+      imageUrl: string;
+    };
+  };
+  imageUrl: string;
+  id: string;
+  createdAt: string;
+  isConsumable: boolean;
+  isCraftable: boolean;
+  name: string;
+
+  description: string;
+  itemCategory: {
+    id: string;
+    name: string;
+    parentItemCategory: {
+      name: string;
+      id: string;
+    };
+    childItemCategories: {
+      id: string;
+      name: string;
+    };
+  };
+  collections: {
+    name: string;
+    id: string;
+    imageUrl: string;
+  };
+  token: {
+    id: string;
+    mintAddress: string;
+  };
+};

@@ -1,6 +1,5 @@
 import { client } from "@/graphql/backend-client";
 import { ADD_TOKEN } from "@/graphql/mutations/add-token";
-import { Token } from "@/features/admin/tokens/tokens-list-item";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address";
@@ -9,6 +8,7 @@ import { Connection } from "@solana/web3.js";
 import { RPC_ENDPOINT } from "@/constants/constants";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import { addTraitsToDb } from "@/utils/nfts/add-traits-to-db";
+import { Token } from "@/app/blueprint/types";
 
 export async function POST(req: NextRequest) {
   const { hashList, noop, nftCollectionId } = await req.json();

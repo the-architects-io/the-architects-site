@@ -41,7 +41,7 @@ export const DispenserControlPanel = ({
           <div className="w-full flex flex-col items-center">
             {isLoading && <Spinner />}
             {!dispenser && !isLoading && <div>Dispenser not found</div>}
-            {!!dispenser && (
+            {!!dispenser?.id && (
               <>
                 <div className="mb-8 p-2 bg-stone-800 rounded-2xl">
                   <ImageWithFallback
@@ -96,25 +96,25 @@ export const DispenserControlPanel = ({
                   {!!activeTab && activeTab.value === "rewards" && (
                     <RewardsSettingsPanel
                       dispenser={dispenser}
-                      refetch={refetch}
+                      refetch={refetch || (() => {})}
                     />
                   )}
                   {!!activeTab && activeTab.value === "costs" && (
                     <CostsSettingsPanel
                       dispenser={dispenser}
-                      refetch={refetch}
+                      refetch={refetch || (() => {})}
                     />
                   )}
                   {!!activeTab && activeTab.value === "gates" && (
                     <GatesSettingsPanel
                       dispenser={dispenser}
-                      refetch={refetch}
+                      refetch={refetch || (() => {})}
                     />
                   )}
                   {!!activeTab && activeTab.value === "restrictions" && (
                     <RestrictionsSettingsPanel
                       dispenser={dispenser}
-                      refetch={refetch}
+                      refetch={refetch || (() => {})}
                     />
                   )}
                   {!!activeTab && activeTab.value === "stats" && (
@@ -124,7 +124,7 @@ export const DispenserControlPanel = ({
                   {!!activeTab && activeTab.value === "config" && (
                     <ConfigSettingsPanel
                       dispenser={dispenser}
-                      refetch={refetch}
+                      refetch={refetch || (() => {})}
                     />
                   )}
                 </Panel>

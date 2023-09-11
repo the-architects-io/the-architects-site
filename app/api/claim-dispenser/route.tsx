@@ -13,11 +13,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
 import { keypairIdentity, Metaplex, token } from "@metaplex-foundation/js";
-import { Token } from "@/features/admin/tokens/tokens-list-item";
 import { ADD_LAST_CLAIM_TIMES } from "@/graphql/mutations/add-last-claim-time";
 import { caluclateBuildVestingRewardAmount } from "@/utils/dispensers/calculate-token-claim-reward-amount";
 import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
-import { Dispenser, Wallet } from "@/app/blueprint/types";
+import { Dispenser, Token, Wallet } from "@/app/blueprint/types";
 
 type Data =
   | {

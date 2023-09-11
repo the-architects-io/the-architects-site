@@ -7,11 +7,11 @@ import { useFormik } from "formik";
 import showToast from "@/features/toasts/show-toast";
 import SharedHead from "@/features/UI/head";
 import { useQuery } from "@apollo/client";
-import { Item } from "@/app/api/add-item/route";
 import { useState } from "react";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { GET_ITEMS_BY_CATEGORY_ID } from "@/graphql/queries/get-items-by-category-id";
 import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-label";
+import { Item } from "@/app/blueprint/types";
 
 export const ITEM_CATEGORY_IDS = {
   Currency: "8d5ea141-ed79-42a3-aa09-363ed39a427b",

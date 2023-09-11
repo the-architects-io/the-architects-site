@@ -1,11 +1,9 @@
 "use client";
-import { useQuery } from "@apollo/client";
 import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-label";
 import { FormikHandlers } from "formik";
 
 import { useEffect, useState } from "react";
-import { GET_ITEMS } from "@/graphql/queries/get-items";
-import { Item } from "@/app/api/add-item/route";
+import { Item } from "@/app/blueprint/types";
 
 interface Props {
   value: string;

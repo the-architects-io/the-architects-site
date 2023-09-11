@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 import { TableWrapper } from "@/features/UI/tables/table-wrapper";
 import { GET_ITEMS } from "@/graphql/queries/get-items";
 import { ItemsListItem } from "@/features/admin/items/items-list-item";
-import { Item } from "@/app/api/add-item/route";
+import { Item } from "@/app/blueprint/types";
 
 export const ItemsList = () => {
   const { data } = useQuery(GET_ITEMS, {

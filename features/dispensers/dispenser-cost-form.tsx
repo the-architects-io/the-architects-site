@@ -19,7 +19,13 @@ import Spinner from "@/features/UI/spinner";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
 
-export const DispenserCostForm = ({ dispenserId }: { dispenserId: string }) => {
+export const DispenserCostForm = ({
+  dispenserId,
+  setStep,
+}: {
+  dispenserId: string;
+  setStep: (step: number) => void;
+}) => {
   const { dispenser, isLoading } = useDispenser(dispenserId);
   const [isFetching, setIsFetching] = useState(false);
   const [tokens, setTokens] = useState<TokenBalance[]>([]);
@@ -36,14 +42,24 @@ export const DispenserCostForm = ({ dispenserId }: { dispenserId: string }) => {
       isFree: false,
     },
     onSubmit: async (values) => {
-      try {
-        // add cost
-      } catch (error) {
-        showToast({
-          primaryMessage: "Error adding cost",
-        });
-        console.log({ error });
-      }
+      // try {
+      //   // add tokens -> items -> cost collection
+      //   await axios.post("/api/add-items", {
+      //     name: getAbbreviatedAddress(dispenser?.rewardWalletAddress || ""),
+      //     imageUrl: "",
+      //     description: "",
+      //     isConsumable: false,
+      //     isCraftable: false,
+      //     categoryId: "",
+      //   });
+      //   showToast({
+      //     primaryMessage: "Cost added",
+      //   });
+      // } catch (error) {
+      //   showToast({
+      //     primaryMessage: "Error adding cost",
+      //   });
+      // }
     },
   });
 
@@ -102,7 +118,9 @@ export const DispenserCostForm = ({ dispenserId }: { dispenserId: string }) => {
                 send the tokens you would like to use in this dispenser to this
                 address:
               </div>
-              <div className="mb-4">{dispenser?.rewardWalletAddress}</div>
+              <div className="text-sm mb-4">
+                {dispenser?.rewardWalletAddress}
+              </div>
               <div className="flex justify-center w-full mb-8 space-x-4">
                 <SecondaryButton>
                   <a
@@ -113,7 +131,12 @@ export const DispenserCostForm = ({ dispenserId }: { dispenserId: string }) => {
                     view on explorer
                   </a>
                 </SecondaryButton>
-                <SecondaryButton onClick={handleCopyAddress}>
+                <SecondaryButton
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleCopyAddress();
+                  }}
+                >
                   Copy
                 </SecondaryButton>
               </div>
@@ -130,103 +153,107 @@ export const DispenserCostForm = ({ dispenserId }: { dispenserId: string }) => {
             </div>
             {!formik.values.isFree && (
               <div className="flex w-full justify-center">
-                <PrimaryButton onClick={() => fetchUserBalances()}>
+                <PrimaryButton
+                  onClick={(e) => {
+                    e.preventDefault();
+                    fetchUserBalances();
+                  }}
+                >
                   refresh
                 </PrimaryButton>
               </div>
             )}
-            {formik.values.costs?.length > 0 && (
+            {isFetching && (
+              <div className="flex flex-col items-center justify-center w-full py-16">
+                <Spinner />
+              </div>
+            )}
+            {formik.values.costs?.length > 0 && !isFetching && (
               <>
                 <div className="text-xl mt-8 mb-4">Select Costs</div>
-                {isFetching && (
-                  <div className="flex flex-col items-center justify-center w-full py-16">
-                    <Spinner />
-                  </div>
-                )}
-                {!isFetching && (
-                  <div
-                    className={classNames([
-                      "flex flex-col items-center justify-center w-full overflow-hidden transition-all duration-500",
-                      formik.values.isFree ? "max-h-[0px]" : "max-h-[600px]",
-                    ])}
-                  >
-                    <FormikProvider value={formik}>
-                      <FieldArray
-                        name="costs"
-                        render={({ insert, remove, push, replace }) => (
-                          <>
-                            {formik.values.costs.map((cost, index) => (
-                              <div
-                                onClick={() => {
-                                  replace(index, {
-                                    mint: cost.mint,
-                                    decimals: cost.decimals,
-                                    amount: cost.amount,
-                                    costAmount: cost.costAmount,
-                                    isSelected: !cost.isSelected,
-                                  });
-                                }}
-                                className={classNames(
-                                  "p-4 px-6 border-2 rounded-lg my-2 cursor-pointer w-full",
-                                  cost.isSelected
-                                    ? "border-sky-300"
-                                    : "border-gray-600"
-                                )}
-                                key={index}
-                              >
-                                <div className="flex justify-between items-center">
-                                  <div className="text-xl">
-                                    {getAbbreviatedAddress(cost.mint)}
+
+                <div
+                  className={classNames([
+                    "flex flex-col items-center justify-center w-full overflow-hidden transition-all duration-500",
+                    formik.values.isFree ? "max-h-[0px]" : "max-h-[600px]",
+                  ])}
+                >
+                  <FormikProvider value={formik}>
+                    <FieldArray
+                      name="costs"
+                      render={({ insert, remove, push, replace }) => (
+                        <>
+                          {formik.values.costs.map((cost, index) => (
+                            <div
+                              onClick={() => {
+                                replace(index, {
+                                  mint: cost.mint,
+                                  decimals: cost.decimals,
+                                  amount: cost.amount,
+                                  costAmount: cost.costAmount,
+                                  isSelected: !cost.isSelected,
+                                });
+                              }}
+                              className={classNames(
+                                "p-4 px-6 border-2 rounded-lg my-2 cursor-pointer w-full",
+                                cost.isSelected
+                                  ? "border-sky-300"
+                                  : "border-gray-600"
+                              )}
+                              key={index}
+                            >
+                              <div className="flex justify-between items-center">
+                                <div className="text-xl">
+                                  {getAbbreviatedAddress(cost.mint)}
+                                </div>
+                                <div>
+                                  <div className="text-xs uppercase text-right">
+                                    total
                                   </div>
-                                  <div>
-                                    <div className="text-xs uppercase text-right">
-                                      total
+                                  <div className="text-xl text-right">
+                                    {getAmountWithDecimals(
+                                      cost.amount,
+                                      cost.decimals
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {cost.isSelected && (
+                                <div className="flex flex-col items-center w-full">
+                                  <Divider />
+                                  <div className="flex flex-col w-full items-end">
+                                    <Field
+                                      name={`costs.${index}.mint`}
+                                      value={cost.mint}
+                                      className="text-gray-800"
+                                      hidden
+                                    />
+                                    <div className="flex w-full items-center justify-between mb-2">
+                                      <div className="text-sm uppercase">
+                                        cost amount
+                                      </div>
+                                      <Field
+                                        name={`costs.${index}.costAmount`}
+                                        className="text-gray-800 bg-gray-100 p-2 rounded max-w-[100px]"
+                                        onClick={(e: any) => {
+                                          e.stopPropagation();
+                                        }}
+                                      />
                                     </div>
-                                    <div className="text-xl text-right">
-                                      {getAmountWithDecimals(
-                                        cost.amount,
-                                        cost.decimals
-                                      )}
+                                    <div className="text-gray-300 text-xs">
+                                      The amount of this token a user must pay
                                     </div>
                                   </div>
                                 </div>
-
-                                {cost.isSelected && (
-                                  <div className="flex flex-col items-center w-full">
-                                    <Divider />
-                                    <div className="flex flex-col w-full items-end">
-                                      <Field
-                                        name={`costs.${index}.mint`}
-                                        value={cost.mint}
-                                        className="text-gray-800"
-                                        hidden
-                                      />
-                                      <div className="flex w-full items-center justify-between mb-2">
-                                        <div className="text-sm uppercase">
-                                          cost amount
-                                        </div>
-                                        <Field
-                                          name={`costs.${index}.costAmount`}
-                                          className="text-gray-800 bg-gray-100 p-2 rounded max-w-[100px]"
-                                          onClick={(e: any) => {
-                                            e.stopPropagation();
-                                          }}
-                                        />
-                                      </div>
-                                      <div className="text-gray-300 text-xs">
-                                        The amount of this token a user must pay
-                                      </div>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </>
-                        )}
-                      />
-                    </FormikProvider>
-                  </div>
-                )}
+                              )}
+                            </div>
+                          ))}
+                        </>
+                      )}
+                    />
+                  </FormikProvider>
+                </div>
               </>
             )}
             <SubmitButton

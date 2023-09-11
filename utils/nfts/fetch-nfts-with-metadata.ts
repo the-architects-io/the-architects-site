@@ -29,8 +29,6 @@ export const fetchNftsWithMetadata = async (
 
     // @ts-ignore
     for (const [i, nft] of nfts.entries()) {
-      console.log("nft", nft?.mintAddress?.toString());
-      console.log("i", i);
       if (!nft) {
         console.log("No nft for", { i, nft });
         continue;

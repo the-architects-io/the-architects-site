@@ -25,8 +25,10 @@ export type DispenserResponse = {
 
 export const AddDispenserForm = ({
   setDispenserId,
+  setStep,
 }: {
   setDispenserId: (id: string) => void;
+  setStep: (step: number) => void;
 }) => {
   const { connection } = useConnection();
   const anchorWallet = useAnchorWallet();
@@ -78,19 +80,10 @@ export const AddDispenserForm = ({
             rewardWalletBump: dispenserBump,
           });
 
-        setDispenserId(dispenser.id);
+        console.log({ updatedDispenser });
 
-        showToast({
-          primaryMessage: "Dispenser added",
-          secondaryMessage: `Address: ${getAbbreviatedAddress(
-            dispenserAddress.toString()
-          )}`,
-          link: {
-            url: `https://explorer.solana.com/tx/${txHash}?cluster=devnet`,
-            title: "View transaction",
-          },
-        });
-        router.push("/admin?tab=dispensers");
+        setDispenserId(dispenser.id);
+        setStep(1);
       } catch (error) {
         showToast({
           primaryMessage: "Error adding dispenser",

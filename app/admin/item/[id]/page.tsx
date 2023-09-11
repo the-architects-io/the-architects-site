@@ -1,13 +1,11 @@
 "use client";
 
 import { useQuery } from "@apollo/client";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BackButton } from "@/features/UI/buttons/back-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { GET_ITEM_BY_ID } from "@/graphql/queries/get-item-by-id";
 import { useAdmin } from "@/hooks/admin";
-import { Item } from "@/app/api/add-item/route";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { Panel } from "@/features/UI/panel";
@@ -26,6 +24,7 @@ import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
+import { Item } from "@/app/blueprint/types";
 
 export default function ItemDetailPage({ params }: { params: any }) {
   const [showBindToTokenInput, setShowBindToTokenInput] = useState(false);
