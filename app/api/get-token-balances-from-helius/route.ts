@@ -40,9 +40,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { data } = await axios.get(
-    `https://api.helius.xyz/v0/addresses/${walletAddress}/balances?api-key=${process.env.HELIUS_API_KEY}`
-  );
+  let url = "";
+
+  switch (process.env.NEXT_PUBLIC_ENV) {
+    case "production":
+      url = `https://api.helius.xyz/v0/addresses/${walletAddress}/balances?api-key=${process.env.HELIUS_API_KEY}`;
+      break;
+    case "local":
+    default:
+      url = `https://api-devnet.helius.xyz/v0/addresses/${walletAddress}/balances?api-key=${process.env.HELIUS_API_KEY}`;
+      break;
+  }
+
+  const { data } = await axios.get(url);
 
   let { tokens: balances }: { tokens: TokenBalance[] } = data;
 

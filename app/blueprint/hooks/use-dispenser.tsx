@@ -90,7 +90,15 @@ const useDispenser = (dispenserId?: string) => {
   if (!dispenser)
     return {
       isLoading: false,
-      dispenser: null,
+      dispenser: {
+        id: null,
+        name: null,
+        description: null,
+        imageUrl: null,
+        isEnabled: false,
+        collectionWallet: null,
+        rewardWalletAddress: null,
+      },
       cost: null,
       rewards: null,
       gates: null,
