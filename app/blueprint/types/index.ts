@@ -295,3 +295,7 @@ export type TokenBalance = {
   amount: number;
   decimals: number;
 };
+
+export enum LocalStorageKeys {
+  DISPENSER_ID_BEING_CREATED = "dispenserIdBeingCreated",
+}

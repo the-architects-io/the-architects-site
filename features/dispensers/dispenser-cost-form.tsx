@@ -3,7 +3,16 @@
 import axios from "axios";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
-import { useFormik } from "formik";
+import {
+  Field,
+  FieldArray,
+  useFormik,
+  useField,
+  Form,
+  ErrorMessage,
+  FormikProvider,
+  Formik,
+} from "formik";
 import { useRouter } from "next/navigation";
 import showToast from "@/features/toasts/show-toast";
 import SharedHead from "@/features/UI/head";
@@ -17,6 +26,8 @@ import { getAbbreviatedAddress } from "@/utils/formatting";
 import { getAmountWithDecimals } from "@/utils/currency";
 import classNames from "classnames";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
+import { FormInput } from "@/features/UI/forms/form-input";
+import { Divider } from "@/features/UI/divider";
 
 export const DispenserCostForm = () => {
   const { connection } = useConnection();
@@ -26,28 +37,30 @@ export const DispenserCostForm = () => {
   const [isFetching, setIsFetching] = useState(false);
   const [tokens, setTokens] = useState<TokenBalance[]>([]);
 
-  const fetchUserBalances = useCallback(async () => {
-    if (!publicKey) return;
-    setIsFetching(true);
-    try {
-      const { data: tokens }: { data: TokenBalance[] } = await axios.post(
-        `${BASE_URL}/api/get-token-balances-from-helius`,
-        {
-          walletAddress: publicKey.toString(),
-        }
-      );
-      setTokens(tokens);
-    } catch (error) {
-      console.log({ error });
-    } finally {
-      setIsFetching(false);
-    }
-  }, [publicKey]);
+  function MyTextInput({ label, ...props }: any) {
+    // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
+    // which we can spread on <input> and alse replace ErrorMessage entirely.
+    const [field, meta] = useField(props);
+    return (
+      <>
+        <label htmlFor={props.id || props.name}>{label}</label>
+        <input className="text-input" {...field} type="text" {...props} />
+        {meta.touched && meta.error ? (
+          <div className="error">{meta.error}</div>
+        ) : null}
+      </>
+    );
+  }
 
   const formik = useFormik({
     initialValues: {
-      selectedTokens: [] as TokenBalance[],
-      costs: [] as { mint: string; costAmount: number }[],
+      costs: [] as {
+        mint: string;
+        costAmount: number;
+        isSelected: boolean;
+        decimals: number;
+        amount: number;
+      }[],
     },
     onSubmit: async (values) => {
       if (!publicKey) {
@@ -68,102 +81,214 @@ export const DispenserCostForm = () => {
     },
   });
 
+  const fetchUserBalances = useCallback(async () => {
+    if (!publicKey) return;
+    setIsFetching(true);
+    try {
+      const { data: tokens }: { data: TokenBalance[] } = await axios.post(
+        `${BASE_URL}/api/get-token-balances-from-helius`,
+        {
+          walletAddress: publicKey.toString(),
+        }
+      );
+      setTokens(tokens);
+      formik.setValues({
+        costs: tokens.map((token) => ({
+          mint: token.mint,
+          amount: token.amount,
+          costAmount: 0,
+          isSelected: false,
+          decimals: token.decimals,
+        })),
+      });
+    } catch (error) {
+      console.log({ error });
+    } finally {
+      setIsFetching(false);
+    }
+  }, [formik, publicKey]);
+
   useEffect(() => {
     if (!publicKey) return;
     // fetchUserBalances();
   }, [fetchUserBalances, publicKey]);
 
   return (
-    <FormWrapper onSubmit={formik.handleSubmit} className="px-0">
-      <SharedHead title="Admin" />
-      <div className="flex flex-col items-center justify-center w-full pt-4">
-        <div className="max-w-[600px] whitespace-break-spaces">
-          {JSON.stringify(formik.values.selectedTokens.map((token) => token))}
-        </div>
-        <div className="text-xl mb-4">Select Costs</div>
-        {tokens?.map((token) => (
-          <div
-            className={classNames(
-              "flex justify-between flex-wrap items-center w-full p-4 px-6 border-2 rounded-lg my-2 cursor-pointer",
-              formik.values.selectedTokens?.find(
-                (selectedToken) => selectedToken.mint === token.mint
-              )
-                ? "border-sky-300"
-                : "border-gray-600"
-            )}
-            key={token.mint}
-          >
-            <div
-              className="flex w-full items-center"
-              onClick={() => {
-                if (
-                  formik.values.selectedTokens?.find(
-                    (selectedToken) => selectedToken.mint === token.mint
-                  )
-                ) {
-                  formik.setFieldValue(
-                    "selectedTokens",
-                    formik.values.selectedTokens?.filter(
-                      (selectedToken) => selectedToken.mint !== token.mint
-                    )
-                  );
-                } else {
-                  formik.setFieldValue("selectedTokens", [
-                    ...(formik.values.selectedTokens || []),
-                    token,
-                  ]);
-                }
-              }}
-            >
-              <div className="text-2xl">
-                {getAbbreviatedAddress(token.mint)}
-              </div>
-              <div className="w-full">
-                <div className="text-xs uppercase text-right">total</div>
-                <div className="text-right text-lg">
-                  {getAmountWithDecimals(token.amount, token.decimals)}
-                </div>
-              </div>
+    <Formik
+      onSubmit={() => {}}
+      initialValues={formik.initialValues}
+      render={({ values }) => (
+        <FormWrapper onSubmit={formik.handleSubmit} className="px-0">
+          <SharedHead title="Admin" />
+          <div className="flex flex-col items-center justify-center w-full pt-4">
+            <div className="max-w-[600px] whitespace-break-spaces">
+              {JSON.stringify(
+                formik?.values?.costs?.filter((cost) => cost.isSelected),
+                null,
+                2
+              )}
             </div>
-            {formik.values.selectedTokens?.find(
-              (selectedToken) => selectedToken.mint === token.mint
-            ) && (
-              <div className="flex py-4 w-full">
-                <FormInputWithLabel
-                  label="Cost amount"
-                  name="cost"
-                  type="number"
-                  value={0}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    formik.setFieldValue(
-                      "costs",
-                      formik.values.costs.map((cost) => {
-                        if (cost.mint === token.mint) {
-                          return {
-                            ...cost,
-                            costAmount: Number(event.target.value),
-                          };
-                        }
-                        return cost;
-                      })
-                    );
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        ))}
+            <div className="text-xl mb-4">Select Costs</div>
+            {/* {tokens.length ? (
+          <div className="flex flex-col items-center w-full">
+            {tokens.map((token, index) => (
+              <div
+                onClick={() => {
+                  const costs = formik.values.costs;
+                  const cost = costs[index];
+                  if (cost.isSelected) {
+                    costs[index] = {
+                      ...cost,
+                      isSelected: false,
+                    };
+                  } else {
+                    costs[index] = {
+                      ...cost,
+                      isSelected: true,
+                    };
+                  }
+                  formik.setValues({
+                    ...formik.values,
+                    costs,
+                  });
+                }}
+                className={classNames(
+                  "p-4 px-6 border-2 rounded-lg my-2 cursor-pointer w-full",
+                  true ? "border-sky-300" : "border-gray-600"
+                )}
+                key={index}
+              >
+                <div className="flex justify-between items-center">
+                  <div className="text-xl">
+                    {getAbbreviatedAddress(token.mint)}
+                  </div>
+                  <div>
+                    <div className="text-xs uppercase text-right">total</div>
+                    <div className="text-xl text-right">
+                      {getAmountWithDecimals(token.amount, token.decimals)}
+                    </div>
+                  </div>
+                </div>
 
-        <PrimaryButton onClick={() => fetchUserBalances()}>test</PrimaryButton>
-        <SubmitButton
-          isSubmitting={formik.isSubmitting}
-          onClick={formik.handleSubmit}
-          buttonText="Continue"
-          disabled={
-            !formik.values.selectedTokens?.length || formik.isSubmitting
-          }
-        />
-      </div>
-    </FormWrapper>
+                {true && (
+                  <div className="flex flex-col items-center w-full">
+                    <Divider />
+                    <div className="flex flex-col w-full items-end">
+                      <Field
+                        name={`costs.${index}.mint`}
+                        value={token.mint}
+                        className="text-gray-800"
+                        hidden
+                      />
+                      <div className="flex w-full items-center justify-between mb-2">
+                        <div className="text-sm uppercase">cost amount</div>
+                        <Field
+                          name={`costs.${index}.costAmount`}
+                          className="text-gray-800 bg-gray-100 p-2 rounded max-w-[100px]"
+                          onClick={(e: any) => {
+                            e.stopPropagation();
+                          }}
+                        />
+                      </div>
+                      <div className="text-gray-300 text-xs">
+                        The amount of this token a user must pay
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <></>
+        )} */}
+
+            <FormikProvider value={formik}>
+              <FieldArray
+                name="costs"
+                render={({ insert, remove, push, replace }) => (
+                  <>
+                    {formik.values.costs.map((cost, index) => (
+                      <div
+                        onClick={() => {
+                          replace(index, {
+                            mint: cost.mint,
+                            decimals: cost.decimals,
+                            amount: cost.amount,
+                            costAmount: cost.costAmount,
+                            isSelected: !cost.isSelected,
+                          });
+                        }}
+                        className={classNames(
+                          "p-4 px-6 border-2 rounded-lg my-2 cursor-pointer w-full",
+                          cost.isSelected ? "border-sky-300" : "border-gray-600"
+                        )}
+                        key={index}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div className="text-xl">
+                            {getAbbreviatedAddress(cost.mint)}
+                          </div>
+                          <div>
+                            <div className="text-xs uppercase text-right">
+                              total
+                            </div>
+                            <div className="text-xl text-right">
+                              {getAmountWithDecimals(
+                                cost.amount,
+                                cost.decimals
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {cost.isSelected && (
+                          <div className="flex flex-col items-center w-full">
+                            <Divider />
+                            <div className="flex flex-col w-full items-end">
+                              <Field
+                                name={`costs.${index}.mint`}
+                                value={cost.mint}
+                                className="text-gray-800"
+                                hidden
+                              />
+                              <div className="flex w-full items-center justify-between mb-2">
+                                <div className="text-sm uppercase">
+                                  cost amount
+                                </div>
+                                <Field
+                                  name={`costs.${index}.costAmount`}
+                                  className="text-gray-800 bg-gray-100 p-2 rounded max-w-[100px]"
+                                  onClick={(e: any) => {
+                                    e.stopPropagation();
+                                  }}
+                                />
+                              </div>
+                              <div className="text-gray-300 text-xs">
+                                The amount of this token a user must pay
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </>
+                )}
+              />
+            </FormikProvider>
+
+            <PrimaryButton onClick={() => fetchUserBalances()}>
+              test
+            </PrimaryButton>
+            <SubmitButton
+              isSubmitting={formik.isSubmitting}
+              onClick={formik.handleSubmit}
+              buttonText="Continue"
+              disabled={!formik.values.costs?.length || formik.isSubmitting}
+            />
+          </div>
+        </FormWrapper>
+      )}
+    ></Formik>
   );
 };

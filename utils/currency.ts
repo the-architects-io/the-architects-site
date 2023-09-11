@@ -4,9 +4,15 @@ export const getRawAmount = (amount: string | number, decimals: number) => {
 
 export const getAmountWithDecimals = (
   amount: string | number,
-  decimals: number
+  decimals: number,
+  roundToTwoDecimals = false
 ) => {
-  return Number(amount) / 10 ** decimals;
+  let value = Number(amount) / 10 ** decimals;
+  if (roundToTwoDecimals) {
+    value = Math.round(value * 100) / 100;
+  }
+
+  return value;
 };
 
 export const getBuildAmountRaw = (amount: string | number) => {

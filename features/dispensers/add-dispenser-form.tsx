@@ -23,7 +23,11 @@ export type DispenserResponse = {
   imageUrl: string;
 };
 
-export const AddDispenserForm = () => {
+export const AddDispenserForm = ({
+  setDispenserId,
+}: {
+  setDispenserId: (id: string) => void;
+}) => {
   const { connection } = useConnection();
   const anchorWallet = useAnchorWallet();
   const router = useRouter();
@@ -73,6 +77,8 @@ export const AddDispenserForm = () => {
             rewardWalletAddress: dispenserAddress.toString(),
             rewardWalletBump: dispenserBump,
           });
+
+        setDispenserId(dispenser.id);
 
         showToast({
           primaryMessage: "Dispenser added",
