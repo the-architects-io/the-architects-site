@@ -17,6 +17,7 @@ import { Divider } from "@/features/UI/divider";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import Spinner from "@/features/UI/spinner";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
+import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
 
 export const DispenserCostForm = ({ dispenserId }: { dispenserId: string }) => {
   const { dispenser, isLoading } = useDispenser(dispenserId);
@@ -32,6 +33,7 @@ export const DispenserCostForm = ({ dispenserId }: { dispenserId: string }) => {
         decimals: number;
         amount: number;
       }[],
+      isFree: false,
     },
     onSubmit: async (values) => {
       try {
@@ -70,6 +72,7 @@ export const DispenserCostForm = ({ dispenserId }: { dispenserId: string }) => {
           isSelected: false,
           decimals: token.decimals,
         })),
+        isFree: false,
       });
     } catch (error) {
       console.log({ error });
@@ -117,109 +120,128 @@ export const DispenserCostForm = ({ dispenserId }: { dispenserId: string }) => {
               Once you have sent the tokens, click the refresh button below to
               see the updated balances.
             </div>
-            <div className="flex w-full justify-center">
-              <PrimaryButton onClick={() => fetchUserBalances()}>
-                refresh
-              </PrimaryButton>
+            <div className="flex justify-center w-full p-2 mb-4">
+              <FormCheckboxWithLabel
+                label="No cost"
+                name="isFree"
+                value={formik.values.isFree}
+                onChange={formik.handleChange}
+              />
             </div>
+            {!formik.values.isFree && (
+              <div className="flex w-full justify-center">
+                <PrimaryButton onClick={() => fetchUserBalances()}>
+                  refresh
+                </PrimaryButton>
+              </div>
+            )}
             {formik.values.costs?.length > 0 && (
               <>
                 <div className="text-xl mt-8 mb-4">Select Costs</div>
-                {isFetching ? (
+                {isFetching && (
                   <div className="flex flex-col items-center justify-center w-full py-16">
                     <Spinner />
                   </div>
-                ) : (
-                  <FormikProvider value={formik}>
-                    <FieldArray
-                      name="costs"
-                      render={({ insert, remove, push, replace }) => (
-                        <>
-                          {formik.values.costs.map((cost, index) => (
-                            <div
-                              onClick={() => {
-                                replace(index, {
-                                  mint: cost.mint,
-                                  decimals: cost.decimals,
-                                  amount: cost.amount,
-                                  costAmount: cost.costAmount,
-                                  isSelected: !cost.isSelected,
-                                });
-                              }}
-                              className={classNames(
-                                "p-4 px-6 border-2 rounded-lg my-2 cursor-pointer w-full",
-                                cost.isSelected
-                                  ? "border-sky-300"
-                                  : "border-gray-600"
-                              )}
-                              key={index}
-                            >
-                              <div className="flex justify-between items-center">
-                                <div className="text-xl">
-                                  {getAbbreviatedAddress(cost.mint)}
-                                </div>
-                                <div>
-                                  <div className="text-xs uppercase text-right">
-                                    total
+                )}
+                {!isFetching && (
+                  <div
+                    className={classNames([
+                      "flex flex-col items-center justify-center w-full overflow-hidden transition-all duration-500",
+                      formik.values.isFree ? "max-h-[0px]" : "max-h-[600px]",
+                    ])}
+                  >
+                    <FormikProvider value={formik}>
+                      <FieldArray
+                        name="costs"
+                        render={({ insert, remove, push, replace }) => (
+                          <>
+                            {formik.values.costs.map((cost, index) => (
+                              <div
+                                onClick={() => {
+                                  replace(index, {
+                                    mint: cost.mint,
+                                    decimals: cost.decimals,
+                                    amount: cost.amount,
+                                    costAmount: cost.costAmount,
+                                    isSelected: !cost.isSelected,
+                                  });
+                                }}
+                                className={classNames(
+                                  "p-4 px-6 border-2 rounded-lg my-2 cursor-pointer w-full",
+                                  cost.isSelected
+                                    ? "border-sky-300"
+                                    : "border-gray-600"
+                                )}
+                                key={index}
+                              >
+                                <div className="flex justify-between items-center">
+                                  <div className="text-xl">
+                                    {getAbbreviatedAddress(cost.mint)}
                                   </div>
-                                  <div className="text-xl text-right">
-                                    {getAmountWithDecimals(
-                                      cost.amount,
-                                      cost.decimals
-                                    )}
+                                  <div>
+                                    <div className="text-xs uppercase text-right">
+                                      total
+                                    </div>
+                                    <div className="text-xl text-right">
+                                      {getAmountWithDecimals(
+                                        cost.amount,
+                                        cost.decimals
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
 
-                              {cost.isSelected && (
-                                <div className="flex flex-col items-center w-full">
-                                  <Divider />
-                                  <div className="flex flex-col w-full items-end">
-                                    <Field
-                                      name={`costs.${index}.mint`}
-                                      value={cost.mint}
-                                      className="text-gray-800"
-                                      hidden
-                                    />
-                                    <div className="flex w-full items-center justify-between mb-2">
-                                      <div className="text-sm uppercase">
-                                        cost amount
-                                      </div>
+                                {cost.isSelected && (
+                                  <div className="flex flex-col items-center w-full">
+                                    <Divider />
+                                    <div className="flex flex-col w-full items-end">
                                       <Field
-                                        name={`costs.${index}.costAmount`}
-                                        className="text-gray-800 bg-gray-100 p-2 rounded max-w-[100px]"
-                                        onClick={(e: any) => {
-                                          e.stopPropagation();
-                                        }}
+                                        name={`costs.${index}.mint`}
+                                        value={cost.mint}
+                                        className="text-gray-800"
+                                        hidden
                                       />
-                                    </div>
-                                    <div className="text-gray-300 text-xs">
-                                      The amount of this token a user must pay
+                                      <div className="flex w-full items-center justify-between mb-2">
+                                        <div className="text-sm uppercase">
+                                          cost amount
+                                        </div>
+                                        <Field
+                                          name={`costs.${index}.costAmount`}
+                                          className="text-gray-800 bg-gray-100 p-2 rounded max-w-[100px]"
+                                          onClick={(e: any) => {
+                                            e.stopPropagation();
+                                          }}
+                                        />
+                                      </div>
+                                      <div className="text-gray-300 text-xs">
+                                        The amount of this token a user must pay
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </>
-                      )}
-                    />
-                    <SubmitButton
-                      isSubmitting={formik.isSubmitting}
-                      onClick={formik.handleSubmit}
-                      buttonText="Continue"
-                      className="mt-4"
-                      disabled={
-                        !formik.values.costs
-                          ?.filter((cost) => cost.isSelected)
-                          .filter((cost) => cost.costAmount > 0)?.length ||
-                        formik.isSubmitting
-                      }
-                    />
-                  </FormikProvider>
+                                )}
+                              </div>
+                            ))}
+                          </>
+                        )}
+                      />
+                    </FormikProvider>
+                  </div>
                 )}
               </>
             )}
+            <SubmitButton
+              isSubmitting={formik.isSubmitting}
+              onClick={formik.handleSubmit}
+              buttonText="Continue"
+              className="mt-4"
+              disabled={
+                !formik.values.isFree &&
+                formik.values.costs.every(
+                  ({ costAmount, isSelected }) =>
+                    costAmount == 0 || !costAmount || !isSelected
+                )
+              }
+            />
           </div>
         </FormWrapper>
       )}

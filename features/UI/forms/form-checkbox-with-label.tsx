@@ -16,7 +16,12 @@ export const FormCheckboxWithLabel = ({
 }: Props) => {
   return (
     <label htmlFor={name} className="flex space-x-4">
-      <input type="checkbox" name={name} checked={value} onChange={onChange} />
+      <input
+        type="checkbox"
+        name={name}
+        checked={value || false}
+        onChange={onChange}
+      />
       <span>{label}</span>
     </label>
   );
