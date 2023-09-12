@@ -54,7 +54,9 @@ export const DispenserCostForm = ({
       try {
         const { data }: { data: { allTokens: Token[]; addedTokens: Token[] } } =
           await axios.post("/api/add-tokens", {
-            mintAddresses: values.costs.map((cost) => cost.mint),
+            mintAddresses: values.costs
+              .filter((cost) => cost.costAmount > 0 && cost.isSelected)
+              .map((cost) => cost.mint),
           });
 
         allTokens = data?.allTokens;
@@ -69,10 +71,7 @@ export const DispenserCostForm = ({
             items: allTokens.map((token) => ({
               name: token.name,
               imageUrl: token?.imageUrl,
-              token: {
-                mintAddress: token.mintAddress,
-                id: token.id,
-              },
+              tokenId: token.id,
             })),
           });
 

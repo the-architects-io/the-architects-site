@@ -1,8 +1,4 @@
-import useDispenser from "@/app/blueprint/hooks/use-dispenser";
-import useRewards from "@/app/blueprint/hooks/use-rewards";
 import { Dispenser } from "@/app/blueprint/types";
-import { PrimaryButton } from "@/features/UI/buttons/primary-button";
-import { AddRewardForm } from "@/features/admin/dispensers/rewards/add-reward-form";
 import { RewardsList } from "@/features/rewards/rewards-list";
 import { useState } from "react";
 

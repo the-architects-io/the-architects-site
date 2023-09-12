@@ -9,7 +9,7 @@ import {
 } from "@/app/blueprint/types";
 import { Payout } from "@/app/profile/[id]/page";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
-import { mapCost } from "@/app/blueprint/utils/mappers/cost";
+import { mapCosts } from "@/app/blueprint/utils/mappers/cost";
 import { mapGates } from "@/app/blueprint/utils/mappers/gates";
 import { mapRestrictions } from "@/app/blueprint/utils/mappers/restrictions";
 import { mapRewards } from "@/app/blueprint/utils/mappers/rewards";
@@ -32,7 +32,7 @@ export type ClaimRewardOptions = {
 const useDispenser = (dispenserId?: string) => {
   const [isClaiming, setIsClaiming] = useState(false);
   const [dispenser, setDispenser] = useState<Dispenser | null>(null);
-  const [cost, setCost] = useState<DispenserCost | null>(null);
+  const [costs, setCosts] = useState<DispenserCost[] | null>(null);
   const [rewards, setRewards] = useState<DispenserReward[] | null>(null);
   const [gates, setGates] = useState<DispenserGate[] | null>(null);
   const [restrictions, setRestrictions] = useState<
@@ -50,7 +50,7 @@ const useDispenser = (dispenserId?: string) => {
     }) => {
       if (!dispenser) return;
       setDispenser(dispenser);
-      setCost(mapCost(dispenser.costCollections?.[0]));
+      setCosts(mapCosts(dispenser.costCollections));
       setRewards(mapRewards(dispenser.rewardCollections));
       setGates(mapGates(dispenser.gateCollections));
       setRestrictions(mapRestrictions(dispenser.restrictionCollections));
@@ -99,7 +99,7 @@ const useDispenser = (dispenserId?: string) => {
         collectionWallet: null,
         rewardWalletAddress: null,
       },
-      cost: null,
+      costs: null,
       rewards: null,
       gates: null,
       restrictions: null,
@@ -120,7 +120,7 @@ const useDispenser = (dispenserId?: string) => {
     isLoading: loading,
     refetch,
     error,
-    cost,
+    costs,
     rewards,
     gates,
     restrictions,

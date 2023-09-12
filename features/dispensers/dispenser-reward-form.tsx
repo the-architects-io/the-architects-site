@@ -13,7 +13,7 @@ import {
   Token,
   TokenBalance,
 } from "@/app/blueprint/types";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BASE_URL } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { getAbbreviatedAddress } from "@/utils/formatting";
@@ -58,7 +58,9 @@ export const DispenserRewardForm = ({
       try {
         const { data }: { data: { allTokens: Token[]; addedTokens: Token[] } } =
           await axios.post("/api/add-tokens", {
-            mintAddresses: values.rewards.map((reward) => reward.mint),
+            mintAddresses: values.rewards
+              .filter((reward) => reward.isSelected && reward.rewardAmount > 0)
+              .map((reward) => reward.mint),
           });
 
         allTokens = data?.allTokens;
@@ -68,7 +70,6 @@ export const DispenserRewardForm = ({
       }
 
       console.log({ allTokens });
-      debugger;
 
       try {
         const { data }: { data: { allItems: Item[]; addedItems: Item[] } } =
@@ -110,15 +111,28 @@ export const DispenserRewardForm = ({
         }: { data: { addedRewardCollections: RewardCollection[] } } =
           await axios.post("/api/add-reward-collections", {
             dispenserId,
-            rewardCollections: allItemCollections.map((itemCollection) => ({
-              name: itemCollection.name,
-              dispenserId: dispenser?.id,
-              itemCollectionId: itemCollection.id,
-              itemId: itemCollection.item.id,
-              payoutChance: values.rewards.find(
-                (reward) => reward.mint == itemCollection.item.token.mintAddress
-              )?.payoutChance,
-            })),
+            rewardCollections: allItemCollections.map((itemCollection) => {
+              const reward = {
+                name: itemCollection.name,
+                dispenserId: dispenser?.id,
+                itemCollectionId: itemCollection.id,
+                itemId: itemCollection.item.id,
+                payoutChance:
+                  (values.rewards.find(
+                    (reward) =>
+                      reward.mint == itemCollection.item.token.mintAddress
+                  )?.payoutChance || 0) / 100,
+              };
+              console.log({
+                reward,
+                rewardPayoutChance: reward.payoutChance,
+                payoutChance: values.rewards.find(
+                  (reward) =>
+                    reward.mint == itemCollection.item.token.mintAddress
+                )?.payoutChance,
+              });
+              return reward;
+            }),
           });
 
         showToast({
@@ -165,6 +179,10 @@ export const DispenserRewardForm = ({
       setIsFetching(false);
     }
   }, [formik, dispenser?.rewardWalletAddress]);
+
+  useEffect(() => {
+    if (!tokens.length && !isFetching) fetchUserBalances();
+  }, [tokens, isFetching, fetchUserBalances]);
 
   if (!dispenser?.id || isLoading)
     return (
@@ -218,6 +236,7 @@ export const DispenserRewardForm = ({
                   e.preventDefault();
                   fetchUserBalances();
                 }}
+                disabled={isFetching}
               >
                 refresh
               </PrimaryButton>

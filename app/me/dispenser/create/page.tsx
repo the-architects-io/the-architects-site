@@ -7,11 +7,9 @@ import { DispenserRewardForm } from "@/features/dispensers/dispenser-reward-form
 import { useEffect, useState } from "react";
 
 export default function DashboardPage() {
-  const [step, setStep] = useState(2);
-  // const [dispenserId, setDispenserId] = useState<string | null>(null);
-  const [dispenserId, setDispenserId] = useState<string | null>(
-    "71e1d3cd-d114-44bb-a20f-ca90b835288a"
-  );
+  const [step, setStep] = useState(0);
+  const [dispenserId, setDispenserId] = useState<string | null>(null);
+
   const [heading, setHeading] = useState<string>("Create Dispenser");
 
   useEffect(() => {

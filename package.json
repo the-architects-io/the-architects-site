@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "fill": "npx ts-node scripts/fill-dispenser.ts"
   },
   "dependencies": {
     "@apollo/client": "^3.7.14",
@@ -63,10 +64,12 @@
     "three": "^0.155.0",
     "tsparticles": "^2.10.1",
     "tsparticles-engine": "^2.10.1",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@types/lodash.clonedeep": "^4.5.7",
-    "lodash.clonedeep": "^4.5.0"
+    "lodash.clonedeep": "^4.5.0",
+    "ts-node": "^10.9.1"
   }
 }

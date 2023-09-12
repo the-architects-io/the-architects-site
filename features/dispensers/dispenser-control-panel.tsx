@@ -14,7 +14,7 @@ import Spinner from "@/features/UI/spinner";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Divider } from "@mui/material";
 import { ITab, Tabs } from "@/features/UI/tabs/tabs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StatsPanel } from "@/features/admin/dispensers/stats/stats-panel";
 import useRewards from "@/app/blueprint/hooks/use-rewards";
 
@@ -34,6 +34,14 @@ export const DispenserControlPanel = ({
     { name: "Config", value: "config" },
   ];
   const [activeTab, setActiveTab] = useState<ITab>(tabs[0]);
+  const [hasBeenRefetched, setHasBeenRefetched] = useState(false);
+
+  useEffect(() => {
+    if (!rewards?.length && !hasBeenRefetched && refetch) {
+      refetch();
+      setHasBeenRefetched(true);
+    }
+  }, [hasBeenRefetched, refetch, rewards?.length]);
 
   return (
     <>

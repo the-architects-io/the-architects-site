@@ -70,7 +70,7 @@ export default function WalletConnector({ className }: { className?: string }) {
         userId: user?.id,
         walletAddress: publicKey?.toString(),
       });
-      debugger;
+
       if (status === 200) {
         showToast({
           primaryMessage: "Wallet linked",

@@ -117,7 +117,6 @@ export default function Page() {
     //   [Buffer.from("arch-authority")],
     //   new PublicKey(DISPENSER_PROGRAM_ID)
     // );
-    // debugger;
     // setDispenserPublicKey(address);
     // setDispenserBump(bump);
   }, []);

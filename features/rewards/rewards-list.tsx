@@ -23,7 +23,7 @@ export const RewardsList = ({
     useState<boolean>(false);
   const [tokenBalances, setTokenBalances] = useState<HeliusToken[]>([]);
 
-  const getLootBoxTokenBalances = useCallback(async () => {
+  const getDispenserTokenBalances = useCallback(async () => {
     if (!collectionWallet?.address) return;
 
     setIsFetchingTokenBalances(true);
@@ -43,8 +43,6 @@ export const RewardsList = ({
     name: string;
     decimals: number;
   }) => {
-    console.log(token);
-    debugger;
     if (!tokenBalances?.length) return 0;
     let balance =
       tokenBalances.find(({ mint }) => mint === token.mintAddress)?.amount || 0;
@@ -54,8 +52,8 @@ export const RewardsList = ({
 
   useEffect(() => {
     if (!rewards) return;
-    if (!tokenBalances?.length) getLootBoxTokenBalances();
-  }, [getLootBoxTokenBalances, rewards, tokenBalances?.length]);
+    if (!tokenBalances?.length) getDispenserTokenBalances();
+  }, [getDispenserTokenBalances, rewards, tokenBalances?.length]);
 
   return (
     <div className={classNames([className, "w-full"])}>
@@ -125,7 +123,6 @@ export const RewardsList = ({
                         ))}
                     </div>
                     <div className="w-full hidden lg:w-1/5 lg:flex justify-end order-1">
-                      {JSON.stringify(payoutChance)}
                       {!!payoutChance && round(payoutChance * 100, 2)}%
                     </div>
                   </>
