@@ -73,6 +73,8 @@ export const AddDispenserForm = ({
             anchorWallet
           );
 
+        // TODO: confirm dispenserAddress account exists on chain
+
         const { data: updatedDispenser }: { data: Dispenser } =
           await axios.post("/api/update-dispenser", {
             id: dispenser.id,

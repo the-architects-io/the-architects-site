@@ -14,6 +14,10 @@ export const ADD_ITEM_COLLECTIONS = gql`
         item {
           id
           name
+          token {
+            id
+            mintAddress
+          }
         }
       }
     }

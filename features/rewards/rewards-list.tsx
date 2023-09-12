@@ -14,7 +14,7 @@ export const RewardsList = ({
   dispenserId: string;
   className?: string;
 }) => {
-  const { rewards, collectionWallet } = useDispenser(dispenserId);
+  const { rewards, collectionWallet, dispenser } = useDispenser(dispenserId);
 
   const [isFetchingTokenBalances, setIsFetchingTokenBalances] =
     useState<boolean>(false);
@@ -27,12 +27,12 @@ export const RewardsList = ({
     const { data } = await axios.post(
       `${BASE_URL}/api/get-token-balances-from-helius`,
       {
-        walletAddress: collectionWallet?.address,
+        walletAddress: dispenser.rewardWalletAddress,
       }
     );
     setTokenBalances(data);
     setIsFetchingTokenBalances(false);
-  }, [collectionWallet?.address]);
+  }, [collectionWallet?.address, dispenser.rewardWalletAddress]);
 
   const getItemBalance = (mintAddress: string) => {
     if (!tokenBalances?.length) return 0;
@@ -66,8 +66,10 @@ export const RewardsList = ({
                   <>
                     <div className="w-full flex justify-between lg:w-2/5 font-bold mb-2">
                       <div className="flex flex-col">
-                        <div className="mb-2 flex">
-                          {name}{" "}
+                        <div className="mb-2 flex w-1/2">
+                          <div className="overflow-hidden rounded-lg">
+                            {name}{" "}
+                          </div>
                           {isFreezeOnDelivery && (
                             <Image
                               className="bg-sky-300 rounded-lg ml-4"
@@ -78,6 +80,7 @@ export const RewardsList = ({
                             />
                           )}
                         </div>
+                        {/* {JSON.stringify(token)} */}
                         {!!token?.mintAddress && (
                           <div>Stock: {getItemBalance(token.mintAddress)}</div>
                         )}
@@ -110,6 +113,7 @@ export const RewardsList = ({
                         ))}
                     </div>
                     <div className="w-full hidden lg:w-1/5 lg:flex justify-end order-1">
+                      {JSON.stringify(payoutChance)}
                       {!!payoutChance && round(payoutChance * 100, 2)}%
                     </div>
                   </>

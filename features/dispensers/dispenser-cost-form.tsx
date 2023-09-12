@@ -180,7 +180,12 @@ export const DispenserCostForm = ({
               <div className="text-sm mb-4">
                 {dispenser?.rewardWalletAddress}
               </div>
-              <div className="flex justify-center w-full mb-8 space-x-4">
+              <div
+                className="flex justify-center w-full mb-8 space-x-4"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
                 <SecondaryButton>
                   <a
                     href={`https://explorer.solana.com/address/${dispenser?.rewardWalletAddress}`}

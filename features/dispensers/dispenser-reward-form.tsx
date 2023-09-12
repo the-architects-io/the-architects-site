@@ -104,6 +104,8 @@ export const DispenserRewardForm = ({
         console.log({ error });
       }
 
+      console.log({ allItemCollections });
+
       try {
         const {
           data,
@@ -115,6 +117,9 @@ export const DispenserRewardForm = ({
               dispenserId: dispenser?.id,
               itemCollectionId: itemCollection.id,
               itemId: itemCollection.item.id,
+              payoutChance: values.rewards.find(
+                (reward) => reward.mint == itemCollection.item.token.mintAddress
+              )?.payoutChance,
             })),
           });
 

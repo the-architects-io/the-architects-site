@@ -16,13 +16,14 @@ import { Divider } from "@mui/material";
 import { ITab, Tabs } from "@/features/UI/tabs/tabs";
 import { useState } from "react";
 import { StatsPanel } from "@/features/admin/dispensers/stats/stats-panel";
+import useRewards from "@/app/blueprint/hooks/use-rewards";
 
 export const DispenserControlPanel = ({
   dispenserId,
 }: {
   dispenserId: string;
 }) => {
-  const { description, isLoading, dispenser, refetch } =
+  const { description, isLoading, dispenser, rewards, refetch } =
     useDispenser(dispenserId);
   const tabs: ITab[] = [
     { name: "Rewards", value: "rewards" },
@@ -95,6 +96,7 @@ export const DispenserControlPanel = ({
                   </div>
                   {!!activeTab && activeTab.value === "rewards" && (
                     <RewardsSettingsPanel
+                      dispenserId={dispenserId}
                       dispenser={dispenser}
                       refetch={refetch || (() => {})}
                     />
@@ -105,7 +107,7 @@ export const DispenserControlPanel = ({
                       refetch={refetch || (() => {})}
                     />
                   )}
-                  {!!activeTab && activeTab.value === "gates" && (
+                  {/* {!!activeTab && activeTab.value === "gates" && (
                     <GatesSettingsPanel
                       dispenser={dispenser}
                       refetch={refetch || (() => {})}
@@ -116,7 +118,7 @@ export const DispenserControlPanel = ({
                       dispenser={dispenser}
                       refetch={refetch || (() => {})}
                     />
-                  )}
+                  )} */}
                   {!!activeTab && activeTab.value === "stats" && (
                     <StatsPanel dispenser={dispenser} />
                   )}
