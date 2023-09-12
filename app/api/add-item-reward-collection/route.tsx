@@ -1,11 +1,14 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { client } from "@/graphql/backend-client";
-import { NoopResponse } from "@/app/api/get-token-metadata-from-helius/route";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { ADD_ITEM_REWARD_COLLECTION } from "@/graphql/mutations/add-item-reward-collection";
 import { ADD_ITEM_COLLECTION } from "@/graphql/mutations/add-item-collection";
-import { ItemCollection, RewardCollection } from "@/app/blueprint/types";
+import {
+  ItemCollection,
+  NoopResponse,
+  RewardCollection,
+} from "@/app/blueprint/types";
 
 type Data =
   | RewardCollection

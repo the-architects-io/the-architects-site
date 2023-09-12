@@ -6,7 +6,13 @@ import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { Field, FieldArray, useFormik, FormikProvider, Formik } from "formik";
 import showToast from "@/features/toasts/show-toast";
 import SharedHead from "@/features/UI/head";
-import { Token, TokenBalance } from "@/app/blueprint/types";
+import {
+  CostCollection,
+  Item,
+  ItemCollection,
+  Token,
+  TokenBalance,
+} from "@/app/blueprint/types";
 import { useCallback, useEffect, useState } from "react";
 import { BASE_URL } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
@@ -43,6 +49,9 @@ export const DispenserCostForm = ({
     },
     onSubmit: async (values) => {
       let allTokens: Token[] = [];
+      let allItems: Item[] = [];
+      let allItemCollections: ItemCollection[] = [];
+
       try {
         const { data }: { data: { allTokens: Token[]; addedTokens: Token[] } } =
           await axios.post("/api/add-tokens", {
@@ -54,24 +63,61 @@ export const DispenserCostForm = ({
       } catch (error) {
         console.log({ error });
       }
+
       try {
-        await axios.post("/api/add-items", {
-          items: allTokens.map((token) => ({
-            name: token.name,
-            imageUrl: token?.imageUrl,
-            token: {
-              mintAddress: token.mintAddress,
-              id: token.id,
-            },
-          })),
-        });
+        const { data }: { data: { allItems: Item[]; addedItems: Item[] } } =
+          await axios.post("/api/add-items", {
+            items: allTokens.map((token) => ({
+              name: token.name,
+              imageUrl: token?.imageUrl,
+              token: {
+                mintAddress: token.mintAddress,
+                id: token.id,
+              },
+            })),
+          });
+
+        allItems = data?.allItems;
+      } catch (error) {
+        console.log({ error });
+      }
+
+      try {
+        const { data }: { data: { addedItemCollections: ItemCollection[] } } =
+          await axios.post("/api/add-item-collections", {
+            itemCollections: allItems.map((item) => ({
+              name: item.name,
+              imageUrl: item?.imageUrl,
+              itemId: item.id,
+              amount:
+                values.costs.find((cost) => cost.mint == item.token.mintAddress)
+                  ?.costAmount || 0,
+            })),
+          });
+
+        allItemCollections = data?.addedItemCollections;
+      } catch (error) {
+        console.log({ error });
+      }
+
+      try {
+        const { data }: { data: { addedCostCollections: CostCollection[] } } =
+          await axios.post("/api/add-cost-collections", {
+            dispenserId,
+            costCollections: allItemCollections.map((itemCollection) => ({
+              name: itemCollection.name,
+              dispenserId: dispenser?.id,
+              itemCollectionId: itemCollection.id,
+              itemId: itemCollection.item.id,
+            })),
+          });
+
         showToast({
-          primaryMessage: "Cost added",
+          primaryMessage:
+            values.costs.length > 1 ? "Costs added" : "Cost added",
         });
       } catch (error) {
-        showToast({
-          primaryMessage: "Error adding cost",
-        });
+        console.log({ error });
       }
     },
   });
