@@ -1,4 +1,4 @@
-import { Dispenser, DispenserReward } from "@/app/blueprint/types";
+import { Dispenser, DispenserReward, HeliusToken } from "@/app/blueprint/types";
 
 const sortRewards = (rewards: DispenserReward[]) => {
   return rewards.sort((a, b) => {
@@ -26,7 +26,7 @@ const mapRewardCollection = (rewards: Dispenser["rewardCollections"]) => {
     }) => {
       let hashList;
       let item;
-      let token;
+      let token: HeliusToken;
       let childRewards;
 
       if (hashListCollection?.id) {
@@ -46,6 +46,7 @@ const mapRewardCollection = (rewards: Dispenser["rewardCollections"]) => {
           id: item.token.id,
           mintAddress: item.token.mintAddress,
           name: item.token.name,
+          decimals: item.token.decimals,
         };
       }
 

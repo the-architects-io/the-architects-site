@@ -13,8 +13,13 @@ export const CostsList = ({
   return (
     <div className={classNames([className, "w-full"])}>
       {!!cost && (
-        <div className="flex flex-wrap w-full flex-1 justify-center rounded-lg p-2">
-          <div className="font-bold text-2xl">{cost.name}</div>
+        <div className="flex w-full justify-center rounded-lg p-2">
+          <div className="font-bold text-2xl w-1/2 overflow-hidden">
+            {cost.name}
+          </div>
+          <div className="font-bold text-2xl w-1/2 overflow-hidden text-right">
+            {cost.amount}
+          </div>
         </div>
       )}
     </div>

@@ -7,6 +7,7 @@ import { Item, NoopResponse } from "@/app/blueprint/types";
 import { ADD_ITEMS } from "@/graphql/mutations/add-items";
 import { GET_ITEMS_BY_IDS } from "@/graphql/queries/get-items-by-ids";
 import { GET_ITEMS_BY_TOKEN_MINT_ADDRESSES } from "@/graphql/queries/get-items-by-token-mint-addresses";
+import { GET_ITEMS_BY_TOKEN_IDS } from "@/graphql/queries/get-items-by-token-ids";
 
 type Data =
   | Item[]
@@ -19,10 +20,6 @@ type ItemArg = {
   name: string;
   imageUrl: string;
   tokenId: string;
-  token: {
-    mintAddress: string;
-    id: string;
-  };
 };
 
 export async function POST(req: NextRequest) {
@@ -49,15 +46,15 @@ export async function POST(req: NextRequest) {
 
   console.log({
     items,
-    tokens: items.map((item: ItemArg) => item.token),
+    tokenIds: items.map((item: ItemArg) => item.tokenId),
   });
 
   try {
     const { items: itemsInDbResponse }: { items: Item[] } =
       await client.request({
-        document: GET_ITEMS_BY_TOKEN_MINT_ADDRESSES,
+        document: GET_ITEMS_BY_TOKEN_IDS,
         variables: {
-          mintAddresses: items.map((item: ItemArg) => item.token.mintAddress),
+          ids: items.map((item: ItemArg) => item.tokenId),
         },
       });
 
@@ -71,7 +68,7 @@ export async function POST(req: NextRequest) {
     (item: ItemArg) =>
       !itemsInDb.find(
         (itemInDb: Item) =>
-          itemInDb.token.mintAddress === item.token.mintAddress
+          itemInDb.token.id === item.tokenId && itemInDb.name === item.name
       )
   );
 

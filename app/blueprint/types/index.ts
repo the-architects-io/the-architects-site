@@ -43,6 +43,7 @@ export type DispenserReward = {
     id: string;
     mintAddress: string;
     name: string;
+    decimals: number;
   };
   hashList?: string;
   childRewards?: DispenserReward[];
@@ -286,6 +287,7 @@ export type HeliusToken = {
   mint: string;
   amount: number;
   decimals: number;
+  id?: string;
 };
 
 export type TokenBalance = {

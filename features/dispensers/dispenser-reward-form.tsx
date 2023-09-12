@@ -62,10 +62,13 @@ export const DispenserRewardForm = ({
           });
 
         allTokens = data?.allTokens;
-        console.log(data?.allTokens);
+        console.log({ allTokens });
       } catch (error) {
         console.log({ error });
       }
+
+      console.log({ allTokens });
+      debugger;
 
       try {
         const { data }: { data: { allItems: Item[]; addedItems: Item[] } } =
@@ -73,10 +76,7 @@ export const DispenserRewardForm = ({
             items: allTokens.map((token) => ({
               name: token.name,
               imageUrl: token?.imageUrl,
-              token: {
-                mintAddress: token.mintAddress,
-                id: token.id,
-              },
+              tokenId: token.id,
             })),
           });
 
@@ -103,8 +103,6 @@ export const DispenserRewardForm = ({
       } catch (error) {
         console.log({ error });
       }
-
-      console.log({ allItemCollections });
 
       try {
         const {

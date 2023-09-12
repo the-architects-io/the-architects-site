@@ -42,7 +42,7 @@ export const CostsSettingsPanel = ({
           setIsAddingCost={setIsAddingCost}
         />
       )}
-      {!isAddingCost && (
+      {/* {!isAddingCost && (
         <PrimaryButton
           onClick={() => {
             !!dispenser.costCollections?.length
@@ -58,7 +58,7 @@ export const CostsSettingsPanel = ({
             </>
           )}
         </PrimaryButton>
-      )}
+      )} */}
     </>
   );
 };

@@ -1,6 +1,8 @@
 import axios from "axios";
 import {
+  DigitalAsset,
   Metadata,
+  fetchAllDigitalAsset,
   fetchDigitalAsset,
 } from "@metaplex-foundation/mpl-token-metadata";
 
@@ -19,6 +21,7 @@ import {
 } from "@metaplex-foundation/js";
 import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
 import {
+  Mint,
   SPL_TOKEN_PROGRAM_ID,
   fetchAllMint,
 } from "@metaplex-foundation/mpl-toolbox";
@@ -44,6 +47,22 @@ type Data =
   | {
       error: unknown;
     };
+
+type ModeledToken = {
+  name: string;
+  symbol?: string;
+  imageUrl: string;
+  mintAddress: string;
+  decimals: number;
+};
+
+const isAsset = (entity: DigitalAsset | Mint): entity is DigitalAsset => {
+  return "mint" in entity && entity.mint ? true : false;
+};
+
+const isMint = (entity: DigitalAsset | Mint): entity is Mint => {
+  return "mint" in entity && entity.mint ? false : true;
+};
 
 export async function POST(req: NextRequest) {
   const { mintAddresses, noop } = await req.json();
@@ -73,45 +92,138 @@ export async function POST(req: NextRequest) {
 
   console.log("tokensInDb: ", tokensInDb);
 
-  const mintAddressesInDb = tokensInDb.map((token) => token.mintAddress);
-  const mintAddressesToFetch = mintAddresses
-    .filter((mintAddress: string) => !mintAddressesInDb.includes(mintAddress))
-    .map((mintAddress: string) => publicKey(mintAddress));
+  const umi = getUmiClient();
+
+  const mintAccounts: Mint[] = await fetchAllMint(umi, mintAddresses);
+  let assets: DigitalAsset[] = [];
+
+  for (const mintAddress of mintAddresses) {
+    try {
+      const asset = await fetchDigitalAsset(umi, mintAddress);
+      assets.push(asset);
+    } catch (error) {}
+  }
+
+  const tokensNotInAssets = mintAccounts.filter(
+    (mint: Mint) =>
+      !assets.find(
+        (asset: DigitalAsset) =>
+          publicKey(asset.mint).toString() ===
+          publicKey(mint.publicKey).toString()
+      )
+  );
+
+  const assetsPlusTokens = [...assets, ...tokensNotInAssets];
+
+  const assetsPlusTokensInDb = assetsPlusTokens.filter(
+    (asset: DigitalAsset | Mint) => {
+      if (isAsset(asset)) {
+        console.log({
+          isAsset: true,
+          asset,
+          token: tokensInDb.find(
+            (token: Token) => publicKey(asset.mint) === token.mintAddress
+          ),
+        });
+
+        return tokensInDb.find(
+          (token: Token) => publicKey(asset.mint) === token.mintAddress
+        );
+      } else if (isMint(asset)) {
+        console.log({
+          isMint: true,
+          asset,
+          token: tokensInDb.find(
+            (token: Token) => publicKey(asset.publicKey) === token.mintAddress
+          ),
+        });
+        return tokensInDb.find(
+          (token: Token) => publicKey(asset.publicKey) === token.mintAddress
+        );
+      }
+      return false;
+    }
+  );
+
+  const assetsPlusTokensToFetch = assetsPlusTokens.filter(
+    (asset: DigitalAsset | Mint) => {
+      if (isAsset(asset)) {
+        return !tokensInDb.find(
+          (token: Token) => publicKey(asset.mint) === token.mintAddress
+        );
+      } else if (isMint(asset)) {
+        return !tokensInDb.find(
+          (token: Token) => publicKey(asset.publicKey) === token.mintAddress
+        );
+      }
+      return false;
+    }
+  );
+
+  // const modelTokensFromAsset = (asset: DigitalAsset): ModeledToken => {
+  //   const pubKey = publicKey(asset.mint).toString();
+  //   return {
+  //     name: asset?.metadata?.name?.trim()?.length
+  //       ? asset?.metadata?.name
+  //       : pubKey,
+  //     symbol: asset?.metadata?.symbol,
+  //     imageUrl: asset?.metadata?.uri,
+  //     mintAddress: pubKey,
+  //     decimals:
+  //       mintAccounts.find(
+  //         (mintAccount: Mint) =>
+  //           publicKey(mintAccount.publicKey).toString() === pubKey
+  //       )?.decimals || 0,
+  //   };
+  // };
+
+  // const modeledTokensInDb = assetsInDb.map(modelTokensFromAsset);
+  // const modeledTokensToFetch = assetsToFetch.map(modelTokensFromAsset);
 
   console.log("trying to get token metadata...");
 
-  const umi = getUmiClient();
+  let toAdd: any[] = [];
 
-  const mintAccounts = await fetchAllMint(umi, mintAddressesToFetch);
-
-  let tokensToAdd: any[] = [];
-
-  for (const token of mintAccounts) {
-    let tokenToAdd;
-    const pubKey = publicKey(token.publicKey);
-    try {
-      const asset = await fetchDigitalAsset(umi, pubKey);
-      if (asset) {
-        console.log("meta: ", asset?.metadata);
-        tokenToAdd = {
-          name: asset?.metadata?.name?.trim()?.length
-            ? asset?.metadata?.name
-            : pubKey,
-          symbol: asset?.metadata?.symbol,
-          imageUrl: asset?.metadata?.uri,
-        };
-      }
-      tokenToAdd = {
-        ...tokenToAdd,
-        mintAddress: publicKey(token.publicKey).toString(),
-        decimals: token.decimals,
+  for (const entity of assetsPlusTokensToFetch) {
+    let modeledToken: ModeledToken;
+    if (isAsset(entity)) {
+      const asset = entity as DigitalAsset;
+      const pubKey = publicKey(asset.mint).toString();
+      modeledToken = {
+        name: asset?.metadata?.name?.trim()?.length
+          ? asset?.metadata?.name
+          : pubKey,
+        symbol: asset?.metadata?.symbol,
+        imageUrl: asset?.metadata?.uri,
+        mintAddress: pubKey,
+        decimals:
+          mintAccounts.find(
+            (mintAccount: Mint) =>
+              publicKey(mintAccount.publicKey).toString() === pubKey
+          )?.decimals || 0,
       };
-    } catch (error) {}
-    if (tokenToAdd) tokensToAdd.push(tokenToAdd);
+      toAdd.push(modeledToken);
+    } else if (isMint(entity)) {
+      const token = entity as Mint;
+      const pubKey = publicKey(token.publicKey).toString();
+      modeledToken = {
+        name: pubKey,
+        imageUrl: "",
+        mintAddress: pubKey,
+        decimals: token?.decimals || 0,
+      };
+      toAdd.push(modeledToken);
+    }
   }
 
   console.log({
-    tokensToAdd,
+    tokensNotInAssets,
+    assetsPlusTokens,
+    assetsPlusTokensInDb,
+    assetsPlusTokensToFetch,
+    mintAccounts,
+    assets,
+    toAdd,
   });
 
   try {
@@ -121,7 +233,7 @@ export async function POST(req: NextRequest) {
       await client.request({
         document: ADD_TOKENS,
         variables: {
-          tokens: tokensToAdd,
+          tokens: toAdd,
         },
       });
     return NextResponse.json(

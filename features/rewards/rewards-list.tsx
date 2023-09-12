@@ -7,6 +7,9 @@ import classNames from "classnames";
 import Image from "next/image";
 import { Fragment, useCallback, useEffect, useState } from "react";
 
+import { getAmountWithDecimals } from "@/utils/currency";
+import { HeliusToken } from "@/app/blueprint/types";
+
 export const RewardsList = ({
   dispenserId,
   className,
@@ -18,7 +21,7 @@ export const RewardsList = ({
 
   const [isFetchingTokenBalances, setIsFetchingTokenBalances] =
     useState<boolean>(false);
-  const [tokenBalances, setTokenBalances] = useState<TokenBalance[]>([]);
+  const [tokenBalances, setTokenBalances] = useState<HeliusToken[]>([]);
 
   const getLootBoxTokenBalances = useCallback(async () => {
     if (!collectionWallet?.address) return;
@@ -34,9 +37,19 @@ export const RewardsList = ({
     setIsFetchingTokenBalances(false);
   }, [collectionWallet?.address, dispenser.rewardWalletAddress]);
 
-  const getItemBalance = (mintAddress: string) => {
+  const getItemBalance = (token: {
+    id: string;
+    mintAddress: string;
+    name: string;
+    decimals: number;
+  }) => {
+    console.log(token);
+    debugger;
     if (!tokenBalances?.length) return 0;
-    return tokenBalances.find(({ mint }) => mint === mintAddress)?.amount || 0;
+    let balance =
+      tokenBalances.find(({ mint }) => mint === token.mintAddress)?.amount || 0;
+
+    return getAmountWithDecimals(balance, token.decimals);
   };
 
   useEffect(() => {
@@ -82,7 +95,7 @@ export const RewardsList = ({
                         </div>
                         {/* {JSON.stringify(token)} */}
                         {!!token?.mintAddress && (
-                          <div>Stock: {getItemBalance(token.mintAddress)}</div>
+                          <div>Stock: {getItemBalance(token)}</div>
                         )}
                       </div>
                       <div className="lg:hidden">
@@ -102,8 +115,7 @@ export const RewardsList = ({
                                   <div>
                                     {name.replace("1", "")}
                                     <div className="text-sky-500">
-                                      {getItemBalance(token.mintAddress)}x
-                                      Remaining
+                                      {getItemBalance(token)}x Remaining
                                     </div>
                                   </div>
                                 )}

@@ -27,6 +27,7 @@ export const GET_DISPENSER_BY_ID = gql`
               id
               name
               mintAddress
+              decimals
             }
           }
         }
@@ -46,6 +47,7 @@ export const GET_DISPENSER_BY_ID = gql`
               id
               name
               mintAddress
+              decimals
             }
           }
         }
@@ -84,6 +86,7 @@ export const GET_DISPENSER_BY_ID = gql`
                 id
                 name
                 mintAddress
+                decimals
               }
             }
           }
