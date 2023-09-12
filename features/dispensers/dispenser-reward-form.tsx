@@ -1,4 +1,5 @@
 "use client";
+
 import axios from "axios";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
@@ -6,9 +7,9 @@ import { Field, FieldArray, useFormik, FormikProvider, Formik } from "formik";
 import showToast from "@/features/toasts/show-toast";
 import SharedHead from "@/features/UI/head";
 import {
-  CostCollection,
   Item,
   ItemCollection,
+  RewardCollection,
   Token,
   TokenBalance,
 } from "@/app/blueprint/types";
@@ -22,9 +23,18 @@ import { Divider } from "@/features/UI/divider";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import Spinner from "@/features/UI/spinner";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
-import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
+import { useRouter } from "next/navigation";
 
-export const DispenserCostForm = ({
+type Reward = {
+  mint: string;
+  isSelected: boolean;
+  decimals: number;
+  rewardAmount: number;
+  payoutChance: number;
+  amount: number;
+};
+
+export const DispenserRewardForm = ({
   dispenserId,
   setStep,
 }: {
@@ -34,17 +44,11 @@ export const DispenserCostForm = ({
   const { dispenser, isLoading } = useDispenser(dispenserId);
   const [isFetching, setIsFetching] = useState(false);
   const [tokens, setTokens] = useState<TokenBalance[]>([]);
+  const router = useRouter();
 
   const formik = useFormik({
     initialValues: {
-      costs: [] as {
-        mint: string;
-        costAmount: number;
-        isSelected: boolean;
-        decimals: number;
-        amount: number;
-      }[],
-      isFree: false,
+      rewards: [] as Reward[],
     },
     onSubmit: async (values) => {
       let allTokens: Token[] = [];
@@ -54,7 +58,7 @@ export const DispenserCostForm = ({
       try {
         const { data }: { data: { allTokens: Token[]; addedTokens: Token[] } } =
           await axios.post("/api/add-tokens", {
-            mintAddresses: values.costs.map((cost) => cost.mint),
+            mintAddresses: values.rewards.map((reward) => reward.mint),
           });
 
         allTokens = data?.allTokens;
@@ -89,8 +93,9 @@ export const DispenserCostForm = ({
               imageUrl: item?.imageUrl,
               itemId: item.id,
               amount:
-                values.costs.find((cost) => cost.mint == item.token.mintAddress)
-                  ?.costAmount || 0,
+                values.rewards.find(
+                  (reward) => reward.mint == item.token.mintAddress
+                )?.rewardAmount || 0,
             })),
           });
 
@@ -100,10 +105,12 @@ export const DispenserCostForm = ({
       }
 
       try {
-        const { data }: { data: { addedCostCollections: CostCollection[] } } =
-          await axios.post("/api/add-cost-collections", {
+        const {
+          data,
+        }: { data: { addedRewardCollections: RewardCollection[] } } =
+          await axios.post("/api/add-reward-collections", {
             dispenserId,
-            costCollections: allItemCollections.map((itemCollection) => ({
+            rewardCollections: allItemCollections.map((itemCollection) => ({
               name: itemCollection.name,
               dispenserId: dispenser?.id,
               itemCollectionId: itemCollection.id,
@@ -113,9 +120,9 @@ export const DispenserCostForm = ({
 
         showToast({
           primaryMessage:
-            values.costs.length > 1 ? "Costs added" : "Cost added",
+            values.rewards.length > 1 ? "Rewards added" : "Reward added",
         });
-        setStep(2);
+        router.push(`/me/dispenser/${dispenserId}`);
       } catch (error) {
         console.log({ error });
       }
@@ -140,14 +147,14 @@ export const DispenserCostForm = ({
       );
       setTokens(tokens);
       formik.setValues({
-        costs: tokens.map((token) => ({
+        rewards: tokens.map((token) => ({
           mint: token.mint,
           amount: token.amount,
-          costAmount: 0,
+          rewardAmount: 0,
+          payoutChance: 0,
           isSelected: false,
           decimals: token.decimals,
         })),
-        isFree: false,
       });
     } catch (error) {
       console.log({ error });
@@ -202,62 +209,50 @@ export const DispenserCostForm = ({
               Once you have sent the tokens, click the refresh button below to
               see the updated balances.
             </div>
-            <div className="flex justify-center w-full p-2 mb-4">
-              <FormCheckboxWithLabel
-                label="No cost"
-                name="isFree"
-                value={formik.values.isFree}
-                onChange={formik.handleChange}
-              />
+            <div className="flex w-full justify-center mb-4">
+              <PrimaryButton
+                onClick={(e) => {
+                  e.preventDefault();
+                  fetchUserBalances();
+                }}
+              >
+                refresh
+              </PrimaryButton>
             </div>
-            {!formik.values.isFree && (
-              <div className="flex w-full justify-center">
-                <PrimaryButton
-                  onClick={(e) => {
-                    e.preventDefault();
-                    fetchUserBalances();
-                  }}
-                >
-                  refresh
-                </PrimaryButton>
-              </div>
-            )}
             {isFetching && (
               <div className="flex flex-col items-center justify-center w-full py-16">
                 <Spinner />
               </div>
             )}
-            {formik.values.costs?.length > 0 && !isFetching && (
+            {formik.values.rewards?.length > 0 && !isFetching && (
               <>
-                <div className="text-xl mt-8 mb-4">Select Costs</div>
+                <div className="text-xl mt-8 mb-4">Select Rewards</div>
 
                 <div
                   className={classNames([
-                    "flex flex-col items-center justify-center w-full transition-all duration-500",
-                    formik.values.isFree
-                      ? "max-h-[0px] overflow-hidden"
-                      : "max-h-[600px] overflow-y-auto",
+                    "flex flex-col items-center justify-center w-full overflow-hidden transition-all duration-500",
                   ])}
                 >
                   <FormikProvider value={formik}>
                     <FieldArray
-                      name="costs"
-                      render={({ insert, remove, push, replace }) => (
+                      name="rewards"
+                      render={({ replace }) => (
                         <>
-                          {formik.values.costs.map((cost, index) => (
+                          {formik.values.rewards.map((reward, index) => (
                             <div
                               onClick={() => {
                                 replace(index, {
-                                  mint: cost.mint,
-                                  decimals: cost.decimals,
-                                  amount: cost.amount,
-                                  costAmount: cost.costAmount,
-                                  isSelected: !cost.isSelected,
+                                  mint: reward.mint,
+                                  decimals: reward.decimals,
+                                  amount: reward.amount,
+                                  rewardAmount: reward.rewardAmount,
+                                  isSelected: !reward.isSelected,
+                                  payoutChance: reward.payoutChance,
                                 });
                               }}
                               className={classNames(
                                 "p-4 px-6 border-2 rounded-lg my-2 cursor-pointer w-full",
-                                cost.isSelected
+                                reward.isSelected
                                   ? "border-sky-300"
                                   : "border-gray-600"
                               )}
@@ -265,7 +260,7 @@ export const DispenserCostForm = ({
                             >
                               <div className="flex justify-between items-center">
                                 <div className="text-xl">
-                                  {getAbbreviatedAddress(cost.mint)}
+                                  {getAbbreviatedAddress(reward.mint)}
                                 </div>
                                 <div>
                                   <div className="text-xs uppercase text-right">
@@ -273,14 +268,14 @@ export const DispenserCostForm = ({
                                   </div>
                                   <div className="text-xl text-right">
                                     {getAmountWithDecimals(
-                                      cost.amount,
-                                      cost.decimals
+                                      reward.amount,
+                                      reward.decimals
                                     )}
                                   </div>
                                 </div>
                               </div>
 
-                              {cost.isSelected && (
+                              {reward.isSelected && (
                                 <div
                                   className="flex flex-col items-center w-full"
                                   onClick={(e) => {
@@ -288,30 +283,46 @@ export const DispenserCostForm = ({
                                   }}
                                 >
                                   <Divider />
-                                  <div className="flex flex-col w-full items-end">
+                                  <div className="flex flex-col w-full items-end mb-6">
                                     <Field
-                                      name={`costs.${index}.mint`}
-                                      value={cost.mint}
+                                      name={`rewards.${index}.mint`}
+                                      value={reward.mint}
                                       className="text-gray-800"
                                       hidden
                                     />
                                     <div className="flex w-full items-center justify-between mb-2">
                                       <div className="text-sm uppercase">
-                                        cost amount
+                                        reward amount
                                       </div>
                                       <Field
-                                        name={`costs.${index}.costAmount`}
-                                        max={cost.amount}
+                                        name={`rewards.${index}.rewardAmount`}
+                                        className="text-gray-800 bg-gray-100 p-2 rounded max-w-[100px]"
+                                        // TODO: will need to check amount - cost amount already allocated
+                                        max={reward.amount}
                                         min={0}
                                         type="number"
-                                        className="text-gray-800 bg-gray-100 p-2 rounded max-w-[100px]"
-                                        onClick={(e: any) => {
-                                          e.stopPropagation();
-                                        }}
                                       />
                                     </div>
                                     <div className="text-gray-300 text-xs">
                                       The amount of this token a user must pay
+                                    </div>
+                                  </div>
+                                  <div className="flex flex-col w-full items-end">
+                                    <div className="flex w-full items-center justify-between mb-2">
+                                      <div className="text-sm uppercase">
+                                        payout chance in percent
+                                      </div>
+                                      <Field
+                                        name={`rewards.${index}.payoutChance`}
+                                        className="text-gray-800 bg-gray-100 p-2 rounded max-w-[100px]"
+                                        max={100}
+                                        min={0}
+                                        type="number"
+                                      />
+                                    </div>
+                                    <div className="text-gray-300 text-xs">
+                                      The chance a user will receive this token
+                                      upoon claiming
                                     </div>
                                   </div>
                                 </div>
@@ -323,6 +334,27 @@ export const DispenserCostForm = ({
                     />
                   </FormikProvider>
                 </div>
+                <div className="flex flex-col w-full items-center uppercase mb-5 mt-8">
+                  <div className="text-sm mb-2">payout chance total</div>
+                  <div
+                    className={classNames([
+                      "text-4xl",
+                      formik.values.rewards.reduce(
+                        (acc, curr) => acc + curr.payoutChance,
+                        0
+                      ) !== 100
+                        ? "text-red-600"
+                        : "text-green-300",
+                    ])}
+                  >
+                    {" "}
+                    {formik.values.rewards.reduce(
+                      (acc, curr) => acc + curr.payoutChance,
+                      0
+                    )}{" "}
+                    %
+                  </div>
+                </div>
               </>
             )}
             <SubmitButton
@@ -331,11 +363,15 @@ export const DispenserCostForm = ({
               buttonText="Continue"
               className="mt-4"
               disabled={
-                !formik.values.isFree &&
-                formik.values.costs.every(
-                  ({ costAmount, isSelected }) =>
-                    costAmount == 0 || !costAmount || !isSelected
-                )
+                formik.values.rewards.every(
+                  ({ rewardAmount, isSelected }) =>
+                    rewardAmount == 0 || !rewardAmount || !isSelected
+                ) ||
+                // also check that all payoutChances add up to 100
+                formik.values.rewards.reduce(
+                  (acc, curr) => acc + curr.payoutChance,
+                  0
+                ) !== 100
               }
             />
           </div>

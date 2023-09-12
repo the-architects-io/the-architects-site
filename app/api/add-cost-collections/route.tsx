@@ -1,10 +1,8 @@
 import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { ADD_ITEM_COLLECTION } from "@/graphql/mutations/add-item-collection";
 import {
   CostCollection,
-  ItemCollection,
   NoopResponse,
   RewardCollection,
 } from "@/app/blueprint/types";
@@ -18,7 +16,7 @@ type Data =
       error: unknown;
     };
 
-type CostCollectionArg = {
+type CostCollectionArgs = {
   name: string;
   dispenserId: string;
   itemCollectionId: string;
@@ -50,7 +48,7 @@ export async function POST(req: NextRequest) {
     });
 
     const costCollectionsToInsert = costCollections.filter(
-      (costCollection: CostCollectionArg) =>
+      (costCollection: CostCollectionArgs) =>
         !costCollectionsInDb.find(
           (costCollectionInDb) =>
             costCollectionInDb.itemCollection.item.id === costCollection.itemId
@@ -65,7 +63,7 @@ export async function POST(req: NextRequest) {
       ),
     });
 
-    costCollectionsToInsert.forEach((costCollection: CostCollectionArg) => {
+    costCollectionsToInsert.forEach((costCollection: CostCollectionArgs) => {
       delete costCollection.itemId;
     });
 
