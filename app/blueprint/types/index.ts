@@ -168,6 +168,7 @@ export type Character = {
 export type NoopResponse = {
   noop: true;
   endpoint: string;
+  returning?: unknown;
 };
 
 export type Wallet = {

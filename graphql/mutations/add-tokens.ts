@@ -9,6 +9,7 @@ export const ADD_TOKENS = gql`
         decimals
         name
         mintAddress
+        imageUrl
       }
     }
   }

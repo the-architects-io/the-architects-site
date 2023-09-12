@@ -6,7 +6,7 @@ import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { Field, FieldArray, useFormik, FormikProvider, Formik } from "formik";
 import showToast from "@/features/toasts/show-toast";
 import SharedHead from "@/features/UI/head";
-import { TokenBalance } from "@/app/blueprint/types";
+import { Token, TokenBalance } from "@/app/blueprint/types";
 import { useCallback, useEffect, useState } from "react";
 import { BASE_URL } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
@@ -42,24 +42,37 @@ export const DispenserCostForm = ({
       isFree: false,
     },
     onSubmit: async (values) => {
-      // try {
-      //   // add tokens -> items -> cost collection
-      //   await axios.post("/api/add-items", {
-      //     name: getAbbreviatedAddress(dispenser?.rewardWalletAddress || ""),
-      //     imageUrl: "",
-      //     description: "",
-      //     isConsumable: false,
-      //     isCraftable: false,
-      //     categoryId: "",
-      //   });
-      //   showToast({
-      //     primaryMessage: "Cost added",
-      //   });
-      // } catch (error) {
-      //   showToast({
-      //     primaryMessage: "Error adding cost",
-      //   });
-      // }
+      let allTokens: Token[] = [];
+      try {
+        const { data }: { data: { allTokens: Token[]; addedTokens: Token[] } } =
+          await axios.post("/api/add-tokens", {
+            mintAddresses: values.costs.map((cost) => cost.mint),
+          });
+
+        allTokens = data?.allTokens;
+        console.log(data?.allTokens);
+      } catch (error) {
+        console.log({ error });
+      }
+      try {
+        await axios.post("/api/add-items", {
+          items: allTokens.map((token) => ({
+            name: token.name,
+            imageUrl: token?.imageUrl,
+            token: {
+              mintAddress: token.mintAddress,
+              id: token.id,
+            },
+          })),
+        });
+        showToast({
+          primaryMessage: "Cost added",
+        });
+      } catch (error) {
+        showToast({
+          primaryMessage: "Error adding cost",
+        });
+      }
     },
   });
 

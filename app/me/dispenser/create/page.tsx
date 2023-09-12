@@ -6,8 +6,11 @@ import { DispenserCostForm } from "@/features/dispensers/dispenser-cost-form";
 import { useState } from "react";
 
 export default function DashboardPage() {
-  const [step, setStep] = useState(0);
-  const [dispenserId, setDispenserId] = useState<string | null>(null);
+  const [step, setStep] = useState(1);
+  // const [dispenserId, setDispenserId] = useState<string | null>(null);
+  const [dispenserId, setDispenserId] = useState<string | null>(
+    "d46426df-c095-4787-ac8a-14700b0bfde0"
+  );
 
   return (
     <ContentWrapper>

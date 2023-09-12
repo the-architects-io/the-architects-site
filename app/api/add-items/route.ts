@@ -5,6 +5,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { Item, NoopResponse } from "@/app/blueprint/types";
 import { ADD_ITEMS } from "@/graphql/mutations/add-items";
+import { GET_ITEMS_BY_IDS } from "@/graphql/queries/get-items-by-ids";
+import { GET_ITEMS_BY_TOKEN_MINT_ADDRESSES } from "@/graphql/queries/get-items-by-token-mint-addresses";
 
 type Data =
   | Item[]
@@ -13,8 +15,24 @@ type Data =
       error: unknown;
     };
 
+type ItemArg = {
+  name: string;
+  imageUrl: string;
+  tokenId: string;
+  token: {
+    mintAddress: string;
+    id: string;
+  };
+};
+
 export async function POST(req: NextRequest) {
-  const { items, noop } = await req.json();
+  const {
+    items,
+    noop,
+  }: {
+    items: ItemArg[];
+    noop: boolean;
+  } = await req.json();
 
   if (noop)
     return NextResponse.json({
@@ -27,18 +45,70 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Required fields not set", status: 500 });
   }
 
+  let itemsInDb: Item[] = [];
+
+  console.log({
+    items,
+    tokens: items.map((item: ItemArg) => item.token),
+  });
+
   try {
-    const { insert_items: addedItems }: { insert_items: Item[] } =
+    const { items: itemsInDbResponse }: { items: Item[] } =
       await client.request({
-        document: ADD_ITEMS,
+        document: GET_ITEMS_BY_TOKEN_MINT_ADDRESSES,
         variables: {
-          items,
+          mintAddresses: items.map((item: ItemArg) => item.token.mintAddress),
         },
       });
 
-    console.log("addedItems: ", addedItems);
+    itemsInDb = itemsInDbResponse;
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error }, { status: 500 });
+  }
 
-    return NextResponse.json(addedItems, { status: 200 });
+  const itemsToAdd = items.filter(
+    (item: ItemArg) =>
+      !itemsInDb.find(
+        (itemInDb: Item) =>
+          itemInDb.token.mintAddress === item.token.mintAddress
+      )
+  );
+
+  console.log({
+    items,
+    itemsToAdd,
+    itemsInDb,
+  });
+
+  if (!itemsToAdd.length) {
+    return NextResponse.json(
+      {
+        addedItems: [],
+        allItems: [...itemsInDb],
+      },
+      { status: 200 }
+    );
+  }
+
+  try {
+    const {
+      insert_items: addedItems,
+    }: { insert_items: { returning: Item[]; affected_rows: number } } =
+      await client.request({
+        document: ADD_ITEMS,
+        variables: {
+          items: itemsToAdd,
+        },
+      });
+
+    return NextResponse.json(
+      {
+        addedItems: addedItems?.returning,
+        allItems: [...itemsInDb, ...addedItems?.returning],
+      } || [],
+      { status: 200 }
+    );
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });
