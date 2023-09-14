@@ -4,7 +4,7 @@ import { PublicKey } from "@solana/web3.js";
 import { useCallback, useEffect, useState } from "react";
 
 const useCostBalance = (
-  cost: DispenserCost | null,
+  cost: DispenserCost[] | null,
   walletAddress: PublicKey | string | null
 ) => {
   const [balance, setBalance] = useState<number | null>(null);
@@ -31,10 +31,11 @@ const useCostBalance = (
 
   useEffect(() => {
     if (hasBeenFetched) return;
-    if (!walletAddress || !cost?.token) return;
-    const mintAddress = cost?.token?.mintAddress;
+    const token = cost?.[0]?.token;
+    if (!walletAddress || !token) return;
+    const mintAddress = token?.mintAddress;
     getCostBalance(mintAddress, walletAddress);
-  }, [cost?.token, getCostBalance, hasBeenFetched, walletAddress]);
+  }, [cost, getCostBalance, hasBeenFetched, walletAddress]);
 
   return {
     balance,

@@ -15,6 +15,13 @@ export const getAmountWithDecimals = (
   return value;
 };
 
+export const getAmountWithoutDecimals = (
+  amount: string | number,
+  decimals: number
+) => {
+  return getRawAmount(amount, decimals);
+};
+
 export const getBuildAmountRaw = (amount: string | number) => {
   return getRawAmount(amount, 2);
 };

@@ -7,6 +7,7 @@ import { PublicKey } from "@metaplex-foundation/js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { AnchorWallet } from "@solana/wallet-adapter-react";
 
+// TODO: Move to endpoint
 const AUTHORITY_SEED = process.env.NEXT_PUBLIC_AUTHORITY_SEED || "";
 
 export const createOnChainDispenser = async (

@@ -79,7 +79,7 @@ export const DispenserControlPanel = ({
                         </a>
                       </div>
                       <PrimaryButton className="mb-4" onClick={() => {}}>
-                        <Link href={`/lab/on-chain-tx?id=${dispenser.id}`}>
+                        <Link href={`/lab/dispenser?id=${dispenser.id}`}>
                           Test
                         </Link>
                       </PrimaryButton>

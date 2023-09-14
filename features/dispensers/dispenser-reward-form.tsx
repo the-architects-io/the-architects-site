@@ -44,6 +44,7 @@ export const DispenserRewardForm = ({
   const { dispenser, isLoading } = useDispenser(dispenserId);
   const [isFetching, setIsFetching] = useState(false);
   const [tokens, setTokens] = useState<TokenBalance[]>([]);
+  const [hasBeenFetched, setHasBeenFetched] = useState(false);
   const router = useRouter();
 
   const formik = useFormik({
@@ -181,8 +182,9 @@ export const DispenserRewardForm = ({
   }, [formik, dispenser?.rewardWalletAddress]);
 
   useEffect(() => {
-    if (!tokens.length && !isFetching) fetchUserBalances();
-  }, [tokens, isFetching, fetchUserBalances]);
+    if (!tokens.length && !isFetching && !hasBeenFetched) fetchUserBalances();
+    setHasBeenFetched(true);
+  }, [tokens, isFetching, fetchUserBalances, hasBeenFetched]);
 
   if (!dispenser?.id || isLoading)
     return (

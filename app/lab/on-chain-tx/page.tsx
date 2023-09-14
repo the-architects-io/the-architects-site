@@ -11,16 +11,18 @@ import { useUserData } from "@nhost/nextjs";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { useState } from "react";
 import { createHash } from "@/utils/hashing";
-import {
-  createAssociatedTokenAccountInstruction,
-  getAssociatedTokenAddress,
-} from "@solana/spl-token";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import { useSearchParams } from "next/navigation";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { useFormik } from "formik";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { getAbbreviatedAddress } from "@/utils/formatting";
+import axios from "axios";
+import {
+  createAssociatedTokenAccountInstruction,
+  getAssociatedTokenAddress,
+  getAssociatedTokenAddressSync,
+} from "@solana/spl-token";
 
 export enum TokenType {
   SPL,
@@ -96,12 +98,7 @@ export default function Page({ params }: { params: any }) {
   };
 
   const handleCreateSplTransaction = async () => {
-    if (
-      !DISPENSER_PROGRAM_ID ||
-      !dispenser ||
-      !anchorWallet ||
-      !anchorWallet?.signTransaction
-    )
+    if (!DISPENSER_PROGRAM_ID || !dispenser?.id || !anchorWallet)
       throw new Error("Missing required data.");
 
     const provider = getProvider();
@@ -122,7 +119,7 @@ export default function Page({ params }: { params: any }) {
     const recipient = new PublicKey(formik.values.walletAddress);
     const mint = new PublicKey("C6XSdTg4eQUUtqyCVTBeW7HooJjTjTo2VpAFnKqzLTTx");
 
-    const fromTokenAccount = await getAssociatedTokenAddress(
+    const fromTokenAccount = await getAssociatedTokenAddressSync(
       mint,
       dispenserPda,
       true
@@ -168,7 +165,7 @@ export default function Page({ params }: { params: any }) {
   const handleCreateSolTransaction = async () => {
     if (
       !DISPENSER_PROGRAM_ID ||
-      !dispenser ||
+      !dispenser?.id ||
       !anchorWallet ||
       !anchorWallet?.signTransaction
     )
@@ -212,11 +209,11 @@ export default function Page({ params }: { params: any }) {
       {!isLoading && dispenser && (
         <Panel className="flex flex-col items-center">
           <ImageWithFallback
-            src={dispenser.imageUrl}
+            src={dispenser.imageUrl || ""}
             height={120}
             width={120}
             className="w-36 mb-8"
-            alt={dispenser.name}
+            alt={dispenser.name || "Dispenser image"}
           />
           <p className="text-center text-3xl mb-4">{dispenser.name} </p>
           <p className="text-center text-xl mb-4">{dispenser.description}</p>

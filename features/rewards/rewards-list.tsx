@@ -9,6 +9,7 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 
 import { getAmountWithDecimals } from "@/utils/currency";
 import { HeliusToken } from "@/app/blueprint/types";
+import Spinner from "@/features/UI/spinner";
 
 export const RewardsList = ({
   dispenserId,
@@ -58,79 +59,94 @@ export const RewardsList = ({
   return (
     <div className={classNames([className, "w-full"])}>
       <div className="flex w-full flex-1 justify-between rounded-lg p-2 my-2 text-lg uppercase">
-        <div>Reward</div>
-        <div>Chance</div>
+        <div className="w-3/5">Reward</div>
+        <div className="w-1/5 text-left">AMT</div>
+        <div className="w-1/5 text-right">Chance</div>
       </div>
-      {!!rewards &&
-        rewards.map(
-          ({
-            isFreezeOnDelivery,
-            token,
-            id,
-            childRewards,
-            payoutChance,
-            name,
-          }) => (
-            <Fragment key={id}>
-              <div className="flex flex-wrap w-full flex-1 justify-between rounded-lg p-2">
-                {!!name && (
-                  <>
-                    <div className="w-full flex justify-between lg:w-2/5 font-bold mb-2">
-                      <div className="flex flex-col">
-                        <div className="mb-2 flex w-1/2">
-                          <div className="overflow-hidden rounded-lg">
-                            {name}{" "}
+      <div className="flex">
+        {!!rewards &&
+          rewards.map(
+            ({
+              isFreezeOnDelivery,
+              token,
+              id,
+              childRewards,
+              payoutChance,
+              amount,
+              name,
+            }) => (
+              <Fragment key={id}>
+                <div className="flex flex-wrap w-full flex-1 justify-between rounded-lg p-2">
+                  {!!name && (
+                    <>
+                      <div className="w-full flex justify-between lg:w-2/5 font-bold mb-2">
+                        <div className="flex flex-col">
+                          <div className="mb-2 flex w-1/2">
+                            <div className="overflow-hidden rounded-lg">
+                              {name}{" "}
+                            </div>
+                            {isFreezeOnDelivery && (
+                              <Image
+                                className="bg-sky-300 rounded-lg ml-4"
+                                src="/images/ice.png"
+                                width={24}
+                                height={20}
+                                alt="ice"
+                              />
+                            )}
                           </div>
-                          {isFreezeOnDelivery && (
-                            <Image
-                              className="bg-sky-300 rounded-lg ml-4"
-                              src="/images/ice.png"
-                              width={24}
-                              height={20}
-                              alt="ice"
-                            />
+                          {!!token?.mintAddress && (
+                            <div className="flex">
+                              <div className="mr-2">Stock: </div>
+                              {isFetchingTokenBalances ? (
+                                <Spinner />
+                              ) : (
+                                getItemBalance(token)
+                              )}
+                            </div>
                           )}
                         </div>
-                        {/* {JSON.stringify(token)} */}
-                        {!!token?.mintAddress && (
-                          <div>Stock: {getItemBalance(token)}</div>
-                        )}
+                        <div className="lg:hidden">
+                          {!!payoutChance && round(payoutChance * 100, 2)}%
+                        </div>
                       </div>
-                      <div className="lg:hidden">
-                        {!!payoutChance && round(payoutChance * 100, 2)}%
-                      </div>
-                    </div>
-                    <div className="flex flex-col justify-end w-full lg:w-2/5 flex-wrap">
-                      {!!childRewards &&
-                        childRewards.map(({ id, token }) => (
-                          <>
-                            {!!id && (
-                              <div
-                                key={id}
-                                className="mb-2 rounded-lg lg:text-right"
-                              >
-                                {!!token?.mintAddress && (
-                                  <div>
-                                    {name.replace("1", "")}
-                                    <div className="text-sky-500">
-                                      {getItemBalance(token)}x Remaining
+                      {/* <div className="flex flex-col justify-end w-full lg:w-2/5 flex-wrap">
+                        {!!childRewards &&
+                          childRewards.map(({ id, token }) => (
+                            <>
+                              {!!id && (
+                                <div
+                                  key={id}
+                                  className="mb-2 rounded-lg lg:text-right"
+                                >
+                                  {!!token?.mintAddress && (
+                                    <div>
+                                      {name.replace("1", "")}
+                                      <div className="text-sky-500">
+                                        {getItemBalance(token)}x Remaining
+                                      </div>
                                     </div>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </>
-                        ))}
-                    </div>
-                    <div className="w-full hidden lg:w-1/5 lg:flex justify-end order-1">
-                      {!!payoutChance && round(payoutChance * 100, 2)}%
-                    </div>
-                  </>
-                )}
-              </div>
-            </Fragment>
-          )
-        )}
+                                  )}
+                                </div>
+                              )}
+                            </>
+                          ))}
+                      </div> */}
+                      <div className="w-full hidden lg:w-1/5 lg:flex justify-end order-1 text-right">
+                        <div>{amount}</div>
+                      </div>
+                      <div className="w-full hidden lg:w-1/5 lg:flex justify-end order-1">
+                        <div>
+                          {!!payoutChance && round(payoutChance * 100, 2)}%
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </Fragment>
+            )
+          )}
+      </div>
     </div>
   );
 };

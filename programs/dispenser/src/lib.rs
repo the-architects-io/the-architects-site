@@ -22,8 +22,6 @@ pub struct DispenserAccount {
 pub enum DispenserErrorCode {
     #[msg("The account is uninitialized.")]
     UninitializedAccount,
-    #[msg("Insufficient funds in the account.")]
-    InsufficientFunds,
     #[msg("Invalid instruction provided.")]
     InvalidInstruction,
     #[msg("Program derived address mismatch.")]
@@ -49,7 +47,7 @@ pub enum DispenserErrorCode {
 pub struct CreateDispenser<'info> {
     #[account(
         seeds = [seed.as_slice(), authority_seed.as_slice()],
-        bump, init, payer = user, space = 8 + 40,
+        bump, init, payer = user, space = 9,
         owner = ID
     )]
     pub dispenser_account: Account<'info, DispenserAccount>,
@@ -87,7 +85,7 @@ pub struct DispenseTokens<'info> {
     /// CHECK: The SPL token program is required to create the account.
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
-    pub global_state: Account<'info, GlobalState>,
+    // pub global_state: Account<'info, GlobalState>,
 }
 
 #[derive(Accounts)]
@@ -105,34 +103,34 @@ pub struct DispenseSol<'info> {
     /// CHECK: The system program is required to create the account.
     #[account(address = system_program_id)]
     pub system_program: AccountInfo<'info>,
-    pub global_state: Account<'info, GlobalState>,
+    // pub global_state: Account<'info, GlobalState>,
 }
 
-#[account]
-pub struct GlobalState {
-    paused: bool,
-    owner: Pubkey,
-}
+// #[account]
+// pub struct GlobalState {
+//     paused: bool,
+//     owner: Pubkey,
+// }
 
-#[derive(Accounts)]
-pub struct PauseContract<'info> {
-    #[account(
-        mut,
-        constraint = global_state.owner == *owner.key
-    )]
-    pub global_state: Account<'info, GlobalState>,
-    pub owner: Signer<'info>,
-}
+// #[derive(Accounts)]
+// pub struct PauseContract<'info> {
+//     #[account(
+//         mut,
+//         constraint = global_state.owner == *owner.key
+//     )]
+//     pub global_state: Account<'info, GlobalState>,
+//     pub owner: Signer<'info>,
+// }
 
-#[derive(Accounts)]
-pub struct UnpauseContract<'info> {
-    #[account(
-        mut,
-        constraint = contract_state.owner == *owner.key
-    )]
-    pub contract_state: Account<'info, GlobalState>,
-    pub owner: Signer<'info>,
-}
+// #[derive(Accounts)]
+// pub struct UnpauseContract<'info> {
+//     #[account(
+//         mut,
+//         constraint = global_state.owner == *owner.key
+//     )]
+//     pub global_state: Account<'info, GlobalState>,
+//     pub owner: Signer<'info>,
+// }
 
 #[program]
 pub mod dispenser {
@@ -160,9 +158,9 @@ pub mod dispenser {
         bump: u8,
         amount: u64,
     ) -> Result<()> {
-        if ctx.accounts.global_state.paused {
-            return Err(DispenserErrorCode::Paused.into());
-        }
+        // if ctx.accounts.global_state.paused {
+        //     return Err(DispenserErrorCode::Paused.into());
+        // }
 
         if amount == 0 {
             return Err(DispenserErrorCode::InvalidAmount.into());
@@ -175,10 +173,6 @@ pub mod dispenser {
 
         if *ctx.accounts.dispenser_pda.key != calculated_pda {
             return Err(DispenserErrorCode::PdaMismatch.into());
-        }
-
-        if ctx.accounts.sender.lamports() < amount {
-            return Err(DispenserErrorCode::InsufficientFunds.into());
         }
 
         let cpi_accounts = token::Transfer {
@@ -206,9 +200,9 @@ pub mod dispenser {
         bump: u8,
         amount: u64,
     ) -> Result<()> {
-        if ctx.accounts.global_state.paused {
-            return Err(DispenserErrorCode::Paused.into());
-        }
+        // if ctx.accounts.global_state.paused {
+        //     return Err(DispenserErrorCode::Paused.into());
+        // }
 
         if amount == 0 {
             return Err(DispenserErrorCode::InvalidAmount.into());
@@ -237,21 +231,21 @@ pub mod dispenser {
         Ok(())
     }
 
-    pub fn pause_contract(ctx: Context<PauseContract>) -> Result<()> {
-        let global_state = &mut ctx.accounts.global_state;
-        if global_state.paused {
-            return Err(DispenserErrorCode::AlreadyPaused.into());
-        }
-        global_state.paused = true;
-        Ok(())
-    }
+    // pub fn pause_contract(ctx: Context<PauseContract>) -> Result<()> {
+    //     let global_state = &mut ctx.accounts.global_state;
+    //     if global_state.paused {
+    //         return Err(DispenserErrorCode::AlreadyPaused.into());
+    //     }
+    //     global_state.paused = true;
+    //     Ok(())
+    // }
 
-    pub fn unpause_contract(ctx: Context<PauseContract>) -> Result<()> {
-        let global_state = &mut ctx.accounts.global_state;
-        if !global_state.paused {
-            return Err(DispenserErrorCode::AlreadyPaused.into());
-        }
-        global_state.paused = false;
-        Ok(())
-    }
+    // pub fn unpause_contract(ctx: Context<PauseContract>) -> Result<()> {
+    //     let global_state = &mut ctx.accounts.global_state;
+    //     if !global_state.paused {
+    //         return Err(DispenserErrorCode::AlreadyPaused.into());
+    //     }
+    //     global_state.paused = false;
+    //     Ok(())
+    // }
 }

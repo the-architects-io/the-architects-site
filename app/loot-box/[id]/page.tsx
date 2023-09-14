@@ -13,9 +13,9 @@ import showToast from "@/features/toasts/show-toast";
 
 export default function LootBoxPage({ params }: { params: any }) {
   const { publicKey } = useWallet();
-  const { name, cost, id, imageUrl, rewards, claimReward, isClaiming } =
+  const { name, costs, id, imageUrl, rewards, claimReward, isClaiming } =
     useDispenser(params.id);
-  const { balance, isLoading } = useCostBalance(cost, publicKey);
+  const { balance, isLoading } = useCostBalance(costs, publicKey);
   const { rewardsWithBalances, isLoading: isLoadingBalances } =
     useRewards(rewards);
 

@@ -16,6 +16,7 @@ import { mapRewards } from "@/app/blueprint/utils/mappers/rewards";
 import { useQuery } from "@apollo/client";
 import axios from "axios";
 import { useState } from "react";
+import { BASE_URL } from "@/constants/constants";
 
 export type ClaimRewardResponse = {
   txAddress?: string;
@@ -42,7 +43,7 @@ const useDispenser = (dispenserId?: string) => {
   const { loading, error, refetch } = useQuery(GET_DISPENSER_BY_ID, {
     variables: { id: dispenserId },
     skip: !dispenserId,
-    // fetchPolicy: "network-only",
+    fetchPolicy: "network-only",
     onCompleted: ({
       dispensers_by_pk: dispenser,
     }: {
@@ -104,6 +105,7 @@ const useDispenser = (dispenserId?: string) => {
       gates: null,
       restrictions: null,
       claimReward: () => Promise.reject("No dispenser"),
+      fetchRewardTokenBalances: () => Promise.reject("No dispenser"),
     };
 
   const { imageUrl, description, id, isEnabled, name, collectionWallet } =
@@ -126,6 +128,18 @@ const useDispenser = (dispenserId?: string) => {
     restrictions,
     claimReward,
     isClaiming,
+    fetchRewardTokenBalances: async () => {
+      if (!collectionWallet?.address) return;
+
+      const { data } = await axios.post(
+        `${BASE_URL}/api/get-token-balances-from-helius`,
+        {
+          walletAddress: dispenser.rewardWalletAddress,
+        }
+      );
+
+      return data;
+    },
   };
 };
 
