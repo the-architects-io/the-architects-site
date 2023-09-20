@@ -21,9 +21,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const Navbar = dynamic(() => import("@/features/navigation/navbar"), {
-    ssr: false,
-  });
+  const Navbar: React.ComponentType<any> = dynamic(
+    () => import("@/features/navigation/navbar"),
+    {
+      ssr: false,
+    }
+  );
   return (
     <html lang="en">
       <body className={classNames([inter.className, "relative"])}>

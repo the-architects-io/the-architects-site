@@ -1,8 +1,9 @@
 "use client";
 import NavbarItems from "@/features/navigation/navbar-items";
 import { usePathname } from "next/navigation";
+import React from "react";
 
-export const Navbar = () => {
+export const Navbar: React.FC = () => {
   const pathname = usePathname();
 
   return (
