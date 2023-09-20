@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import classNames from "classnames";
 import Toaster from "@/features/toasts/toaster";
 import { DebugModeProvider } from "@/hooks/debug-mode";
+import Navbar from "@/features/navigation/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,13 +22,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const DynamicNavbar = dynamic(() => import("@/features/navigation/navbar"), {
-    ssr: false,
-  });
-
-  const NavbarWrapper: React.FC = () => {
-    return <DynamicNavbar />;
-  };
   return (
     <html lang="en">
       <body className={classNames([inter.className, "relative"])}>
@@ -36,7 +30,7 @@ export default function RootLayout({
             <SidebarProvider>
               <AdminProvider>
                 {children}
-                <NavbarWrapper />
+                <Navbar />
                 <Toaster />
                 {/* <Sidebar /> */}
               </AdminProvider>
