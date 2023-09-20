@@ -4,7 +4,6 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import { useEffect, useState } from "react";
 import PortalsSdk from "@/utils/portals-sdk-v2";
-import { BadgeClaim } from "@/features/in-portals/badge-claim";
 import { usePathname, useSearchParams } from "next/navigation";
 import { ENV } from "@/constants/constants";
 import { DispenserClaim } from "@/features/in-portals/dispenser-claim";

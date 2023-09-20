@@ -14,6 +14,8 @@ export function getUmiClient() {
       .use(
         nftStorageUploader({
           token: process.env.NFT_STORAGE_API_KEY || "",
+          // gatewayHost: "https://cf-ipfs.com",
+          gatewayHost: "https://dweb.link",
         })
       )
       .use(mplToolbox())

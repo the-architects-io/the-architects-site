@@ -1,42 +1,28 @@
 import { parse, stringify } from "lossless-json";
-import { TokenType } from "@/app/blueprint/types";
 import { RPC_ENDPOINT } from "@/constants/constants";
 import { getUmiClient } from "@/utils/umi";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
+import { fetchDigitalAsset } from "@metaplex-foundation/mpl-token-metadata";
 import {
-  createFungible,
-  createFungibleAsset,
-  createNft,
-  fetchDigitalAsset,
-} from "@metaplex-foundation/mpl-token-metadata";
-import {
-  createGenericFileFromJson,
-  createNoopSigner,
-  createSignerFromKeypair,
-  generateSigner,
-  generatedSignerPayer,
-  isKeypairSigner,
-  isSigner,
-  percentAmount,
+  createGenericFile,
+  createGenericFileFromBrowserFile,
   publicKey,
-  signerIdentity,
-  signerPayer,
 } from "@metaplex-foundation/umi";
 import { Connection, Keypair } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
-import axios from "axios";
 
 export async function POST(req: NextRequest) {
-  const {
-    noop,
-    image,
-    description,
-    name,
-    sellerFeeBasisPoints = 8.0,
-    tokenType = TokenType.NFT,
-  } = await req.json();
+  console.log("sanity check");
+  const res = await req.formData();
+  const description = res.get("description") as string;
+  const name = res.get("name") as string;
+  const sellerFeeBasisPoints = res.get("sellerFeeBasisPoints") as string;
+  const noop = res.get("noop");
+  const imageFile = res.get("imageFile") as File;
+
+  console.log({ name, imageFile });
 
   if (noop)
     return NextResponse.json(
@@ -47,7 +33,12 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
 
-  if (!description || !name || !process.env.EXECUTION_WALLET_PRIVATE_KEY) {
+  if (
+    !description ||
+    !name ||
+    !process.env.EXECUTION_WALLET_PRIVATE_KEY ||
+    !imageFile
+  ) {
     return NextResponse.json(
       { error: "Required fields not set" },
       { status: 500 }
@@ -83,17 +74,19 @@ export async function POST(req: NextRequest) {
     const wallet = new NodeWallet(keypair);
     metaplex.use(keypairIdentity(keypair));
 
-    // console.log({ data });
+    console.log({ imageFile });
 
-    // const image = data;
+    const genericImageFile = await createGenericFileFromBrowserFile(imageFile);
+
+    const [imageUri] = await umi.uploader.upload([genericImageFile]);
+
+    console.log({ imageUri });
 
     const uri = await umi.uploader.uploadJson({
       name,
       description,
-      image:
-        image ||
-        "https://the-architects.io/_next/image?url=%2Fimages%2Farchitects-logo.webp&w=640&q=75",
-      seller_fee_basis_points: sellerFeeBasisPoints * 100,
+      image: imageUri,
+      seller_fee_basis_points: Number(sellerFeeBasisPoints) * 100,
     });
     console.log({ uri });
     if (!uri || uri.length === 0) {
@@ -127,7 +120,6 @@ export async function POST(req: NextRequest) {
       console.log({ error });
     }
 
-    // console.log(JSON.stringify({ signature, result }, null, 2));
     console.log({ asset });
 
     return NextResponse.json(
