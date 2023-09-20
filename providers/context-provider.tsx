@@ -15,9 +15,7 @@ import {
 } from "@solana/wallet-adapter-react";
 import { WalletModalProvider as ReactUIWalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import {
-  GlowWalletAdapter,
   PhantomWalletAdapter,
-  SlopeWalletAdapter,
   SolflareWalletAdapter,
   TorusWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
@@ -91,8 +89,6 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
-      new GlowWalletAdapter(),
-      new SlopeWalletAdapter(),
       new SolflareWalletAdapter({ network }),
       new TorusWalletAdapter(),
     ],
