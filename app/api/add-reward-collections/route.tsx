@@ -52,14 +52,6 @@ export async function POST(req: NextRequest) {
         )
     );
 
-    console.log({
-      rewardCollectionsToInsert,
-      rewardCollectionsInDb,
-      rewardCollectionsInDbItemCollectionItems: rewardCollectionsInDb.map(
-        (rewardCollectionInDb) => rewardCollectionInDb.itemCollection.item
-      ),
-    });
-
     rewardCollectionsToInsert.forEach(
       (rewardCollection: RewardCollectionArgs) => {
         delete rewardCollection.itemId;

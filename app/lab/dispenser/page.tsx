@@ -7,28 +7,15 @@ import { Panel } from "@/features/UI/panel";
 import { useUserData } from "@nhost/nextjs";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useState } from "react";
-import { createHash } from "@/utils/hashing";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import { useSearchParams } from "next/navigation";
-import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
-import { useFormik } from "formik";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
-import { getAbbreviatedAddress } from "@/utils/formatting";
 import axios from "axios";
 import WalletButton from "@/features/UI/buttons/wallet-button";
 import { RewardsList } from "@/features/rewards/rewards-list";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
-import {
-  getAmountWithDecimals,
-  getAmountWithoutDecimals,
-} from "@/utils/currency";
-
-export enum TokenType {
-  SPL,
-  NFT,
-  SFT,
-}
+import { getAmountWithoutDecimals } from "@/utils/currency";
 
 export default function Page({ params }: { params: any }) {
   const user = useUserData();

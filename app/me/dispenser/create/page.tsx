@@ -33,10 +33,10 @@ export default function DashboardPage() {
         {step === 0 && (
           <AddDispenserForm setDispenserId={setDispenserId} setStep={setStep} />
         )}
-        {step === 1 && dispenserId && (
+        {/* {step === 1 && dispenserId && (
           <DispenserCostForm dispenserId={dispenserId} setStep={setStep} />
-        )}
-        {step === 2 && dispenserId && (
+        )} */}
+        {step === 1 && dispenserId && (
           <DispenserRewardForm dispenserId={dispenserId} setStep={setStep} />
         )}
       </Panel>

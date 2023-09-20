@@ -321,7 +321,6 @@ export const DispenserRewardForm = ({
                                       <Field
                                         name={`rewards.${index}.rewardAmount`}
                                         className="text-gray-800 bg-gray-100 p-2 rounded max-w-[100px]"
-                                        // TODO: will need to check amount - cost amount already allocated
                                         max={reward.amount}
                                         min={0}
                                         type="number"

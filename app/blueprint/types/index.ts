@@ -353,3 +353,9 @@ export type Item = {
     mintAddress: string;
   };
 };
+
+export enum TokenType {
+  SPL,
+  NFT,
+  SFT,
+}
