@@ -5,7 +5,7 @@ import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Panel } from "@/features/UI/panel";
 import showToast from "@/features/toasts/show-toast";
-import { IDL } from "@/target/types/dispenser";
+import { IDL } from "@/idl/types/dispenser";
 import { PublicKey } from "@metaplex-foundation/js";
 import { useUserData } from "@nhost/nextjs";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";

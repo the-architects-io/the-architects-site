@@ -1,5 +1,5 @@
 import { DISPENSER_PROGRAM_ID } from "@/constants/constants";
-import { IDL } from "@/target/types/dispenser";
+import { IDL } from "@/idl/types/dispenser";
 import { createHash } from "@/utils/hashing";
 import * as anchor from "@coral-xyz/anchor";
 import { Provider } from "@coral-xyz/anchor";

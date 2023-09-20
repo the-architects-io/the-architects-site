@@ -1,0 +1,210 @@
+{
+  "version": "0.1.0",
+  "name": "dispenser",
+  "instructions": [
+    {
+      "name": "createDispenser",
+      "accounts": [
+        {
+          "name": "dispenserAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "seed",
+          "type": "bytes"
+        },
+        {
+          "name": "authoritySeed",
+          "type": "bytes"
+        },
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "dispenseTokens",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "recipient",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispenserPda",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "seed",
+          "type": "bytes"
+        },
+        {
+          "name": "authoritySeed",
+          "type": "bytes"
+        },
+        {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "dispenseSol",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "recipient",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispenserPda",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "seed",
+          "type": "bytes"
+        },
+        {
+          "name": "authoritySeed",
+          "type": "bytes"
+        },
+        {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "DispenserAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "UninitializedAccount",
+      "msg": "The account is uninitialized."
+    },
+    {
+      "code": 6001,
+      "name": "InvalidInstruction",
+      "msg": "Invalid instruction provided."
+    },
+    {
+      "code": 6002,
+      "name": "PdaMismatch",
+      "msg": "Program derived address mismatch."
+    },
+    {
+      "code": 6003,
+      "name": "PdaGenerationFailed",
+      "msg": "Failed to generate program derived address."
+    },
+    {
+      "code": 6004,
+      "name": "AlreadyInitialized",
+      "msg": "The account is already initialized."
+    },
+    {
+      "code": 6005,
+      "name": "TokenTransferFailed",
+      "msg": "Token transfer failed."
+    },
+    {
+      "code": 6006,
+      "name": "InvalidAmount",
+      "msg": "Invalid amount provided."
+    },
+    {
+      "code": 6007,
+      "name": "PotentialUnderflow",
+      "msg": "Potential underflow detected."
+    },
+    {
+      "code": 6008,
+      "name": "AlreadyPaused",
+      "msg": "The contract is already paused."
+    },
+    {
+      "code": 6009,
+      "name": "Paused",
+      "msg": "Cannot execute, the contract is paused."
+    }
+  ],
+  "metadata": {
+    "address": "4gWo4AXW987N93RAiuoJJF51FwFV5Yyza4CYZ9j6qSYJ"
+  }
+}

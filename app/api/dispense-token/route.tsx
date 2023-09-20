@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
 import { Dispenser, NoopResponse } from "@/app/blueprint/types";
 import { Connection, Keypair } from "@solana/web3.js";
 import { DISPENSER_PROGRAM_ID, RPC_ENDPOINT } from "@/constants/constants";
-import { IDL } from "@/target/types/dispenser";
+import { IDL } from "@/idl/types/dispenser";
 import { createHash } from "@/utils/hashing";
 import { PublicKey } from "@metaplex-foundation/js";
 import {
