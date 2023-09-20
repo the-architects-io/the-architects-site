@@ -21,12 +21,13 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const Navbar: React.ComponentType<any> = dynamic(
-    () => import("@/features/navigation/navbar"),
-    {
-      ssr: false,
-    }
-  );
+  const DynamicNavbar = dynamic(() => import("@/features/navigation/navbar"), {
+    ssr: false,
+  });
+
+  const NavbarWrapper: React.FC = () => {
+    return <DynamicNavbar />;
+  };
   return (
     <html lang="en">
       <body className={classNames([inter.className, "relative"])}>
@@ -35,7 +36,7 @@ export default function RootLayout({
             <SidebarProvider>
               <AdminProvider>
                 {children}
-                <Navbar />
+                <NavbarWrapper />
                 <Toaster />
                 {/* <Sidebar /> */}
               </AdminProvider>
