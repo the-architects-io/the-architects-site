@@ -35,8 +35,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "target/idl/*.json",
-    "target/types/*.ts"
+    "target/idl/**/*.json",
+    "target/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
