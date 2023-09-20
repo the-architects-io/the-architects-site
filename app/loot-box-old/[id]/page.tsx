@@ -35,8 +35,8 @@ export default function LootBoxDetailPage({ params }: { params: any }) {
   const wallet = useWallet();
   const { connection } = useConnection();
   const { isAdmin } = useAdmin();
-  const { claimReward, cost } = useDispenser(params?.id);
-  const { balance } = useCostBalance(cost, wallet.publicKey?.toString() || "");
+  const { claimReward, costs } = useDispenser(params?.id);
+  const { balance } = useCostBalance(costs, wallet.publicKey?.toString() || "");
 
   const [lootBox, setLootBox] = useState<Dispenser | null>(null);
   const [rewardHashList, setRewardHashList] = useState<string[]>([]);
@@ -87,7 +87,7 @@ export default function LootBoxDetailPage({ params }: { params: any }) {
       setCostItemMintAddress(costItem.token.mintAddress);
       setCostAmount(costAmount);
       setCostTokenImageUrl(imageUrl);
-      if (!wallet?.publicKey || !cost) return;
+      if (!wallet?.publicKey || !costs) return;
     },
   });
 

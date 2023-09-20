@@ -1,17 +1,17 @@
 "use client";
 import Spinner from "@/features/UI/spinner";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { Connection, PublicKey } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import { useCallback, useEffect, useState } from "react";
 import PortalsSdk from "@/utils/portals-sdk-v2";
-import { ENV, RPC_ENDPOINT } from "@/constants/constants";
+import { ENV } from "@/constants/constants";
 import { DispenserClaim } from "@/features/in-portals/dispenser-claim";
 import { fetchDaoNfts } from "@/utils/nfts/fetch-dao-nfts";
 import { ModeledNftMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import WalletButton from "@/features/UI/buttons/wallet-button";
 import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
-import { useLazyQuery, useQuery } from "@apollo/client";
-import { Token } from "@/features/admin/tokens/tokens-list-item";
+import { useQuery } from "@apollo/client";
+import { Token } from "@/app/blueprint/types";
 
 export default function DispenserClaimPage({ params }: { params: any }) {
   const { publicKey: walletAdapterWalletAddress } = useWallet();

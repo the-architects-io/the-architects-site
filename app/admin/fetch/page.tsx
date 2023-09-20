@@ -30,6 +30,7 @@ export default function FetchPage() {
   const [numberOfSuccesses, setNumberOfSuccesses] = useState<number>(0);
   const [numberOfSkips, setNumberOfSkips] = useState<number>(0);
   const [failedAdditions, setFailedAdditions] = useState<string[]>([]);
+  const [hashList, setHashList] = useState<string>("");
 
   const saveCharacterToDb = useCallback(
     async (

@@ -17,18 +17,11 @@ import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { useFormik } from "formik";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { getAbbreviatedAddress } from "@/utils/formatting";
-import axios from "axios";
 import {
   createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddress,
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
-
-export enum TokenType {
-  SPL,
-  NFT,
-  SFT,
-}
 
 const AUTHORITY_SEED = process.env.NEXT_PUBLIC_AUTHORITY_SEED || "";
 

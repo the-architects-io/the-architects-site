@@ -2,7 +2,6 @@ import { client } from "@/graphql/backend-client";
 import { ADD_TOKEN } from "@/graphql/mutations/add-token";
 import { ADD_CHARACTER } from "@/graphql/mutations/add-character";
 import { ADD_TRAIT_INSTANCE } from "@/graphql/mutations/add-trait-instance";
-import { Token } from "@/features/admin/tokens/tokens-list-item";
 import { GET_TRAIT_BY_NAME } from "@/graphql/queries/get-trait-by-name";
 import { GET_CHARACTER_BY_TOKEN_MINT_ADDRESS } from "@/graphql/queries/get-character-by-token-mint-address";
 import { NextResponse } from "next/server";
@@ -13,7 +12,7 @@ import { Connection } from "@solana/web3.js";
 import { RPC_ENDPOINT } from "@/constants/constants";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import { addTraitsToDb } from "@/utils/nfts/add-traits-to-db";
-import { Character, NoopResponse } from "@/app/blueprint/types";
+import { Character, NoopResponse, Token } from "@/app/blueprint/types";
 
 export type Trait = {
   id: string;

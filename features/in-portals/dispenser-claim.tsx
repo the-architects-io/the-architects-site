@@ -4,22 +4,14 @@ import { PublicKey } from "@solana/web3.js";
 
 import { useEffect, useState } from "react";
 import Spinner from "@/features/UI/spinner";
-import {
-  Dispenser,
-  TokenClaimPayoutStrategies,
-} from "@/features/admin/dispensers/dispensers-list-item";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
 import ConfettiBackground from "@/features/animations/confetti-background";
 import { DispenserClaimButton } from "@/features/UI/buttons/dispenser-claim-button";
-import {
-  BASE_URL,
-  BUILD_REWARD_WALLET,
-  REWARD_WALLET_ADDRESS,
-} from "@/constants/constants";
+import { BASE_URL, BUILD_REWARD_WALLET } from "@/constants/constants";
 import axios from "axios";
 import { BuildTokenVestingDetails } from "@/features/dispensers/details/build-token-vesting-details";
 import { ModeledNftMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
-import { calculateTokenClaimRewardAmount } from "@/utils/dispensers/calculate-token-claim-reward-amount";
+import { Dispenser } from "@/app/blueprint/types";
 
 export interface ITokenClaim {
   id: string;

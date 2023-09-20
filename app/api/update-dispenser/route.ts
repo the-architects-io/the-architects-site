@@ -1,8 +1,8 @@
 import { client } from "@/graphql/backend-client";
-import { Token } from "@/features/admin/tokens/tokens-list-item";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { UPDATE_DISPENSER } from "@/graphql/mutations/update-dispenser";
+import { Token } from "@/app/blueprint/types";
 
 export async function POST(req: NextRequest) {
   const { id, rewardWalletAddress, rewardWalletBump, noop } = await req.json();

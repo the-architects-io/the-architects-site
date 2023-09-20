@@ -1,7 +1,4 @@
-import {
-  Dispenser,
-  TokenClaimPayoutStrategies,
-} from "@/features/admin/dispensers/dispensers-list-item";
+import { Dispenser, TokenClaimPayoutStrategies } from "@/app/blueprint/types";
 import { diffInDays, diffInHours } from "utils/date-time";
 
 const CUMULATIVE_ACCRUAL = 10500;
