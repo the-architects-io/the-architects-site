@@ -18,15 +18,6 @@ import { caluclateBuildVestingRewardAmount } from "@/utils/dispensers/calculate-
 import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
 import { Dispenser, Token, Wallet } from "@/app/blueprint/types";
 
-type Data =
-  | {
-      rewardTxAddress: string;
-      data: any;
-    }
-  | {
-      error: string;
-    };
-
 export async function POST(req: NextRequest) {
   const {
     address,

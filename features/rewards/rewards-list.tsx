@@ -10,12 +10,15 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import { getAmountWithDecimals } from "@/utils/currency";
 import { HeliusToken } from "@/app/blueprint/types";
 import Spinner from "@/features/UI/spinner";
+import { StopCircleRounded } from "@mui/icons-material";
 
 export const RewardsList = ({
   dispenserId,
+  inStockMintAddresses,
   className,
 }: {
-  dispenserId: string;
+  dispenserId?: string;
+  inStockMintAddresses?: string[];
   className?: string;
 }) => {
   const { rewards, collectionWallet, dispenser } = useDispenser(dispenserId);
@@ -95,7 +98,19 @@ export const RewardsList = ({
                         <div className="w-full flex justify-between lg:w-2/5 font-bold mb-2">
                           <div className="flex flex-col w-full">
                             <div className="mb-2 flex w-full overflow-hidden">
-                              <div className="truncate">{name}</div>
+                              <div
+                                className={classNames([
+                                  "truncate",
+                                  {
+                                    "text-red-500 line-through":
+                                      !inStockMintAddresses?.includes(
+                                        token?.mintAddress || ""
+                                      ),
+                                  },
+                                ])}
+                              >
+                                {name}
+                              </div>
                               {isFreezeOnDelivery && (
                                 <Image
                                   className="bg-sky-300 rounded-lg ml-4"

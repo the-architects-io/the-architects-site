@@ -109,7 +109,6 @@ export const DispenserRewardForm = ({
             };
           })
         );
-        debugger;
 
         const { data }: { data: { allItems: Item[]; addedItems: Item[] } } =
           await axios.post("/api/add-items", {

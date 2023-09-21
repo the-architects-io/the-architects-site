@@ -1,6 +1,10 @@
 "use client";
 import * as anchor from "@coral-xyz/anchor";
-import { DISPENSER_PROGRAM_ID } from "@/constants/constants";
+import {
+  BASE_URL,
+  DISPENSER_PROGRAM_ID,
+  RPC_ENDPOINT,
+} from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Panel } from "@/features/UI/panel";
@@ -16,37 +20,113 @@ import { RewardsList } from "@/features/rewards/rewards-list";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
 import { getAmountWithoutDecimals } from "@/utils/currency";
+import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
+import {
+  DigitalAssetWithToken,
+  fetchAllDigitalAsset,
+  fetchAllDigitalAssetWithTokenByMint,
+  fetchAllDigitalAssetWithTokenByOwner,
+  fetchDigitalAsset,
+} from "@metaplex-foundation/mpl-token-metadata";
+import { publicKey } from "@metaplex-foundation/umi";
+import { Dispenser, TokenBalance } from "@/app/blueprint/types";
 
 export default function Page({ params }: { params: any }) {
   const user = useUserData();
   const [hasBeenFetched, setHasBeenFetched] = useState(false);
   const searchParams = useSearchParams();
-  const { publicKey } = useWallet();
+  const { publicKey: pubKey } = useWallet();
   const [isClaiming, setIsClaiming] = useState(false);
+  const [inStockMintAddresses, setInStockMintAddresses] = useState<string[]>(
+    []
+  );
+  const [hasStock, setHasStock] = useState<boolean>(false);
 
   const { dispenser, isLoading, fetchRewardTokenBalances } = useDispenser(
     searchParams.get("id") || ""
   );
 
+  enum PayoutMethod {
+    RANDOM = "RANDOM",
+    SORTED = "SORTED",
+  }
+
   const handleClaim = async () => {
-    if (!DISPENSER_PROGRAM_ID || !dispenser?.id || !publicKey)
+    if (!DISPENSER_PROGRAM_ID || !dispenser?.id || !pubKey)
       throw new Error("Missing required data.");
 
     try {
       setIsClaiming(true);
 
+      const umi = createUmi(RPC_ENDPOINT);
+
+      const onChainDispenserAssets = await fetchAllDigitalAssetWithTokenByOwner(
+        umi,
+        publicKey(dispenser.rewardWalletAddress)
+      );
+
+      const { data: tokenBalances }: { data: TokenBalance[] } =
+        await axios.post(`${BASE_URL}/api/get-token-balances-from-helius`, {
+          walletAddress: dispenser?.rewardWalletAddress,
+        });
+
+      let rewards = dispenser.rewardCollections.filter((reward) => {
+        const { mintAddress } = reward.itemCollection.item.token;
+        return (
+          onChainDispenserAssets.find(
+            (asset) => asset.publicKey === mintAddress
+          ) || tokenBalances.find((token) => token.mint === mintAddress)
+        );
+      });
+
+      setInStockMintAddresses(
+        rewards.map((reward) => reward.itemCollection.item.token.mintAddress)
+      );
+      setHasStock(!!rewards.length);
+
+      const payoutMethod: PayoutMethod =
+        rewards[0]?.payoutSortOrder && rewards[0].payoutSortOrder > -1
+          ? PayoutMethod.SORTED
+          : PayoutMethod.RANDOM;
+
+      let reward;
+
+      if (payoutMethod === PayoutMethod.SORTED) {
+        reward = rewards.sort(
+          (a, b) => (a.payoutSortOrder || 0) - (b.payoutSortOrder || 0)
+        )[0];
+      }
+
+      if (payoutMethod === PayoutMethod.RANDOM) {
+        const random = Math.random();
+        const totalPayoutChance = rewards.reduce(
+          (prev, current) => prev + (current.payoutChance || 0),
+          0
+        );
+        let cumulativePayoutChance = 0;
+        reward = rewards.find((reward) => {
+          cumulativePayoutChance +=
+            (reward.payoutChance || 0) / totalPayoutChance;
+          return random <= cumulativePayoutChance;
+        });
+
+        console.log({ random, totalPayoutChance, cumulativePayoutChance });
+      }
+
+      if (!reward) throw new Error("Dispenser is empty");
+
+      // either get random reward or next sorted reward
       const amount = getAmountWithoutDecimals(
-        dispenser.rewardCollections[0].itemCollection.amount,
+        reward.itemCollection.amount,
         dispenser.rewardCollections[0].itemCollection.item.token.decimals
       );
 
-      console.log({ amount });
+      console.log({ reward, amount });
 
       const { data } = await axios.post("/api/dispense-token", {
         dispenserId: dispenser.id,
-        recipientAddress: publicKey,
-        mintAddress:
-          dispenser.rewardCollections[0].itemCollection.item.token.mintAddress,
+        recipientAddress: pubKey,
+        mintAddress: reward.itemCollection.item.token.mintAddress,
         amount,
       });
 
@@ -89,16 +169,20 @@ export default function Page({ params }: { params: any }) {
 
           {!!dispenser?.id && (
             <RewardsList
+              inStockMintAddresses={inStockMintAddresses}
               dispenserId={dispenser?.id}
               className="mb-4 max-w-md"
             />
           )}
 
           <WalletButton />
+          {!hasStock && (
+            <p className="text-center my-4">This dispenser is out of stock.</p>
+          )}
           <PrimaryButton
             className="my-4"
             onClick={handleClaim}
-            disabled={!publicKey || isClaiming}
+            disabled={!pubKey || isClaiming || !hasStock}
           >
             {isClaiming ? <Spinner /> : "Claim"}
           </PrimaryButton>
