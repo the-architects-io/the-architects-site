@@ -12,6 +12,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { DndCard } from "@/features/UI/dnd-card";
 import axios from "axios";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
+import { useRouter } from "next/navigation";
 
 export type DispenserResponse = {
   id: string;
@@ -51,7 +52,7 @@ export const DispenserPayoutStructureForm = ({
   setStep: (step: number) => void;
 }) => {
   const { dispenser, rewards } = useDispenser(dispenserId);
-
+  const router = useRouter();
   const formik = useFormik({
     initialValues: {
       sortOrder: sortOrderOptions[0].value,
@@ -74,7 +75,7 @@ export const DispenserPayoutStructureForm = ({
         showToast({
           primaryMessage: "Successfully updated rewards",
         });
-        setStep(3);
+        router.push(`/me/dispenser/${dispenserId}`);
       } catch (error) {
         showToast({
           primaryMessage: "Error updating rewards",
@@ -117,6 +118,7 @@ export const DispenserPayoutStructureForm = ({
         rewards
           .sort((a, b) => (a.payoutSortOrder || 0) - (b.payoutSortOrder || 0))
           .map((reward, index) => ({
+            imageUrl: reward.imageUrl,
             payoutSortOrder: reward?.payoutSortOrder || index,
             mint: reward.token?.mintAddress,
             decimals: reward.token?.decimals,
@@ -162,10 +164,9 @@ export const DispenserPayoutStructureForm = ({
                       <ImageWithFallback
                         src={imageUrl}
                         alt={imageUrl}
-                        width={300}
-                        height={300}
+                        width={100}
+                        height={100}
                       />
-
                       <div className="truncate text-xl">{name}</div>
                     </div>
                   </DndCard>

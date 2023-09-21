@@ -4,15 +4,24 @@ import { Panel } from "@/features/UI/panel";
 import { AddDispenserForm } from "@/features/dispensers/add-dispenser-form";
 import { DispenserPayoutStructureForm } from "@/features/dispensers/dispenser-payout-structure-form";
 import { DispenserRewardForm } from "@/features/dispensers/dispenser-reward-form";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function DashboardPage() {
-  const [step, setStep] = useState(1);
-  const [dispenserId, setDispenserId] = useState<string | null>(
-    "6ec102a3-cb10-4bae-b31e-3b22dd213b21"
-  );
+  const searchParams = useSearchParams();
+  const [step, setStep] = useState(0);
+  const [dispenserId, setDispenserId] = useState<string | null>(null);
+  const stepParam = searchParams.get("step");
+  const dispenserIdParam = searchParams.get("dispenserId");
 
-  const [heading, setHeading] = useState<string>("Create Dispenser");
+  useEffect(() => {
+    if (stepParam && parseInt(stepParam) > -1 && parseInt(stepParam) < 3) {
+      setStep(parseInt(stepParam));
+    }
+    if (dispenserIdParam) {
+      setDispenserId(dispenserIdParam);
+    }
+  }, [dispenserIdParam, stepParam]);
 
   // if (!dispenserId) {
   //   return (

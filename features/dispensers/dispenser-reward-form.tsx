@@ -24,7 +24,10 @@ import Spinner from "@/features/UI/spinner";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import { useRouter } from "next/navigation";
 import { TokenMintingForm } from "@/features/dispensers/token-minting-form";
-import { fetchAllDigitalAssetByOwner } from "@metaplex-foundation/mpl-token-metadata";
+import {
+  fetchAllDigitalAsset,
+  fetchAllDigitalAssetByOwner,
+} from "@metaplex-foundation/mpl-token-metadata";
 import { publicKey } from "@metaplex-foundation/umi";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
@@ -87,11 +90,34 @@ export const DispenserRewardForm = ({
       console.log({ allTokens });
 
       try {
+        const umi = createUmi(RPC_ENDPOINT);
+        const nfts = await fetchAllDigitalAsset(
+          umi,
+          allTokens
+            .filter((token) => token?.decimals === 0)
+            .map((token) => publicKey(token.mintAddress))
+        );
+
+        const nftsWithMetadata = await Promise.all(
+          nfts.map(async (token) => {
+            const { data: offChainMetadata }: { data: OffChainMetadata } =
+              await axios.get(token.metadata.uri);
+
+            return {
+              ...token,
+              offChainMetadata,
+            };
+          })
+        );
+        debugger;
+
         const { data }: { data: { allItems: Item[]; addedItems: Item[] } } =
           await axios.post("/api/add-items", {
             items: allTokens.map((token) => ({
               name: token.name,
-              imageUrl: token?.imageUrl,
+              imageUrl: nftsWithMetadata.find(
+                (nft) => nft.mint.publicKey.toString() === token.mintAddress
+              )?.offChainMetadata.image,
               tokenId: token.id,
             })),
           });
@@ -154,7 +180,7 @@ export const DispenserRewardForm = ({
           primaryMessage:
             values.rewards.length > 1 ? "Rewards added" : "Reward added",
         });
-        router.push(`/me/dispenser/${dispenserId}`);
+        setStep(2);
       } catch (error) {
         console.log({ error });
       }
@@ -185,7 +211,6 @@ export const DispenserRewardForm = ({
         publicKey(dispenser.rewardWalletAddress)
       );
 
-      // fetch data from uri to get imageUrl
       const assetsWithMetadata = await Promise.all(
         assets.map(async (asset) => {
           const { data: offChainMetadata }: { data: OffChainMetadata } =
@@ -242,6 +267,10 @@ export const DispenserRewardForm = ({
         <Spinner />
       </div>
     );
+
+  if (dispenser?.rewardCollections.length) {
+    router.push(`/me/dispenser/${dispenserId}`);
+  }
 
   return (
     <>
@@ -385,22 +414,23 @@ export const DispenserRewardForm = ({
                                         className="text-gray-800"
                                         hidden
                                       />
-                                      {reward.amount > 1 && (
-                                        <div className="flex w-full items-center justify-between mb-2">
-                                          <div className="text-sm uppercase">
-                                            reward amount
-                                          </div>
-                                          <Field
-                                            name={`rewards.${index}.rewardAmount`}
-                                            className="text-gray-800 bg-gray-100 p-2 rounded max-w-[100px]"
-                                            max={reward.amount}
-                                            min={0}
-                                            type="number"
-                                          />
+
+                                      <div className="flex w-full items-center justify-between mb-2">
+                                        <div className="text-sm uppercase">
+                                          reward amount
                                         </div>
-                                      )}
+                                        <Field
+                                          name={`rewards.${index}.rewardAmount`}
+                                          className="text-gray-800 bg-gray-100 p-2 rounded max-w-[100px]"
+                                          max={reward.amount}
+                                          min={0}
+                                          type="number"
+                                        />
+                                      </div>
+
                                       <div className="text-gray-300 text-xs">
-                                        The amount of this token a user must pay
+                                        The amount of this token dispensed to
+                                        the user
                                       </div>
                                     </div>
                                     <div className="flex flex-col w-full items-end">

@@ -61,56 +61,67 @@ export const RewardsList = ({
       <div className="flex w-full flex-1 justify-between rounded-lg p-2 my-2 text-lg uppercase">
         <div className="w-3/5">Reward</div>
         <div className="w-1/5 text-left">AMT</div>
-        <div className="w-1/5 text-right">Chance</div>
+        <div className="w-1/5 text-right">
+          {
+            // if any rewards have a payoutSortOrder, show that column
+            rewards?.some(
+              (reward) =>
+                typeof reward.payoutSortOrder === "number" &&
+                reward?.payoutSortOrder > -1
+            )
+              ? "Order"
+              : "Chance"
+          }
+        </div>
       </div>
-      <div className="flex">
+      <div className="flex flex-wrap">
         {!!rewards &&
-          rewards.map(
-            ({
-              isFreezeOnDelivery,
-              token,
-              id,
-              childRewards,
-              payoutChance,
-              amount,
-              name,
-            }) => (
-              <Fragment key={id}>
-                <div className="flex flex-wrap w-full flex-1 justify-between rounded-lg p-2">
-                  {!!name && (
-                    <>
-                      <div className="w-full flex justify-between lg:w-2/5 font-bold mb-2">
-                        <div className="flex flex-col">
-                          <div className="mb-2 flex w-1/2">
-                            <div className="overflow-hidden rounded-lg">
-                              {name}{" "}
-                            </div>
-                            {isFreezeOnDelivery && (
-                              <Image
-                                className="bg-sky-300 rounded-lg ml-4"
-                                src="/images/ice.png"
-                                width={24}
-                                height={20}
-                                alt="ice"
-                              />
-                            )}
-                          </div>
-                          {!!token?.mintAddress && (
-                            <div className="flex">
-                              <div className="mr-2">Stock: </div>
-                              {isFetchingTokenBalances ? (
-                                <Spinner />
-                              ) : (
-                                getItemBalance(token)
+          rewards
+            .sort((a, b) => (a.payoutSortOrder || 0) - (b.payoutSortOrder || 0))
+            .map(
+              ({
+                isFreezeOnDelivery,
+                token,
+                id,
+                payoutChance,
+                amount,
+                name,
+                payoutSortOrder,
+              }) => (
+                <Fragment key={id}>
+                  <div className="flex flex-wrap w-full flex-1 justify-between rounded-lg p-2">
+                    {!!name && (
+                      <>
+                        <div className="w-full flex justify-between lg:w-2/5 font-bold mb-2">
+                          <div className="flex flex-col w-full">
+                            <div className="mb-2 flex w-full overflow-hidden">
+                              <div className="truncate">{name}</div>
+                              {isFreezeOnDelivery && (
+                                <Image
+                                  className="bg-sky-300 rounded-lg ml-4"
+                                  src="/images/ice.png"
+                                  width={24}
+                                  height={20}
+                                  alt="ice"
+                                />
                               )}
                             </div>
-                          )}
+                            {!!token?.mintAddress && token?.decimals > 0 && (
+                              <div className="flex">
+                                <div className="mr-2">Stock: </div>
+                                {isFetchingTokenBalances ? (
+                                  <Spinner />
+                                ) : (
+                                  getItemBalance(token)
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          <div className="lg:hidden">
+                            {!!payoutChance && round(payoutChance * 100, 2)}%
+                          </div>
                         </div>
-                        <div className="lg:hidden">
-                          {!!payoutChance && round(payoutChance * 100, 2)}%
-                        </div>
-                      </div>
-                      {/* <div className="flex flex-col justify-end w-full lg:w-2/5 flex-wrap">
+                        {/* <div className="flex flex-col justify-end w-full lg:w-2/5 flex-wrap">
                         {!!childRewards &&
                           childRewards.map(({ id, token }) => (
                             <>
@@ -132,20 +143,25 @@ export const RewardsList = ({
                             </>
                           ))}
                       </div> */}
-                      <div className="w-full hidden lg:w-1/5 lg:flex justify-end order-1 text-right">
-                        <div>{amount}</div>
-                      </div>
-                      <div className="w-full hidden lg:w-1/5 lg:flex justify-end order-1">
-                        <div>
-                          {!!payoutChance && round(payoutChance * 100, 2)}%
+                        <div className="w-full hidden lg:w-1/5 lg:flex justify-end order-1 text-right">
+                          <div>{amount}</div>
                         </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </Fragment>
-            )
-          )}
+                        <div className="w-full hidden lg:w-1/5 lg:flex justify-end order-1">
+                          {typeof payoutSortOrder === "number" &&
+                          payoutSortOrder > -1 ? (
+                            <div>{payoutSortOrder}</div>
+                          ) : (
+                            <div>
+                              {!!payoutChance && round(payoutChance * 100, 2)}%
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </Fragment>
+              )
+            )}
       </div>
     </div>
   );
