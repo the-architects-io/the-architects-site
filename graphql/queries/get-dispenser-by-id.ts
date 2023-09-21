@@ -35,6 +35,7 @@ export const GET_DISPENSER_BY_ID = gql`
       rewardCollections {
         dispenserId
         payoutChance
+        payoutSortOrder
         isFreezeOnDelivery
         itemCollection {
           id

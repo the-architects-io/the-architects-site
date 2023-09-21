@@ -2,7 +2,7 @@ import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { UPDATE_DISPENSER } from "@/graphql/mutations/update-dispenser";
-import { Token } from "@/app/blueprint/types";
+import { Dispenser } from "@/app/blueprint/types";
 
 export async function POST(req: NextRequest) {
   const { id, rewardWalletAddress, rewardWalletBump, noop } = await req.json();
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
   const {
     update_dispensers_by_pk: updatedDispenser,
-  }: { update_dispensers_by_pk: Token } = await client.request(
+  }: { update_dispensers_by_pk: Dispenser } = await client.request(
     UPDATE_DISPENSER,
     {
       id,

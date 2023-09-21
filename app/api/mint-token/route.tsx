@@ -3,7 +3,7 @@ import { RPC_ENDPOINT } from "@/constants/constants";
 import { getUmiClient } from "@/utils/umi";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
-import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
+import { Metaplex, PublicKey, keypairIdentity } from "@metaplex-foundation/js";
 import { fetchDigitalAsset } from "@metaplex-foundation/mpl-token-metadata";
 import {
   createGenericFile,
@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
   const name = res.get("name") as string;
   const sellerFeeBasisPoints = res.get("sellerFeeBasisPoints") as string;
   const noop = res.get("noop");
+  const tokenOwner = res.get("tokenOwner") as string;
   const imageFile = res.get("imageFile") as File;
 
   console.log({ name, imageFile });
@@ -33,12 +34,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
 
-  if (
-    !description ||
-    !name ||
-    !process.env.EXECUTION_WALLET_PRIVATE_KEY ||
-    !imageFile
-  ) {
+  if (!description || !name || !process.env.EXECUTION_WALLET_PRIVATE_KEY) {
     return NextResponse.json(
       { error: "Required fields not set" },
       { status: 500 }
@@ -74,18 +70,20 @@ export async function POST(req: NextRequest) {
     const wallet = new NodeWallet(keypair);
     metaplex.use(keypairIdentity(keypair));
 
-    console.log({ imageFile });
+    let image;
 
-    const genericImageFile = await createGenericFileFromBrowserFile(imageFile);
-
-    const [imageUri] = await umi.uploader.upload([genericImageFile]);
-
-    console.log({ imageUri });
+    if (imageFile) {
+      const genericImageFile = await createGenericFileFromBrowserFile(
+        imageFile
+      );
+      const [imageUri] = await umi.uploader.upload([genericImageFile]);
+      image = imageUri;
+    }
 
     const uri = await umi.uploader.uploadJson({
       name,
       description,
-      image: imageUri,
+      image,
       seller_fee_basis_points: Number(sellerFeeBasisPoints) * 100,
     });
     console.log({ uri });
@@ -95,11 +93,25 @@ export async function POST(req: NextRequest) {
         error: "Error uploading file",
       });
     }
-    const transactionBuilder = await metaplex.nfts().builders().create({
-      uri: uri,
+
+    let createNftInput = {
+      uri,
       name,
-      sellerFeeBasisPoints: 500, // Represents 5.00%.
-    });
+      sellerFeeBasisPoints: Number(sellerFeeBasisPoints) * 100,
+    };
+
+    if (tokenOwner) {
+      createNftInput = {
+        ...createNftInput,
+        //  @ts-ignore
+        tokenOwner: new PublicKey(tokenOwner),
+      };
+    }
+
+    const transactionBuilder = await metaplex
+      .nfts()
+      .builders()
+      .create(createNftInput);
 
     // Get the data that you don't know in advance from getContext()
     const { mintAddress } = transactionBuilder.getContext();

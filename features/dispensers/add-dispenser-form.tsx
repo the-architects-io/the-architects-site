@@ -8,11 +8,9 @@ import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 import showToast from "@/features/toasts/show-toast";
-import SharedHead from "@/features/UI/head";
 import { FormTextareaWithLabel } from "@/features/UI/forms/form-textarea-with-label";
 import { createOnChainDispenser } from "@/utils/dispensers/create-on-chain-dispenser";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
-import { getAbbreviatedAddress } from "@/utils/formatting";
 import { Dispenser } from "@/app/blueprint/types";
 import { useUserData } from "@nhost/nextjs";
 import { useEffect } from "react";
@@ -73,8 +71,6 @@ export const AddDispenserForm = ({
             anchorWallet
           );
 
-        // TODO: confirm dispenserAddress account exists on chain
-
         const { data: updatedDispenser }: { data: Dispenser } =
           await axios.post("/api/update-dispenser", {
             id: dispenser.id,
@@ -111,41 +107,43 @@ export const AddDispenserForm = ({
   };
 
   return (
-    <FormWrapper onSubmit={formik.handleSubmit}>
-      <SharedHead title="Admin" />
-      <FormInputWithLabel
-        label="Name"
-        name="name"
-        value={formik.values.name}
-        onChange={formik.handleChange}
-        description="The name of your dispenser."
-      />
-      <FormInputWithLabel
-        label="Image url"
-        name="imageUrl"
-        value={formik.values.imageUrl}
-        onChange={formik.handleChange}
-        description="The url of the image for your dispenser."
-      />
-      <FormTextareaWithLabel
-        label="Description"
-        name="description"
-        value={formik.values.description}
-        onChange={formik.handleChange}
-        description="A description for your dispenser."
-      />
-      <div className="flex justify-center w-full pt-4">
-        <SubmitButton
-          isSubmitting={formik.isSubmitting}
-          onClick={formik.handleSubmit}
-          buttonText="Continue"
-          disabled={
-            !formik.values.name ||
-            !formik.values.imageUrl ||
-            !formik.values.description
-          }
+    <>
+      <h1 className="text-3xl my-4 text-gray-100">Create Dispenser</h1>
+      <FormWrapper onSubmit={formik.handleSubmit}>
+        <FormInputWithLabel
+          label="Name"
+          name="name"
+          value={formik.values.name}
+          onChange={formik.handleChange}
+          description="The name of your dispenser."
         />
-      </div>
-    </FormWrapper>
+        <FormInputWithLabel
+          label="Image url"
+          name="imageUrl"
+          value={formik.values.imageUrl}
+          onChange={formik.handleChange}
+          description="The url of the image for your dispenser."
+        />
+        <FormTextareaWithLabel
+          label="Description"
+          name="description"
+          value={formik.values.description}
+          onChange={formik.handleChange}
+          description="A description for your dispenser."
+        />
+        <div className="flex justify-center w-full pt-4">
+          <SubmitButton
+            isSubmitting={formik.isSubmitting}
+            onClick={formik.handleSubmit}
+            buttonText="Continue"
+            disabled={
+              !formik.values.name ||
+              !formik.values.imageUrl ||
+              !formik.values.description
+            }
+          />
+        </div>
+      </FormWrapper>
+    </>
   );
 };

@@ -12,6 +12,7 @@ interface Props extends React.HTMLAttributes<HTMLSelectElement> {
   }[];
   placeholder: string;
   hideLabel?: boolean;
+  disabled?: boolean;
 }
 
 export const SelectInputWithLabel = ({
@@ -23,6 +24,7 @@ export const SelectInputWithLabel = ({
   name,
   placeholder,
   hideLabel,
+  disabled,
 }: Props) => {
   return (
     <label htmlFor={name} className="flex flex-col w-full">
@@ -36,6 +38,7 @@ export const SelectInputWithLabel = ({
         value={value}
         onChange={onChange}
         onBlur={onBlur}
+        disabled={disabled}
       >
         <option value="" label={placeholder} disabled />
         {options?.map((option) => (

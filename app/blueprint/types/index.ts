@@ -47,6 +47,7 @@ export type DispenserReward = {
   };
   hashList?: string;
   childRewards?: DispenserReward[];
+  payoutSortOrder?: number;
 };
 
 export type DispenserGate = {
@@ -199,7 +200,9 @@ export type Dispenser = {
   }[];
   rewardCollections: {
     dispenserId: string;
+    payoutSortOrder?: number;
     childRewardCollections?: {
+      payoutSortOrder?: number;
       dispenserId: string;
       isFreezeOnDelivery: boolean;
       hashListCollection: HashListCollection;

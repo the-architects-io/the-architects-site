@@ -26,8 +26,8 @@ export const DispenserControlPanel = ({
   const { description, isLoading, dispenser, rewards, refetch } =
     useDispenser(dispenserId);
   const tabs: ITab[] = [
-    { name: "Costs", value: "costs" },
     { name: "Rewards", value: "rewards" },
+    { name: "Costs", value: "costs" },
     // { name: "Gates", value: "gates" },
     // { name: "Restrictions", value: "restrictions" },
     { name: "Stats", value: "stats" },
