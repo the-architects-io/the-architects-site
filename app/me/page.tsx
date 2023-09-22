@@ -7,7 +7,6 @@ import { Divider } from "@/features/UI/divider";
 import { Panel } from "@/features/UI/panel";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
-import WalletConnector from "@/features/wallets/wallet-connector";
 import { GET_WALLETS_BY_USER_ID } from "@/graphql/queries/get-wallets-by-user-id";
 import { copyTextToClipboard } from "@/utils/clipboard";
 import { getAbbreviatedAddress } from "@/utils/formatting";
@@ -119,8 +118,17 @@ export default function Page() {
           Sign in with Discord
         </a> */}
         <Divider />
+        <PrimaryButton className="mb-4">
+          <Link href="/me/dispenser/create">Create Dispenser</Link>
+        </PrimaryButton>
+        <PrimaryButton>
+          <Link href="/me/dispenser">My Dispensers</Link>
+        </PrimaryButton>
+        <Divider />
+        <div className="uppercase mb-4">Connected Wallet</div>
         <WalletButton />
-        <div className="text-lg uppercase mb-4">Wallets</div>
+        <Divider />
+        <div className="uppercase mb-4">Linked Wallets</div>
         <div className="w-2/3 pb-8 space-y-2">
           {!!userWallets?.length && (
             <>
@@ -163,7 +171,9 @@ export default function Page() {
           <Link href="/me/manage-wallets">Link wallet</Link>
         </PrimaryButton>
         <Divider />
-        <PrimaryButton onClick={handleSignOut}>Sign out</PrimaryButton>
+        <PrimaryButton className="mb-4" onClick={handleSignOut}>
+          Sign out
+        </PrimaryButton>
       </Panel>
     </ContentWrapper>
   );

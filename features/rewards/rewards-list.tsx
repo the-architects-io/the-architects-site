@@ -96,7 +96,7 @@ export const RewardsList = ({
                   <div className="flex w-full justify-between rounded-lg p-2">
                     {!!name && (
                       <>
-                        <div className="w-full flex justify-between lg:w-2/5 font-bold mb-2">
+                        <div className="flex justify-between w-2/5 font-bold mb-2">
                           <div className="flex flex-col w-full">
                             <div className="mb-2 flex w-full overflow-hidden">
                               <div className={classNames(["truncate"])}>
@@ -125,18 +125,15 @@ export const RewardsList = ({
                               </div>
                             )}
                           </div>
-                          <div className="lg:hidden">
-                            {!!payoutChance && round(payoutChance * 100, 2)}%
-                          </div>
                         </div>
-                        {/* <div className="flex flex-col justify-end w-full lg:w-2/5 flex-wrap">
+                        {/* <div className="flex flex-col justify-end w-full w-2/5 flex-wrap">
                         {!!childRewards &&
                           childRewards.map(({ id, token }) => (
                             <>
                               {!!id && (
                                 <div
                                   key={id}
-                                  className="mb-2 rounded-lg lg:text-right"
+                                  className="mb-2 rounded-lg text-right"
                                 >
                                   {!!token?.mintAddress && (
                                     <div>
@@ -151,10 +148,10 @@ export const RewardsList = ({
                             </>
                           ))}
                       </div> */}
-                        <div className="w-full hidden lg:w-1/5 lg:flex justify-end order-1 text-right">
+                        <div className="w-1/5 flex justify-end order-1 text-right">
                           <div>{amount}</div>
                         </div>
-                        <div className="w-full hidden lg:w-1/5 lg:flex justify-end order-1">
+                        <div className="w-1/5 flex justify-end order-1">
                           {typeof payoutSortOrder === "number" &&
                           payoutSortOrder > -1 ? (
                             <div>{payoutSortOrder}</div>
