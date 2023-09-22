@@ -22,9 +22,10 @@ import { publicKey } from "@metaplex-foundation/umi";
 import { Dispenser, TokenBalance } from "@/app/blueprint/types";
 import { PublicKey } from "@metaplex-foundation/js";
 import PortalsSdk from "@/utils/portals-sdk-v2";
+import { useSearchParams } from "next/navigation";
 
-export default function Page({ params }: { params: any }) {
-  const { id } = params;
+export default function Page() {
+  const searchParams = useSearchParams();
   const { publicKey: pubKey } = useWallet();
   const [isClaiming, setIsClaiming] = useState(false);
   const [inStockMintAddresses, setInStockMintAddresses] = useState<string[]>(
@@ -35,7 +36,7 @@ export default function Page({ params }: { params: any }) {
   const [roomId, setRoomId] = useState<string | null>(null);
 
   const { dispenser, isLoading, fetchRewardTokenBalances } = useDispenser(
-    id || ""
+    searchParams.get("id") || ""
   );
   const [hasFetchedBalances, setHasFetchedBalances] = useState<boolean>(false);
   const [isFetchingBalances, setIsFetchingBalances] = useState<boolean>(false);
