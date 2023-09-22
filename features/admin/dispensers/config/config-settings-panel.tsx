@@ -24,7 +24,7 @@ export const ConfigSettingsPanel = ({
         className="flex items-center justify-center"
         onClick={() =>
           copyTextToClipboard(
-            `https://preview.the-architects.io/in-portals/dispenser-claim?id=${dispenser.id}`
+            `https://preview.the-architects.io/in-portals/dispenser?id=${dispenser.id}`
           )
         }
       >
