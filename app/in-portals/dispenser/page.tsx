@@ -207,6 +207,11 @@ export default function Page() {
     return (
       <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
         <Spinner />
+        <RewardsList
+          inStockMintAddresses={inStockMintAddresses}
+          dispenserId={dispenser?.id || ""}
+          className="mb-4 max-w-md"
+        />
       </div>
     );
 
