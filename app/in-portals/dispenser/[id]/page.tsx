@@ -164,14 +164,7 @@ export default function Page({ params }: { params: any }) {
         secondaryMessage: "Please try again later.",
       });
     }
-  }, [
-    PayoutMethod.RANDOM,
-    PayoutMethod.SORTED,
-    dispenser,
-    pubKey,
-    rewards,
-    updateBalances,
-  ]);
+  }, [PayoutMethod.RANDOM, PayoutMethod.SORTED, dispenser, pubKey, rewards]);
 
   useEffect(() => {
     if (!hasFetchedBalances) {
