@@ -93,7 +93,7 @@ export const RewardsList = ({
                 payoutSortOrder,
               }) => (
                 <Fragment key={id}>
-                  <div className="flex flex-wrap w-full flex-1 justify-between rounded-lg p-2">
+                  <div className="flex w-full justify-between rounded-lg p-2">
                     {!!name && (
                       <>
                         <div className="w-full flex justify-between lg:w-2/5 font-bold mb-2">
