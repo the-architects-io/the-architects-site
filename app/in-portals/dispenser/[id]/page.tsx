@@ -1,5 +1,4 @@
 "use client";
-import * as anchor from "@coral-xyz/anchor";
 import {
   BASE_URL,
   DISPENSER_PROGRAM_ID,
@@ -7,13 +6,9 @@ import {
   RPC_ENDPOINT,
 } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
-import { ContentWrapper } from "@/features/UI/content-wrapper";
-import { Panel } from "@/features/UI/panel";
-import { useUserData } from "@nhost/nextjs";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useCallback, useEffect, useState } from "react";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
-import { useSearchParams } from "next/navigation";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import axios from "axios";
 import WalletButton from "@/features/UI/buttons/wallet-button";
