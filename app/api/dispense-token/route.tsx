@@ -2,7 +2,7 @@
 import * as anchor from "@coral-xyz/anchor";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { Dispenser, NoopResponse } from "@/app/blueprint/types";
+import { NoopResponse } from "@/app/blueprint/types";
 import { Connection, Keypair } from "@solana/web3.js";
 import { DISPENSER_PROGRAM_ID, RPC_ENDPOINT } from "@/constants/constants";
 import { IDL } from "@/idl/types/dispenser";
@@ -58,7 +58,6 @@ export async function POST(req: NextRequest) {
   );
 
   const anchorWallet = new NodeWallet(rewardKeypair);
-
   const connection = new Connection(RPC_ENDPOINT, "confirmed");
 
   const feeCalculator = await connection.getRecentBlockhash();
