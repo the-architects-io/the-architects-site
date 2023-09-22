@@ -362,3 +362,9 @@ export enum TokenType {
   NFT,
   SFT,
 }
+
+export type Trait = {
+  id: string;
+  name: string;
+  value: string;
+};

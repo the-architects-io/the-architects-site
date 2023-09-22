@@ -7,7 +7,6 @@ import { Metaplex, PublicKey } from "@metaplex-foundation/js";
 import { Connection } from "@solana/web3.js";
 import { RPC_ENDPOINT } from "@/constants/constants";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
-import { addTraitsToDb } from "@/utils/nfts/add-traits-to-db";
 import { Token } from "@/app/blueprint/types";
 
 export async function POST(req: NextRequest) {
@@ -51,7 +50,10 @@ export async function POST(req: NextRequest) {
 
   if (!nftMetasFromMetaplex.length) {
     console.log("No nfts fetched from metaplex");
-    return;
+    return NextResponse.json(
+      { error: "No nfts fetched from metaplex" },
+      { status: 500 }
+    );
   }
 
   const nftsWithMetadata = await fetchNftsWithMetadata(

@@ -12,26 +12,7 @@ import { Connection } from "@solana/web3.js";
 import { RPC_ENDPOINT } from "@/constants/constants";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import { addTraitsToDb } from "@/utils/nfts/add-traits-to-db";
-import { Character, NoopResponse, Token } from "@/app/blueprint/types";
-
-export type Trait = {
-  id: string;
-  name: string;
-  value: string;
-};
-
-type CharacterResponse = {
-  characters?: Character[];
-  success: boolean;
-  message: string;
-};
-
-type Data =
-  | CharacterResponse
-  | NoopResponse
-  | {
-      error: unknown;
-    };
+import { Character, NoopResponse, Token, Trait } from "@/app/blueprint/types";
 
 export async function POST(req: NextRequest) {
   const { hashList, noop, nftCollectionId } = await req.json();
@@ -103,7 +84,10 @@ export async function POST(req: NextRequest) {
 
   if (!nftMetasFromMetaplex.length) {
     console.log("No nfts fetched from metaplex");
-    return;
+    return NextResponse.json(
+      { error: "Could not resolve nfts" },
+      { status: 500 }
+    );
   }
 
   const nftsWithMetadata = await fetchNftsWithMetadata(
@@ -191,7 +175,7 @@ export async function POST(req: NextRequest) {
         }
         const {
           insert_traitInstances_one,
-        }: { insert_traitInstances_one: Data } = await client.request({
+        }: { insert_traitInstances_one: any } = await client.request({
           document: ADD_TRAIT_INSTANCE,
           variables: {
             traitId,

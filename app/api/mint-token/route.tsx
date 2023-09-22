@@ -6,7 +6,6 @@ import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { Metaplex, PublicKey, keypairIdentity } from "@metaplex-foundation/js";
 import { fetchDigitalAsset } from "@metaplex-foundation/mpl-token-metadata";
 import {
-  createGenericFile,
   createGenericFileFromBrowserFile,
   publicKey,
 } from "@metaplex-foundation/umi";
@@ -14,7 +13,6 @@ import { Connection, Keypair } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  console.log("sanity check");
   const res = await req.formData();
   const description = res.get("description") as string;
   const name = res.get("name") as string;
@@ -22,8 +20,6 @@ export async function POST(req: NextRequest) {
   const noop = res.get("noop");
   const tokenOwner = res.get("tokenOwner") as string;
   const imageFile = res.get("imageFile") as File;
-
-  console.log({ name, imageFile });
 
   if (noop)
     return NextResponse.json(
@@ -42,23 +38,6 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // let createToken = null;
-    // switch (tokenType) {
-    //   case TokenType.NFT:
-    //     createToken = createNft;
-    //     break;
-    //   case TokenType.SFT:
-    //     createToken = createFungibleAsset;
-    //     break;
-    //   case TokenType.SPL:
-    //     createToken = createFungible;
-    //   default:
-    //     return NextResponse.json(
-    //       { error: "Invalid token type" },
-    //       { status: 500 }
-    //     );
-    // }
-
     const connection = new Connection(RPC_ENDPOINT);
     const metaplex = Metaplex.make(connection);
     const umi = await getUmiClient();
@@ -86,7 +65,7 @@ export async function POST(req: NextRequest) {
       image,
       seller_fee_basis_points: Number(sellerFeeBasisPoints) * 100,
     });
-    console.log({ uri });
+
     if (!uri || uri.length === 0) {
       return NextResponse.json({
         status: 500,
@@ -132,26 +111,20 @@ export async function POST(req: NextRequest) {
       console.log({ error });
     }
 
-    console.log({ asset });
-
     return NextResponse.json(
       {
-        // signature,
-        // result,
-        // signature: response?.signature || "",
-        // nft,
         asset: parse(stringify(asset) || ""),
         signature,
       },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.log({ error });
-    return {
-      status: 500,
-      json: {
-        error: "Error minting token",
+    return NextResponse.json(
+      {
+        error: error?.message,
       },
-    };
+      { status: 500 }
+    );
   }
 }
