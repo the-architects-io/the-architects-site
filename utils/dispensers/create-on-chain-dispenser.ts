@@ -23,6 +23,13 @@ export const createOnChainDispenser = async (
   return new Promise(async (resolve, reject) => {
     anchor.setProvider(provider);
 
+    console.log({
+      DISPENSER_PROGRAM_ID,
+      dispenserId,
+      provider,
+      connection,
+    });
+
     if (!DISPENSER_PROGRAM_ID || !dispenserId || !provider || !connection) {
       throw new Error("Missing required parameters");
     }
