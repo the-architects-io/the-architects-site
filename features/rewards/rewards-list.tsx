@@ -11,7 +11,7 @@ import { getAmountWithDecimals } from "@/utils/currency";
 import { HeliusToken } from "@/app/blueprint/types";
 import Spinner from "@/features/UI/spinner";
 import { StopCircleRounded } from "@mui/icons-material";
-import { publicKey } from "@metaplex-foundation/umi";
+import { isPublicKey, publicKey } from "@metaplex-foundation/umi";
 
 export const RewardsList = ({
   dispenserId,
@@ -100,7 +100,7 @@ export const RewardsList = ({
                           <div className="flex flex-col w-full">
                             <div className="mb-2 flex w-full overflow-hidden">
                               <div className={classNames(["truncate"])}>
-                                {!!publicKey(name)
+                                {isPublicKey(name)
                                   ? getAbbreviatedAddress(name)
                                   : name}
                               </div>
