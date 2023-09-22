@@ -26,7 +26,6 @@ import { useSearchParams } from "next/navigation";
 
 export default function Page() {
   const searchParams = useSearchParams();
-  const { publicKey: pubKey } = useWallet();
   const [isClaiming, setIsClaiming] = useState(false);
   const [inStockMintAddresses, setInStockMintAddresses] = useState<string[]>(
     []
@@ -87,7 +86,7 @@ export default function Page() {
   }, [dispenser, isFetchingBalances]);
 
   const handleClaim = useCallback(async () => {
-    if (!DISPENSER_PROGRAM_ID || !dispenser?.id || !pubKey)
+    if (!DISPENSER_PROGRAM_ID || !dispenser?.id)
       throw new Error("Missing required data.");
 
     try {
@@ -136,7 +135,7 @@ export default function Page() {
 
       const { data } = await axios.post("/api/dispense-token", {
         dispenserId: dispenser.id,
-        recipientAddress: pubKey,
+        recipientAddress: inPortalsWalletAddress?.toString(),
         mintAddress: reward.itemCollection.item.token.mintAddress,
         amount,
       });
@@ -160,7 +159,13 @@ export default function Page() {
         secondaryMessage: "Please try again later.",
       });
     }
-  }, [PayoutMethod.RANDOM, PayoutMethod.SORTED, dispenser, pubKey, rewards]);
+  }, [
+    PayoutMethod.RANDOM,
+    PayoutMethod.SORTED,
+    dispenser,
+    inPortalsWalletAddress,
+    rewards,
+  ]);
 
   useEffect(() => {
     if (!hasFetchedBalances) {
@@ -273,7 +278,7 @@ export default function Page() {
               <PrimaryButton
                 className="my-4"
                 onClick={handleClaim}
-                disabled={!pubKey || isClaiming || !hasStock}
+                disabled={isClaiming || !hasStock}
               >
                 {isClaiming ? <Spinner /> : "Claim"}
               </PrimaryButton>
