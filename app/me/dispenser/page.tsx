@@ -9,6 +9,7 @@ import { GET_DISPENSERS_BY_OWNER_ID } from "@/graphql/queries/get-dispensers-by-
 import { useQuery } from "@apollo/client";
 import { RemoveCircleOutline } from "@mui/icons-material";
 import { useUserData } from "@nhost/nextjs";
+import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
