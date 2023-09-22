@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   const { imageUrl, name, description, noop, ownerId } = await req.json();
 
   console.log({
-    ipViaHeaders: req.headers.get("x-real-ip"),
+    ip: req.headers.get("x-real-ip"),
   });
 
   if (noop)

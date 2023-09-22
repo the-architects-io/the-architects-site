@@ -98,17 +98,7 @@ export const RewardsList = ({
                         <div className="w-full flex justify-between lg:w-2/5 font-bold mb-2">
                           <div className="flex flex-col w-full">
                             <div className="mb-2 flex w-full overflow-hidden">
-                              <div
-                                className={classNames([
-                                  "truncate",
-                                  {
-                                    "text-red-500 line-through":
-                                      !inStockMintAddresses?.includes(
-                                        token?.mintAddress || ""
-                                      ),
-                                  },
-                                ])}
-                              >
+                              <div className={classNames(["truncate"])}>
                                 {name}
                               </div>
                               {isFreezeOnDelivery && (
