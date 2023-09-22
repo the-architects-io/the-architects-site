@@ -1,7 +1,7 @@
 import { TokenBalance } from "@/app/api/get-token-balances-from-helius/route";
 import { BASE_URL, REWARD_WALLET_ADDRESS } from "@/constants/constants";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
-import { round } from "@/utils/formatting";
+import { getAbbreviatedAddress, round } from "@/utils/formatting";
 import axios from "axios";
 import classNames from "classnames";
 import Image from "next/image";
@@ -11,6 +11,7 @@ import { getAmountWithDecimals } from "@/utils/currency";
 import { HeliusToken } from "@/app/blueprint/types";
 import Spinner from "@/features/UI/spinner";
 import { StopCircleRounded } from "@mui/icons-material";
+import { publicKey } from "@metaplex-foundation/umi";
 
 export const RewardsList = ({
   dispenserId,
@@ -99,7 +100,9 @@ export const RewardsList = ({
                           <div className="flex flex-col w-full">
                             <div className="mb-2 flex w-full overflow-hidden">
                               <div className={classNames(["truncate"])}>
-                                {name}
+                                {!!publicKey(name)
+                                  ? getAbbreviatedAddress(name)
+                                  : name}
                               </div>
                               {isFreezeOnDelivery && (
                                 <Image
