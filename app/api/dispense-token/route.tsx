@@ -27,6 +27,10 @@ export async function POST(req: NextRequest) {
   const { noop, dispenserId, recipientAddress, mintAddress, amount } =
     await req.json();
 
+  console.log({
+    ip: req.headers.get("x-real-ip"),
+  });
+
   if (noop)
     return NextResponse.json({
       noop: true,
