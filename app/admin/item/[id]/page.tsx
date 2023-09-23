@@ -150,7 +150,7 @@ export default function ItemDetailPage({ params }: { params: any }) {
                     <div>Bound to token:</div>
                     <a
                       className="text-xl underline"
-                      href={`https://explorer.solana.com/address/${item.token.mintAddress}`}
+                      href={`https://solscan.io/token/${item.token.mintAddress}`}
                       target="_blank"
                       rel="noreferrer"
                     >

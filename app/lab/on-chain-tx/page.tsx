@@ -81,8 +81,8 @@ export default function Page({ params }: { params: any }) {
         primaryMessage: "Dispensed!",
         secondaryMessage: `Transaction: ${getAbbreviatedAddress(txHash)}`,
         link: {
-          url: `https://explorer.solana.com/tx/${txHash}`,
-          title: "View on Solana Explorer",
+          url: `https://solscan.io/tx/${txHash}`,
+          title: "View Transaction",
         },
       });
     } catch (err) {

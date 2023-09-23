@@ -147,8 +147,8 @@ export default function Page() {
         primaryMessage: "Sent!",
         secondaryMessage: "You have claimed your reward!",
         link: {
-          url: `https://explorer.solana.com/tx/${txHash}?cluster=devnet`,
-          title: "View on Solana Explorer",
+          url: `https://solscan.io/tx/${txHash}?cluster=devnet`,
+          title: "View on Transaction",
         },
       });
       setIsClaiming(false);

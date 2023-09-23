@@ -214,7 +214,7 @@ export default function ProfilePage({ params }: { params: any }) {
           </div>
           <a
             className="flex justify-center items-center underline"
-            href={`https://explorer.solana.com/address/${character.token.mintAddress}`}
+            href={`https://solscan.io/token/${character.token.mintAddress}`}
             target="_blank"
             rel="noreferrer"
           >
@@ -272,7 +272,7 @@ export default function ProfilePage({ params }: { params: any }) {
                 <div>{amount}</div>
                 <a
                   className="flex justify-center items-center underline"
-                  href={`https://explorer.solana.com/tx/${txAddress}`}
+                  href={`https://solscan.io/tx/${txAddress}`}
                   target="_blank"
                   rel="noreferrer"
                 >

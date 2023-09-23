@@ -29,11 +29,11 @@ const ClaimButton = ({ dispenserId }: { dispenserId: string }) => {
           <div className="flex flex-col">
             <div className="text-lg uppercase text-center mb-2">Success!</div>
             <a
-              href={`https://explorer.solana.com/tx/${txAddress}`}
+              href={`https://solscan.io/tx/${txAddress}`}
               target="_blank"
               rel="noopener noreferrer"
             >
-              View on Solana Explorer
+              View Transaction
             </a>
           </div>
         </div>

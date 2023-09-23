@@ -71,7 +71,7 @@ export const DispenserControlPanel = ({
                         Wallet:{" "}
                         <a
                           className="text-sky-400 underline"
-                          href={`https://explorer.solana.com/account/${dispenser.rewardWalletAddress}?cluster=devnet`}
+                          href={`https://solscan.io/account/${dispenser.rewardWalletAddress}?cluster=devnet`}
                           target="_blank"
                           rel="noreferrer"
                         >

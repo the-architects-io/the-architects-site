@@ -16,7 +16,7 @@ export const PayoutListItem = ({ payout }: { payout: Payout }) => {
           <div>Token:</div>
           <a
             className="underline"
-            href={`https://explorer.solana.com/address/${payout.token.mintAddress}`}
+            href={`https://solscan.io/token/${payout.token.mintAddress}`}
             target="_blank"
             rel="noreferrer"
           >
@@ -28,7 +28,7 @@ export const PayoutListItem = ({ payout }: { payout: Payout }) => {
             <div>Wallet:</div>
             <a
               className="underline"
-              href={`https://explorer.solana.com/address/${payout.wallet.address}`}
+              href={`https://solscan.io/account/${payout.wallet.address}`}
               target="_blank"
               rel="noreferrer"
             >
@@ -40,7 +40,7 @@ export const PayoutListItem = ({ payout }: { payout: Payout }) => {
           <div>Tx:</div>
           <a
             className="underline"
-            href={`https://explorer.solana.com/tx/${payout.txAddress}`}
+            href={`https://solscan.io/tx/${payout.txAddress}`}
             target="_blank"
             rel="noreferrer"
           >

@@ -295,7 +295,7 @@ export const DispenserRewardForm = ({
                 <div className="flex justify-center w-full mb-8 space-x-4">
                   <SecondaryButton>
                     <a
-                      href={`https://explorer.solana.com/address/${dispenser?.rewardWalletAddress}?cluster=devnet`}
+                      href={`https://solscan.io/account/${dispenser?.rewardWalletAddress}?cluster=devnet`}
                       target="_blank"
                       rel="noreferrer"
                     >

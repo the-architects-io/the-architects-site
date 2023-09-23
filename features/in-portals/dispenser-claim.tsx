@@ -113,7 +113,7 @@ export const DispenserClaim = ({
           Transfer
           <br /> Successful!
           <a
-            href={`https://explorer.solana.com/tx/${txAddress}`}
+            href={`https://solscan.io/tx/${txAddress}`}
             target="_blank"
             rel="noreferrer"
             className="underline text-sm pt-8"

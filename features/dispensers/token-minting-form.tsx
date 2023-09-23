@@ -59,7 +59,7 @@ export const TokenMintingForm = ({
         showToast({
           primaryMessage: "Minted",
           link: {
-            url: `https://explorer.solana.com/address/${data.asset.publicKey}?cluster=devnet`,
+            url: `https://solscan.io/token/${data.asset.publicKey}?cluster=devnet`,
             title: "View token",
           },
         });
