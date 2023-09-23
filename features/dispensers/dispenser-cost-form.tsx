@@ -189,7 +189,7 @@ export const DispenserCostForm = ({
                 >
                   <SecondaryButton>
                     <a
-                      href={`https://explorer.solana.com/address/${dispenser?.rewardWalletAddress}`}
+                      href={`https://explorer.solana.com/address/${dispenser?.rewardWalletAddress}?cluster=devnet`}
                       target="_blank"
                       rel="noreferrer"
                     >
