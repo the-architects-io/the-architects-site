@@ -129,6 +129,7 @@ export const DispenserClaim = ({
     <div className="flex flex-col justify-center items-center w-full min-h-screen">
       {!!dispenser && (
         <>
+          {JSON.stringify({ isLoading, numberOfDaoNftsHeld })}
           <BuildTokenVestingDetails
             walletAddress={walletAddress}
             numberOfDaoNftsHeld={numberOfDaoNftsHeld || 0}

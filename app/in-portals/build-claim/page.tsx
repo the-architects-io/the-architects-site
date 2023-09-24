@@ -107,8 +107,13 @@ export default function DispenserClaimPage({ params }: { params: any }) {
     handleFetchDaoNfts,
     walletAdapterWalletAddress,
   ]);
+  return (
+    <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
+      <Spinner />
+    </div>
+  );
 
-  if (!inPortalsWalletAddress && ENV !== "local")
+  if (!inPortalsWalletAddress && !walletAdapterWalletAddress)
     return (
       <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
         <Spinner />
@@ -119,11 +124,10 @@ export default function DispenserClaimPage({ params }: { params: any }) {
     <>
       {!walletAdapterWalletAddress && !inPortalsWalletAddress ? (
         <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300 bg-slate-800">
-          {ENV === "local" && (
-            <div className="absolute top-4 right-4">
-              <WalletButton />
-            </div>
-          )}
+          <div className="absolute top-4 right-4">
+            <WalletButton />
+          </div>
+
           <div className="max-w-xs text-center mb-4">
             Please allow your wallet to be connected in the popup above.
           </div>
