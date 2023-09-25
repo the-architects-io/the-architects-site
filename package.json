@@ -9,7 +9,8 @@
     "lint": "next lint",
     "fill": "npx ts-node scripts/fill-dispenser.ts",
     "test": "jest",
-    "test:watch": "jest --watchAll"
+    "test:watch": "jest --watchAll",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@apollo/client": "^3.7.14",
@@ -91,6 +92,7 @@
     "lodash.clonedeep": "^4.5.0",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",
-    "tsc": "^2.0.4"
+    "tsc": "^2.0.4",
+    "husky": "^8.0.0"
   }
 }
