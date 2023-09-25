@@ -15,7 +15,7 @@ import WalletButton from "@/features/UI/buttons/wallet-button";
 import { RewardsList } from "@/features/rewards/rewards-list";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
-import { getAmountWithoutDecimals } from "@/utils/currency";
+import { toBaseUnit } from "@/utils/currency";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { fetchAllDigitalAssetWithTokenByOwner } from "@metaplex-foundation/mpl-token-metadata";
 import { publicKey } from "@metaplex-foundation/umi";
@@ -126,7 +126,7 @@ export default function Page() {
       if (!reward) throw new Error("Dispenser is empty");
 
       // either get random reward or next sorted reward
-      const amount = getAmountWithoutDecimals(
+      const amount = toBaseUnit(
         reward.itemCollection.amount,
         dispenser.rewardCollections[0].itemCollection.item.token.decimals
       );

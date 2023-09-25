@@ -1,3 +1,4 @@
+import { isPublicKey } from "@metaplex-foundation/umi";
 import { PublicKey } from "@solana/web3.js";
 
 export const getAbbreviatedAddress = (
@@ -8,6 +9,9 @@ export const getAbbreviatedAddress = (
   if (typeof address !== "string") {
     address = address.toString();
   }
+
+  if (!isPublicKey(address)) return "";
+
   if (!address) return "";
   return `${address.slice(0, identifierLength)}...${address.slice(
     address.length - identifierLength

@@ -16,7 +16,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { BASE_URL, RPC_ENDPOINT } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { getAbbreviatedAddress } from "@/utils/formatting";
-import { getAmountWithDecimals } from "@/utils/currency";
+import { fromBaseUnit } from "@/utils/currency";
 import classNames from "classnames";
 import { Divider } from "@/features/UI/divider";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
@@ -388,7 +388,7 @@ export const DispenserRewardForm = ({
                                           total
                                         </div>
                                         <div className="text-xl">
-                                          {getAmountWithDecimals(
+                                          {fromBaseUnit(
                                             reward.amount,
                                             reward.decimals
                                           )}

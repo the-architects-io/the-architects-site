@@ -7,7 +7,7 @@ import classNames from "classnames";
 import Image from "next/image";
 import { Fragment, useCallback, useEffect, useState } from "react";
 
-import { getAmountWithDecimals } from "@/utils/currency";
+import { fromBaseUnit } from "@/utils/currency";
 import { HeliusToken } from "@/app/blueprint/types";
 import Spinner from "@/features/UI/spinner";
 import { StopCircleRounded } from "@mui/icons-material";
@@ -52,7 +52,7 @@ export const RewardsList = ({
     let balance =
       tokenBalances.find(({ mint }) => mint === token.mintAddress)?.amount || 0;
 
-    return getAmountWithDecimals(balance, token.decimals);
+    return fromBaseUnit(balance, token.decimals);
   };
 
   useEffect(() => {

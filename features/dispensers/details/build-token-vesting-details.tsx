@@ -1,6 +1,6 @@
 import { Dispenser } from "@/app/blueprint/types";
 import { LastClaimTimeDetails } from "@/features/dispensers/details/last-claim-time-details";
-import { getAmountWithDecimals } from "@/utils/currency";
+import { fromBaseUnit } from "@/utils/currency";
 import { calculateTokenClaimRewardAmount } from "@/utils/dispensers/calculate-token-claim-reward-amount";
 import { formatNumberWithCommas } from "@/utils/formatting";
 import { PublicKey } from "@solana/web3.js";
@@ -93,9 +93,7 @@ export const BuildTokenVestingDetails = ({
         {rewardAmount > 0 && (
           <div className="flex space-x-2">
             <div>$BUILD available to claim:</div>
-            <div>
-              {formatNumberWithCommas(getAmountWithDecimals(rewardAmount, 2))}
-            </div>
+            <div>{formatNumberWithCommas(fromBaseUnit(rewardAmount, 2))}</div>
           </div>
         )}
 
