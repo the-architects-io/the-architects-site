@@ -108,6 +108,18 @@ export default function DispenserClaimTestPage({ params }: { params: any }) {
     walletAdapterWalletAddress,
   ]);
 
+  if (
+    ENV === "local" &&
+    !inPortalsWalletAddress &&
+    !walletAdapterWalletAddress
+  ) {
+    return (
+      <div className="absolute top-4 right-4">
+        <WalletButton />
+      </div>
+    );
+  }
+
   if (!inPortalsWalletAddress && !walletAdapterWalletAddress)
     return (
       <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
@@ -119,10 +131,6 @@ export default function DispenserClaimTestPage({ params }: { params: any }) {
     <>
       {!walletAdapterWalletAddress && !inPortalsWalletAddress ? (
         <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300 bg-slate-800">
-          <div className="absolute top-4 right-4">
-            <WalletButton />
-          </div>
-
           <div className="max-w-xs text-center mb-4">
             Please allow your wallet to be connected in the popup above.
           </div>

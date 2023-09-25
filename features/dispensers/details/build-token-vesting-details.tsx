@@ -88,7 +88,7 @@ export const BuildTokenVestingDetails = ({
         {rewardAmount > 0 && (
           <div className="flex space-x-2">
             <div>$BUILD available to claim:</div>
-            <div>{formatNumberWithCommas(fromBaseUnit(rewardAmount, 2))}</div>
+            <div>{formatNumberWithCommas(rewardAmount)}</div>
           </div>
         )}
 
