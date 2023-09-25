@@ -40,9 +40,9 @@ export const fromBaseUnit = (
   decimals: number,
   roundToTwoDecimals = false
 ) => {
-  if (!Number.isInteger(decimals) || decimals < 0) {
+  if (!Number.isInteger(decimals) || decimals < 0 || decimals > MAX_DECIMALS) {
     throw new Error(
-      "Invalid decimals value. Decimals must be a non-negative integer."
+      "Invalid decimals value. Decimals must be a non-negative integer and less than SOME_MAX_VALUE."
     );
   }
 
@@ -55,12 +55,6 @@ export const fromBaseUnit = (
   let value = Number(amount) / 10 ** decimals;
   if (roundToTwoDecimals) {
     value = Math.round(value * 100) / 100;
-  }
-
-  if (!Number.isInteger(decimals) || decimals < 0 || decimals > MAX_DECIMALS) {
-    throw new Error(
-      "Invalid decimals value. Decimals must be a non-negative integer and less than SOME_MAX_VALUE."
-    );
   }
 
   return value;

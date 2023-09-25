@@ -8,11 +8,6 @@ import Spinner from "features/UI/spinner";
 import { useCallback, useEffect, useState } from "react";
 import { dayjs } from "utils/date-time";
 
-export enum TokenClaimPayoutStrategies {
-  VESTING_BUILD_TOKEN = "VESTING_BUILD_TOKEN",
-  BASIC_CLAIM = "BASIC_CLAIM",
-}
-
 interface Props {
   walletAddress: PublicKey | null;
   numberOfDaoNftsHeld?: number;

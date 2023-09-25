@@ -1,15 +1,21 @@
 import { Dispenser, TokenClaimPayoutStrategies } from "@/app/blueprint/types";
-import { diffInDays, diffInHours } from "utils/date-time";
+import { fromBaseUnit, toBaseUnit } from "@/utils/currency";
+import { diffInDays } from "@/utils/date-time";
 
-const CUMULATIVE_ACCRUAL = 10500;
+export const CUMULATIVE_ACCRUAL = 10500;
 
 export const caluclateBuildVestingRewardAmount = (
   numberOfDaoNftsHeld: number,
   lastClaimTime: string | undefined
 ) => {
-  const baseClaimAmount = 1000; // 10.00 $BUILD
+  const baseClaimAmountBaseUnit = 1000; // 10.00 $BUILD
 
-  if (!lastClaimTime) return baseClaimAmount * numberOfDaoNftsHeld;
+  if (!lastClaimTime)
+    return fromBaseUnit(baseClaimAmountBaseUnit * numberOfDaoNftsHeld, 2);
+
+  if (numberOfDaoNftsHeld < 0 || Number(lastClaimTime) < 0) {
+    throw new Error("Invalid input");
+  }
 
   const daysSinceLastClaim = diffInDays(lastClaimTime);
 
@@ -18,22 +24,17 @@ export const caluclateBuildVestingRewardAmount = (
   }
 
   if (daysSinceLastClaim >= 20) {
-    return CUMULATIVE_ACCRUAL * numberOfDaoNftsHeld;
+    return fromBaseUnit(CUMULATIVE_ACCRUAL * numberOfDaoNftsHeld, 2);
   }
 
+  const reduction = Math.max(0, daysSinceLastClaim - 1) * 25;
+
   const amount =
-    (baseClaimAmount - (daysSinceLastClaim - 1) * 25) *
+    (baseClaimAmountBaseUnit - reduction) *
     daysSinceLastClaim *
     numberOfDaoNftsHeld;
 
-  console.log({
-    baseClaimAmount,
-    daysSinceLastClaim,
-    numberOfDaoNftsHeld,
-    amount,
-  });
-
-  return amount;
+  return fromBaseUnit(amount, 2);
 };
 
 export const calculateTokenClaimRewardAmount = (
