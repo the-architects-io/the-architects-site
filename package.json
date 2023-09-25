@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "fill": "npx ts-node scripts/fill-dispenser.ts",
-    "test": "jest --forceExit",
+    "test": "jest",
     "test:watch": "jest --watchAll",
     "prepare": "husky install"
   },
