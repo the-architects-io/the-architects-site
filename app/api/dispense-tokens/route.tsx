@@ -34,13 +34,8 @@ export async function POST(req: Request) {
     );
   }
 
-  const ipWhitelist = process.env.API_ACCESS_IP_LIST;
   const hostWhitelist = process.env.API_ACCESS_HOST_LIST;
-
-  const ip = req.headers.get("x-real-ip") || "";
   const host = req.headers.get("host") || "";
-
-  const isValidIp = ipWhitelist.indexOf(ip) > -1;
   const isValidHost = hostWhitelist.indexOf(host) > -1;
 
   console.log("/api/dispense-tokens", {
@@ -51,12 +46,14 @@ export async function POST(req: Request) {
     "x-invoke-query": req.headers.get("x-invoke-query"),
     "x-invoke-output": req.headers.get("x-invoke-output"),
     "x-real-ip": req.headers.get("x-real-ip"),
+    "x-forwarded-for": req.headers.get("x-forwarded-for"),
+    "x-forwarded-host": req.headers.get("x-forwarded-host"),
   });
 
-  if (ENV !== "local" && (!isValidIp || !isValidHost)) {
+  if (ENV !== "local" && !isValidHost) {
     return NextResponse.json(
       {
-        error: `API access not allowed for host: ${host} and IP: ${ip}`,
+        error: `API access not allowed for host: ${host}`,
         status: 500,
       },
       { status: 500 }

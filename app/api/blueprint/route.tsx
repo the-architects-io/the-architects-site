@@ -2,7 +2,7 @@ import {
   BlueprintApiActions,
   MappedErrorResponse,
 } from "@/app/blueprint/types";
-import { BASE_URL } from "@/constants/constants";
+import { BASE_URL, ENV } from "@/constants/constants";
 import { logError } from "@/utils/errors/log-error";
 import axios from "axios";
 import { NextResponse, type NextRequest } from "next/server";
@@ -100,6 +100,16 @@ const handleDispenseTokens = async (params: any) => {
 export async function POST(req: NextRequest) {
   const { action, params, noop } = await req.json();
 
+  if (!process.env.API_ACCESS_HOST_LIST) {
+    return NextResponse.json(
+      {
+        error: "API access not configured",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+
   console.log("/api/blueprint", {
     "x-real-ip": req.headers.get("x-real-ip"),
     "x-forwarded-for": req.headers.get("x-forwarded-for"),
@@ -110,7 +120,22 @@ export async function POST(req: NextRequest) {
     "x-forwarded-prefix": req.headers.get("x-forwarded-prefix"),
     "x-forwarded-uri": req.headers.get("x-forwarded-uri"),
     "x-forwarded-server": req.headers.get("x-forwarded-server"),
+    host: req.headers.get("host"),
   });
+
+  const hostWhitelist = process.env.API_ACCESS_HOST_LIST;
+  const host = req.headers.get("x-forwarded-host") || "";
+  const isValidHost = hostWhitelist.indexOf(host) > -1;
+
+  if (ENV !== "local" && !isValidHost) {
+    return NextResponse.json(
+      {
+        error: `API access not allowed for host: ${host}`,
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
 
   if (noop) {
     return NextResponse.json(
