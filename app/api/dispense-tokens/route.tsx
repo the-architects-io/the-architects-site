@@ -30,6 +30,7 @@ export async function POST(req: Request) {
     "x-invoke-path": req.headers.get("x-invoke-path"),
     "x-invoke-query": req.headers.get("x-invoke-query"),
     "x-invoke-output": req.headers.get("x-invoke-output"),
+    "x-real-ip": req.headers.get("x-real-ip"),
   });
 
   if (apiKey !== process.env.BLUEPRINT_API_KEY) {

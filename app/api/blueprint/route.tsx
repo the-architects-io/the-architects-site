@@ -10,6 +10,21 @@ const BlueprintApiActionUrls = {
   [DISPENSE_TOKENS]: `${BASE_URL}/api/dispense-tokens`,
 };
 
+const mapErrorToResponse = (error: any) => {
+  console.error({ error, response: error?.response });
+  const status =
+    error?.response?.status || error?.response?.data?.status || 500;
+  const statusText =
+    error?.response?.data?.statusText || "Internal Server Error";
+  const message = error?.response?.statusText || "Internal Server Error";
+  const errorMessage = error?.response?.data?.error;
+
+  return {
+    error: { message, errorMessage, status, statusText },
+    status,
+  };
+};
+
 const handleCreateDispenser = async (params: any) => {
   const { data, status, statusText, config } = await axios.post(
     BlueprintApiActionUrls[CREATE_DISENSER],
@@ -58,16 +73,9 @@ const handleDispenseTokens = async (params: any) => {
       }
     );
   } catch (error: any) {
-    console.error({ error, response: error?.response });
-    return NextResponse.json(
-      {
-        error,
-        status: 500,
-      },
-      {
-        status: 500,
-      }
-    );
+    let { error: errorResponse, status } = mapErrorToResponse(error);
+
+    return NextResponse.json(errorResponse, { status });
   }
 };
 
