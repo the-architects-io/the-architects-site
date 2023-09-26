@@ -14,7 +14,10 @@ type Params = {
   walletId?: string;
 };
 
-export const logError = async (error: MappedErrorResponse, metadata?: any) => {
+export const logError = async (
+  error: MappedErrorResponse,
+  metadata: any = {}
+) => {
   console.error({
     error,
     metadata,
