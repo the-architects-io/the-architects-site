@@ -6,8 +6,6 @@ import { getAbbreviatedAddress } from "@/utils/formatting";
 import Link from "next/link";
 import { RewardsSettingsPanel } from "@/features/admin/dispensers/rewards/rewards-settings-panel";
 import { CostsSettingsPanel } from "@/features/admin/dispensers/costs/cost-settings-panel";
-import { GatesSettingsPanel } from "@/features/admin/dispensers/gates/gates-settings-panel";
-import { RestrictionsSettingsPanel } from "@/features/admin/dispensers/restrictions/restrictions-settings-panel";
 import { ConfigSettingsPanel } from "@/features/admin/dispensers/config/config-settings-panel";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import Spinner from "@/features/UI/spinner";

@@ -2,6 +2,7 @@ import { Dispenser } from "@/app/blueprint/types";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import showToast from "@/features/toasts/show-toast";
 import { ClipboardIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 export const ConfigSettingsPanel = ({
   dispenser,
@@ -20,8 +21,14 @@ export const ConfigSettingsPanel = ({
   return (
     <>
       <h2 className="text-xl uppercase mb-4">Config</h2>
+      <Link href={`/admin/dispensers/${dispenser.id}/edit-display`}>
+        <PrimaryButton className="flex items-center justify-center mb-4">
+          <ClipboardIcon className="h-5 w-5 inline-block" />
+          <span className="mx-2">Edit Dispenser Display</span>
+        </PrimaryButton>
+      </Link>
       <PrimaryButton
-        className="flex items-center justify-center"
+        className="flex items-center justify-center mb-4"
         onClick={() =>
           copyTextToClipboard(
             `https://preview.the-architects.io/in-portals/dispenser?id=${dispenser.id}`
