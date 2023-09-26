@@ -42,12 +42,16 @@ export async function POST(req: Request) {
     );
   }
 
+  console.log(1);
+
   if (noop)
     return NextResponse.json({
       noop: true,
       endpoint: "add-dispenser",
       status: 200,
     });
+
+  console.log(2);
 
   if (
     !dispenserId ||
@@ -64,6 +68,8 @@ export async function POST(req: Request) {
     );
   }
 
+  console.log(3);
+
   const hash = createHash(dispenserId);
 
   const [dispenserPda, bump] = await PublicKey.findProgramAddressSync(
@@ -71,18 +77,24 @@ export async function POST(req: Request) {
     new PublicKey(DISPENSER_PROGRAM_ID)
   );
 
+  console.log(4);
+
   const rewardKeypair = Keypair.fromSecretKey(
     bs58.decode(process.env.EXECUTION_WALLET_PRIVATE_KEY)
   );
 
+  console.log(5);
+
   const anchorWallet = new NodeWallet(rewardKeypair);
   const connection = new Connection(RPC_ENDPOINT_DEVNET, "confirmed");
+
+  console.log(6);
 
   const feeCalculator = await connection.getRecentBlockhash();
   const feeInLamports = feeCalculator.feeCalculator.lamportsPerSignature;
   const feeInLamportsWithPadding = feeInLamports + 1000;
 
-  console.log({ feeInLamports, feeInLamportsWithPadding });
+  console.log(7);
 
   const provider = new anchor.AnchorProvider(connection, anchorWallet, {
     preflightCommitment: "confirmed",
