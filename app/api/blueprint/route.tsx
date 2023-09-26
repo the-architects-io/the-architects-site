@@ -33,6 +33,11 @@ const handleCreateDispenser = async (params: any) => {
     }
   );
 
+  console.log("handleCreateDispenser", {
+    status,
+    config,
+  });
+
   return NextResponse.json({
     data,
     status: data?.status || 500,
