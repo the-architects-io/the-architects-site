@@ -58,6 +58,7 @@ const handleDispenseTokens = async (params: any) => {
       }
     );
   } catch (error) {
+    console.error({ error });
     return NextResponse.json(
       {
         error,
