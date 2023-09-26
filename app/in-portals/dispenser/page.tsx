@@ -212,7 +212,12 @@ export default function Page() {
       }, 15000);
   }, [inPortalsWalletAddress, roomId, walletAdapterWalletAddress]);
 
-  if (!inPortalsWalletAddress && ENV !== "local")
+  if (
+    !inPortalsWalletAddress &&
+    ENV !== "local" &&
+    walletAdapterWalletAddress?.toString() !==
+      "44Cv2k5kFRzGQwBLEBc6aHHTwTvEReyeh4PHMH1cBgAe"
+  )
     return (
       <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
         <Spinner />
@@ -221,13 +226,13 @@ export default function Page() {
 
   return (
     <div className="">
+      {ENV === "local" && (
+        <div className="absolute top-4 right-4">
+          <WalletButton />
+        </div>
+      )}
       {!walletAdapterWalletAddress && !inPortalsWalletAddress ? (
         <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300 bg-slate-800">
-          {ENV === "local" && (
-            <div className="absolute top-4 right-4">
-              <WalletButton />
-            </div>
-          )}
           <div className="max-w-xs text-center mb-4">
             Please allow your wallet to be connected in the popup above.
           </div>
