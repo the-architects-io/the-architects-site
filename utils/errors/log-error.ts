@@ -1,3 +1,4 @@
+import { MappedErrorResponse } from "@/app/blueprint/types";
 import { client } from "@/graphql/backend-client";
 import { LOG_ERROR } from "@/graphql/mutations/log-error";
 
@@ -13,7 +14,18 @@ type Params = {
   walletId?: string;
 };
 
-export const logError = async ({ error, burnTxAddress, walletId }: Params) => {
+export const logError = async (error: MappedErrorResponse, metadata?: any) => {
+  console.error({
+    error,
+    metadata,
+  });
+};
+
+export const logErrorDeprecated = async ({
+  error,
+  burnTxAddress,
+  walletId,
+}: Params) => {
   const {
     insert_errorInstances_one,
   }: { insert_errorInstances_one: ErrorInstance[] } = await client.request(

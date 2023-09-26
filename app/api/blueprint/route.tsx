@@ -1,5 +1,9 @@
-import { BlueprintApiActions } from "@/app/blueprint/types";
+import {
+  BlueprintApiActions,
+  MappedErrorResponse,
+} from "@/app/blueprint/types";
 import { BASE_URL } from "@/constants/constants";
+import { logError } from "@/utils/errors/log-error";
 import axios from "axios";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -10,7 +14,7 @@ const BlueprintApiActionUrls = {
   [DISPENSE_TOKENS]: `${BASE_URL}/api/dispense-tokens`,
 };
 
-const mapErrorToResponse = (error: any) => {
+const mapErrorToResponse = (error: any): MappedErrorResponse => {
   const status =
     error?.response?.status || error?.response?.data?.status || 500;
   const statusText =
@@ -19,33 +23,40 @@ const mapErrorToResponse = (error: any) => {
   const errorMessage = error?.response?.data?.error;
 
   return {
+    status: status || 500,
     error: { message, errorMessage, status, statusText },
-    status,
   };
 };
 
 const handleCreateDispenser = async (params: any) => {
-  const { data, status, statusText, config } = await axios.post(
-    BlueprintApiActionUrls[CREATE_DISENSER],
-    {
-      ...params,
-      apiKey: process.env.BLUEPRINT_API_KEY,
-    }
-  );
+  try {
+    const { data, status, statusText, config } = await axios.post(
+      BlueprintApiActionUrls[CREATE_DISENSER],
+      {
+        ...params,
+        apiKey: process.env.BLUEPRINT_API_KEY,
+      }
+    );
 
-  console.log("handleCreateDispenser", {
-    status,
-    config,
-  });
+    console.log("handleCreateDispenser", {
+      status,
+      config,
+    });
 
-  return NextResponse.json({
-    data,
-    status: data?.status || 500,
-    statusText: data?.status !== 200 ? data?.statusText : statusText,
-    config,
-    action: CREATE_DISENSER,
-    params,
-  });
+    return NextResponse.json({
+      data,
+      status: data?.status || 500,
+      statusText: data?.status !== 200 ? data?.statusText : statusText,
+      config,
+      action: CREATE_DISENSER,
+      params,
+    });
+  } catch (rawError: any) {
+    let error = mapErrorToResponse(rawError);
+
+    logError(error);
+    return NextResponse.json(error);
+  }
 };
 
 const handleDispenseTokens = async (params: any) => {
@@ -71,10 +82,11 @@ const handleDispenseTokens = async (params: any) => {
         status: status || 500,
       }
     );
-  } catch (error: any) {
-    let { error: errorResponse, status } = mapErrorToResponse(error);
+  } catch (rawError: any) {
+    let error = mapErrorToResponse(rawError);
 
-    return NextResponse.json(errorResponse, { status });
+    logError(error);
+    return NextResponse.json(error);
   }
 };
 
@@ -92,7 +104,6 @@ export async function POST(req: NextRequest) {
   }
 
   switch (action) {
-    // use string ver of enum
     case BlueprintApiActions.CREATE_DISENSER:
       return handleCreateDispenser(params);
     case BlueprintApiActions.DISPENSE_TOKENS:

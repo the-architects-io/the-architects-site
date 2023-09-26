@@ -373,3 +373,13 @@ export enum BlueprintApiActions {
   CREATE_DISENSER = "CREATE_DISENSER",
   DISPENSE_TOKENS = "DISPENSE_TOKENS",
 }
+
+export type MappedErrorResponse = {
+  error: {
+    message: string;
+    errorMessage: string;
+    status: number;
+    statusText: string;
+  };
+  status: number;
+};

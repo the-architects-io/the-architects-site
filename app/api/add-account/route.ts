@@ -4,7 +4,7 @@ import { User } from "@/features/admin/users/users-list-item";
 import { client } from "@/graphql/backend-client";
 import { ADD_ACCOUNT } from "@/graphql/mutations/add-account";
 import { UPDATE_USER } from "@/graphql/mutations/update-user";
-import { logError } from "@/utils/log-error";
+import { logErrorDeprecated } from "@/utils/errors/log-error";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -21,7 +21,7 @@ type Data =
     };
 
 export async function POST(req: NextRequest) {
-  logError({
+  logErrorDeprecated({
     error: {
       code: 2,
       message: "Attempting to save Discord account info",
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     userId,
   });
 
-  logError({
+  logErrorDeprecated({
     error: {
       code: 3,
       message: "Attempting to save Discord account info",
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (!imageUrl || !providerId || !providerAccountId || !username) {
-    logError({
+    logErrorDeprecated({
       error: {
         code: 500,
         message: "Could not save Discord account info",
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
     accessToken,
   };
 
-  logError({
+  logErrorDeprecated({
     error: {
       code: 4,
       message: "Attempting to save Discord account info",
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
         variables,
       });
 
-    logError({
+    logErrorDeprecated({
       error: {
         code: 5,
         message: "Attempting to save Discord account info",
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
         },
       });
 
-    logError({
+    logErrorDeprecated({
       error: {
         code: 6,
         message: "Attempting to save Discord account info",
@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    logError({
+    logErrorDeprecated({
       error: {
         code: 500,
         message: "Could not save Discord account info",

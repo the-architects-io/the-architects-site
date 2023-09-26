@@ -23,6 +23,34 @@ export async function POST(req: Request) {
   const { noop, dispenserId, recipientAddress, mintAddress, amount, apiKey } =
     await req.json();
 
+  if (!process.env.API_ACCESS_HOST_LIST || !process.env.API_ACCESS_IP_LIST) {
+    return NextResponse.json(
+      {
+        error: "API access not configured",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+
+  const ipWhitelist = Array(process.env.API_ACCESS_IP_LIST);
+  const hostWhitelist = Array(process.env.API_ACCESS_HOST_LIST);
+  const ip = req.headers.get("x-real-ip") || "";
+  const host = req.headers.get("host") || "";
+
+  if (
+    !ipWhitelist.indexOf(req.headers.get("x-real-ip") || "") ||
+    !hostWhitelist.indexOf(req.headers.get("host") || "")
+  ) {
+    return NextResponse.json(
+      {
+        error: `API access not allowed for host: ${host} and IP: ${ip}`,
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+
   console.log({
     host: req.headers.get("host"),
     connection: req.headers.get("connection"),
