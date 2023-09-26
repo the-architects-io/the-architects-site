@@ -4,6 +4,7 @@ import {
   BASE_URL,
   DISPENSER_PROGRAM_ID,
   RPC_ENDPOINT,
+  RPC_ENDPOINT_DEVNET,
 } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
@@ -52,7 +53,7 @@ export default function Page({ params }: { params: any }) {
     try {
       setIsClaiming(true);
 
-      const umi = createUmi(RPC_ENDPOINT);
+      const umi = createUmi(RPC_ENDPOINT_DEVNET);
 
       const onChainDispenserAssets = await fetchAllDigitalAssetWithTokenByOwner(
         umi,

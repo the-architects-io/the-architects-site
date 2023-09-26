@@ -13,7 +13,11 @@ import {
   TokenBalance,
 } from "@/app/blueprint/types";
 import React, { useCallback, useEffect, useState } from "react";
-import { BASE_URL, RPC_ENDPOINT } from "@/constants/constants";
+import {
+  BASE_URL,
+  RPC_ENDPOINT,
+  RPC_ENDPOINT_DEVNET,
+} from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { fromBaseUnit } from "@/utils/currency";
@@ -90,7 +94,7 @@ export const DispenserRewardForm = ({
       console.log({ allTokens });
 
       try {
-        const umi = createUmi(RPC_ENDPOINT);
+        const umi = createUmi(RPC_ENDPOINT_DEVNET);
         const nfts = await fetchAllDigitalAsset(
           umi,
           allTokens
@@ -203,7 +207,7 @@ export const DispenserRewardForm = ({
           walletAddress: dispenser?.rewardWalletAddress,
         }
       );
-      const umi = createUmi(RPC_ENDPOINT);
+      const umi = createUmi(RPC_ENDPOINT_DEVNET);
 
       const assets = await fetchAllDigitalAssetByOwner(
         umi,

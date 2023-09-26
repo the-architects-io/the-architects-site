@@ -4,6 +4,7 @@ import {
   DISPENSER_PROGRAM_ID,
   ENV,
   RPC_ENDPOINT,
+  RPC_ENDPOINT_DEVNET,
 } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -55,7 +56,7 @@ export default function Page() {
 
   const updateBalances = useCallback(async () => {
     if (!dispenser?.rewardWalletAddress || isFetchingBalances) return;
-    const umi = createUmi(RPC_ENDPOINT);
+    const umi = createUmi(RPC_ENDPOINT_DEVNET);
 
     const onChainDispenserAssets = await fetchAllDigitalAssetWithTokenByOwner(
       umi,
@@ -141,7 +142,7 @@ export default function Page() {
         action: BlueprintApiActions.DISPENSE_TOKENS,
         params: {
           dispenserId: dispenser.id,
-          recipientAddress: "44Cv2k5kFRzGQwBLEBc6aHHTwTvEReyeh4PHMH1cBgAe",
+          recipientAddress: inPortalsWalletAddress?.toBase58(),
           mintAddress: reward.itemCollection.item.token.mintAddress,
           amount,
         },
