@@ -13,11 +13,22 @@ type Data =
     };
 
 export async function POST(req: NextRequest) {
-  const { imageUrl, name, description, noop, ownerId } = await req.json();
+  const { imageUrl, name, description, noop, ownerId, apiKey } =
+    await req.json();
 
-  console.log({
-    ip: req.headers.get("x-real-ip"),
-  });
+  const ip = req.headers.get("x-real-ip");
+
+  console.log({ ip });
+
+  if (apiKey !== process.env.BLUEPRINT_API_KEY) {
+    return NextResponse.json(
+      {
+        error: "Invalid API key",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
 
   if (noop)
     return NextResponse.json({

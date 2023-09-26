@@ -19,7 +19,11 @@ import { toBaseUnit } from "@/utils/currency";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { fetchAllDigitalAssetWithTokenByOwner } from "@metaplex-foundation/mpl-token-metadata";
 import { publicKey } from "@metaplex-foundation/umi";
-import { Dispenser, TokenBalance } from "@/app/blueprint/types";
+import {
+  BlueprintApiActions,
+  Dispenser,
+  TokenBalance,
+} from "@/app/blueprint/types";
 import { PublicKey } from "@metaplex-foundation/js";
 import PortalsSdk from "@/utils/portals-sdk-v2";
 import { useSearchParams } from "next/navigation";
@@ -133,11 +137,14 @@ export default function Page() {
 
       console.log({ reward, amount });
 
-      const { data } = await axios.post("/api/dispense-token", {
-        dispenserId: dispenser.id,
-        recipientAddress: inPortalsWalletAddress?.toString(),
-        mintAddress: reward.itemCollection.item.token.mintAddress,
-        amount,
+      const { data } = await axios.post("/api/blueprint", {
+        action: BlueprintApiActions.DISPENSE_TOKENS,
+        params: {
+          dispenserId: dispenser.id,
+          recipientAddress: "44Cv2k5kFRzGQwBLEBc6aHHTwTvEReyeh4PHMH1cBgAe",
+          mintAddress: reward.itemCollection.item.token.mintAddress,
+          amount,
+        },
       });
 
       console.log({ data });
@@ -151,13 +158,14 @@ export default function Page() {
           title: "View on Transaction",
         },
       });
-      setIsClaiming(false);
       // refetch && refetch();
     } catch (error) {
       showToast({
         primaryMessage: "Error claiming token",
         secondaryMessage: "Please try again later.",
       });
+    } finally {
+      setIsClaiming(false);
     }
   }, [
     PayoutMethod.RANDOM,

@@ -117,7 +117,7 @@ export default function Page({ params }: { params: any }) {
 
       console.log({ reward, amount });
 
-      const { data } = await axios.post("/api/dispense-token", {
+      const { data } = await axios.post("/api/dispense-tokens", {
         dispenserId: dispenser.id,
         recipientAddress: pubKey,
         mintAddress: reward.itemCollection.item.token.mintAddress,

@@ -18,6 +18,7 @@ import { caluclateBuildVestingRewardAmount } from "@/utils/dispensers/calculate-
 import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
 import { Dispenser, Token, Wallet } from "@/app/blueprint/types";
 
+// Old endpoint currently supporting BUILD dispenser
 export async function POST(req: NextRequest) {
   const {
     address,

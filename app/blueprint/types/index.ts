@@ -368,3 +368,8 @@ export type Trait = {
   name: string;
   value: string;
 };
+
+export enum BlueprintApiActions {
+  CREATE_DISENSER = "CREATE_DISENSER",
+  DISPENSE_TOKENS = "DISPENSE_TOKENS",
+}

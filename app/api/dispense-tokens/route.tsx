@@ -2,9 +2,12 @@
 import * as anchor from "@coral-xyz/anchor";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { NoopResponse } from "@/app/blueprint/types";
 import { Connection, Keypair } from "@solana/web3.js";
-import { DISPENSER_PROGRAM_ID, RPC_ENDPOINT } from "@/constants/constants";
+import {
+  DISPENSER_PROGRAM_ID,
+  RPC_ENDPOINT,
+  RPC_ENDPOINT_DEVNET,
+} from "@/constants/constants";
 import { IDL } from "@/idl/types/dispenser";
 import { createHash } from "@/utils/hashing";
 import { PublicKey } from "@metaplex-foundation/js";
@@ -16,20 +19,28 @@ import { sendTransaction } from "@/utils/transactions/send-transaction";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 
-type Data =
-  | any
-  | NoopResponse
-  | {
-      error: unknown;
-    };
-
-export async function POST(req: NextRequest) {
-  const { noop, dispenserId, recipientAddress, mintAddress, amount } =
+export async function POST(req: Request) {
+  const { noop, dispenserId, recipientAddress, mintAddress, amount, apiKey } =
     await req.json();
 
   console.log({
-    ip: req.headers.get("x-real-ip"),
+    host: req.headers.get("host"),
+    connection: req.headers.get("connection"),
+    userAgent: req.headers.get("user-agent"),
+    "x-invoke-path": req.headers.get("x-invoke-path"),
+    "x-invoke-query": req.headers.get("x-invoke-query"),
+    "x-invoke-output": req.headers.get("x-invoke-output"),
   });
+
+  if (apiKey !== process.env.BLUEPRINT_API_KEY) {
+    return NextResponse.json(
+      {
+        error: "Invalid API key",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
 
   if (noop)
     return NextResponse.json({
@@ -47,7 +58,10 @@ export async function POST(req: NextRequest) {
     !mintAddress ||
     !amount
   ) {
-    return NextResponse.json({ error: "Required fields not set", status: 500 });
+    return NextResponse.json(
+      { error: "Required fields not set", status: 500 },
+      { status: 500 }
+    );
   }
 
   const hash = createHash(dispenserId);
@@ -62,7 +76,7 @@ export async function POST(req: NextRequest) {
   );
 
   const anchorWallet = new NodeWallet(rewardKeypair);
-  const connection = new Connection(RPC_ENDPOINT, "confirmed");
+  const connection = new Connection(RPC_ENDPOINT_DEVNET, "confirmed");
 
   const feeCalculator = await connection.getRecentBlockhash();
   const feeInLamports = feeCalculator.feeCalculator.lamportsPerSignature;
@@ -86,47 +100,61 @@ export async function POST(req: NextRequest) {
   const recipient = new PublicKey(recipientAddress);
   const mint = new PublicKey(mintAddress);
 
-  const fromTokenAccount = await getAssociatedTokenAddress(
-    mint,
-    dispenserPda,
-    true
-  );
+  let txHash;
 
-  const toTokenAccount = await getAssociatedTokenAddress(mint, recipient);
-  const toTokenAccountInfo = await connection.getAccountInfo(toTokenAccount);
+  try {
+    const fromTokenAccount = await getAssociatedTokenAddress(
+      mint,
+      dispenserPda,
+      true
+    );
 
-  const transaction = new anchor.web3.Transaction();
+    const toTokenAccount = await getAssociatedTokenAddress(mint, recipient);
+    const toTokenAccountInfo = await connection.getAccountInfo(toTokenAccount);
 
-  if (!toTokenAccountInfo) {
-    transaction.add(
-      createAssociatedTokenAccountInstruction(
-        provider.wallet.publicKey,
-        toTokenAccount,
-        recipient,
-        mint
+    const transaction = new anchor.web3.Transaction();
+
+    if (!toTokenAccountInfo) {
+      transaction.add(
+        createAssociatedTokenAccountInstruction(
+          provider.wallet.publicKey,
+          toTokenAccount,
+          recipient,
+          mint
+        )
+      );
+    }
+
+    const ix = await program.methods
+      .dispenseTokens(
+        Buffer.from(hash),
+        Buffer.from(process.env.AUTHORITY_SEED),
+        bump,
+        new anchor.BN(amount)
       )
+      .accounts({
+        sender: fromTokenAccount,
+        recipient: toTokenAccount,
+        dispenserPda,
+        mint,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .instruction();
+
+    transaction.add(ix);
+
+    txHash = await sendTransaction(transaction, provider, connection);
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: {
+          apiError: error,
+          txError: txHash,
+        },
+      },
+      { status: 500 }
     );
   }
-
-  const ix = await program.methods
-    .dispenseTokens(
-      Buffer.from(hash),
-      Buffer.from(process.env.AUTHORITY_SEED),
-      bump,
-      new anchor.BN(amount)
-    )
-    .accounts({
-      sender: fromTokenAccount,
-      recipient: toTokenAccount,
-      dispenserPda,
-      mint,
-      systemProgram: anchor.web3.SystemProgram.programId,
-    })
-    .instruction();
-
-  transaction.add(ix);
-
-  const txHash = await sendTransaction(transaction, provider, connection);
 
   try {
     return NextResponse.json(
@@ -138,7 +166,6 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error(error);
     return NextResponse.json({ error }, { status: 500 });
   }
 }
