@@ -11,7 +11,6 @@ const BlueprintApiActionUrls = {
 };
 
 const mapErrorToResponse = (error: any) => {
-  console.error({ error, response: error?.response });
   const status =
     error?.response?.status || error?.response?.data?.status || 500;
   const statusText =
@@ -53,11 +52,6 @@ const handleDispenseTokens = async (params: any) => {
         apiKey: process.env.BLUEPRINT_API_KEY,
       }
     );
-
-    console.log({
-      data,
-      status,
-    });
 
     return NextResponse.json(
       {
