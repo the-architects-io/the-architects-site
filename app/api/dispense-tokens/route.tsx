@@ -5,6 +5,7 @@ import type { NextRequest } from "next/server";
 import { Connection, Keypair } from "@solana/web3.js";
 import {
   DISPENSER_PROGRAM_ID,
+  ENV,
   RPC_ENDPOINT,
   RPC_ENDPOINT_DEVNET,
 } from "@/constants/constants";
@@ -35,13 +36,14 @@ export async function POST(req: Request) {
 
   const ipWhitelist = Array(process.env.API_ACCESS_IP_LIST);
   const hostWhitelist = Array(process.env.API_ACCESS_HOST_LIST);
+
   const ip = req.headers.get("x-real-ip") || "";
   const host = req.headers.get("host") || "";
 
-  if (
-    !ipWhitelist.indexOf(req.headers.get("x-real-ip") || "") ||
-    !hostWhitelist.indexOf(req.headers.get("host") || "")
-  ) {
+  const isValidIp = ipWhitelist.indexOf(ip) > -1;
+  const isValidHost = hostWhitelist.indexOf(host) > -1;
+
+  if (ENV !== "local" && (!isValidIp || !isValidHost)) {
     return NextResponse.json(
       {
         error: `API access not allowed for host: ${host} and IP: ${ip}`,

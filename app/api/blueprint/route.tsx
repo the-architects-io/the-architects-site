@@ -17,6 +17,13 @@ const BlueprintApiActionUrls = {
 const mapErrorToResponse = (error: any): MappedErrorResponse => {
   const status =
     error?.response?.status || error?.response?.data?.status || 500;
+  console.log({
+    statuses: {
+      "error?.response?.status": error?.response?.status,
+      "error?.response?.data?.status": error?.response?.data?.status,
+      status: status,
+    },
+  });
   const statusText =
     error?.response?.data?.statusText || "Internal Server Error";
   const message = error?.response?.statusText || "Internal Server Error";
@@ -55,7 +62,7 @@ const handleCreateDispenser = async (params: any) => {
     let error = mapErrorToResponse(rawError);
 
     logError(error);
-    return NextResponse.json(error);
+    return NextResponse.json({ error });
   }
 };
 
@@ -83,10 +90,10 @@ const handleDispenseTokens = async (params: any) => {
       }
     );
   } catch (rawError: any) {
-    let error = mapErrorToResponse(rawError);
+    let { error, status } = mapErrorToResponse(rawError);
 
-    logError(error);
-    return NextResponse.json(error);
+    logError({ error, status });
+    return NextResponse.json({ error, status });
   }
 };
 
