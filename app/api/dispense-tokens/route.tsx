@@ -34,14 +34,24 @@ export async function POST(req: Request) {
     );
   }
 
-  const ipWhitelist = Array(process.env.API_ACCESS_IP_LIST);
-  const hostWhitelist = Array(process.env.API_ACCESS_HOST_LIST);
+  const ipWhitelist = process.env.API_ACCESS_IP_LIST;
+  const hostWhitelist = process.env.API_ACCESS_HOST_LIST;
 
   const ip = req.headers.get("x-real-ip") || "";
   const host = req.headers.get("host") || "";
 
   const isValidIp = ipWhitelist.indexOf(ip) > -1;
   const isValidHost = hostWhitelist.indexOf(host) > -1;
+
+  console.log("/api/dispense-tokens", {
+    host: req.headers.get("host"),
+    connection: req.headers.get("connection"),
+    userAgent: req.headers.get("user-agent"),
+    "x-invoke-path": req.headers.get("x-invoke-path"),
+    "x-invoke-query": req.headers.get("x-invoke-query"),
+    "x-invoke-output": req.headers.get("x-invoke-output"),
+    "x-real-ip": req.headers.get("x-real-ip"),
+  });
 
   if (ENV !== "local" && (!isValidIp || !isValidHost)) {
     return NextResponse.json(
@@ -52,16 +62,6 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-
-  console.log({
-    host: req.headers.get("host"),
-    connection: req.headers.get("connection"),
-    userAgent: req.headers.get("user-agent"),
-    "x-invoke-path": req.headers.get("x-invoke-path"),
-    "x-invoke-query": req.headers.get("x-invoke-query"),
-    "x-invoke-output": req.headers.get("x-invoke-output"),
-    "x-real-ip": req.headers.get("x-real-ip"),
-  });
 
   if (apiKey !== process.env.BLUEPRINT_API_KEY) {
     return NextResponse.json(

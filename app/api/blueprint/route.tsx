@@ -93,7 +93,7 @@ const handleDispenseTokens = async (params: any) => {
     let { error, status } = mapErrorToResponse(rawError);
 
     logError({ error, status });
-    return NextResponse.json({ error, status });
+    return NextResponse.json({ error }, { status });
   }
 };
 
