@@ -57,8 +57,8 @@ const handleDispenseTokens = async (params: any) => {
         status: status || 500,
       }
     );
-  } catch (error) {
-    console.error({ error });
+  } catch (error: any) {
+    console.error({ error, response: error?.response });
     return NextResponse.json(
       {
         error,
