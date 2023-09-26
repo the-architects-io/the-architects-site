@@ -143,12 +143,6 @@ export default function Page() {
         params: {
           dispenserId: dispenser.id,
           recipientAddress: inPortalsWalletAddress?.toBase58(),
-          // recipientAddress:
-          //   inPortalsWalletAddress?.toBase58() ||
-          //   (walletAdapterWalletAddress?.toString() ===
-          //     "44cV2k5kFRzGQwBLEBc6aHHTwTvEReyeh4PHMH1cBgAe" &&
-          //     walletAdapterWalletAddress?.toString()) ||
-          //   "",
           mintAddress: reward.itemCollection.item.token.mintAddress,
           amount,
         },

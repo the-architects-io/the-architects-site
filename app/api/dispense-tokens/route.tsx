@@ -35,20 +35,10 @@ export async function POST(req: Request) {
   }
 
   const hostWhitelist = process.env.API_ACCESS_HOST_LIST;
-  const host = req.headers.get("host") || "";
+  const host = req.headers.get("x-forwarded-host") || "";
   const isValidHost = hostWhitelist.indexOf(host) > -1;
 
-  console.log("/api/dispense-tokens", {
-    host: req.headers.get("host"),
-    connection: req.headers.get("connection"),
-    userAgent: req.headers.get("user-agent"),
-    "x-invoke-path": req.headers.get("x-invoke-path"),
-    "x-invoke-query": req.headers.get("x-invoke-query"),
-    "x-invoke-output": req.headers.get("x-invoke-output"),
-    "x-real-ip": req.headers.get("x-real-ip"),
-    "x-forwarded-for": req.headers.get("x-forwarded-for"),
-    "x-forwarded-host": req.headers.get("x-forwarded-host"),
-  });
+  console.log("/api/dispense-tokens", {});
 
   if (ENV !== "local" && !isValidHost) {
     return NextResponse.json(

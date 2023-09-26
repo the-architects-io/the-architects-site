@@ -78,12 +78,12 @@ const handleDispenseTokens = async (params: any) => {
 
     return NextResponse.json(
       {
-        data,
         status: status || 500,
         statusText,
         config,
         action: DISPENSE_TOKENS,
         params,
+        ...data,
       },
       {
         status: status || 500,
