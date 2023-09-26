@@ -24,7 +24,7 @@ export async function POST(req: Request) {
   const { noop, dispenserId, recipientAddress, mintAddress, amount, apiKey } =
     await req.json();
 
-  if (!process.env.API_ACCESS_HOST_LIST || !process.env.API_ACCESS_IP_LIST) {
+  if (!process.env.API_ACCESS_HOST_LIST) {
     return NextResponse.json(
       {
         error: "API access not configured",
@@ -36,11 +36,11 @@ export async function POST(req: Request) {
 
   const hostWhitelist = process.env.API_ACCESS_HOST_LIST;
   const host = req.headers.get("x-forwarded-host") || "";
-  const isValidHost = hostWhitelist.indexOf(host) > -1;
+  const isValidHost = hostWhitelist.indexOf(host) > -1 || ENV === "local";
 
   console.log("/api/dispense-tokens", {});
 
-  if (ENV !== "local" && !isValidHost) {
+  if (!isValidHost) {
     return NextResponse.json(
       {
         error: `API access not allowed for host: ${host}`,
