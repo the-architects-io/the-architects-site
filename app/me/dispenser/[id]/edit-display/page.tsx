@@ -84,6 +84,7 @@ export default function Page({ params }: { params: any }) {
   const { data, loading, error } = useQuery(
     GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID,
     {
+      fetchPolicy: "network-only",
       variables: {
         id: params.id,
       },
