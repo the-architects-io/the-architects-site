@@ -43,6 +43,7 @@ interface DispenserUiProps {
   descriptionTextSize?: number;
   claimButtonTextSize?: number;
   claimButtonText?: string;
+  isBeingEdited?: boolean;
   children?: React.ReactNode;
 }
 
@@ -61,6 +62,7 @@ export default function DispenserUi({
   descriptionTextSize,
   claimButtonTextSize,
   claimButtonText,
+  isBeingEdited = false,
   children,
 }: DispenserUiProps) {
   const searchParams = useSearchParams();
@@ -247,7 +249,8 @@ export default function DispenserUi({
     !inPortalsWalletAddress &&
     ENV !== "local" &&
     walletAdapterWalletAddress?.toString() !==
-      "44Cv2k5kFRzGQwBLEBc6aHHTwTvEReyeh4PHMH1cBgAe"
+      "44Cv2k5kFRzGQwBLEBc6aHHTwTvEReyeh4PHMH1cBgAe" &&
+    !isBeingEdited
   )
     return (
       <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
@@ -262,7 +265,9 @@ export default function DispenserUi({
           <WalletButton />
         </div>
       )}
-      {!walletAdapterWalletAddress && !inPortalsWalletAddress ? (
+      {!walletAdapterWalletAddress &&
+      !inPortalsWalletAddress &&
+      !isBeingEdited ? (
         <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300 bg-slate-800">
           <div className="max-w-xs text-center mb-4">
             Please allow your wallet to be connected in the popup above.
@@ -297,7 +302,7 @@ export default function DispenserUi({
             </div>
           )}
           {!isLoading && dispenser && (
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center w-full">
               {!!shouldDisplayImage && (
                 <ImageWithFallback
                   src={dispenser.imageUrl || ""}
@@ -350,7 +355,7 @@ export default function DispenserUi({
                   "rounded-xl p-4 py-2 uppercase border border-gray-800 hover:border-gray-800 font-bold transition-colors duration-300 ease-in-out mt-4",
                   { "opacity-50 cursor-not-allowed": isClaiming || !hasStock },
                 ])}
-                onClick={handleClaim}
+                onClick={isBeingEdited ? () => {} : handleClaim}
                 disabled={isClaiming || !hasStock}
               >
                 {isClaiming ? <Spinner /> : claimButtonText || "Claim"}

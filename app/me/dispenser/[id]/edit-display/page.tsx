@@ -182,6 +182,7 @@ export default function Page({ params }: { params: any }) {
             descriptionTextSize={formik.values.descriptionTextSize}
             claimButtonTextSize={formik.values.claimButtonTextSize}
             claimButtonText={formik.values.claimButtonText}
+            isBeingEdited={true}
           >
             <div
               className={classNames([
