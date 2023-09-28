@@ -110,19 +110,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  console.log("/api/blueprint", {
-    "x-real-ip": req.headers.get("x-real-ip"),
-    "x-forwarded-for": req.headers.get("x-forwarded-for"),
-    "x-forwarded-host": req.headers.get("x-forwarded-host"),
-    "x-forwarded-proto": req.headers.get("x-forwarded-proto"),
-    "x-forwarded-port": req.headers.get("x-forwarded-port"),
-    "x-forwarded-path": req.headers.get("x-forwarded-path"),
-    "x-forwarded-prefix": req.headers.get("x-forwarded-prefix"),
-    "x-forwarded-uri": req.headers.get("x-forwarded-uri"),
-    "x-forwarded-server": req.headers.get("x-forwarded-server"),
-    host: req.headers.get("host"),
-  });
-
   const hostWhitelist = process.env.API_ACCESS_HOST_LIST;
   const host = req.headers.get("x-forwarded-host") || "";
   const isValidHost = hostWhitelist.indexOf(host) > -1;

@@ -21,7 +21,7 @@ export const ConfigSettingsPanel = ({
   return (
     <>
       <h2 className="text-xl uppercase mb-4">Config</h2>
-      <Link href={`/admin/dispensers/${dispenser.id}/edit-display`}>
+      <Link href={`/me/dispenser/${dispenser.id}/edit-display`}>
         <PrimaryButton className="flex items-center justify-center mb-4">
           <ClipboardIcon className="h-5 w-5 inline-block" />
           <span className="mx-2">Edit Dispenser Display</span>

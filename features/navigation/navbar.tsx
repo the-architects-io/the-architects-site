@@ -8,7 +8,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      {pathname.includes("in-portals") ? (
+      {pathname.includes("in-portals") || pathname.includes("edit-display") ? (
         <div />
       ) : (
         <div className="-mb-20 h-20 md:h-16 md:-mb-16 bg-gray-900 shadow-2xl z-100 absolute top-0 w-full">
