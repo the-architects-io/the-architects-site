@@ -1,4 +1,5 @@
 "use client";
+import { defaultCustomizations } from "@/app/blueprint/constants";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
@@ -17,29 +18,12 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 
-const defaultStyles = {
-  backgroundColor: "#2d2d2d",
-  textColor: "#b6b6b6",
-  claimButtonColor: "#7dd3fc",
-  claimButtonTextColor: "#000000",
-  shouldDisplayRewardsList: true,
-  shouldDisplayName: true,
-  shouldDisplayDescription: true,
-  shouldDisplayImage: true,
-  imageSize: 120,
-  nameTextSize: 36,
-  descriptionTextSize: 16,
-  claimButtonTextSize: 16,
-  isDirty: false,
-  claimButtonText: "Claim",
-};
-
 export default function Page({ params }: { params: any }) {
   const [initialValues, setInitialValues] = useState<any>(null);
   const [isFormDirty, setIsFormDirty] = useState(false);
 
   const formik = useFormik({
-    initialValues: initialValues || defaultStyles,
+    initialValues: initialValues || defaultCustomizations,
     enableReinitialize: true,
     onSubmit: async ({
       backgroundColor,
@@ -106,7 +90,7 @@ export default function Page({ params }: { params: any }) {
       onCompleted: ({ dispenser_displays }) => {
         console.log({ dispenser_displays });
         if (dispenser_displays.length === 0) {
-          setInitialValues(defaultStyles);
+          setInitialValues(defaultCustomizations);
           return;
         }
         const values = {
@@ -128,15 +112,15 @@ export default function Page({ params }: { params: any }) {
               : dispenser_displays[0]?.shouldDisplayImage,
           backgroundColor:
             dispenser_displays[0]?.backgroundColor ||
-            defaultStyles.backgroundColor,
+            defaultCustomizations.backgroundColor,
           textColor:
-            dispenser_displays[0]?.textColor || defaultStyles.textColor,
+            dispenser_displays[0]?.textColor || defaultCustomizations.textColor,
           claimButtonTextColor:
             dispenser_displays[0]?.claimButtonTextColor ||
-            defaultStyles.claimButtonTextColor,
+            defaultCustomizations.claimButtonTextColor,
           claimButtonColor:
             dispenser_displays[0]?.claimButtonColor ||
-            defaultStyles.claimButtonColor,
+            defaultCustomizations.claimButtonColor,
           imageSize: dispenser_displays[0]?.imageSize || 120,
           nameTextSize: dispenser_displays[0]?.nameTextSize || 24,
           descriptionTextSize: dispenser_displays[0]?.descriptionTextSize || 16,
