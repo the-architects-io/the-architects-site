@@ -38,6 +38,11 @@ interface DispenserUiProps {
   shouldDisplayImage?: boolean;
   claimButtonColor?: string;
   claimButtonTextColor?: string;
+  imageSize?: number;
+  nameTextSize?: number;
+  descriptionTextSize?: number;
+  claimButtonTextSize?: number;
+  claimButtonText?: string;
   children?: React.ReactNode;
 }
 
@@ -51,6 +56,11 @@ export default function DispenserUi({
   shouldDisplayImage = true,
   claimButtonColor,
   claimButtonTextColor,
+  imageSize,
+  nameTextSize,
+  descriptionTextSize,
+  claimButtonTextSize,
+  claimButtonText,
   children,
 }: DispenserUiProps) {
   const searchParams = useSearchParams();
@@ -269,17 +279,17 @@ export default function DispenserUi({
         </div>
       ) : (
         <div
-          className="min-h-screen w-full flex flex-col justify-center items-center py-16"
+          className="min-h-screen w-full flex flex-col justify-center items-center py-16 overflow-y-hidden"
           style={{
             backgroundColor: backgroundColor || "transparent",
             color: textColor,
           }}
         >
-          {ENV === "local" && (
+          {/* {ENV === "local" && (
             <div className="absolute top-24 left-4">
               <WalletButton />
             </div>
-          )}
+          )} */}
           {!dispenser && !isLoading && <div>Dispenser not found</div>}
           {isLoading && (
             <div className="flex flex-col justify-center items-center w-full">
@@ -291,17 +301,25 @@ export default function DispenserUi({
               {!!shouldDisplayImage && (
                 <ImageWithFallback
                   src={dispenser.imageUrl || ""}
-                  height={120}
-                  width={120}
-                  className="w-36 mb-8"
+                  height={imageSize || 120}
+                  width={imageSize || 120}
+                  className="mb-8"
                   alt={dispenser.name || "Dispenser image"}
                 />
               )}
               {!!shouldDisplayName && (
-                <p className="text-center text-4xl mb-4">{dispenser.name} </p>
+                <p
+                  className="text-center mb-4"
+                  style={{ fontSize: `${nameTextSize}px` || "36px" }}
+                >
+                  {dispenser.name}{" "}
+                </p>
               )}
               {!!shouldDisplayDescription && (
-                <p className="text-center text-xl mb-4">
+                <p
+                  className="text-center mb-4"
+                  style={{ fontSize: `${descriptionTextSize}px` || "24px" }}
+                >
                   {dispenser.description}
                 </p>
               )}
@@ -326,6 +344,7 @@ export default function DispenserUi({
                 style={{
                   backgroundColor: claimButtonColor || "transparent",
                   color: claimButtonTextColor,
+                  fontSize: `${claimButtonTextSize}px` || "24px",
                 }}
                 className={classNames([
                   "rounded-xl p-4 py-2 uppercase border border-gray-800 hover:border-gray-800 font-bold transition-colors duration-300 ease-in-out mt-4",
@@ -334,7 +353,7 @@ export default function DispenserUi({
                 onClick={handleClaim}
                 disabled={isClaiming || !hasStock}
               >
-                {isClaiming ? <Spinner /> : "Claim"}
+                {isClaiming ? <Spinner /> : claimButtonText || "Claim"}
               </button>
             </div>
           )}

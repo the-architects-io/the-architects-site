@@ -14,10 +14,10 @@ export const Tab = ({
     <button
       key={tab.value}
       className={classNames([
-        "text-center py-2 text-gray-100 px-3 cursor-pointer border text-xm uppercase",
+        "text-center py-2 text-gray-100 px-3 cursor-pointer text-xm uppercase",
         tab.value === activeTab.value
-          ? "bg-gray-300 border-gray-300 text-gray-800 font-bold"
-          : "border-gray-800 hover:border-gray-900 hover:bg-gray-900",
+          ? "bg-gray-300 text-gray-800 font-bold"
+          : "hover:bg-gray-900",
       ])}
       onClick={() => handleSetTab(tab)}
     >

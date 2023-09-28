@@ -14,6 +14,13 @@ export const GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID = gql`
       shouldDisplayName
       shouldDisplayRewardsList
       textColor
+      claimButtonText
+      claimButtonTextColor
+      claimButtonTextSize
+      descriptionTextSize
+      imageSize
+      nameTextSize
+      dispenserId
     }
   }
 `;

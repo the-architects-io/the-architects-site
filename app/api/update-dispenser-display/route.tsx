@@ -17,6 +17,11 @@ export async function POST(req: NextRequest) {
     claimButtonColor,
     claimButtonTextColor,
     shouldDisplayImage,
+    imageSize,
+    nameTextSize,
+    descriptionTextSize,
+    claimButtonTextSize,
+    claimButtonText,
     noop,
   } = await req.json();
 
@@ -31,6 +36,11 @@ export async function POST(req: NextRequest) {
     claimButtonColor,
     claimButtonTextColor,
     shouldDisplayImage,
+    imageSize,
+    nameTextSize,
+    descriptionTextSize,
+    claimButtonTextSize,
+    claimButtonText,
     noop,
   });
 
@@ -74,6 +84,22 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const display = {
+    backgroundColor,
+    textColor,
+    shouldDisplayRewardsList,
+    shouldDisplayName,
+    shouldDisplayDescription,
+    claimButtonColor,
+    claimButtonTextColor,
+    shouldDisplayImage,
+    imageSize,
+    nameTextSize,
+    descriptionTextSize,
+    claimButtonTextSize,
+    claimButtonText,
+  };
+
   if (dispenserDisplay) {
     console.log("=== UPDATING ===");
     try {
@@ -83,16 +109,7 @@ export async function POST(req: NextRequest) {
         update_dispenser_displays_by_pk: DispenserDisplay;
       } = await client.request(UPDATE_DISPENSER_DISPLAY, {
         id: dispenserDisplay.id,
-        display: {
-          backgroundColor,
-          textColor,
-          shouldDisplayRewardsList,
-          shouldDisplayName,
-          shouldDisplayDescription,
-          claimButtonColor,
-          claimButtonTextColor,
-          shouldDisplayImage,
-        },
+        display,
       });
 
       if (update_dispenser_displays_by_pk) {
@@ -117,15 +134,8 @@ export async function POST(req: NextRequest) {
         insert_dispenser_displays_one: DispenserDisplay;
       } = await client.request(ADD_DISPENSER_DISPLAY, {
         display: {
+          ...display,
           dispenserId,
-          backgroundColor,
-          textColor,
-          shouldDisplayRewardsList,
-          shouldDisplayName,
-          shouldDisplayDescription,
-          claimButtonColor,
-          claimButtonTextColor,
-          shouldDisplayImage,
         },
       });
 

@@ -1,10 +1,9 @@
 "use client";
-import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
-import { FormWrapper } from "@/features/UI/forms/form-wrapper";
+import { FormInput } from "@/features/UI/forms/form-input";
 import Spinner from "@/features/UI/spinner";
 import DispenserUi from "@/features/dispensers/dispenser-ui";
 import showToast from "@/features/toasts/show-toast";
@@ -27,7 +26,12 @@ const defaultStyles = {
   shouldDisplayName: true,
   shouldDisplayDescription: true,
   shouldDisplayImage: true,
+  imageSize: 120,
+  nameTextSize: 36,
+  descriptionTextSize: 16,
+  claimButtonTextSize: 16,
   isDirty: false,
+  claimButtonText: "Claim",
 };
 
 export default function Page({ params }: { params: any }) {
@@ -45,7 +49,12 @@ export default function Page({ params }: { params: any }) {
       shouldDisplayDescription,
       claimButtonColor,
       claimButtonTextColor,
+      imageSize,
       shouldDisplayImage,
+      nameTextSize,
+      descriptionTextSize,
+      claimButtonTextSize,
+      claimButtonText = "Claim",
     }) => {
       try {
         const { data } = await axios.post("/api/update-dispenser-display", {
@@ -57,7 +66,12 @@ export default function Page({ params }: { params: any }) {
           shouldDisplayDescription,
           claimButtonColor,
           claimButtonTextColor,
+          imageSize,
           shouldDisplayImage,
+          nameTextSize,
+          descriptionTextSize,
+          claimButtonTextSize,
+          claimButtonText,
         });
         showToast({
           primaryMessage: "Update successful",
@@ -70,7 +84,12 @@ export default function Page({ params }: { params: any }) {
           shouldDisplayDescription,
           claimButtonColor,
           claimButtonTextColor,
+          imageSize,
           shouldDisplayImage,
+          nameTextSize,
+          descriptionTextSize,
+          claimButtonTextSize,
+          claimButtonText,
         });
       } catch (error) {
         console.log(error);
@@ -85,30 +104,44 @@ export default function Page({ params }: { params: any }) {
         id: params.id,
       },
       onCompleted: ({ dispenser_displays }) => {
+        console.log({ dispenser_displays });
+        if (dispenser_displays.length === 0) {
+          setInitialValues(defaultStyles);
+          return;
+        }
         const values = {
+          shouldDisplayRewardsList:
+            dispenser_displays[0]?.shouldDisplayRewardsList === null
+              ? true
+              : dispenser_displays[0]?.shouldDisplayRewardsList,
+          shouldDisplayName:
+            dispenser_displays[0]?.shouldDisplayName === null
+              ? true
+              : dispenser_displays[0]?.shouldDisplayName,
+          shouldDisplayDescription:
+            dispenser_displays[0]?.shouldDisplayDescription === null
+              ? true
+              : dispenser_displays[0]?.shouldDisplayDescription,
+          shouldDisplayImage:
+            dispenser_displays[0]?.shouldDisplayImage === null
+              ? true
+              : dispenser_displays[0]?.shouldDisplayImage,
           backgroundColor:
             dispenser_displays[0]?.backgroundColor ||
             defaultStyles.backgroundColor,
           textColor:
             dispenser_displays[0]?.textColor || defaultStyles.textColor,
-          shouldDisplayRewardsList:
-            dispenser_displays[0]?.shouldDisplayRewardsList ||
-            defaultStyles.shouldDisplayRewardsList,
-          shouldDisplayName:
-            dispenser_displays[0]?.shouldDisplayName ||
-            defaultStyles.shouldDisplayName,
-          shouldDisplayDescription:
-            dispenser_displays[0]?.shouldDisplayDescription ||
-            defaultStyles.shouldDisplayDescription,
-          claimButtonColor:
-            dispenser_displays[0]?.claimButtonColor ||
-            defaultStyles.claimButtonColor,
-          shouldDisplayImage:
-            dispenser_displays[0]?.shouldDisplayImage ||
-            defaultStyles.shouldDisplayImage,
           claimButtonTextColor:
             dispenser_displays[0]?.claimButtonTextColor ||
             defaultStyles.claimButtonTextColor,
+          claimButtonColor:
+            dispenser_displays[0]?.claimButtonColor ||
+            defaultStyles.claimButtonColor,
+          imageSize: dispenser_displays[0]?.imageSize || 120,
+          nameTextSize: dispenser_displays[0]?.nameTextSize || 24,
+          descriptionTextSize: dispenser_displays[0]?.descriptionTextSize || 16,
+          claimButtonTextSize: dispenser_displays[0]?.claimButtonTextSize || 16,
+          claimButtonText: dispenser_displays[0]?.claimButtonText || "Claim",
         };
         setInitialValues(values);
       },
@@ -160,6 +193,11 @@ export default function Page({ params }: { params: any }) {
             shouldDisplayImage={formik.values.shouldDisplayImage}
             claimButtonColor={formik.values.claimButtonColor}
             claimButtonTextColor={formik.values.claimButtonTextColor}
+            imageSize={formik.values.imageSize}
+            nameTextSize={formik.values.nameTextSize}
+            descriptionTextSize={formik.values.descriptionTextSize}
+            claimButtonTextSize={formik.values.claimButtonTextSize}
+            claimButtonText={formik.values.claimButtonText}
           >
             <div
               className={classNames([
@@ -235,8 +273,107 @@ export default function Page({ params }: { params: any }) {
                 />
               </div>
             </div>
+
+            <div className="my-2">
+              <div className="mb-2">
+                <FormCheckboxWithLabel
+                  label="Image"
+                  name="shouldDisplayImage"
+                  value={formik.values.shouldDisplayImage}
+                  onChange={(e: any) => {
+                    formik.setFieldValue(
+                      "shouldDisplayImage",
+                      e.target.checked
+                    );
+                  }}
+                />
+              </div>
+              {!!formik.values.shouldDisplayImage && (
+                <div className="flex items-center mb-2">
+                  <div className="mr-2">Size:</div>
+                  <input
+                    type="range"
+                    name="imageSize"
+                    min={0}
+                    max={600}
+                    value={formik.values.imageSize}
+                    onChange={formik.handleChange}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="my-2">
+              <div className="mb-2">
+                <FormCheckboxWithLabel
+                  label="Name"
+                  name="shouldDisplayName"
+                  value={formik.values.shouldDisplayName}
+                  onChange={(e: any) => {
+                    formik.setFieldValue("shouldDisplayName", e.target.checked);
+                  }}
+                />
+              </div>
+              {!!formik.values.shouldDisplayName && (
+                <div className="flex items-center mb-2">
+                  <div className="mr-2">Size:</div>
+                  <input
+                    type="range"
+                    name="nameTextSize"
+                    min={28}
+                    max={160}
+                    value={formik.values.nameTextSize}
+                    onChange={formik.handleChange}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="my-2">
+              <div className="mb-2">
+                <FormCheckboxWithLabel
+                  label="Description"
+                  name="shouldDisplayRewardsList"
+                  value={formik.values.shouldDisplayDescription}
+                  onChange={(e: any) => {
+                    formik.setFieldValue(
+                      "shouldDisplayDescription",
+                      e.target.checked
+                    );
+                  }}
+                />
+              </div>
+              {!!formik.values.shouldDisplayDescription && (
+                <div className="flex items-center mb-2">
+                  <div className="mr-2">Size:</div>
+                  <input
+                    type="range"
+                    name="descriptionTextSize"
+                    min={20}
+                    max={160}
+                    value={formik.values.descriptionTextSize}
+                    onChange={formik.handleChange}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="my-2">
+              <div className="mb-2">
+                <FormCheckboxWithLabel
+                  label="Rewards List"
+                  name="shouldDisplayRewardsList"
+                  value={formik.values.shouldDisplayRewardsList}
+                  onChange={(e: any) => {
+                    formik.setFieldValue(
+                      "shouldDisplayRewardsList",
+                      e.target.checked
+                    );
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="text-2xl uppercase mb-4 pt-8">Claim Button</div>
             <div className="flex flex-col items-center mb-8">
-              <div className="uppercase text-lg mb-2">Claim Button Color</div>
+              <div className="uppercase text-lg mb-2">Button Color</div>
               <HexColorPicker
                 className="mb-4"
                 color={formik.values.claimButtonColor}
@@ -256,9 +393,7 @@ export default function Page({ params }: { params: any }) {
               </div>
             </div>
             <div className="flex flex-col items-center mb-8">
-              <div className="uppercase text-lg mb-2">
-                Claim Button Text Color
-              </div>
+              <div className="uppercase text-lg mb-2">Button Text Color</div>
               <HexColorPicker
                 className="mb-4"
                 color={formik.values.claimButtonTextColor}
@@ -266,7 +401,7 @@ export default function Page({ params }: { params: any }) {
                   formik.setFieldValue("claimButtonTextColor", color);
                 }}
               />
-              <div className="flex items-center">
+              <div className="flex items-center mb-6">
                 <div className="uppercase text-sm mr-2">Hex:</div>
                 <HexColorInput
                   className="text-gray-800 p-2 rounded w-32 bg-gray-200"
@@ -276,47 +411,26 @@ export default function Page({ params }: { params: any }) {
                   }}
                 />
               </div>
+              <div className="flex items-center mb-6">
+                <div className="mr-2">Button size:</div>
+                <input
+                  type="range"
+                  name="claimButtonTextSize"
+                  min={0}
+                  max={250}
+                  value={formik.values.claimButtonTextSize}
+                  onChange={formik.handleChange}
+                />
+              </div>
+              <div className="flex items-center mb-2">
+                <div className="mr-4">Text:</div>
+                <FormInput
+                  name="claimButtonText"
+                  value={formik.values.claimButtonText}
+                  onChange={formik.handleChange}
+                />
+              </div>
             </div>
-
-            <div className="uppercase text-lg mb-2">Details</div>
-            <FormCheckboxWithLabel
-              label="Display Image"
-              name="shouldDisplayImage"
-              value={formik.values.shouldDisplayImage}
-              onChange={(e: any) => {
-                formik.setFieldValue("shouldDisplayImage", e.target.checked);
-              }}
-            />
-            <FormCheckboxWithLabel
-              label="Display Title"
-              name="shouldDisplayName"
-              value={formik.values.shouldDisplayName}
-              onChange={(e: any) => {
-                formik.setFieldValue("shouldDisplayName", e.target.checked);
-              }}
-            />
-            <FormCheckboxWithLabel
-              label="Display Description"
-              name="shouldDisplayRewardsList"
-              value={formik.values.shouldDisplayDescription}
-              onChange={(e: any) => {
-                formik.setFieldValue(
-                  "shouldDisplayDescription",
-                  e.target.checked
-                );
-              }}
-            />
-            <FormCheckboxWithLabel
-              label="Display Rewards List"
-              name="shouldDisplayRewardsList"
-              value={formik.values.shouldDisplayRewardsList}
-              onChange={(e: any) => {
-                formik.setFieldValue(
-                  "shouldDisplayRewardsList",
-                  e.target.checked
-                );
-              }}
-            />
           </div>
         </div>
       </div>
