@@ -383,3 +383,17 @@ export type MappedErrorResponse = {
   };
   status: number;
 };
+
+export type DispenserDisplay = {
+  backgroundColor: string;
+  claimButtonColor: string;
+  dispenser: {
+    id: string;
+  };
+  id: string;
+  shouldDisplayDescription: boolean;
+  shouldDisplayImage: boolean;
+  shouldDisplayName: boolean;
+  shouldDisplayRewardsList: boolean;
+  textColor: string;
+};

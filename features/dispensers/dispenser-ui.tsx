@@ -37,6 +37,8 @@ interface DispenserUiProps {
   shouldDisplayDescription?: boolean;
   shouldDisplayImage?: boolean;
   claimButtonColor?: string;
+  claimButtonTextColor?: string;
+  children?: React.ReactNode;
 }
 
 export default function DispenserUi({
@@ -48,6 +50,8 @@ export default function DispenserUi({
   shouldDisplayDescription = true,
   shouldDisplayImage = true,
   claimButtonColor,
+  claimButtonTextColor,
+  children,
 }: DispenserUiProps) {
   const searchParams = useSearchParams();
   const [isClaiming, setIsClaiming] = useState(false);
@@ -321,7 +325,7 @@ export default function DispenserUi({
               <button
                 style={{
                   backgroundColor: claimButtonColor || "transparent",
-                  color: textColor,
+                  color: claimButtonTextColor,
                 }}
                 className={classNames([
                   "rounded-xl p-4 py-2 uppercase border border-gray-800 hover:border-gray-800 font-bold transition-colors duration-300 ease-in-out mt-4",
@@ -334,6 +338,7 @@ export default function DispenserUi({
               </button>
             </div>
           )}
+          {children}
         </div>
       )}
     </>
