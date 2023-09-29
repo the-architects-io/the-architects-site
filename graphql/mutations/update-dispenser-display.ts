@@ -8,12 +8,14 @@ export const UPDATE_DISPENSER_DISPLAY = gql`
     update_dispenser_displays_by_pk(pk_columns: { id: $id }, _set: $display) {
       id
       textColor
-      shouldDisplayRewardsList
+      shouldDisplayRewards
+      rewardDisplayType
       shouldDisplayName
       shouldDisplayImage
       shouldDisplayDescription
       claimButtonColor
       backgroundColor
+      rewardDisplayType
       dispenser {
         id
       }

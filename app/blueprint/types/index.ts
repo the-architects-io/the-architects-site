@@ -394,6 +394,18 @@ export type DispenserDisplay = {
   shouldDisplayDescription: boolean;
   shouldDisplayImage: boolean;
   shouldDisplayName: boolean;
-  shouldDisplayRewardsList: boolean;
+  shouldDisplayRewards: boolean;
+  rewardDisplayType: RewardDisplayType;
   textColor: string;
 };
+
+export type RewardDisplayType = {
+  name: string;
+  id: string;
+  label: string;
+};
+
+export enum RewardDisplayTypes {
+  LIST = "LIST",
+  CARDS = "CARDS",
+}

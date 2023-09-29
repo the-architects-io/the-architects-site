@@ -61,9 +61,6 @@ export default function DashboardPage() {
             <div className="flex w-full max-w-6xl just m-auto flex-wrap h-full text-gray-100">
               {!!setupDispensers?.length && (
                 <>
-                  <h2 className="w-full text-2xl text-center mb-4">
-                    Setup Complete Dispensers
-                  </h2>
                   {setupDispensers?.map((dispenser) => (
                     <Link
                       href={`/me/dispenser/${dispenser.id}`}

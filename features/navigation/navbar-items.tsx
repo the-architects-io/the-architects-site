@@ -27,7 +27,10 @@ const NavbarItems = () => {
         />
       </Link>
       <div className="space-x-2 md:space-x-8 items-center text-base md:text-xl tracking-wider hidden md:flex">
-        <Link href="/" className="flex items-center justify-center flex-none">
+        <Link
+          href="/"
+          className="flex items-center justify-center flex-none mr-8"
+        >
           <Image
             className="h-12 hidden md:block mr-2 md:mr-8"
             src="/images/architects-logo.webp"
@@ -36,6 +39,14 @@ const NavbarItems = () => {
             width={50}
           />
         </Link>
+        {!!user?.id && (
+          <Link
+            href="/me/dispenser"
+            className="hover:text-stone-200 uppercase text-sm tracking-widest"
+          >
+            My Dispensers
+          </Link>
+        )}
       </div>
       {!!user?.id ? (
         <UserMenu />

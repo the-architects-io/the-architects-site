@@ -11,8 +11,7 @@ export default function Page() {
   const searchParams = useSearchParams();
   const dispenserId = searchParams.get("id");
 
-  const [shouldDisplayRewardsList, setShouldDisplayRewardsList] =
-    useState(true);
+  const [shouldDisplayRewards, setShouldDisplayRewards] = useState(true);
   const [shouldDisplayName, setShouldDisplayName] = useState(true);
   const [shouldDisplayDescription, setShouldDisplayDescription] =
     useState(true);
@@ -44,44 +43,10 @@ export default function Page() {
         if (dispenser_displays.length === 0) {
           return;
         }
-        // const values = {
-        //   shouldDisplayRewardsList:
-        //     dispenser_displays[0]?.shouldDisplayRewardsList === null
-        //       ? true
-        //       : dispenser_displays[0]?.shouldDisplayRewardsList,
-        //   shouldDisplayName:
-        //     dispenser_displays[0]?.shouldDisplayName === null
-        //       ? true
-        //       : dispenser_displays[0]?.shouldDisplayName,
-        //   shouldDisplayDescription:
-        //     dispenser_displays[0]?.shouldDisplayDescription === null
-        //       ? true
-        //       : dispenser_displays[0]?.shouldDisplayDescription,
-        //   shouldDisplayImage:
-        //     dispenser_displays[0]?.shouldDisplayImage === null
-        //       ? true
-        //       : dispenser_displays[0]?.shouldDisplayImage,
-        //   backgroundColor:
-        //     dispenser_displays[0]?.backgroundColor ||
-        //     defaultCustomizations.backgroundColor,
-        //   textColor:
-        //     dispenser_displays[0]?.textColor || defaultCustomizations.textColor,
-        //   claimButtonTextColor:
-        //     dispenser_displays[0]?.claimButtonTextColor ||
-        //     defaultCustomizations.claimButtonTextColor,
-        //   claimButtonColor:
-        //     dispenser_displays[0]?.claimButtonColor ||
-        //     defaultCustomizations.claimButtonColor,
-        //   imageSize: dispenser_displays[0]?.imageSize || 120,
-        //   nameTextSize: dispenser_displays[0]?.nameTextSize || 24,
-        //   descriptionTextSize: dispenser_displays[0]?.descriptionTextSize || 16,
-        //   claimButtonTextSize: dispenser_displays[0]?.claimButtonTextSize || 16,
-        //   claimButtonText: dispenser_displays[0]?.claimButtonText || "Claim",
-        // };
-        setShouldDisplayRewardsList(
-          dispenser_displays[0]?.shouldDisplayRewardsList === null
+        setShouldDisplayRewards(
+          dispenser_displays[0]?.shouldDisplayRewards === null
             ? true
-            : dispenser_displays[0]?.shouldDisplayRewardsList
+            : dispenser_displays[0]?.shouldDisplayRewards
         );
         setShouldDisplayName(
           dispenser_displays[0]?.shouldDisplayName === null
@@ -133,7 +98,7 @@ export default function Page() {
           dispenserId={dispenserId}
           backgroundColor={backgroundColor}
           textColor={textColor}
-          shouldDisplayRewardsList={shouldDisplayRewardsList}
+          shouldDisplayRewards={shouldDisplayRewards}
           shouldDisplayName={shouldDisplayName}
           shouldDisplayDescription={shouldDisplayDescription}
           shouldDisplayImage={shouldDisplayImage}

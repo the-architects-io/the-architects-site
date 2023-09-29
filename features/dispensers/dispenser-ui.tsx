@@ -21,18 +21,21 @@ import { publicKey } from "@metaplex-foundation/umi";
 import {
   BlueprintApiActions,
   Dispenser,
+  RewardDisplayType,
+  RewardDisplayTypes,
   TokenBalance,
 } from "@/app/blueprint/types";
 import { PublicKey } from "@metaplex-foundation/js";
 import PortalsSdk from "@/utils/portals-sdk-v2";
 import { useSearchParams } from "next/navigation";
 import classNames from "classnames";
+import { RewardsUI } from "@/features/rewards/rewards-ui";
 
 interface DispenserUiProps {
   dispenserId: string;
   backgroundColor?: string;
   textColor?: string;
-  shouldDisplayRewardsList?: boolean;
+  shouldDisplayRewards?: boolean;
   shouldDisplayName?: boolean;
   shouldDisplayDescription?: boolean;
   shouldDisplayImage?: boolean;
@@ -44,6 +47,7 @@ interface DispenserUiProps {
   claimButtonTextSize?: number;
   claimButtonText?: string;
   isBeingEdited?: boolean;
+  rewardDisplayType?: RewardDisplayTypes;
   children?: React.ReactNode;
 }
 
@@ -51,7 +55,7 @@ export default function DispenserUi({
   dispenserId,
   backgroundColor,
   textColor,
-  shouldDisplayRewardsList = true,
+  shouldDisplayRewards = true,
   shouldDisplayName = true,
   shouldDisplayDescription = true,
   shouldDisplayImage = true,
@@ -63,6 +67,7 @@ export default function DispenserUi({
   claimButtonTextSize,
   claimButtonText,
   isBeingEdited = false,
+  rewardDisplayType,
   children,
 }: DispenserUiProps) {
   const searchParams = useSearchParams();
@@ -301,7 +306,7 @@ export default function DispenserUi({
               <Spinner />
             </div>
           )}
-          {!isLoading && dispenser && (
+          {!isLoading && dispenser?.id && (
             <div className="flex flex-col items-center w-full">
               {!!shouldDisplayImage && (
                 <ImageWithFallback
@@ -329,14 +334,15 @@ export default function DispenserUi({
                 </p>
               )}
 
-              {!!dispenser?.id && (
-                <RewardsList
-                  className={classNames([
-                    "mb-4 max-w-md",
-                    shouldDisplayRewardsList ? "" : "hidden",
-                  ])}
+              {!!shouldDisplayRewards && (
+                <RewardsUI
                   inStockMintAddresses={inStockMintAddresses}
-                  dispenserId={dispenser?.id}
+                  dispenserId={dispenserId}
+                  rewardDisplayType={
+                    rewardDisplayType
+                      ? rewardDisplayType
+                      : RewardDisplayTypes.LIST
+                  }
                 />
               )}
 

@@ -1,14 +1,17 @@
 "use client";
 import { defaultCustomizations } from "@/app/blueprint/constants";
+import { RewardDisplayType } from "@/app/blueprint/types";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
 import { FormInput } from "@/features/UI/forms/form-input";
+import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-label";
 import Spinner from "@/features/UI/spinner";
 import DispenserUi from "@/features/dispensers/dispenser-ui";
 import showToast from "@/features/toasts/show-toast";
 import { GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID } from "@/graphql/queries/get-dispenser-displays-by-dispenser-id";
+import { GET_DISPENSER_REWARD_DISPLAY_TYPES } from "@/graphql/queries/get-dispenser-reward-display-types";
 import { useQuery } from "@apollo/client";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import axios from "axios";
@@ -22,13 +25,17 @@ export default function Page({ params }: { params: any }) {
   const [initialValues, setInitialValues] = useState<any>(null);
   const [isFormDirty, setIsFormDirty] = useState(false);
 
+  const [rewardDisplayTypes, setRewardDisplayTypes] = useState<
+    RewardDisplayType[]
+  >([]);
+
   const formik = useFormik({
     initialValues: initialValues || defaultCustomizations,
     enableReinitialize: true,
     onSubmit: async ({
       backgroundColor,
       textColor,
-      shouldDisplayRewardsList,
+      shouldDisplayRewards,
       shouldDisplayName,
       shouldDisplayDescription,
       claimButtonColor,
@@ -39,13 +46,14 @@ export default function Page({ params }: { params: any }) {
       descriptionTextSize,
       claimButtonTextSize,
       claimButtonText = "Claim",
+      rewardDisplayType,
     }) => {
       try {
         const { data } = await axios.post("/api/update-dispenser-display", {
           dispenserId: params.id,
           backgroundColor,
           textColor,
-          shouldDisplayRewardsList,
+          shouldDisplayRewards,
           shouldDisplayName,
           shouldDisplayDescription,
           claimButtonColor,
@@ -56,6 +64,7 @@ export default function Page({ params }: { params: any }) {
           descriptionTextSize,
           claimButtonTextSize,
           claimButtonText,
+          rewardDisplayType,
         });
         showToast({
           primaryMessage: "Update successful",
@@ -63,7 +72,7 @@ export default function Page({ params }: { params: any }) {
         setInitialValues({
           backgroundColor,
           textColor,
-          shouldDisplayRewardsList,
+          shouldDisplayRewards,
           shouldDisplayName,
           shouldDisplayDescription,
           claimButtonColor,
@@ -74,9 +83,18 @@ export default function Page({ params }: { params: any }) {
           descriptionTextSize,
           claimButtonTextSize,
           claimButtonText,
+          rewardDisplayType,
         });
       } catch (error) {
         console.log(error);
+      }
+    },
+  });
+
+  useQuery(GET_DISPENSER_REWARD_DISPLAY_TYPES, {
+    onCompleted: ({ rewardDisplayTypes }) => {
+      if (rewardDisplayTypes.length > 0) {
+        setRewardDisplayTypes(rewardDisplayTypes);
       }
     },
   });
@@ -95,10 +113,10 @@ export default function Page({ params }: { params: any }) {
           return;
         }
         const values = {
-          shouldDisplayRewardsList:
-            dispenser_displays[0]?.shouldDisplayRewardsList === null
+          shouldDisplayRewards:
+            dispenser_displays[0]?.shouldDisplayRewards === null
               ? true
-              : dispenser_displays[0]?.shouldDisplayRewardsList,
+              : dispenser_displays[0]?.shouldDisplayRewards,
           shouldDisplayName:
             dispenser_displays[0]?.shouldDisplayName === null
               ? true
@@ -127,6 +145,9 @@ export default function Page({ params }: { params: any }) {
           descriptionTextSize: dispenser_displays[0]?.descriptionTextSize || 16,
           claimButtonTextSize: dispenser_displays[0]?.claimButtonTextSize || 16,
           claimButtonText: dispenser_displays[0]?.claimButtonText || "Claim",
+          rewardDisplayType:
+            dispenser_displays[0]?.rewardDisplayType ||
+            rewardDisplayTypes[0]?.id,
         };
         setInitialValues(values);
       },
@@ -172,7 +193,7 @@ export default function Page({ params }: { params: any }) {
             dispenserId={params.id}
             backgroundColor={formik.values.backgroundColor}
             textColor={formik.values.textColor}
-            shouldDisplayRewardsList={formik.values.shouldDisplayRewardsList}
+            shouldDisplayRewards={formik.values.shouldDisplayRewards}
             shouldDisplayName={formik.values.shouldDisplayName}
             shouldDisplayDescription={formik.values.shouldDisplayDescription}
             shouldDisplayImage={formik.values.shouldDisplayImage}
@@ -183,6 +204,7 @@ export default function Page({ params }: { params: any }) {
             descriptionTextSize={formik.values.descriptionTextSize}
             claimButtonTextSize={formik.values.claimButtonTextSize}
             claimButtonText={formik.values.claimButtonText}
+            rewardDisplayType={formik.values.rewardDisplayType}
             isBeingEdited={true}
           >
             <div
@@ -317,7 +339,7 @@ export default function Page({ params }: { params: any }) {
               <div className="mb-2">
                 <FormCheckboxWithLabel
                   label="Description"
-                  name="shouldDisplayRewardsList"
+                  name="shouldDisplayRewards"
                   value={formik.values.shouldDisplayDescription}
                   onChange={(e: any) => {
                     formik.setFieldValue(
@@ -345,17 +367,34 @@ export default function Page({ params }: { params: any }) {
               <div className="mb-2">
                 <FormCheckboxWithLabel
                   label="Rewards List"
-                  name="shouldDisplayRewardsList"
-                  value={formik.values.shouldDisplayRewardsList}
+                  name="shouldDisplayRewards"
+                  value={formik.values.shouldDisplayRewards}
                   onChange={(e: any) => {
                     formik.setFieldValue(
-                      "shouldDisplayRewardsList",
+                      "shouldDisplayRewards",
                       e.target.checked
                     );
                   }}
                 />
               </div>
             </div>
+            {!!formik.values.shouldDisplayRewards && (
+              <SelectInputWithLabel
+                value={formik.values.rewardDisplayType}
+                label="Reward Display Type"
+                name="rewardDisplayType"
+                options={rewardDisplayTypes.map((type) => ({
+                  label: type.label,
+                  value: type.name,
+                }))}
+                onChange={(ev) => {
+                  formik.setFieldValue("rewardDisplayType", ev.target.value);
+                }}
+                onBlur={formik.handleBlur}
+                placeholder="Select a reward display type"
+                hideLabel={false}
+              />
+            )}
 
             <div className="text-2xl uppercase mb-4 pt-8">Claim Button</div>
             <div className="flex flex-col items-center mb-8">

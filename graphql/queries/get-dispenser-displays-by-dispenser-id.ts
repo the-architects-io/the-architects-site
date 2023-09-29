@@ -12,7 +12,12 @@ export const GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID = gql`
       shouldDisplayDescription
       shouldDisplayImage
       shouldDisplayName
-      shouldDisplayRewardsList
+      shouldDisplayRewards
+      rewardDisplayType {
+        id
+        label
+        name
+      }
       textColor
       claimButtonText
       claimButtonTextColor
@@ -21,6 +26,7 @@ export const GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID = gql`
       imageSize
       nameTextSize
       dispenserId
+      rewardDisplayType
     }
   }
 `;
