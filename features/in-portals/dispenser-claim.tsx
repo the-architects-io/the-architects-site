@@ -59,6 +59,7 @@ export const DispenserClaim = ({
       {
         walletAddress: BUILD_REWARD_WALLET,
         mintAddresses: [mintAddress],
+        cluster: "mainnet",
       }
     );
     const amount = data?.[0]?.amount || 0;

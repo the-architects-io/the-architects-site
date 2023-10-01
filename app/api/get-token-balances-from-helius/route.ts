@@ -18,7 +18,8 @@ type Data =
     };
 
 export async function POST(req: NextRequest) {
-  const { walletAddress, mintAddresses, noop, withDetails } = await req.json();
+  const { walletAddress, mintAddresses, noop, withDetails, cluster } =
+    await req.json();
 
   if (noop)
     return NextResponse.json(
@@ -40,16 +41,26 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let url = "";
+  let url;
 
-  switch (process.env.NEXT_PUBLIC_ENV) {
-    case "production":
-      url = `https://api.helius.xyz/v0/addresses/${walletAddress}/balances?api-key=${process.env.HELIUS_API_KEY}`;
-      break;
-    case "local":
-    default:
-      url = `https://api-devnet.helius.xyz/v0/addresses/${walletAddress}/balances?api-key=${process.env.HELIUS_API_KEY}`;
-      break;
+  if (cluster.includes("devnet")) {
+    url = `https://api-devnet.helius.xyz/v0/addresses/${walletAddress}/balances?api-key=${process.env.HELIUS_API_KEY}`;
+  }
+
+  if (cluster.includes("mainnet")) {
+    url = `https://api.helius.xyz/v0/addresses/${walletAddress}/balances?api-key=${process.env.HELIUS_API_KEY}`;
+  }
+
+  if (!url) {
+    switch (process.env.NEXT_PUBLIC_ENV) {
+      case "production":
+        url = `https://api.helius.xyz/v0/addresses/${walletAddress}/balances?api-key=${process.env.HELIUS_API_KEY}`;
+        break;
+      case "local":
+      default:
+        url = `https://api-devnet.helius.xyz/v0/addresses/${walletAddress}/balances?api-key=${process.env.HELIUS_API_KEY}`;
+        break;
+    }
   }
 
   const { data } = await axios.get(url);
