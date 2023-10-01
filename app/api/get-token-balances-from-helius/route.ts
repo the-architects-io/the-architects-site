@@ -56,18 +56,22 @@ export async function POST(req: NextRequest) {
 
   let { tokens: balances }: { tokens: TokenBalance[] } = data;
 
+  console.log({ balances, mintAddresses, walletAddress });
+
   if (mintAddresses && mintAddresses.length > 0) {
     balances = balances.filter((balance) =>
       mintAddresses.includes(balance.mint)
     );
   }
 
+  console.log("filtered balances", balances);
+
   balances = balances
     .filter((balance) => balance.amount > 0)
     .filter((balance) => balance.decimals > 0 && balance.amount > 1) // Only SPLs
     .sort((a, b) => b.amount - a.amount);
 
-  console.log("balances", balances.slice(0, 10));
+  console.log("sliced balances", balances.slice(0, 10));
 
   if (withDetails) {
     const { data: tokenDetails } = await axios.post(
