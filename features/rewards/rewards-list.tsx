@@ -1,5 +1,4 @@
-import { TokenBalance } from "@/app/api/get-token-balances-from-helius/route";
-import { BASE_URL, REWARD_WALLET_ADDRESS } from "@/constants/constants";
+import { BASE_URL } from "@/constants/constants";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import { getAbbreviatedAddress, round } from "@/utils/formatting";
 import axios from "axios";
@@ -10,7 +9,6 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import { fromBaseUnit } from "@/utils/currency";
 import { HeliusToken } from "@/app/blueprint/types";
 import Spinner from "@/features/UI/spinner";
-import { StopCircleRounded } from "@mui/icons-material";
 import { isPublicKey, publicKey } from "@metaplex-foundation/umi";
 
 export const RewardsList = ({

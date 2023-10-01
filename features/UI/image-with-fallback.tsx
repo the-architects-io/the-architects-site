@@ -22,8 +22,8 @@ export const ImageWithFallback = ({ src, alt, className, ...props }: Props) => {
       ) : (
         <div className="flex justify-center ">
           <PhotoIcon
-            width={props.width || 60}
-            height={props.height || 60}
+            width={(props.width && Number(props.width)) || 60}
+            height={(props.height && Number(props.height)) || 60}
             className={classNames(["text-stone-500"])}
           />
         </div>

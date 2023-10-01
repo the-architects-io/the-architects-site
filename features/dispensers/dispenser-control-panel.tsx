@@ -1,9 +1,6 @@
-import { Dispenser } from "@/app/blueprint/types";
-import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { Panel } from "@/features/UI/panel";
 import { getAbbreviatedAddress } from "@/utils/formatting";
-import Link from "next/link";
 import { RewardsSettingsPanel } from "@/features/admin/dispensers/rewards/rewards-settings-panel";
 import { CostsSettingsPanel } from "@/features/admin/dispensers/costs/cost-settings-panel";
 import { ConfigSettingsPanel } from "@/features/admin/dispensers/config/config-settings-panel";
@@ -14,7 +11,6 @@ import { Divider } from "@mui/material";
 import { ITab, Tabs } from "@/features/UI/tabs/tabs";
 import { useEffect, useState } from "react";
 import { StatsPanel } from "@/features/admin/dispensers/stats/stats-panel";
-import useRewards from "@/app/blueprint/hooks/use-rewards";
 
 export const DispenserControlPanel = ({
   dispenserId,
@@ -76,11 +72,11 @@ export const DispenserControlPanel = ({
                           {getAbbreviatedAddress(dispenser.rewardWalletAddress)}
                         </a>
                       </div>
-                      <PrimaryButton className="mb-4" onClick={() => {}}>
+                      {/* <PrimaryButton className="mb-4" onClick={() => {}}>
                         <Link href={`/lab/dispenser?id=${dispenser.id}`}>
                           Test
                         </Link>
-                      </PrimaryButton>
+                      </PrimaryButton> */}
                     </div>
                   )}
                   {!!dispenser.rarity && (
