@@ -12,6 +12,7 @@ import axios from "axios";
 import { BuildTokenVestingDetails } from "@/features/dispensers/details/build-token-vesting-details";
 import { ModeledNftMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import { Dispenser } from "@/app/blueprint/types";
+import { useUserData } from "@nhost/nextjs";
 
 export interface ITokenClaim {
   id: string;
@@ -46,6 +47,8 @@ export const DispenserClaim = ({
   const [dispenser, setDispenser] = useState<Dispenser | null>(null);
   const [isDispenserEmpty, setIsDispenserEmpty] = useState(false);
   const [txAddress, setTxAddress] = useState<string | null>(null);
+  const [inStockAmount, setInStockAmount] = useState(0);
+  const user = useUserData();
 
   const setupDispenser = async (dispenser: Dispenser) => {
     const { rewardCollections } = dispenser;
@@ -58,6 +61,8 @@ export const DispenserClaim = ({
       }
     );
     const amount = data?.[0]?.amount || 0;
+    console.log({ data });
+    setInStockAmount(amount);
     setIsDispenserEmpty(amount === 0);
     if (amount === 0) setIsEnabledClaim(false);
   };
@@ -129,6 +134,14 @@ export const DispenserClaim = ({
     <div className="flex flex-col justify-center items-center w-full min-h-screen">
       {!!dispenser && (
         <>
+          {user?.email === "bus@thebuildersdao.com" ||
+            (user?.email === "warly42@pm.me" && (
+              <>
+                <div>inStockAmount: {inStockAmount}</div>
+                <div>wasClaimSucessful: {wasClaimSucessful.toString()}</div>
+                <div>isEnabledClaim: {isEnabledClaim.toString()}</div>
+              </>
+            ))}
           <BuildTokenVestingDetails
             walletAddress={walletAddress}
             numberOfDaoNftsHeld={numberOfDaoNftsHeld || 0}
