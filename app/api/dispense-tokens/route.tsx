@@ -19,6 +19,11 @@ import {
 import { sendTransaction } from "@/utils/transactions/send-transaction";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
+import { Item, Wallet } from "@/app/blueprint/types";
+import { client } from "@/graphql/backend-client";
+import { ADD_ITEM_PAYOUT } from "@/graphql/mutations/add-item-payout";
+import { GET_ITEM_BY_ID } from "@/graphql/queries/get-item-by-id";
+import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 
 export async function POST(req: Request) {
   const { noop, dispenserId, recipientAddress, mintAddress, amount, apiKey } =
@@ -174,6 +179,16 @@ export async function POST(req: Request) {
     transaction.add(ix);
 
     txHash = await sendTransaction(transaction, provider, connection);
+
+    if (!txHash) {
+      return NextResponse.json(
+        {
+          error: "Transaction failed",
+          status: 500,
+        },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     return NextResponse.json(
       {
@@ -186,12 +201,48 @@ export async function POST(req: Request) {
     );
   }
 
+  let payout;
+
+  try {
+    const { items_by_pk: item }: { items_by_pk: Item } = await client.request({
+      document: GET_ITEM_BY_ID,
+    });
+
+    const { wallets_by_pk: wallet }: { wallets_by_pk: Wallet } =
+      await client.request({
+        document: GET_WALLET_BY_ADDRESS,
+        variables: {
+          address: recipientAddress,
+        },
+      });
+
+    const { insert_payouts_one }: { insert_payouts_one: Wallet } =
+      await client.request({
+        document: ADD_ITEM_PAYOUT,
+        variables: {
+          txAddress: txHash,
+          amount,
+          tokenId: item.token.id,
+          itemId: item.id,
+          dispenserId,
+          walletId: wallet.id,
+        },
+      });
+    payout = insert_payouts_one;
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to add payout" },
+      { status: 500 }
+    );
+  }
+
   try {
     return NextResponse.json(
       {
         txHash,
         mintAddress,
         amount,
+        payout,
       },
       { status: 200 }
     );

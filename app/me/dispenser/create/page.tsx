@@ -5,14 +5,18 @@ import { Panel } from "@/features/UI/panel";
 import { AddDispenserForm } from "@/features/dispensers/add-dispenser-form";
 import { DispenserPayoutStructureForm } from "@/features/dispensers/dispenser-payout-structure-form";
 import { DispenserRewardForm } from "@/features/dispensers/dispenser-reward-form";
+import { DispenserSettingsForm } from "@/features/dispensers/dispenser-settings-form";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function DashboardPage() {
   const searchParams = useSearchParams();
-  const [step, setStep] = useState(0);
-  const [dispenserId, setDispenserId] = useState<string | null>(null);
+  const [step, setStep] = useState(3);
+  // const [dispenserId, setDispenserId] = useState<string | null>(null);
+  const [dispenserId, setDispenserId] = useState<string | null>(
+    "3e062884-588f-46d2-aef3-3a688c426524"
+  );
   const stepParam = searchParams.get("step");
   const dispenserIdParam = searchParams.get("dispenserId");
   const { publicKey } = useWallet();
@@ -71,6 +75,9 @@ export default function DashboardPage() {
             dispenserId={dispenserId}
             setStep={setStep}
           />
+        )}
+        {step === 3 && dispenserId && (
+          <DispenserSettingsForm dispenserId={dispenserId} setStep={setStep} />
         )}
       </Panel>
     </ContentWrapper>

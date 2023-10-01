@@ -43,11 +43,11 @@ export async function POST(req: NextRequest) {
 
   let url;
 
-  if (cluster.includes("devnet")) {
+  if (cluster?.includes("devnet")) {
     url = `https://api-devnet.helius.xyz/v0/addresses/${walletAddress}/balances?api-key=${process.env.HELIUS_API_KEY}`;
   }
 
-  if (cluster.includes("mainnet")) {
+  if (cluster?.includes("mainnet")) {
     url = `https://api.helius.xyz/v0/addresses/${walletAddress}/balances?api-key=${process.env.HELIUS_API_KEY}`;
   }
 

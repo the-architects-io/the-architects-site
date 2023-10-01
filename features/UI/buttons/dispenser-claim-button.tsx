@@ -15,6 +15,7 @@ interface Props extends React.HTMLAttributes<HTMLButtonElement> {
   setIsClaimed?: (isClaimed: boolean) => void;
   setTxAddress: (txAddress: string | null) => void;
   mintAddresses?: string[];
+  hasBeenFetched?: boolean;
 }
 
 export const DispenserClaimButton = ({
@@ -25,6 +26,7 @@ export const DispenserClaimButton = ({
   isClaimed,
   setIsClaimed,
   mintAddresses,
+  hasBeenFetched,
 }: Props) => {
   const [errorMessage, setErrorMessage] = useState("");
   const { claimReward } = useDispenser(dispenserId);
@@ -65,7 +67,7 @@ export const DispenserClaimButton = ({
           Already claimed
         </div>
       )}
-      {!isClaimed && isEnabledClaim && (
+      {!isClaimed && isEnabledClaim && hasBeenFetched && (
         <PrimaryButton onClick={handleClaimToken}>Claim</PrimaryButton>
       )}
     </div>

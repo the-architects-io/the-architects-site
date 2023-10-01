@@ -75,7 +75,7 @@ export const DispenserPayoutStructureForm = ({
         showToast({
           primaryMessage: "Successfully updated rewards",
         });
-        router.push(`/me/dispenser/${dispenserId}`);
+        setStep(3);
       } catch (error) {
         showToast({
           primaryMessage: "Error updating rewards",

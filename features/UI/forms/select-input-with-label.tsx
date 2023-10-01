@@ -1,7 +1,7 @@
 import classNames from "classnames";
 
 interface Props extends React.HTMLAttributes<HTMLSelectElement> {
-  value: string;
+  value: string | number;
   label: string;
   name: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;

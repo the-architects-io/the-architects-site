@@ -18,7 +18,7 @@ import axios from "axios";
 import classNames from "classnames";
 import { Formik, useFormik } from "formik";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 
 export default function Page({ params }: { params: any }) {

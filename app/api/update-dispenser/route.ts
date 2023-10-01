@@ -4,8 +4,15 @@ import type { NextRequest } from "next/server";
 import { UPDATE_DISPENSER } from "@/graphql/mutations/update-dispenser";
 import { Dispenser } from "@/app/blueprint/types";
 
+type UpdateDispenserInput = {
+  rewardWalletAddress?: string;
+  rewardWalletBump?: number;
+  cooldownInMs?: number;
+};
+
 export async function POST(req: NextRequest) {
-  const { id, rewardWalletAddress, rewardWalletBump, noop } = await req.json();
+  const { id, rewardWalletAddress, rewardWalletBump, cooldownInMs, noop } =
+    await req.json();
 
   if (noop)
     return NextResponse.json(
@@ -16,11 +23,25 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
 
-  if (!id || !rewardWalletAddress || !rewardWalletBump) {
+  if (!id) {
     return NextResponse.json(
       { error: "Required fields not set" },
       { status: 500 }
     );
+  }
+
+  let setInput: UpdateDispenserInput = {};
+
+  if (rewardWalletAddress) {
+    setInput = { ...setInput, rewardWalletAddress };
+  }
+
+  if (rewardWalletBump) {
+    setInput = { ...setInput, rewardWalletBump };
+  }
+
+  if (cooldownInMs) {
+    setInput = { ...setInput, cooldownInMs };
   }
 
   const {
@@ -29,12 +50,11 @@ export async function POST(req: NextRequest) {
     UPDATE_DISPENSER,
     {
       id,
-      setInput: {
-        rewardWalletAddress,
-        rewardWalletBump,
-      },
+      setInput,
     }
   );
+
+  console.log({ updatedDispenser });
 
   if (!updatedDispenser) {
     return NextResponse.json(
