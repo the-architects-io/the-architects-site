@@ -16,7 +16,7 @@ import { Token } from "@/app/blueprint/types";
 // Deprecated, used for BUILD claim only
 
 export default function DispenserClaimPage({ params }: { params: any }) {
-  const { publicKey: walletAdapterWalletAddress } = useWallet();
+  // const { publicKey: walletAdapterWalletAddress } = useWallet();
   const { connection } = useConnection();
   const [inPortalsWalletAddress, setInPortalsWalletAddress] =
     useState<PublicKey | null>(null);
@@ -51,7 +51,8 @@ export default function DispenserClaimPage({ params }: { params: any }) {
   });
 
   const handleFetchDaoNfts = useCallback(async () => {
-    const walletAddress = inPortalsWalletAddress || walletAdapterWalletAddress;
+    const walletAddress = inPortalsWalletAddress;
+    //  || walletAdapterWalletAddress;
 
     if (!walletAddress) return;
 
@@ -66,7 +67,7 @@ export default function DispenserClaimPage({ params }: { params: any }) {
     setIsFetchingNfts(false);
     setHasBeenFetched(true);
     setNumberOfDaoNftsHeld(nfts?.length || 0);
-  }, [connection, inPortalsWalletAddress, walletAdapterWalletAddress]);
+  }, [connection, inPortalsWalletAddress]);
 
   const requestPublicKey = () => {
     PortalsSdk.requestPublicKey("https://theportal.to", (publicKey: string) => {
@@ -89,13 +90,8 @@ export default function DispenserClaimPage({ params }: { params: any }) {
       hasBeenFetched,
       isFetchingNfts,
       inPortalsWalletAddress,
-      walletAdapterWalletAddress,
     });
-    if (
-      !hasBeenFetched &&
-      !isFetchingNfts &&
-      (inPortalsWalletAddress || walletAdapterWalletAddress)
-    )
+    if (!hasBeenFetched && !isFetchingNfts && inPortalsWalletAddress)
       handleFetchDaoNfts();
 
     setTimeout(() => {
@@ -107,10 +103,9 @@ export default function DispenserClaimPage({ params }: { params: any }) {
     hasBeenFetched,
     isFetchingNfts,
     handleFetchDaoNfts,
-    walletAdapterWalletAddress,
   ]);
 
-  if (!inPortalsWalletAddress && !walletAdapterWalletAddress)
+  if (!inPortalsWalletAddress || loading)
     return (
       <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
         <Spinner />
@@ -119,7 +114,7 @@ export default function DispenserClaimPage({ params }: { params: any }) {
 
   return (
     <>
-      {!walletAdapterWalletAddress && !inPortalsWalletAddress ? (
+      {!inPortalsWalletAddress ? (
         <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300 bg-slate-800">
           <div className="absolute top-4 right-4">
             <WalletButton />
@@ -151,11 +146,7 @@ export default function DispenserClaimPage({ params }: { params: any }) {
             numberOfDaoNftsHeld={numberOfDaoNftsHeld}
             collectionNfts={collectionNfts}
             dispenserId={"dd078f38-e4d5-47fa-a571-8786029e324e"}
-            walletAddress={
-              ENV === "local"
-                ? walletAdapterWalletAddress || inPortalsWalletAddress
-                : inPortalsWalletAddress
-            }
+            walletAddress={inPortalsWalletAddress}
           />
         </div>
       )}
