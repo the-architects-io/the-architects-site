@@ -48,6 +48,7 @@ export const DispenserClaim = ({
   const [isDispenserEmpty, setIsDispenserEmpty] = useState(false);
   const [txAddress, setTxAddress] = useState<string | null>(null);
   const [inStockAmount, setInStockAmount] = useState(0);
+  const [hasBeenFetched, setHasBeenFetched] = useState(false);
   const user = useUserData();
 
   const setupDispenser = async (dispenser: Dispenser) => {
@@ -64,6 +65,7 @@ export const DispenserClaim = ({
     console.log({ data });
     setInStockAmount(amount);
     setIsDispenserEmpty(amount === 0);
+    setHasBeenFetched(true);
     if (amount === 0) setIsEnabledClaim(false);
   };
 
@@ -134,16 +136,16 @@ export const DispenserClaim = ({
     <div className="flex flex-col justify-center items-center w-full min-h-screen">
       {!!dispenser && (
         <>
-          <>
+          {/* <>
             <div>inStockAmount: {inStockAmount}</div>
             <div>wasClaimSucessful: {wasClaimSucessful.toString()}</div>
             <div>isEnabledClaim: {isEnabledClaim.toString()}</div>
-          </>
+          </> */}
           <BuildTokenVestingDetails
             walletAddress={walletAddress}
             numberOfDaoNftsHeld={numberOfDaoNftsHeld || 0}
             lastClaimTime={lastClaimTime}
-            hasBeenFetched={true}
+            hasBeenFetched={hasBeenFetched}
             tokenClaimSource={dispenser}
             isEnabledClaim={isEnabledClaim}
             isLoading={isLoading || !!isFetching}
