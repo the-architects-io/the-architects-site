@@ -134,14 +134,11 @@ export const DispenserClaim = ({
     <div className="flex flex-col justify-center items-center w-full min-h-screen">
       {!!dispenser && (
         <>
-          {user?.email === "bus@thebuildersdao.com" ||
-            (user?.email === "warly42@pm.me" && (
-              <>
-                <div>inStockAmount: {inStockAmount}</div>
-                <div>wasClaimSucessful: {wasClaimSucessful.toString()}</div>
-                <div>isEnabledClaim: {isEnabledClaim.toString()}</div>
-              </>
-            ))}
+          <>
+            <div>inStockAmount: {inStockAmount}</div>
+            <div>wasClaimSucessful: {wasClaimSucessful.toString()}</div>
+            <div>isEnabledClaim: {isEnabledClaim.toString()}</div>
+          </>
           <BuildTokenVestingDetails
             walletAddress={walletAddress}
             numberOfDaoNftsHeld={numberOfDaoNftsHeld || 0}
