@@ -13,6 +13,8 @@ import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mi
 import { useQuery } from "@apollo/client";
 import { Token } from "@/app/blueprint/types";
 
+// Deprecated, used for BUILD claim only
+
 export default function DispenserClaimPage({ params }: { params: any }) {
   const { publicKey: walletAdapterWalletAddress } = useWallet();
   const { connection } = useConnection();
@@ -107,11 +109,6 @@ export default function DispenserClaimPage({ params }: { params: any }) {
     handleFetchDaoNfts,
     walletAdapterWalletAddress,
   ]);
-  return (
-    <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
-      <Spinner />
-    </div>
-  );
 
   if (!inPortalsWalletAddress && !walletAdapterWalletAddress)
     return (
