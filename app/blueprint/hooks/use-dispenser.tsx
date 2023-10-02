@@ -100,6 +100,7 @@ const useDispenser = (dispenserId?: string) => {
         collectionWallet: null,
         rewardWalletAddress: null,
         rewardCollections: [],
+        cooldownInMs: null,
       },
       costs: null,
       rewards: null,

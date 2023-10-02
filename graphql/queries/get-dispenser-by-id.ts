@@ -88,6 +88,7 @@ export const GET_DISPENSER_BY_ID = gql`
                 name
                 mintAddress
                 decimals
+                imageUrl
               }
             }
           }

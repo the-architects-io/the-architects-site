@@ -1,7 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import * as anchor from "@coral-xyz/anchor";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 import { Connection, Keypair } from "@solana/web3.js";
 import {
   DISPENSER_PROGRAM_ID,
@@ -22,14 +21,13 @@ import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { Item, Token, Wallet } from "@/app/blueprint/types";
 import { client } from "@/graphql/backend-client";
 import { ADD_ITEM_PAYOUT } from "@/graphql/mutations/add-item-payout";
-import { GET_ITEM_BY_ID } from "@/graphql/queries/get-item-by-id";
 import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
 import { logError } from "@/utils/errors/log-error";
 import { mapErrorToResponse } from "@/app/api/blueprint/route";
 import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address";
-import { ADD_TOKEN } from "@/graphql/mutations/add-token";
 import { GET_ITEMS_BY_TOKEN_IDS } from "@/graphql/queries/get-items-by-token-ids";
+import { fromBaseUnit } from "@/utils/currency";
 
 export async function POST(req: Request) {
   const { noop, dispenserId, recipientAddress, mintAddress, amount, apiKey } =
@@ -299,7 +297,7 @@ export async function POST(req: Request) {
       {
         txHash,
         mintAddress,
-        amount,
+        amount: fromBaseUnit(amount, token.decimals),
         payout,
         token,
         item,

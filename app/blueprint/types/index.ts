@@ -396,17 +396,28 @@ export type DispenserDisplay = {
   shouldDisplayImage: boolean;
   shouldDisplayName: boolean;
   shouldDisplayRewards: boolean;
-  rewardDisplayType: RewardDisplayType;
+  rewardDisplayType: string;
   textColor: string;
-};
-
-export type RewardDisplayType = {
-  name: string;
-  id: string;
-  label: string;
 };
 
 export enum RewardDisplayTypes {
   LIST = "LIST",
   CARDS = "CARDS",
 }
+
+export type DispenseTokensApiResponse = {
+  txHash: string;
+  mintAddress: string;
+  amount: number;
+  payout: {
+    id: string;
+    amount: number;
+    token: {
+      id: string;
+      name: string;
+      mintAddress: string;
+    };
+  };
+  token: Token;
+  item: Item;
+};

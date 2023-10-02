@@ -13,6 +13,8 @@ const sortRewards = (rewards: DispenserReward[]) => {
 };
 
 const mapRewardCollection = (rewards: Dispenser["rewardCollections"]) => {
+  console.log("rewards", rewards);
+  // debugger;
   return rewards.map(
     ({
       name,

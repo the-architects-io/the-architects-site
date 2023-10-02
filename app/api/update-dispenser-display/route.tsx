@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
     descriptionTextSize,
     claimButtonTextSize,
     claimButtonText,
+    rewardDisplayType,
     noop,
   } = await req.json();
 
@@ -41,6 +42,7 @@ export async function POST(req: NextRequest) {
     descriptionTextSize,
     claimButtonTextSize,
     claimButtonText,
+    rewardDisplayType,
     noop,
   });
 
@@ -98,6 +100,7 @@ export async function POST(req: NextRequest) {
     descriptionTextSize,
     claimButtonTextSize,
     claimButtonText,
+    rewardDisplayType,
   };
 
   if (dispenserDisplay) {

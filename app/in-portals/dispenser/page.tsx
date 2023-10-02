@@ -1,9 +1,16 @@
 "use client";
 
 import { defaultCustomizations } from "@/app/blueprint/constants";
+import { DispenseTokensApiResponse } from "@/app/blueprint/types";
+import { ContentWrapper } from "@/features/UI/content-wrapper";
+import { ImageWithFallback } from "@/features/UI/image-with-fallback";
+import ConfettiBackground from "@/features/animations/confetti-background";
 import DispenserUi from "@/features/dispensers/dispenser-ui";
+import showToast from "@/features/toasts/show-toast";
 import { GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID } from "@/graphql/queries/get-dispenser-displays-by-dispenser-id";
+import { getAbbreviatedAddress } from "@/utils/formatting";
 import { useQuery } from "@apollo/client";
+import { isPublicKey } from "@metaplex-foundation/umi";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -31,6 +38,10 @@ export default function Page() {
   const [descriptionTextSize, setDescriptionTextSize] = useState(16);
   const [claimButtonTextSize, setClaimButtonTextSize] = useState(16);
   const [claimButtonText, setClaimButtonText] = useState("Claim");
+  const [dispensedInfo, setDispensedInfo] =
+    useState<DispenseTokensApiResponse | null>(null);
+  const [amountString, setAmountString] = useState("");
+  const [dispensedName, setDispensedName] = useState("");
 
   const { data, loading, error } = useQuery(
     GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID,
@@ -91,9 +102,58 @@ export default function Page() {
     }
   );
 
+  useEffect(() => {
+    if (dispensedInfo) {
+      console.log({ dispensedInfo });
+      const amountString =
+        dispensedInfo?.amount > 0 ? `${dispensedInfo?.amount}x of` : "a";
+      setAmountString(amountString);
+      const dispensedNameString = isPublicKey(dispensedInfo?.token?.name)
+        ? getAbbreviatedAddress(dispensedInfo?.token?.name)
+        : dispensedInfo?.token?.name;
+      setDispensedName(dispensedNameString);
+      showToast({
+        primaryMessage: `You got ${amountString} ${dispensedName}!`,
+        link: {
+          url: `https://solscan.io/tx/${dispensedInfo.txHash}?cluster=devnet`,
+          title: "View Transaction",
+        },
+      });
+    }
+  }, [dispensedInfo, dispensedName, setAmountString, setDispensedName]);
+
   return (
     <>
-      {!!dispenserId && (
+      {!!dispensedInfo && (
+        <div className="flex flex-col items-center justify-center w-full min-w-screen min-h-screen">
+          <div className="-mt-16">
+            <ConfettiBackground />
+          </div>
+          <div className="text-7xl mb-8">Success!</div>
+          {(!!dispensedInfo?.token?.imageUrl ||
+            dispensedInfo?.item?.imageUrl) && (
+            <ImageWithFallback
+              src={
+                dispensedInfo?.token?.imageUrl || dispensedInfo?.item?.imageUrl
+              }
+              alt={dispensedInfo?.token?.name || dispensedInfo?.item?.name}
+              className="w-48 h-48 mb-8"
+            />
+          )}
+          <div className="text-4xl">
+            You got {amountString} {dispensedName}!
+          </div>
+          <a
+            href={`https://solscan.io/tx/${dispensedInfo.txHash}?cluster=devnet}`}
+            target="_blank"
+            rel="noreferrer"
+            className="underline uppercase pt-8 text-lg"
+          >
+            View transaction
+          </a>
+        </div>
+      )}
+      {!!dispenserId && !dispensedInfo && (
         <DispenserUi
           dispenserId={dispenserId}
           backgroundColor={backgroundColor}
@@ -109,6 +169,7 @@ export default function Page() {
           descriptionTextSize={descriptionTextSize}
           claimButtonTextSize={claimButtonTextSize}
           claimButtonText={claimButtonText}
+          setDispensedInfo={setDispensedInfo}
         />
       )}
     </>

@@ -188,13 +188,16 @@ export async function POST(req: NextRequest) {
     let modeledToken: ModeledToken;
     if (isAsset(entity)) {
       const asset = entity as DigitalAsset;
+      const { data } = await axios.get(asset?.metadata?.uri);
+      const imageUrl = data?.image;
       const pubKey = publicKey(asset.mint).toString();
+
       modeledToken = {
         name: asset?.metadata?.name?.trim()?.length
           ? asset?.metadata?.name
           : pubKey,
         symbol: asset?.metadata?.symbol,
-        imageUrl: asset?.metadata?.uri,
+        imageUrl,
         mintAddress: pubKey,
         decimals:
           mintAccounts.find(
@@ -202,6 +205,7 @@ export async function POST(req: NextRequest) {
               publicKey(mintAccount.publicKey).toString() === pubKey
           )?.decimals || 0,
       };
+
       toAdd.push(modeledToken);
     } else if (isMint(entity)) {
       const token = entity as Mint;

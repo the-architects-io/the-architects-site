@@ -4,14 +4,12 @@ import {
   ENV,
   RPC_ENDPOINT_DEVNET,
 } from "@/constants/constants";
-import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useCallback, useEffect, useState } from "react";
+import { Dispatch, useCallback, useEffect, useState } from "react";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import axios from "axios";
 import WalletButton from "@/features/UI/buttons/wallet-button";
-import { RewardsList } from "@/features/rewards/rewards-list";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
 import { toBaseUnit } from "@/utils/currency";
@@ -21,7 +19,6 @@ import { publicKey } from "@metaplex-foundation/umi";
 import {
   BlueprintApiActions,
   Dispenser,
-  RewardDisplayType,
   RewardDisplayTypes,
   TokenBalance,
 } from "@/app/blueprint/types";
@@ -30,8 +27,9 @@ import PortalsSdk from "@/utils/portals-sdk-v2";
 import { useSearchParams } from "next/navigation";
 import classNames from "classnames";
 import { RewardsUI } from "@/features/rewards/rewards-ui";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { GET_PAYOUTS } from "@/graphql/queries/get-payouts";
+import { Payout } from "@/app/profile/[id]/page";
 
 interface DispenserUiProps {
   dispenserId: string;
@@ -50,6 +48,7 @@ interface DispenserUiProps {
   claimButtonText?: string;
   isBeingEdited?: boolean;
   rewardDisplayType?: RewardDisplayTypes;
+  setDispensedInfo?: Dispatch<any>;
   children?: React.ReactNode;
 }
 
@@ -70,6 +69,7 @@ export default function DispenserUi({
   claimButtonText,
   isBeingEdited = false,
   rewardDisplayType,
+  setDispensedInfo,
   children,
 }: DispenserUiProps) {
   const searchParams = useSearchParams();
@@ -82,7 +82,7 @@ export default function DispenserUi({
   const [roomId, setRoomId] = useState<string | null>(null);
   const [hasFetchedRoomId, setHasFetchedRoomId] = useState<boolean>(false);
 
-  const { dispenser, isLoading, fetchRewardTokenBalances } =
+  const { dispenser, isLoading, fetchRewardTokenBalances, refetch } =
     useDispenser(dispenserId);
   const [hasFetchedBalances, setHasFetchedBalances] = useState<boolean>(false);
   const [isFetchingBalances, setIsFetchingBalances] = useState<boolean>(false);
@@ -94,14 +94,17 @@ export default function DispenserUi({
     setHasFetchedInPortalsWalletAddress,
   ] = useState<boolean>(false);
   const [showReloadButton, setShowReloadButton] = useState(false);
-  const [hasPassedCooldownCheck, setHasPassedCooldownCheck] = useState(true);
+  const [hasPassedCooldownCheck, setHasPassedCooldownCheck] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [payouts, setPayouts] = useState<Payout[]>([]);
+  const [lastClaimTimeString, setLastClaimTimeString] = useState<string>("");
+  const [nextClaimTimeString, setNextClaimTimeString] = useState<string>("");
+  const [hasCooldown, setHasCooldown] = useState<boolean>(false);
 
   const {
     loading: isFetchingPayouts,
-    data: payouts,
     error: fetchPayoutsError,
-    called: isFetchPayoutsCalled,
+    called: hasFechedPayouts,
   } = useQuery(GET_PAYOUTS, {
     variables: {
       dispenserId: dispenserId,
@@ -110,6 +113,15 @@ export default function DispenserUi({
         walletAdapterWalletAddress?.toString(),
     },
     skip: !inPortalsWalletAddress && !walletAdapterWalletAddress,
+    onCompleted: ({ payouts }: { payouts: Payout[] }) => {
+      const sortedPayouts = [...payouts].sort(
+        (a: Payout, b: Payout) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      setPayouts(sortedPayouts);
+      !!refetch && refetch();
+    },
   });
 
   enum PayoutMethod {
@@ -142,19 +154,6 @@ export default function DispenserUi({
         ) || tokenBalances.find((token) => token.mint === mintAddress)
       );
     });
-
-    const cooldown = dispenser?.cooldownInMs || 0;
-
-    if (cooldown) {
-      // const data = await fetchPayouts();
-      // console.log({ data });
-      // debugger;
-      // const lastClaimedAt = dispenser?.lastClaimedAt || 0;
-      // const now = new Date().getTime();
-      // const timeSinceLastClaim = now - lastClaimedAt;
-      // const hasPassedCooldownCheck = timeSinceLastClaim > cooldown;
-      // setHasPassedCooldownCheck(hasPassedCooldownCheck);
-    }
 
     setInStockMintAddresses(
       rewards.map((reward) => reward.itemCollection.item.token.mintAddress)
@@ -222,17 +221,7 @@ export default function DispenserUi({
       });
 
       console.log({ data });
-      const { txHash } = data;
-
-      showToast({
-        primaryMessage: "Sent!",
-        secondaryMessage: "You have claimed your reward!",
-        link: {
-          url: `https://solscan.io/tx/${txHash}?cluster=devnet`,
-          title: "View on Transaction",
-        },
-      });
-      // refetch && refetch();
+      setDispensedInfo && setDispensedInfo(data);
     } catch (error) {
       showToast({
         primaryMessage: "Error claiming token",
@@ -247,6 +236,7 @@ export default function DispenserUi({
     dispenser.id,
     dispenser.rewardCollections,
     rewards,
+    setDispensedInfo,
     walletAddress,
   ]);
 
@@ -280,6 +270,8 @@ export default function DispenserUi({
   };
 
   useEffect(() => {
+    if (!dispenser?.id) return;
+
     if (ENV === "local" && !walletAddress && walletAdapterWalletAddress) {
       setWalletAddress(walletAdapterWalletAddress.toString());
     }
@@ -297,6 +289,68 @@ export default function DispenserUi({
 
     if (!roomId && !hasFetchedRoomId && ENV !== "local") requestRoomId();
 
+    const cooldownInMs = dispenser?.cooldownInMs || 0;
+
+    if (cooldownInMs) {
+      setHasCooldown(!!cooldownInMs);
+    } else {
+      setHasCooldown(false);
+    }
+
+    if (cooldownInMs && payouts?.length) {
+      // UTC timestamp of when the last claim was made
+      const lastClaimedAt = payouts[0].createdAt;
+      const now = new Date().getTime();
+      const timeSinceLastClaim = now - new Date(lastClaimedAt).getTime();
+      const hasPassedCooldownCheck = timeSinceLastClaim >= cooldownInMs;
+      setHasPassedCooldownCheck(hasPassedCooldownCheck);
+      // display as days, hours, minutes, seconds
+      let lastClaimTime = `${Math.floor(
+        timeSinceLastClaim / 86400000
+      )}d ${Math.floor(
+        (timeSinceLastClaim % 86400000) / 3600000
+      )}h ${Math.floor(((timeSinceLastClaim % 86400000) % 3600000) / 60000)}m ${
+        Math.floor(
+          (((timeSinceLastClaim % 86400000) % 3600000) % 60000) / 1000
+        ) || 0
+      }s`;
+
+      lastClaimTime = lastClaimTime.replace(/0d /, "");
+      lastClaimTime = lastClaimTime.replace(/0h /, "");
+      lastClaimTime = lastClaimTime.replace(/0m /, "");
+      lastClaimTime = lastClaimTime.replace(/0s/, "");
+
+      setLastClaimTimeString(lastClaimTime);
+      let nextClaimTime = `${Math.floor(
+        (cooldownInMs - timeSinceLastClaim) / 86400000
+      )}d ${Math.floor(
+        ((cooldownInMs - timeSinceLastClaim) % 86400000) / 3600000
+      )}h ${Math.floor(
+        (((cooldownInMs - timeSinceLastClaim) % 86400000) % 3600000) / 60000
+      )}m ${
+        Math.floor(
+          ((((cooldownInMs - timeSinceLastClaim) % 86400000) % 3600000) %
+            60000) /
+            1000
+        ) || 0
+      }s`;
+
+      nextClaimTime = nextClaimTime.replace(/0d /, "");
+      nextClaimTime = nextClaimTime.replace(/0h /, "");
+      nextClaimTime = nextClaimTime.replace(/0m /, "");
+      nextClaimTime = nextClaimTime.replace(/0s/, "");
+
+      setNextClaimTimeString(nextClaimTime);
+    }
+
+    if (hasFechedPayouts && !payouts?.length) {
+      setHasPassedCooldownCheck(true);
+    }
+
+    if (!cooldownInMs && !payouts?.length && hasFechedPayouts) {
+      setHasPassedCooldownCheck(false);
+    }
+
     if (walletAddress) {
       setTimeout(() => setShowReloadButton(true), 15000);
     }
@@ -307,6 +361,10 @@ export default function DispenserUi({
     roomId,
     walletAdapterWalletAddress,
     walletAddress,
+    dispenser,
+    payouts,
+    hasFechedPayouts,
+    isBeingEdited,
   ]);
 
   if (
@@ -408,29 +466,48 @@ export default function DispenserUi({
                   This dispenser is out of stock!
                 </p>
               )}
-              <>
-                <div>isClaiming: {JSON.stringify(isClaiming)}</div>
-                <div>hasStock: {JSON.stringify(hasStock)}</div>
-                <div>
-                  hasPassedCooldownCheck:{" "}
-                  {JSON.stringify(hasPassedCooldownCheck)}
-                </div>
-              </>
-              <button
-                style={{
-                  backgroundColor: claimButtonColor || "transparent",
-                  color: claimButtonTextColor,
-                  fontSize: `${claimButtonTextSize}px` || "24px",
-                }}
-                className={classNames([
-                  "rounded-xl p-4 py-2 uppercase border border-gray-800 hover:border-gray-800 font-bold transition-colors duration-300 ease-in-out mt-4",
-                  { "opacity-50 cursor-not-allowed": isClaiming || !hasStock },
-                ])}
-                onClick={isBeingEdited ? () => {} : handleClaim}
-                disabled={isClaiming || !hasStock || !hasPassedCooldownCheck}
-              >
-                {isClaiming ? <Spinner /> : claimButtonText || "Claim"}
-              </button>
+              {isBeingEdited || !!hasPassedCooldownCheck ? (
+                <button
+                  style={{
+                    backgroundColor: claimButtonColor || "transparent",
+                    color: claimButtonTextColor,
+                    fontSize: `${claimButtonTextSize}px` || "24px",
+                  }}
+                  className={classNames([
+                    "rounded-xl p-4 py-2 uppercase border border-gray-800 hover:border-gray-800 font-bold transition-colors duration-300 ease-in-out mt-4",
+                    {
+                      "opacity-50 cursor-not-allowed": isClaiming || !hasStock,
+                    },
+                  ])}
+                  onClick={
+                    isBeingEdited
+                      ? (ev) => {
+                          ev.preventDefault();
+                        }
+                      : handleClaim
+                  }
+                  disabled={isClaiming || !hasStock}
+                >
+                  {isClaiming ? <Spinner /> : claimButtonText || "Claim"}
+                </button>
+              ) : (
+                <>
+                  {hasCooldown ? (
+                    <div className="text-2xl text-center space-y-2">
+                      <div>{`You just claimed ${lastClaimTimeString} ago.`}</div>
+
+                      <div>
+                        {" "}
+                        {`You can claim again in ${nextClaimTimeString}.`}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-2xl text-center space-y-2">
+                      <div>You have already claimed from this dispenser.</div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           )}
           {children}

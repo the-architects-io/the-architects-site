@@ -9,7 +9,6 @@ export const UPDATE_DISPENSER_DISPLAY = gql`
       id
       textColor
       shouldDisplayRewards
-      rewardDisplayType
       shouldDisplayName
       shouldDisplayImage
       shouldDisplayDescription

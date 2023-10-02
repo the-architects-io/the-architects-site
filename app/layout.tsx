@@ -4,7 +4,7 @@ import { Inter } from "next/font/google";
 import { ContextProvider } from "@/providers/context-provider";
 import { SidebarProvider } from "@/hooks/sidebar";
 import { AdminProvider } from "@/hooks/admin";
-import dynamic from "next/dynamic";
+
 import classNames from "classnames";
 import Toaster from "@/features/toasts/toaster";
 import { DebugModeProvider } from "@/hooks/debug-mode";

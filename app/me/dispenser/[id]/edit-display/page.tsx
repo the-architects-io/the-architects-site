@@ -1,6 +1,6 @@
 "use client";
 import { defaultCustomizations } from "@/app/blueprint/constants";
-import { RewardDisplayType } from "@/app/blueprint/types";
+import { RewardDisplayTypes } from "@/app/blueprint/types";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
@@ -11,7 +11,6 @@ import Spinner from "@/features/UI/spinner";
 import DispenserUi from "@/features/dispensers/dispenser-ui";
 import showToast from "@/features/toasts/show-toast";
 import { GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID } from "@/graphql/queries/get-dispenser-displays-by-dispenser-id";
-import { GET_DISPENSER_REWARD_DISPLAY_TYPES } from "@/graphql/queries/get-dispenser-reward-display-types";
 import { useQuery } from "@apollo/client";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import axios from "axios";
@@ -26,8 +25,21 @@ export default function Page({ params }: { params: any }) {
   const [isFormDirty, setIsFormDirty] = useState(false);
 
   const [rewardDisplayTypes, setRewardDisplayTypes] = useState<
-    RewardDisplayType[]
-  >([]);
+    { id: string; name: string; label: string }[]
+  >(
+    [
+      {
+        id: "LIST",
+        name: "LIST",
+        label: "List",
+      },
+      {
+        id: "CARDS",
+        name: "CARDS",
+        label: "Cards",
+      },
+    ] || []
+  );
 
   const formik = useFormik({
     initialValues: initialValues || defaultCustomizations,
@@ -64,7 +76,7 @@ export default function Page({ params }: { params: any }) {
           descriptionTextSize,
           claimButtonTextSize,
           claimButtonText,
-          rewardDisplayType,
+          rewardDisplayType: rewardDisplayType || RewardDisplayTypes.LIST,
         });
         showToast({
           primaryMessage: "Update successful",
@@ -91,13 +103,45 @@ export default function Page({ params }: { params: any }) {
     },
   });
 
-  useQuery(GET_DISPENSER_REWARD_DISPLAY_TYPES, {
-    onCompleted: ({ rewardDisplayTypes }) => {
-      if (rewardDisplayTypes.length > 0) {
-        setRewardDisplayTypes(rewardDisplayTypes);
-      }
-    },
-  });
+  const updateInitialValues = (dispenserDisplay: any) => {
+    const values = {
+      shouldDisplayRewards:
+        dispenserDisplay.shouldDisplayRewards === null
+          ? true
+          : dispenserDisplay.shouldDisplayRewards,
+      shouldDisplayName:
+        dispenserDisplay.shouldDisplayName === null
+          ? true
+          : dispenserDisplay.shouldDisplayName,
+      shouldDisplayDescription:
+        dispenserDisplay.shouldDisplayDescription === null
+          ? true
+          : dispenserDisplay.shouldDisplayDescription,
+      shouldDisplayImage:
+        dispenserDisplay.shouldDisplayImage === null
+          ? true
+          : dispenserDisplay.shouldDisplayImage,
+      backgroundColor:
+        dispenserDisplay.backgroundColor ||
+        defaultCustomizations.backgroundColor,
+      textColor: dispenserDisplay.textColor || defaultCustomizations.textColor,
+      claimButtonTextColor:
+        dispenserDisplay.claimButtonTextColor ||
+        defaultCustomizations.claimButtonTextColor,
+      claimButtonColor:
+        dispenserDisplay.claimButtonColor ||
+        defaultCustomizations.claimButtonColor,
+      imageSize: dispenserDisplay.imageSize || 120,
+      nameTextSize: dispenserDisplay.nameTextSize || 24,
+      descriptionTextSize: dispenserDisplay.descriptionTextSize || 16,
+      claimButtonTextSize: dispenserDisplay.claimButtonTextSize || 16,
+      claimButtonText: dispenserDisplay.claimButtonText || "Claim",
+      rewardDisplayType:
+        dispenserDisplay.rewardDisplayType || RewardDisplayTypes.LIST,
+    };
+
+    setInitialValues(values);
+  };
 
   const { data, loading, error } = useQuery(
     GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID,
@@ -108,48 +152,13 @@ export default function Page({ params }: { params: any }) {
       },
       onCompleted: ({ dispenser_displays }) => {
         console.log({ dispenser_displays });
+
         if (dispenser_displays.length === 0) {
           setInitialValues(defaultCustomizations);
           return;
         }
-        const values = {
-          shouldDisplayRewards:
-            dispenser_displays[0]?.shouldDisplayRewards === null
-              ? true
-              : dispenser_displays[0]?.shouldDisplayRewards,
-          shouldDisplayName:
-            dispenser_displays[0]?.shouldDisplayName === null
-              ? true
-              : dispenser_displays[0]?.shouldDisplayName,
-          shouldDisplayDescription:
-            dispenser_displays[0]?.shouldDisplayDescription === null
-              ? true
-              : dispenser_displays[0]?.shouldDisplayDescription,
-          shouldDisplayImage:
-            dispenser_displays[0]?.shouldDisplayImage === null
-              ? true
-              : dispenser_displays[0]?.shouldDisplayImage,
-          backgroundColor:
-            dispenser_displays[0]?.backgroundColor ||
-            defaultCustomizations.backgroundColor,
-          textColor:
-            dispenser_displays[0]?.textColor || defaultCustomizations.textColor,
-          claimButtonTextColor:
-            dispenser_displays[0]?.claimButtonTextColor ||
-            defaultCustomizations.claimButtonTextColor,
-          claimButtonColor:
-            dispenser_displays[0]?.claimButtonColor ||
-            defaultCustomizations.claimButtonColor,
-          imageSize: dispenser_displays[0]?.imageSize || 120,
-          nameTextSize: dispenser_displays[0]?.nameTextSize || 24,
-          descriptionTextSize: dispenser_displays[0]?.descriptionTextSize || 16,
-          claimButtonTextSize: dispenser_displays[0]?.claimButtonTextSize || 16,
-          claimButtonText: dispenser_displays[0]?.claimButtonText || "Claim",
-          rewardDisplayType:
-            dispenser_displays[0]?.rewardDisplayType ||
-            rewardDisplayTypes[0]?.id,
-        };
-        setInitialValues(values);
+
+        updateInitialValues(dispenser_displays[0]);
       },
     }
   );
@@ -165,7 +174,7 @@ export default function Page({ params }: { params: any }) {
     } else {
       setIsFormDirty(false);
     }
-  }, [formik.values, initialValues]);
+  }, [formik, formik.values, initialValues, rewardDisplayTypes]);
 
   if (!params?.id) return <div>Dispenser not found</div>;
 
@@ -387,9 +396,7 @@ export default function Page({ params }: { params: any }) {
                   label: type.label,
                   value: type.name,
                 }))}
-                onChange={(ev) => {
-                  formik.setFieldValue("rewardDisplayType", ev.target.value);
-                }}
+                onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 placeholder="Select a reward display type"
                 hideLabel={false}

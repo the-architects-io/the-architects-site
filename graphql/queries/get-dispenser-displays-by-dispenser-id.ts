@@ -13,11 +13,7 @@ export const GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID = gql`
       shouldDisplayImage
       shouldDisplayName
       shouldDisplayRewards
-      rewardDisplayType {
-        id
-        label
-        name
-      }
+      rewardDisplayType
       textColor
       claimButtonText
       claimButtonTextColor
