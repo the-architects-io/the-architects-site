@@ -1,4 +1,4 @@
-import { RewardDisplayType, RewardDisplayTypes } from "@/app/blueprint/types";
+import { RewardDisplayTypes } from "@/app/blueprint/types";
 import { RewardsCardList } from "@/features/rewards/rewards-card-list";
 import { RewardsList } from "@/features/rewards/rewards-list";
 import classNames from "classnames";
