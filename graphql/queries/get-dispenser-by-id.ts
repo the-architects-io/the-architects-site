@@ -1,4 +1,3 @@
-import { DISPENSER_DETAILS } from "@/graphql/fragments/dispensers/dispenser-details";
 import { gql } from "@apollo/client";
 
 export const GET_DISPENSER_BY_ID = gql`
@@ -6,6 +5,7 @@ export const GET_DISPENSER_BY_ID = gql`
     dispensers_by_pk(id: $id) {
       rewardWalletAddress
       rewardWalletBump
+      cooldownInMs
       collectionWallet {
         id
         address

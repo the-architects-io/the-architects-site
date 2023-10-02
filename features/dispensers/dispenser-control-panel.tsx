@@ -11,6 +11,9 @@ import { Divider } from "@mui/material";
 import { ITab, Tabs } from "@/features/UI/tabs/tabs";
 import { useEffect, useState } from "react";
 import { StatsPanel } from "@/features/admin/dispensers/stats/stats-panel";
+import { copyTextToClipboard } from "@/utils/clipboard";
+import { ClipboardIcon } from "@heroicons/react/24/outline";
+import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 
 export const DispenserControlPanel = ({
   dispenserId,
@@ -55,13 +58,13 @@ export const DispenserControlPanel = ({
                     alt={dispenser.name}
                   />
                 </div>
-                <Panel className="flex flex-col items-center justify-center max-w-2xl w-full">
-                  <h1 className="text-3xl mb-2 text-center">
+                <Panel className="flex flex-col items-center justify-center max-w-2xl w-full p-8">
+                  <h1 className="text-3xl mb-4 text-center">
                     {dispenser.name}
                   </h1>
                   {!!dispenser.rewardWalletAddress && (
                     <div className="flex flex-col">
-                      <div className="text-xl mb-4">
+                      <div className="text-xl mb-8">
                         Wallet:{" "}
                         <a
                           className="text-sky-400 underline"
@@ -86,8 +89,19 @@ export const DispenserControlPanel = ({
                     </div>
                   )}
                   {!!description && (
-                    <div className="italic text-lg">{description}</div>
+                    <div className="italic text-lg mb-8">{description}</div>
                   )}
+                  <PrimaryButton
+                    className="flex items-center justify-center mb-8"
+                    onClick={() =>
+                      copyTextToClipboard(
+                        `https://preview.the-architects.io/in-portals/dispenser?id=${dispenser.id}`
+                      )
+                    }
+                  >
+                    <ClipboardIcon className="h-5 w-5 inline-block" />
+                    <span className="mx-2">Copy Portals Interaction Link</span>
+                  </PrimaryButton>
                   <Divider />
                   <div className="py-4">
                     <Tabs

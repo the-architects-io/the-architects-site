@@ -4,7 +4,7 @@ export const ADD_ITEM_PAYOUT = gql`
   mutation ADD_ITEM_PAYOUT(
     $txAddress: String = ""
     $amount: numeric!
-    $itemId: uuid!
+    $itemId: uuid = null
     $tokenId: uuid!
     $dispenserId: uuid!
     $walletId: uuid!

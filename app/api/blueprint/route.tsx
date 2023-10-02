@@ -14,7 +14,7 @@ const BlueprintApiActionUrls = {
   [DISPENSE_TOKENS]: `${BASE_URL}/api/dispense-tokens`,
 };
 
-const mapErrorToResponse = (error: any): MappedErrorResponse => {
+export const mapErrorToResponse = (error: any): MappedErrorResponse => {
   const status =
     error?.response?.status || error?.response?.data?.status || 500;
   console.log({

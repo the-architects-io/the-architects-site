@@ -14,6 +14,8 @@ export const FormInput = ({ children, onChange, value, ...props }: Props) => {
       )}
       onChange={onChange}
       value={value}
+      min={props.min}
+      max={props.max}
     />
   );
 };

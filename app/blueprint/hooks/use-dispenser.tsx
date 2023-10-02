@@ -99,6 +99,7 @@ const useDispenser = (dispenserId?: string) => {
         isEnabled: false,
         collectionWallet: null,
         rewardWalletAddress: null,
+        rewardCollections: [],
       },
       costs: null,
       rewards: null,

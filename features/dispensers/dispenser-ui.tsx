@@ -30,6 +30,8 @@ import PortalsSdk from "@/utils/portals-sdk-v2";
 import { useSearchParams } from "next/navigation";
 import classNames from "classnames";
 import { RewardsUI } from "@/features/rewards/rewards-ui";
+import { useLazyQuery, useQuery } from "@apollo/client";
+import { GET_PAYOUTS } from "@/graphql/queries/get-payouts";
 
 interface DispenserUiProps {
   dispenserId: string;
@@ -78,6 +80,7 @@ export default function DispenserUi({
   const [hasStock, setHasStock] = useState<boolean>(false);
   const [rewards, setRewards] = useState<Dispenser["rewardCollections"]>([]);
   const [roomId, setRoomId] = useState<string | null>(null);
+  const [hasFetchedRoomId, setHasFetchedRoomId] = useState<boolean>(false);
 
   const { dispenser, isLoading, fetchRewardTokenBalances } =
     useDispenser(dispenserId);
@@ -86,7 +89,28 @@ export default function DispenserUi({
   const { publicKey: walletAdapterWalletAddress } = useWallet();
   const [inPortalsWalletAddress, setInPortalsWalletAddress] =
     useState<PublicKey | null>(null);
+  const [
+    hasFetchedInPortalsWalletAddress,
+    setHasFetchedInPortalsWalletAddress,
+  ] = useState<boolean>(false);
   const [showReloadButton, setShowReloadButton] = useState(false);
+  const [hasPassedCooldownCheck, setHasPassedCooldownCheck] = useState(true);
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+
+  const {
+    loading: isFetchingPayouts,
+    data: payouts,
+    error: fetchPayoutsError,
+    called: isFetchPayoutsCalled,
+  } = useQuery(GET_PAYOUTS, {
+    variables: {
+      dispenserId: dispenserId,
+      walletAddress:
+        inPortalsWalletAddress?.toString() ||
+        walletAdapterWalletAddress?.toString(),
+    },
+    skip: !inPortalsWalletAddress && !walletAdapterWalletAddress,
+  });
 
   enum PayoutMethod {
     RANDOM = "RANDOM",
@@ -119,6 +143,19 @@ export default function DispenserUi({
       );
     });
 
+    const cooldown = dispenser?.cooldownInMs || 0;
+
+    if (cooldown) {
+      // const data = await fetchPayouts();
+      // console.log({ data });
+      // debugger;
+      // const lastClaimedAt = dispenser?.lastClaimedAt || 0;
+      // const now = new Date().getTime();
+      // const timeSinceLastClaim = now - lastClaimedAt;
+      // const hasPassedCooldownCheck = timeSinceLastClaim > cooldown;
+      // setHasPassedCooldownCheck(hasPassedCooldownCheck);
+    }
+
     setInStockMintAddresses(
       rewards.map((reward) => reward.itemCollection.item.token.mintAddress)
     );
@@ -131,7 +168,7 @@ export default function DispenserUi({
   }, [dispenser, isFetchingBalances]);
 
   const handleClaim = useCallback(async () => {
-    if (!DISPENSER_PROGRAM_ID || !dispenser?.id)
+    if (!DISPENSER_PROGRAM_ID || !dispenser?.id || !walletAddress)
       throw new Error("Missing required data.");
 
     try {
@@ -178,7 +215,7 @@ export default function DispenserUi({
         action: BlueprintApiActions.DISPENSE_TOKENS,
         params: {
           dispenserId: dispenser.id,
-          recipientAddress: inPortalsWalletAddress?.toBase58(),
+          recipientAddress: walletAddress,
           mintAddress: reward.itemCollection.item.token.mintAddress,
           amount,
         },
@@ -207,9 +244,10 @@ export default function DispenserUi({
   }, [
     PayoutMethod.RANDOM,
     PayoutMethod.SORTED,
-    dispenser,
-    inPortalsWalletAddress,
+    dispenser.id,
+    dispenser.rewardCollections,
     rewards,
+    walletAddress,
   ]);
 
   useEffect(() => {
@@ -227,6 +265,7 @@ export default function DispenserUi({
 
   const requestPublicKey = () => {
     PortalsSdk.requestPublicKey("https://theportal.to", (publicKey: string) => {
+      setHasFetchedInPortalsWalletAddress(true);
       console.log("publicKey", publicKey);
       setInPortalsWalletAddress(new PublicKey(publicKey));
     });
@@ -234,21 +273,41 @@ export default function DispenserUi({
 
   const requestRoomId = () => {
     PortalsSdk.getRoomId(({ roomId }: { roomId: string }) => {
+      setHasFetchedRoomId(true);
       console.log("roomId", roomId);
       setRoomId(roomId);
     });
   };
 
   useEffect(() => {
-    if (!inPortalsWalletAddress && ENV !== "local") requestPublicKey();
-    if (!roomId && ENV !== "local") requestRoomId();
+    if (ENV === "local" && !walletAddress && walletAdapterWalletAddress) {
+      setWalletAddress(walletAdapterWalletAddress.toString());
+    }
 
-    if (inPortalsWalletAddress || walletAdapterWalletAddress)
-      setTimeout(() => {
-        if (!inPortalsWalletAddress && ENV !== "local")
-          setShowReloadButton(true);
-      }, 15000);
-  }, [inPortalsWalletAddress, roomId, walletAdapterWalletAddress]);
+    if (inPortalsWalletAddress && !walletAddress) {
+      setWalletAddress(inPortalsWalletAddress.toString());
+    }
+
+    if (
+      !inPortalsWalletAddress &&
+      !hasFetchedInPortalsWalletAddress &&
+      ENV !== "local"
+    )
+      requestPublicKey();
+
+    if (!roomId && !hasFetchedRoomId && ENV !== "local") requestRoomId();
+
+    if (walletAddress) {
+      setTimeout(() => setShowReloadButton(true), 15000);
+    }
+  }, [
+    hasFetchedInPortalsWalletAddress,
+    hasFetchedRoomId,
+    inPortalsWalletAddress,
+    roomId,
+    walletAdapterWalletAddress,
+    walletAddress,
+  ]);
 
   if (
     !inPortalsWalletAddress &&
@@ -270,9 +329,7 @@ export default function DispenserUi({
           <WalletButton />
         </div>
       )}
-      {!walletAdapterWalletAddress &&
-      !inPortalsWalletAddress &&
-      !isBeingEdited ? (
+      {!walletAddress && !isBeingEdited ? (
         <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300 bg-slate-800">
           <div className="max-w-xs text-center mb-4">
             Please allow your wallet to be connected in the popup above.
@@ -351,6 +408,14 @@ export default function DispenserUi({
                   This dispenser is out of stock!
                 </p>
               )}
+              <>
+                <div>isClaiming: {JSON.stringify(isClaiming)}</div>
+                <div>hasStock: {JSON.stringify(hasStock)}</div>
+                <div>
+                  hasPassedCooldownCheck:{" "}
+                  {JSON.stringify(hasPassedCooldownCheck)}
+                </div>
+              </>
               <button
                 style={{
                   backgroundColor: claimButtonColor || "transparent",
@@ -362,7 +427,7 @@ export default function DispenserUi({
                   { "opacity-50 cursor-not-allowed": isClaiming || !hasStock },
                 ])}
                 onClick={isBeingEdited ? () => {} : handleClaim}
-                disabled={isClaiming || !hasStock}
+                disabled={isClaiming || !hasStock || !hasPassedCooldownCheck}
               >
                 {isClaiming ? <Spinner /> : claimButtonText || "Claim"}
               </button>

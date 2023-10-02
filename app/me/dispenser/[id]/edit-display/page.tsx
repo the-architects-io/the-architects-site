@@ -339,7 +339,7 @@ export default function Page({ params }: { params: any }) {
               <div className="mb-2">
                 <FormCheckboxWithLabel
                   label="Description"
-                  name="shouldDisplayRewards"
+                  name="shouldDisplayDescription"
                   value={formik.values.shouldDisplayDescription}
                   onChange={(e: any) => {
                     formik.setFieldValue(

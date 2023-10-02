@@ -23,6 +23,7 @@ export const FormInputWithLabel = ({
         placeholder={props.placeholder}
         onChange={onChange}
         value={value}
+        {...props}
       />
       {children}
       {description && (

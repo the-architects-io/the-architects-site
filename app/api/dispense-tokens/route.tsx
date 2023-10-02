@@ -19,11 +19,17 @@ import {
 import { sendTransaction } from "@/utils/transactions/send-transaction";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
-import { Item, Wallet } from "@/app/blueprint/types";
+import { Item, Token, Wallet } from "@/app/blueprint/types";
 import { client } from "@/graphql/backend-client";
 import { ADD_ITEM_PAYOUT } from "@/graphql/mutations/add-item-payout";
 import { GET_ITEM_BY_ID } from "@/graphql/queries/get-item-by-id";
 import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
+import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
+import { logError } from "@/utils/errors/log-error";
+import { mapErrorToResponse } from "@/app/api/blueprint/route";
+import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address";
+import { ADD_TOKEN } from "@/graphql/mutations/add-token";
+import { GET_ITEMS_BY_TOKEN_IDS } from "@/graphql/queries/get-items-by-token-ids";
 
 export async function POST(req: Request) {
   const { noop, dispenserId, recipientAddress, mintAddress, amount, apiKey } =
@@ -99,6 +105,34 @@ export async function POST(req: Request) {
     [Buffer.from(hash), Buffer.from(process.env.AUTHORITY_SEED)],
     new PublicKey(DISPENSER_PROGRAM_ID)
   );
+
+  const { tokens }: { tokens: Token[] } = await client.request({
+    document: GET_TOKEN_BY_MINT_ADDRESS,
+    variables: {
+      mintAddress,
+    },
+  });
+
+  let token = tokens[0];
+
+  if (!token) {
+    return NextResponse.json(
+      {
+        error: "Token not found in the system",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+
+  const { items }: { items: Item[] } = await client.request({
+    document: GET_ITEMS_BY_TOKEN_IDS,
+    variables: {
+      ids: [token.id],
+    },
+  });
+
+  let item = items?.[0];
 
   console.log(4);
 
@@ -204,17 +238,40 @@ export async function POST(req: Request) {
   let payout;
 
   try {
-    const { items_by_pk: item }: { items_by_pk: Item } = await client.request({
-      document: GET_ITEM_BY_ID,
+    let walletId;
+
+    const { wallets }: { wallets: Wallet[] } = await client.request({
+      document: GET_WALLET_BY_ADDRESS,
+      variables: {
+        address: recipientAddress,
+      },
     });
 
-    const { wallets_by_pk: wallet }: { wallets_by_pk: Wallet } =
-      await client.request({
-        document: GET_WALLET_BY_ADDRESS,
-        variables: {
-          address: recipientAddress,
+    walletId = wallets[0]?.id;
+
+    if (!walletId) {
+      const { insert_wallets_one }: { insert_wallets_one: Wallet } =
+        await client.request({
+          document: ADD_WALLET,
+          variables: {
+            address: recipientAddress,
+          },
+        });
+
+      walletId = insert_wallets_one.id;
+    }
+
+    if (!walletId) {
+      return NextResponse.json(
+        {
+          error: {
+            message: "Wallet not found and error adding",
+          },
+          status: 500,
         },
-      });
+        { status: 500 }
+      );
+    }
 
     const { insert_payouts_one }: { insert_payouts_one: Wallet } =
       await client.request({
@@ -222,18 +279,19 @@ export async function POST(req: Request) {
         variables: {
           txAddress: txHash,
           amount,
-          tokenId: item.token.id,
-          itemId: item.id,
+          itemId: item?.id,
+          tokenId: token.id,
           dispenserId,
-          walletId: wallet.id,
+          walletId,
         },
       });
     payout = insert_payouts_one;
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to add payout" },
-      { status: 500 }
-    );
+  } catch (rawError) {
+    console.log({ rawError: JSON.stringify(rawError) });
+    let { error, status } = mapErrorToResponse(rawError);
+
+    logError({ error, status });
+    return NextResponse.json({ error }, { status });
   }
 
   try {
@@ -243,6 +301,8 @@ export async function POST(req: Request) {
         mintAddress,
         amount,
         payout,
+        token,
+        item,
       },
       { status: 200 }
     );

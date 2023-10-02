@@ -187,6 +187,7 @@ export type Dispenser = {
   tokenClaimPayoutStrategy: TokenClaimPayoutStrategies;
   rewardWalletAddress: string;
   rewardWalletBump: number;
+  cooldownInMs?: number;
   collectionWallet: {
     id: string;
     address: string;
