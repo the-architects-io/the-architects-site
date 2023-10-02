@@ -1,6 +1,6 @@
 import { TableWrapper } from "@/features/UI/tables/table-wrapper";
-import { PayoutListItem } from "@/features/admin/payouts/payout-list-item";
 import { Payout } from "@/app/profile/[id]/page";
+import { PayoutListItem } from "@/features/dispensers/payouts/payout-list-item";
 
 export const PayoutList = ({ payouts }: { payouts: Payout[] }) => {
   return (

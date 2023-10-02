@@ -1,7 +1,9 @@
 import { Payout } from "@/app/profile/[id]/page";
 import { TableRow } from "@/features/UI/tables/table-row";
+import { fromBaseUnit } from "@/utils/currency";
 import { formatDateTime } from "@/utils/date-time";
 import { getAbbreviatedAddress } from "@/utils/formatting";
+import { isPublicKey } from "@metaplex-foundation/umi";
 
 export const PayoutListItem = ({ payout }: { payout: Payout }) => {
   return (
@@ -9,8 +11,12 @@ export const PayoutListItem = ({ payout }: { payout: Payout }) => {
       <div className="flex items-center space-x-12 justify-between w-full">
         <div>{formatDateTime(payout.createdAt)}</div>
         <div className="flex items-center space-x-4">
-          <div>{payout.amount}x</div>
-          <div>{payout.item.name}</div>
+          <div>{fromBaseUnit(payout.amount, payout.token.decimals)}x</div>
+          <div>
+            {isPublicKey(payout.token?.name)
+              ? getAbbreviatedAddress(payout.token?.name)
+              : payout.token?.name}
+          </div>
         </div>
         <div className="flex flex-col items-center space-x-4">
           <div>Token:</div>
@@ -44,7 +50,7 @@ export const PayoutListItem = ({ payout }: { payout: Payout }) => {
             target="_blank"
             rel="noreferrer"
           >
-            {getAbbreviatedAddress(payout.txAddress)}
+            View Tx
           </a>
         </div>
       </div>

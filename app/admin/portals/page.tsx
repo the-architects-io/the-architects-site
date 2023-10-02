@@ -2,8 +2,8 @@
 import { Payout } from "@/app/profile/[id]/page";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import Spinner from "@/features/UI/spinner";
-import { AggregatePayoutStats } from "@/features/admin/payouts/aggregate-payout-stats";
-import { PayoutList } from "@/features/admin/payouts/payout-list";
+import { AggregatePayoutStats } from "@/features/dispensers/payouts/aggregate-payout-stats";
+import { PayoutList } from "@/features/dispensers/payouts/payout-list";
 import { GET_PAYOUTS_BY_DISPENSER_ID } from "@/graphql/queries/get-payouts-by-dispenser-id";
 import { useQuery } from "@apollo/client";
 import { useState } from "react";

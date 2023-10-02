@@ -27,7 +27,7 @@ export type Payout = {
   amount: number;
   createdAt: string;
   txAddress: string;
-  item: {
+  item?: {
     id: string;
     name: string;
     imageUrl: string;
@@ -41,6 +41,7 @@ export type Payout = {
     name: string;
     imageUrl: string;
     mintAddress: string;
+    decimals: number;
     items: {
       id: string;
       name: string;

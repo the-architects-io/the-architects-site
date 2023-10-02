@@ -23,6 +23,7 @@ export const GET_PAYOUTS_BY_DISPENSER_ID = gql`
         name
         id
         mintAddress
+        decimals
         items {
           id
           name

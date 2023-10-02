@@ -1,29 +1,31 @@
 import { Payout } from "@/app/profile/[id]/page";
 import { Panel } from "@/features/UI/panel";
-import { round } from "@/utils/formatting";
+import { getAbbreviatedAddress, round } from "@/utils/formatting";
+import { isPublicKey } from "@metaplex-foundation/umi";
 import { useEffect, useState } from "react";
 
 export const AggregatePayoutStats = ({ payouts }: { payouts: Payout[] }) => {
   const [rewardsWithCounts, setRewardsWithCounts] = useState<any[]>([]);
 
   useEffect(() => {
-    const uniqueRewardItems = payouts
-      .map((payout) => payout.item)
+    const uniqueRewards = payouts
+      .map((payout) => payout.token)
       .filter(
-        (item, index, self) => self.findIndex((t) => t.id === item.id) === index
+        (token, index, self) =>
+          self.findIndex((t) => t?.id === token?.id) === index
       );
 
     // sort by count
-    const uniqueRewardItemsWithCount = uniqueRewardItems
-      .map((item) => {
-        const count = payouts.filter(
-          (payout) => payout.item.id === item.id
-        ).length;
-        return { ...item, count };
-      })
+    const uniqueRewardsWithCount = uniqueRewards
+      .map((reward) => ({
+        ...reward,
+        count: payouts.filter((payout) => payout.token?.id === reward?.id)
+          .length,
+      }))
       .sort((a, b) => b.count - a.count);
-    setRewardsWithCounts(uniqueRewardItemsWithCount);
-    console.log({ payouts, uniqueRewardItems, uniqueRewardItemsWithCount });
+
+    setRewardsWithCounts(uniqueRewardsWithCount);
+    console.log({ payouts, uniqueRewards, uniqueRewardsWithCount });
   }, [payouts]);
 
   return (
@@ -35,13 +37,18 @@ export const AggregatePayoutStats = ({ payouts }: { payouts: Payout[] }) => {
         </div>
         <Panel>
           <div className="uppercase mb-2 text-center">Payouts Breakdown</div>
-          <div className="flex flex-wrap mx-auto w-full justify-center">
+          <div className="flex flex-col mx-auto w-full justify-center space-y-2">
             {rewardsWithCounts.map((reward) => (
               <div
                 className="flex items-center justify-center space-x-4"
                 key={reward.id}
               >
-                <div>{reward.name}:</div>
+                <div>
+                  {isPublicKey(reward.name)
+                    ? getAbbreviatedAddress(reward.name)
+                    : reward.name}
+                  :
+                </div>
                 <div>{reward.count}</div>
                 <div>{round((reward.count / payouts.length) * 100, 2)}%</div>
               </div>
