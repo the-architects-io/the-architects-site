@@ -41,6 +41,8 @@ const handleCreateDispenser = async (params: any) => {
     CREATE_DISENSER,
     params,
     apiKey: process.env.BLUEPRINT_API_KEY,
+    action: CREATE_DISENSER,
+    url: BlueprintApiActionUrls[CREATE_DISENSER],
   });
 
   try {
