@@ -40,6 +40,7 @@ const handleCreateDispenser = async (params: any) => {
     BlueprintApiActionUrls,
     CREATE_DISENSER,
     params,
+    apiKey: process.env.BLUEPRINT_API_KEY,
   });
 
   try {
