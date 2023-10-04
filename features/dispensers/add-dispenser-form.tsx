@@ -11,7 +11,7 @@ import showToast from "@/features/toasts/show-toast";
 import { FormTextareaWithLabel } from "@/features/UI/forms/form-textarea-with-label";
 import { createOnChainDispenser } from "@/utils/dispensers/create-on-chain-dispenser";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
-import { Dispenser } from "@/app/blueprint/types";
+import { BlueprintApiActions, Dispenser } from "@/app/blueprint/types";
 import { useUserData } from "@nhost/nextjs";
 import { useEffect } from "react";
 
@@ -51,8 +51,19 @@ export const AddDispenserForm = ({
       }
 
       try {
-        const { data: dispenser }: { data: Dispenser } =
-          await axios.post<Dispenser>("/api/add-dispenser", values);
+        // const { data: dispenser }: { data: Dispenser } =
+        //   await axios.post<Dispenser>("/api/add-dispenser", values);
+
+        const { data: dispenser }: { data: Dispenser } = await axios.post(
+          "/api/blueprint",
+          {
+            action: BlueprintApiActions.CREATE_DISENSER,
+            params: values,
+          }
+        );
+
+        console.log({ dispenser });
+
         const provider = getProvider();
 
         if (!provider) {
