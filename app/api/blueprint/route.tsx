@@ -36,6 +36,12 @@ export const mapErrorToResponse = (error: any): MappedErrorResponse => {
 };
 
 const handleCreateDispenser = async (params: any) => {
+  console.log({
+    BlueprintApiActionUrls,
+    CREATE_DISENSER,
+    params,
+  });
+
   try {
     const { data, status, statusText, config } = await axios.post(
       BlueprintApiActionUrls[CREATE_DISENSER],
