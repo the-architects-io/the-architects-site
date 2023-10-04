@@ -31,7 +31,12 @@ export async function POST(req: NextRequest) {
   const host = req.headers.get("x-forwarded-host") || "";
   const isValidHost = hostWhitelist.indexOf(host) > -1 || ENV === "local";
 
-  console.log("/api/add-dispenser", {});
+  console.log("/api/add-dispenser", {
+    host,
+    hostWhitelist,
+    isValidHost,
+    ENV,
+  });
 
   if (!isValidHost) {
     return NextResponse.json(
