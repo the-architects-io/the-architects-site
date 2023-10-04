@@ -60,7 +60,7 @@ const handleCreateDispenser = async (params: any) => {
     });
 
     return NextResponse.json({
-      data,
+      ...data,
       status: data?.status || 500,
       statusText: data?.status !== 200 ? data?.statusText : statusText,
       config,
