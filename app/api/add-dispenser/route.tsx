@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (!isValidHost) {
+    console.log("API access not allowed for host: ", host);
     return NextResponse.json(
       {
         error: `API access not allowed for host: ${host}`,
@@ -49,6 +50,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (apiKey !== process.env.BLUEPRINT_API_KEY) {
+    console.log("Invalid API key: ", apiKey);
     return NextResponse.json(
       {
         error: "Invalid API key",
@@ -66,6 +68,7 @@ export async function POST(req: NextRequest) {
     });
 
   if (!name) {
+    console.log("Required fields not set");
     return NextResponse.json({ error: "Required fields not set", status: 500 });
   }
 
