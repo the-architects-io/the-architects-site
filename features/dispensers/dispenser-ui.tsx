@@ -468,7 +468,8 @@ export default function DispenserUi({
                   This dispenser is out of stock!
                 </p>
               )}
-              {isBeingEdited || !!hasPassedCooldownCheck ? (
+              {/* {isBeingEdited || !!hasPassedCooldownCheck ? ( */}
+              {true ? (
                 <button
                   style={{
                     backgroundColor: claimButtonColor || "transparent",
