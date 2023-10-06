@@ -366,6 +366,7 @@ export default function DispenserUi({
     payouts,
     hasFechedPayouts,
     isBeingEdited,
+    lastClaimTimeString?.length,
   ]);
 
   if (
