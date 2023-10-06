@@ -1,7 +1,10 @@
 "use client";
 
 import { defaultCustomizations } from "@/app/blueprint/constants";
-import { DispenseTokensApiResponse } from "@/app/blueprint/types";
+import {
+  DispenseTokensApiResponse,
+  RewardDisplayTypes,
+} from "@/app/blueprint/types";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import ConfettiBackground from "@/features/animations/confetti-background";
@@ -37,6 +40,9 @@ export default function Page() {
   const [nameTextSize, setNameTextSize] = useState(24);
   const [descriptionTextSize, setDescriptionTextSize] = useState(16);
   const [claimButtonTextSize, setClaimButtonTextSize] = useState(16);
+  const [rewardDisplayType, setRewardDisplayType] = useState(
+    RewardDisplayTypes.LIST
+  );
   const [claimButtonText, setClaimButtonText] = useState("Claim");
   const [dispensedInfo, setDispensedInfo] =
     useState<DispenseTokensApiResponse | null>(null);
@@ -98,6 +104,9 @@ export default function Page() {
           dispenser_displays[0]?.claimButtonTextSize || 16
         );
         setClaimButtonText(dispenser_displays[0]?.claimButtonText || "Claim");
+        setRewardDisplayType(
+          dispenser_displays[0]?.rewardDisplayType || "list"
+        );
       },
     }
   );
@@ -170,6 +179,7 @@ export default function Page() {
           claimButtonTextSize={claimButtonTextSize}
           claimButtonText={claimButtonText}
           setDispensedInfo={setDispensedInfo}
+          rewardDisplayType={rewardDisplayType}
         />
       )}
     </>
