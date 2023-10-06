@@ -44,22 +44,29 @@ export default function FetchPage() {
       let returnData;
 
       try {
-        // const { data } = await axios.post("/api/add-characters-from-nfts", {
-        //   hashList,
-        //   nftCollectionId,
-        // });
-        const { data } = await axios.post("/api/add-nfts", {
+        const { data: characterData } = await axios.post(
+          "/api/add-characters-from-nfts",
+          {
+            hashList,
+            nftCollectionId,
+          }
+        );
+        const { data: nftData } = await axios.post("/api/add-nfts", {
           hashList,
           nftCollectionId,
         });
 
-        returnData = data;
+        returnData = {
+          ...characterData,
+          ...nftData,
+        };
 
         console.log({
           i,
           total,
         });
-        if (returnData.message.includes("already exists")) {
+
+        if (returnData.message.includes("Character already exists")) {
           setNumberOfSkips((prev) => prev + 1);
         } else {
           setNumberOfSuccesses((prev) => prev + 1);

@@ -51,9 +51,6 @@ export const AddDispenserForm = ({
       }
 
       try {
-        // const { data: dispenser }: { data: Dispenser } =
-        //   await axios.post<Dispenser>("/api/add-dispenser", values);
-
         const { data: dispenser }: { data: Dispenser } = await axios.post(
           "/api/blueprint",
           {

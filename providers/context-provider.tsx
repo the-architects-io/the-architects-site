@@ -19,7 +19,11 @@ import {
   SolflareWalletAdapter,
   TorusWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
-import { CLUSTER, RPC_ENDPOINT } from "@/constants/constants";
+import {
+  CLUSTER,
+  RPC_ENDPOINT,
+  RPC_ENDPOINT_DEVNET,
+} from "@/constants/constants";
 import { SnackbarProvider, useSnackbar } from "notistack";
 import { FC, ReactNode, useCallback, useMemo } from "react";
 import {
@@ -81,7 +85,7 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
       : WalletAdapterNetwork.Devnet;
 
   // You can also provide a custom RPC endpoint
-  const endpoint = useMemo(() => RPC_ENDPOINT, []);
+  const endpoint = useMemo(() => RPC_ENDPOINT_DEVNET, []);
 
   // @solana/wallet-adapter-wallets includes all the adapters but supports tree shaking and lazy loading --
   // Only the wallets you configure here will be compiled into your application, and only the dependencies
