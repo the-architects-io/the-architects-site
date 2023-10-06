@@ -29,7 +29,10 @@ export const DispenserSettingsForm = ({
       cooldownMinutes,
       hasRecurringPayments,
     }) => {
-      if (!hasRecurringPayments) return;
+      if (!hasRecurringPayments) {
+        router.push(`/me/dispenser/${dispenserId}`);
+        return;
+      }
 
       const cooldownInMs = hasRecurringPayments
         ? cooldownDays * 24 * 60 * 60 * 1000 +

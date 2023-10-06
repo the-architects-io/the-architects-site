@@ -30,6 +30,8 @@ import { RewardsUI } from "@/features/rewards/rewards-ui";
 import { useQuery } from "@apollo/client";
 import { GET_PAYOUTS } from "@/graphql/queries/get-payouts";
 import { Payout } from "@/app/profile/[id]/page";
+import { fetchNftsByHashList } from "@/utils/nfts/fetch-nfts-by-hash-list";
+import { Connection } from "@solana/web3.js";
 
 interface DispenserUiProps {
   dispenserId: string;
@@ -139,12 +141,31 @@ export default function DispenserUi({
       publicKey(dispenser.rewardWalletAddress)
     );
 
-    const { data: tokenBalances }: { data: TokenBalance[] } = await axios.post(
-      `${BASE_URL}/api/get-token-balances-from-helius`,
-      {
+    const { data: splTokenBalances }: { data: TokenBalance[] } =
+      await axios.post(`${BASE_URL}/api/get-token-balances-from-helius`, {
         walletAddress: dispenser?.rewardWalletAddress,
-      }
+      });
+
+    const connection = new Connection(RPC_ENDPOINT_DEVNET);
+
+    const hashList = onChainDispenserAssets.map((asset) =>
+      asset.publicKey.toString()
     );
+
+    // get NFT balances
+    const nftBalances = await fetchNftsByHashList({
+      hashList,
+      publicKey: new PublicKey(dispenser?.rewardWalletAddress),
+      connection,
+    });
+
+    console.log({ hashList, nftBalances });
+    debugger;
+
+    const tokenBalances = {
+      ...splTokenBalances,
+      // ...nftBalances,
+    };
 
     let rewards = dispenser.rewardCollections.filter((reward) => {
       const { mintAddress } = reward.itemCollection.item.token;
@@ -468,8 +489,7 @@ export default function DispenserUi({
                   This dispenser is out of stock!
                 </p>
               )}
-              {/* {isBeingEdited || !!hasPassedCooldownCheck ? ( */}
-              {true ? (
+              {isBeingEdited || !!hasPassedCooldownCheck ? (
                 <button
                   style={{
                     backgroundColor: claimButtonColor || "transparent",
@@ -512,6 +532,42 @@ export default function DispenserUi({
                 </>
               )}
             </div>
+          )}
+          {ENV === "local" && (
+            <>
+              <div>hasStock: {JSON.stringify(hasStock)}</div>
+              <div>
+                hasFetchedBalances: {JSON.stringify(hasFetchedBalances)}
+              </div>
+              <div>
+                isFetchingBalances: {JSON.stringify(isFetchingBalances)}
+              </div>
+              <div>rewards: {JSON.stringify(rewards)}</div>
+              <div>
+                inStockMintAddresses: {JSON.stringify(inStockMintAddresses)}
+              </div>
+              <div>
+                hasPassedCooldownCheck: {JSON.stringify(hasPassedCooldownCheck)}
+              </div>
+              <div>hasCooldown: {JSON.stringify(hasCooldown)}</div>
+              <div>
+                lastClaimTimeString: {JSON.stringify(lastClaimTimeString)}
+              </div>
+              <div>
+                nextClaimTimeString: {JSON.stringify(nextClaimTimeString)}
+              </div>
+              <div>isBeingEdited: {JSON.stringify(isBeingEdited)}</div>
+              <div>ENV: {JSON.stringify(ENV)}</div>
+              <div>walletAddress: {JSON.stringify(walletAddress)}</div>
+              <div>
+                inPortalsWalletAddress: {JSON.stringify(inPortalsWalletAddress)}
+              </div>
+              <div>roomId: {JSON.stringify(roomId)}</div>
+              <div>hasFetchedRoomId: {JSON.stringify(hasFetchedRoomId)}</div>
+              <div>showReloadButton: {JSON.stringify(showReloadButton)}</div>
+              <div>isLoading: {JSON.stringify(isLoading)}</div>
+              <div>dispenserId: {JSON.stringify(dispenserId)}</div>
+            </>
           )}
           {children}
         </div>
