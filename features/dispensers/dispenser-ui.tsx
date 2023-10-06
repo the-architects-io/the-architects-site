@@ -295,6 +295,7 @@ export default function DispenserUi({
       setHasCooldown(!!cooldownInMs);
     } else {
       setHasCooldown(false);
+      setHasPassedCooldownCheck(!lastClaimTimeString?.length);
     }
 
     if (cooldownInMs && payouts?.length) {
