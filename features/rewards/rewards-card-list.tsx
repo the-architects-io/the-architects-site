@@ -112,10 +112,6 @@ export const RewardsCardList = ({
                   {!!amount && amount > 1 && (
                     <div className="text-4xl my-2 text-center">x{amount}</div>
                   )}
-                  {!isFetchingInStockMintAddresses &&
-                    !inStockMintAddresses?.includes(
-                      token?.mintAddress || ""
-                    ) && <div className="text-red-500 text-xl mb-2">OOS</div>}
                   <div className="text-base">
                     {typeof payoutSortOrder === "number" &&
                     payoutSortOrder > -1 ? (
@@ -126,6 +122,10 @@ export const RewardsCardList = ({
                       </div>
                     )}
                   </div>
+                  {!isFetchingInStockMintAddresses &&
+                    !inStockMintAddresses?.includes(
+                      token?.mintAddress || ""
+                    ) && <div className="text-red-500 text-xl mb-2">OOS</div>}
                 </div>
               )
             )}
