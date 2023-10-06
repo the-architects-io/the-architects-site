@@ -153,32 +153,39 @@ export default function DispenserUi({
     );
 
     // get NFT balances
-    const nftBalances = await fetchNftsByHashList({
+    const nfts = await fetchNftsByHashList({
       hashList,
       publicKey: new PublicKey(dispenser?.rewardWalletAddress),
       connection,
     });
 
-    console.log({ hashList, nftBalances });
-    debugger;
+    const nftBalances = Object.keys(nfts).map((key) => {
+      // @ts-ignore
+      const nft = nfts[key];
+      console.log({
+        nft,
+        nfts,
+      });
+      return {
+        ...nft,
+        mint: nft.mintAddress,
+      };
+    });
 
-    const tokenBalances = {
-      ...splTokenBalances,
-      // ...nftBalances,
-    };
+    console.log({ hashList, nftBalances, splTokenBalances });
+
+    const tokenBalances = [...splTokenBalances, ...nftBalances];
+    debugger;
 
     let rewards = dispenser.rewardCollections.filter((reward) => {
       const { mintAddress } = reward.itemCollection.item.token;
-      return (
-        onChainDispenserAssets.find(
-          (asset) => asset.publicKey === mintAddress
-        ) || tokenBalances.find((token) => token.mint === mintAddress)
-      );
+      return tokenBalances.find((token) => token.mint === mintAddress);
     });
 
     setInStockMintAddresses(
       rewards.map((reward) => reward.itemCollection.item.token.mintAddress)
     );
+    debugger;
     setHasStock(!!rewards.length);
     setRewards(rewards);
     console.log({ rewards });
@@ -312,12 +319,19 @@ export default function DispenserUi({
 
     const cooldownInMs = dispenser?.cooldownInMs || 0;
 
-    if (cooldownInMs) {
+    if (cooldownInMs && cooldownInMs > 0) {
       setHasCooldown(!!cooldownInMs);
     } else {
       setHasCooldown(false);
       setHasPassedCooldownCheck(!lastClaimTimeString?.length);
     }
+
+    console.log({
+      cooldownInMs,
+      hasCooldown,
+      hasPassedCooldownCheck,
+      lastClaimTimeString,
+    });
 
     if (cooldownInMs && payouts?.length) {
       // UTC timestamp of when the last claim was made
@@ -369,7 +383,7 @@ export default function DispenserUi({
       setHasPassedCooldownCheck(true);
     }
 
-    if (!cooldownInMs && !payouts?.length && hasFechedPayouts) {
+    if (!cooldownInMs && payouts?.length && hasFechedPayouts) {
       setHasPassedCooldownCheck(false);
     }
 
@@ -387,15 +401,19 @@ export default function DispenserUi({
     payouts,
     hasFechedPayouts,
     isBeingEdited,
-    lastClaimTimeString?.length,
+    lastClaimTimeString.length,
+    hasCooldown,
+    hasPassedCooldownCheck,
+    lastClaimTimeString,
   ]);
 
   if (
-    !inPortalsWalletAddress &&
-    ENV !== "local" &&
-    walletAdapterWalletAddress?.toString() !==
-      "44Cv2k5kFRzGQwBLEBc6aHHTwTvEReyeh4PHMH1cBgAe" &&
-    !isBeingEdited
+    (!inPortalsWalletAddress &&
+      ENV !== "local" &&
+      walletAdapterWalletAddress?.toString() !==
+        "44Cv2k5kFRzGQwBLEBc6aHHTwTvEReyeh4PHMH1cBgAe" &&
+      !isBeingEdited) ||
+    isFetchingBalances
   )
     return (
       <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300">
@@ -476,6 +494,7 @@ export default function DispenserUi({
                 <RewardsUI
                   inStockMintAddresses={inStockMintAddresses}
                   dispenserId={dispenserId}
+                  isFetchingInStockMintAddresses={isFetchingBalances}
                   rewardDisplayType={
                     rewardDisplayType
                       ? rewardDisplayType
@@ -511,7 +530,11 @@ export default function DispenserUi({
                   }
                   disabled={isClaiming || !hasStock}
                 >
-                  {isClaiming ? <Spinner /> : claimButtonText || "Claim"}
+                  {isClaiming || isFetchingBalances ? (
+                    <Spinner />
+                  ) : (
+                    claimButtonText || "Claim"
+                  )}
                 </button>
               ) : (
                 <>
@@ -533,7 +556,7 @@ export default function DispenserUi({
               )}
             </div>
           )}
-          {ENV === "local" && (
+          {/* {ENV === "local" && (
             <>
               <div>hasStock: {JSON.stringify(hasStock)}</div>
               <div>
@@ -542,7 +565,6 @@ export default function DispenserUi({
               <div>
                 isFetchingBalances: {JSON.stringify(isFetchingBalances)}
               </div>
-              <div>rewards: {JSON.stringify(rewards)}</div>
               <div>
                 inStockMintAddresses: {JSON.stringify(inStockMintAddresses)}
               </div>
@@ -568,7 +590,7 @@ export default function DispenserUi({
               <div>isLoading: {JSON.stringify(isLoading)}</div>
               <div>dispenserId: {JSON.stringify(dispenserId)}</div>
             </>
-          )}
+          )} */}
           {children}
         </div>
       )}

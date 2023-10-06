@@ -20,10 +20,12 @@ const isJsonString = (str: string) => {
 export const RewardsCardList = ({
   dispenserId,
   inStockMintAddresses,
+  isFetchingInStockMintAddresses,
   className,
 }: {
   dispenserId: string;
   inStockMintAddresses?: string[];
+  isFetchingInStockMintAddresses: boolean;
   className?: string;
 }) => {
   const { rewards, collectionWallet, dispenser } = useDispenser(dispenserId);
@@ -86,6 +88,11 @@ export const RewardsCardList = ({
                       "w-1/4": parsedRewards.length === 4,
                       "w-1/5": parsedRewards.length === 5,
                       "w-1/6": parsedRewards.length === 6,
+                      "opacity-60 bg-red-800":
+                        !isFetchingInStockMintAddresses &&
+                        !inStockMintAddresses?.includes(
+                          token?.mintAddress || ""
+                        ),
                     },
                   ])}
                   key={id}
@@ -105,6 +112,10 @@ export const RewardsCardList = ({
                   {!!amount && amount > 1 && (
                     <div className="text-4xl my-2 text-center">x{amount}</div>
                   )}
+                  {!isFetchingInStockMintAddresses &&
+                    !inStockMintAddresses?.includes(
+                      token?.mintAddress || ""
+                    ) && <div className="text-red-500 text-xl mb-2">OOS</div>}
                   <div className="text-base">
                     {typeof payoutSortOrder === "number" &&
                     payoutSortOrder > -1 ? (

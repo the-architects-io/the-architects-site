@@ -421,3 +421,9 @@ export type DispenseTokensApiResponse = {
   token: Token;
   item: Item;
 };
+
+export type NftMetadataJson = {
+  name: string;
+  image: string;
+  mintAddress: string;
+};

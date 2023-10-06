@@ -14,10 +14,12 @@ import { isPublicKey, publicKey } from "@metaplex-foundation/umi";
 export const RewardsList = ({
   dispenserId,
   inStockMintAddresses,
+  isFetchingInStockMintAddresses,
   className,
 }: {
   dispenserId?: string;
   inStockMintAddresses?: string[];
+  isFetchingInStockMintAddresses: boolean;
   className?: string;
 }) => {
   const { rewards, collectionWallet, dispenser } = useDispenser(dispenserId);
@@ -97,7 +99,16 @@ export const RewardsList = ({
                         <div className="flex justify-between w-2/5 font-bold mb-2">
                           <div className="flex flex-col w-full">
                             <div className="mb-2 flex w-full overflow-hidden">
-                              <div className={classNames(["truncate"])}>
+                              <div
+                                className={classNames([
+                                  "truncate",
+                                  !isFetchingInStockMintAddresses &&
+                                    !inStockMintAddresses?.includes(
+                                      token?.mintAddress || ""
+                                    ) &&
+                                    "text-red-500 line-through",
+                                ])}
+                              >
                                 {isPublicKey(name)
                                   ? getAbbreviatedAddress(name)
                                   : name}
@@ -112,15 +123,31 @@ export const RewardsList = ({
                                 />
                               )}
                             </div>
-                            {!!token?.mintAddress && token?.decimals > 0 && (
-                              <div className="flex">
-                                <div className="mr-2">Stock: </div>
-                                {isFetchingTokenBalances ? (
-                                  <Spinner />
-                                ) : (
-                                  getItemBalance(token)
-                                )}
-                              </div>
+                            {!isFetchingTokenBalances && (
+                              <>
+                                {!!token?.mintAddress &&
+                                  token?.decimals > 0 &&
+                                  inStockMintAddresses?.includes(
+                                    token?.mintAddress || ""
+                                  ) && (
+                                    <div className="flex">
+                                      <div className="mr-2">Stock: </div>
+                                      {isFetchingTokenBalances ? (
+                                        <Spinner />
+                                      ) : (
+                                        getItemBalance(token)
+                                      )}
+                                    </div>
+                                  )}
+                                {!isFetchingInStockMintAddresses &&
+                                  !inStockMintAddresses?.includes(
+                                    token?.mintAddress || ""
+                                  ) && (
+                                    <div className="text-red-500 text-sm mb-2">
+                                      OOS
+                                    </div>
+                                  )}
+                              </>
                             )}
                           </div>
                         </div>

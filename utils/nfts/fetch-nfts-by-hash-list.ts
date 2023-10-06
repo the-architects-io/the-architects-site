@@ -1,12 +1,8 @@
+import { NftMetadataJson } from "@/app/blueprint/types";
 import { Trait } from "@/features/admin/traits/traits-list-item";
 import { ModeledNftMetadata } from "@/utils/nfts/fetch-nfts-by-first-creator-address";
 import { Metaplex } from "@metaplex-foundation/js";
 import { PublicKey } from "@solana/web3.js";
-
-type NftMetadataJson = {
-  name: string;
-  image: string;
-};
 
 interface Props {
   publicKey: PublicKey;
@@ -24,7 +20,7 @@ export const fetchNftsByHashList = async ({
   setHasBeenFetched,
   hashList,
   withDetails = true,
-}: Props): Promise<any[]> => {
+}: Props): Promise<NftMetadataJson[]> => {
   setIsLoading && setIsLoading(true);
   return new Promise(async (resolve, reject) => {
     const metaplex = Metaplex.make(connection);

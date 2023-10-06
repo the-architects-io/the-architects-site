@@ -9,7 +9,6 @@ import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import ConfettiBackground from "@/features/animations/confetti-background";
 import DispenserUi from "@/features/dispensers/dispenser-ui";
-import showToast from "@/features/toasts/show-toast";
 import { GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID } from "@/graphql/queries/get-dispenser-displays-by-dispenser-id";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { useQuery } from "@apollo/client";
@@ -121,13 +120,6 @@ export default function Page() {
         ? getAbbreviatedAddress(dispensedInfo?.token?.name)
         : dispensedInfo?.token?.name;
       setDispensedName(dispensedNameString);
-      showToast({
-        primaryMessage: `You got ${amountString} ${dispensedName}!`,
-        link: {
-          url: `https://solscan.io/tx/${dispensedInfo.txHash}?cluster=devnet`,
-          title: "View Transaction",
-        },
-      });
     }
   }, [dispensedInfo, dispensedName, setAmountString, setDispensedName]);
 

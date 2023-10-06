@@ -1,3 +1,4 @@
+import { NftMetadataJson } from "@/app/blueprint/types";
 import { Metaplex } from "@metaplex-foundation/js";
 import { PublicKey } from "@solana/web3.js";
 import { CREATOR_ADDRESS } from "constants/constants";
@@ -6,11 +7,6 @@ export type ModeledNftMetadata = {
   name: string;
   imageUrl: string;
   mintAddress: string;
-};
-
-type NftMetadataJson = {
-  name: string;
-  image: string;
 };
 
 interface Props {
