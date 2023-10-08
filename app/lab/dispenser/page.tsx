@@ -164,6 +164,7 @@ export default function Page({ params }: { params: any }) {
 
           {!!dispenser?.id && (
             <RewardsList
+              isFetchingInStockMintAddresses={isLoading}
               inStockMintAddresses={inStockMintAddresses}
               dispenserId={dispenser?.id}
               className="mb-4 max-w-md"

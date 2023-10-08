@@ -2,7 +2,7 @@ import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import WalletButton from "@/features/UI/buttons/wallet-button";
 import showToast from "@/features/toasts/show-toast";
 import { useAdmin } from "@/hooks/admin";
-// import ReactJson from "react-json-view";
+import ReactJson from "react-json-view";
 
 export default function AdminToolbarContent() {
   const { adminToolbarData, setShouldForceEnableClaim } = useAdmin();
@@ -25,7 +25,7 @@ export default function AdminToolbarContent() {
         </PrimaryButton>
       </div>
       <div className="w-full">
-        {/* <div className="overflow-y-auto h-52">
+        <div className="overflow-y-auto h-52">
           {!!adminToolbarData && (
             <ReactJson
               style={{ padding: "1rem" }}
@@ -35,7 +35,7 @@ export default function AdminToolbarContent() {
               theme={"monokai"}
             />
           )}
-        </div> */}
+        </div>
       </div>
     </div>
   );
