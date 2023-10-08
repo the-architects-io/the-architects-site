@@ -12,6 +12,7 @@ import DispenserUi from "@/features/dispensers/dispenser-ui";
 import { GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID } from "@/graphql/queries/get-dispenser-displays-by-dispenser-id";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { useQuery } from "@apollo/client";
+import { XCircleIcon } from "@heroicons/react/24/outline";
 import { isPublicKey } from "@metaplex-foundation/umi";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -47,6 +48,7 @@ export default function Page() {
     useState<DispenseTokensApiResponse | null>(null);
   const [amountString, setAmountString] = useState("");
   const [dispensedName, setDispensedName] = useState("");
+  const [dispenserKey, setDispenserKey] = useState(Math.random());
 
   const { data, loading, error } = useQuery(
     GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID,
@@ -110,6 +112,11 @@ export default function Page() {
     }
   );
 
+  const handeRefresh = () => {
+    setDispensedInfo(null);
+    setDispenserKey(Math.random());
+  };
+
   useEffect(() => {
     if (dispensedInfo) {
       console.log({ dispensedInfo });
@@ -126,7 +133,13 @@ export default function Page() {
   return (
     <>
       {!!dispensedInfo && (
-        <div className="flex flex-col items-center justify-center w-full min-w-screen min-h-screen">
+        <div className="flex flex-col items-center justify-center w-full min-w-screen min-h-screen relative">
+          <div className="absolute top-4 right-4">
+            <XCircleIcon
+              className="w-16 h-16 text-gray-200 cursor-pointer"
+              onClick={handeRefresh}
+            />
+          </div>
           <div className="-mt-16">
             <ConfettiBackground />
           </div>
@@ -156,6 +169,7 @@ export default function Page() {
       )}
       {!!dispenserId && !dispensedInfo && (
         <DispenserUi
+          key={dispenserKey}
           dispenserId={dispenserId}
           backgroundColor={backgroundColor}
           textColor={textColor}
