@@ -41,9 +41,6 @@ dependencies:
   '@metaplex-foundation/umi-bundle-defaults':
     specifier: ^0.8.9
     version: 0.8.9(@metaplex-foundation/umi@0.8.9)(@solana/web3.js@1.87.0)(encoding@0.1.13)
-  '@metaplex-foundation/umi-uploader-bundlr':
-    specifier: ^0.8.9
-    version: 0.8.9(@metaplex-foundation/umi@0.8.9)(@solana/web3.js@1.87.0)(encoding@0.1.13)
   '@metaplex-foundation/umi-uploader-nft-storage':
     specifier: ^0.8.9
     version: 0.8.9(@metaplex-foundation/umi@0.8.9)(encoding@0.1.13)
@@ -3300,25 +3297,6 @@ packages:
       '@metaplex-foundation/umi': 0.8.9
       '@metaplex-foundation/umi-web3js-adapters': 0.8.9(@metaplex-foundation/umi@0.8.9)(@solana/web3.js@1.87.0)
       '@solana/web3.js': 1.87.0(encoding@0.1.13)
-    dev: false
-
-  /@metaplex-foundation/umi-uploader-bundlr@0.8.9(@metaplex-foundation/umi@0.8.9)(@solana/web3.js@1.87.0)(encoding@0.1.13):
-    resolution: {integrity: sha512-FGc5HeyGKDeqRNOZTPPMDmoT2NslY6WyUGTlIe5v6gKXd13iBeGW2UE17Dlvtp9E6G9guUTGHRwYZGddm4Rn3A==}
-    peerDependencies:
-      '@metaplex-foundation/umi': ^0.8.9
-      '@solana/web3.js': ^1.72.0
-    dependencies:
-      '@bundlr-network/client': 0.8.9(debug@4.3.4)(encoding@0.1.13)
-      '@metaplex-foundation/umi': 0.8.9
-      '@metaplex-foundation/umi-web3js-adapters': 0.8.9(@metaplex-foundation/umi@0.8.9)(@solana/web3.js@1.87.0)
-      '@solana/web3.js': 1.87.0(encoding@0.1.13)
-      bignumber.js: 9.1.2
-      buffer: 6.0.3
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - encoding
-      - utf-8-validate
     dev: false
 
   /@metaplex-foundation/umi-uploader-nft-storage@0.8.9(@metaplex-foundation/umi@0.8.9)(encoding@0.1.13):

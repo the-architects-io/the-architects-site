@@ -1,5 +1,5 @@
 import { parse, stringify } from "lossless-json";
-import { RPC_ENDPOINT, RPC_ENDPOINT_DEVNET } from "@/constants/constants";
+import { RPC_ENDPOINT_DEVNET } from "@/constants/constants";
 import { getUmiClient } from "@/utils/umi";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";

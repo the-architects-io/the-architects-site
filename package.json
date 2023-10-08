@@ -25,7 +25,6 @@
     "@metaplex-foundation/mpl-toolbox": "^0.9.1",
     "@metaplex-foundation/umi": "^0.8.9",
     "@metaplex-foundation/umi-bundle-defaults": "^0.8.9",
-    "@metaplex-foundation/umi-uploader-bundlr": "^0.8.9",
     "@metaplex-foundation/umi-uploader-nft-storage": "^0.8.9",
     "@mui/icons-material": "^5.14.9",
     "@mui/material": "^5.13.3",
