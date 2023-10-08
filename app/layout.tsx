@@ -9,6 +9,7 @@ import classNames from "classnames";
 import Toaster from "@/features/toasts/toaster";
 import { DebugModeProvider } from "@/hooks/debug-mode";
 import Navbar from "@/features/navigation/navbar";
+import AdminToolbar from "@/features/admin/tools/admin-toolbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,6 +34,7 @@ export default function RootLayout({
                 <Navbar />
                 <Toaster />
                 {/* <Sidebar /> */}
+                <AdminToolbar />
               </AdminProvider>
             </SidebarProvider>
           </DebugModeProvider>

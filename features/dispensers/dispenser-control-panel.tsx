@@ -14,20 +14,24 @@ import { StatsPanel } from "@/features/admin/dispensers/stats/stats-panel";
 import { copyTextToClipboard } from "@/utils/clipboard";
 import { ClipboardIcon } from "@heroicons/react/24/outline";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
+import { BASE_URL } from "@/constants/constants";
+import Link from "next/link";
+import { useAdmin } from "@/hooks/admin";
 
 export const DispenserControlPanel = ({
   dispenserId,
 }: {
   dispenserId: string;
 }) => {
+  const { isAdmin } = useAdmin();
   const { description, isLoading, dispenser, rewards, refetch } =
     useDispenser(dispenserId);
   const tabs: ITab[] = [
     { name: "Rewards", value: "rewards" },
-    { name: "Costs", value: "costs" },
+    // { name: "Costs", value: "costs" },
     // { name: "Gates", value: "gates" },
     // { name: "Restrictions", value: "restrictions" },
-    { name: "Stats", value: "stats" },
+    // { name: "Stats", value: "stats" },
     { name: "Config", value: "config" },
   ];
   const [activeTab, setActiveTab] = useState<ITab>(tabs[0]);
@@ -92,7 +96,7 @@ export const DispenserControlPanel = ({
                     <div className="italic text-lg mb-8">{description}</div>
                   )}
                   <PrimaryButton
-                    className="flex items-center justify-center mb-8"
+                    className="flex items-center justify-center mb-4"
                     onClick={() =>
                       copyTextToClipboard(
                         `https://preview.the-architects.io/in-portals/dispenser?id=${dispenser.id}`
@@ -102,6 +106,24 @@ export const DispenserControlPanel = ({
                     <ClipboardIcon className="h-5 w-5 inline-block" />
                     <span className="mx-2">Copy Portals Interaction Link</span>
                   </PrimaryButton>
+                  {isAdmin && (
+                    <PrimaryButton className="mb-4">
+                      <Link
+                        href={`https://preview.the-architects.io/in-portals/dispenser?id=${dispenser.id}`}
+                      >
+                        Open Admin Portals Screen
+                      </Link>
+                    </PrimaryButton>
+                  )}
+                  <div className="mb-4">
+                    <PrimaryButton>
+                      <Link
+                        href={`${BASE_URL}/admin/dispenser/${dispenser.id}/payouts`}
+                      >
+                        View Payouts
+                      </Link>
+                    </PrimaryButton>
+                  </div>
                   <Divider />
                   <div className="py-4">
                     <Tabs

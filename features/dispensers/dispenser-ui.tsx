@@ -32,6 +32,8 @@ import { GET_PAYOUTS } from "@/graphql/queries/get-payouts";
 import { Payout } from "@/app/profile/[id]/page";
 import { fetchNftsByHashList } from "@/utils/nfts/fetch-nfts-by-hash-list";
 import { Connection } from "@solana/web3.js";
+import { useAdmin } from "@/hooks/admin";
+import usePrevious from "@/hooks/previous";
 
 interface DispenserUiProps {
   dispenserId: string;
@@ -75,6 +77,7 @@ export default function DispenserUi({
   children,
 }: DispenserUiProps) {
   const searchParams = useSearchParams();
+  const { isAdmin, setAdminToolbarData, shouldForceEnableClaim } = useAdmin();
   const [isClaiming, setIsClaiming] = useState(false);
   const [inStockMintAddresses, setInStockMintAddresses] = useState<string[]>(
     []
@@ -98,10 +101,15 @@ export default function DispenserUi({
   const [showReloadButton, setShowReloadButton] = useState(false);
   const [hasPassedCooldownCheck, setHasPassedCooldownCheck] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const previousWalletAddress = usePrevious(walletAddress);
   const [payouts, setPayouts] = useState<Payout[]>([]);
   const [lastClaimTimeString, setLastClaimTimeString] = useState<string>("");
   const [nextClaimTimeString, setNextClaimTimeString] = useState<string>("");
   const [hasCooldown, setHasCooldown] = useState<boolean>(false);
+  const [hasUpdatedAdminToolbarData, setHasUpdatedAdminToolbarData] =
+    useState(false);
+  const [isDebouncingAdminToolbar, setIsDebouncingAdminToolbar] =
+    useState(false);
 
   const {
     loading: isFetchingPayouts,
@@ -130,6 +138,40 @@ export default function DispenserUi({
     RANDOM = "RANDOM",
     SORTED = "SORTED",
   }
+
+  const handleUpdateAdminToolbarData = () => {
+    if (!dispenser?.id) return;
+    setAdminToolbarData({
+      ["Dispenser"]: dispenser,
+      ["Connected wallet"]: walletAddress,
+      ["Scope data"]: {
+        isAdmin,
+        isBeingEdited,
+        hasStock,
+        hasFetchedBalances,
+        isFetchingBalances,
+        inStockMintAddresses,
+        rewards,
+        roomId,
+        hasFetchedRoomId,
+        hasFetchedInPortalsWalletAddress,
+        inPortalsWalletAddress,
+        showReloadButton,
+        hasPassedCooldownCheck,
+        hasCooldown,
+        lastClaimTimeString,
+        nextClaimTimeString,
+        walletAddress,
+        payouts,
+        hasFechedPayouts,
+        isFetchingPayouts,
+        fetchPayoutsError,
+        hasUpdatedAdminToolbarData,
+        shouldForceEnableClaim,
+      },
+    });
+    setHasUpdatedAdminToolbarData(true);
+  };
 
   const updateBalances = useCallback(async () => {
     if (!dispenser?.rewardWalletAddress || isFetchingBalances) return;
@@ -175,7 +217,6 @@ export default function DispenserUi({
     console.log({ hashList, nftBalances, splTokenBalances });
 
     const tokenBalances = [...splTokenBalances, ...nftBalances];
-    debugger;
 
     let rewards = dispenser.rewardCollections.filter((reward) => {
       const { mintAddress } = reward.itemCollection.item.token;
@@ -185,7 +226,7 @@ export default function DispenserUi({
     setInStockMintAddresses(
       rewards.map((reward) => reward.itemCollection.item.token.mintAddress)
     );
-    debugger;
+
     setHasStock(!!rewards.length);
     setRewards(rewards);
     console.log({ rewards });
@@ -272,6 +313,22 @@ export default function DispenserUi({
     if (!hasFetchedBalances && !isFetchingBalances && !rewards.length) {
       updateBalances();
     }
+    if (previousWalletAddress !== walletAddress) {
+      updateBalances();
+    }
+
+    if (isAdmin && !hasUpdatedAdminToolbarData) {
+      handleUpdateAdminToolbarData();
+    }
+
+    if (isAdmin && !isDebouncingAdminToolbar) {
+      handleUpdateAdminToolbarData();
+      setIsDebouncingAdminToolbar(true);
+      setTimeout(() => {
+        setIsDebouncingAdminToolbar(false);
+      }, 1000);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     dispenser.id,
     fetchRewardTokenBalances,
@@ -279,6 +336,7 @@ export default function DispenserUi({
     isFetchingBalances,
     rewards.length,
     updateBalances,
+    isAdmin,
   ]);
 
   const requestPublicKey = () => {
@@ -300,7 +358,7 @@ export default function DispenserUi({
   useEffect(() => {
     if (!dispenser?.id) return;
 
-    if (ENV === "local" && !walletAddress && walletAdapterWalletAddress) {
+    if (isAdmin && !walletAddress && walletAdapterWalletAddress) {
       setWalletAddress(walletAdapterWalletAddress.toString());
     }
 
@@ -423,11 +481,6 @@ export default function DispenserUi({
 
   return (
     <>
-      {ENV === "local" && (
-        <div className="absolute bottom-4 left-4">
-          <WalletButton />
-        </div>
-      )}
       {!walletAddress && !isBeingEdited ? (
         <div className="flex flex-col justify-center items-center w-full min-h-screen text-stone-300 bg-slate-800">
           <div className="max-w-xs text-center mb-4">
@@ -508,7 +561,9 @@ export default function DispenserUi({
                   This dispenser is out of stock!
                 </p>
               )}
-              {isBeingEdited || !!hasPassedCooldownCheck ? (
+              {isBeingEdited ||
+              !!hasPassedCooldownCheck ||
+              shouldForceEnableClaim ? (
                 <button
                   style={{
                     backgroundColor: claimButtonColor || "transparent",
@@ -528,7 +583,9 @@ export default function DispenserUi({
                         }
                       : handleClaim
                   }
-                  disabled={isClaiming || !hasStock}
+                  disabled={
+                    shouldForceEnableClaim ? false : isClaiming || !hasStock
+                  }
                 >
                   {isClaiming || isFetchingBalances ? (
                     <Spinner />
