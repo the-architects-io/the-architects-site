@@ -102,7 +102,8 @@ export const RewardsList = ({
                               <div
                                 className={classNames([
                                   "truncate",
-                                  !isFetchingInStockMintAddresses &&
+                                  !!inStockMintAddresses &&
+                                    !isFetchingInStockMintAddresses &&
                                     !inStockMintAddresses?.includes(
                                       token?.mintAddress || ""
                                     ) &&
@@ -125,6 +126,16 @@ export const RewardsList = ({
                             </div>
                             {!isFetchingTokenBalances && (
                               <>
+                                {!inStockMintAddresses && !!token && (
+                                  <div className="flex">
+                                    <div className="mr-2">Stock: </div>
+                                    {isFetchingTokenBalances ? (
+                                      <Spinner />
+                                    ) : (
+                                      getItemBalance(token)
+                                    )}
+                                  </div>
+                                )}
                                 {!!token?.mintAddress &&
                                   token?.decimals > 0 &&
                                   inStockMintAddresses?.includes(
@@ -139,7 +150,8 @@ export const RewardsList = ({
                                       )}
                                     </div>
                                   )}
-                                {!isFetchingInStockMintAddresses &&
+                                {inStockMintAddresses &&
+                                  !isFetchingInStockMintAddresses &&
                                   !inStockMintAddresses?.includes(
                                     token?.mintAddress || ""
                                   ) && (
