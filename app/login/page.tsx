@@ -54,7 +54,9 @@ export default function Page() {
           res = await signInEmailPassword(email, password);
           break;
         case "signup":
-          res = await signUpEmailPassword(email, password);
+          res = await signUpEmailPassword(email, password, {
+            allowedRoles: ["user"],
+          });
           break;
       }
 
