@@ -1,3 +1,4 @@
+"use client";
 import classNames from "classnames";
 
 interface Props extends React.HTMLAttributes<HTMLButtonElement> {

@@ -283,7 +283,12 @@ export default function LootBoxDetailPage({ params }: { params: any }) {
             <div className="text-center uppercase text-3xl mb-2">
               Possible Rewards
             </div>
-            {!!lootBox && <RewardsList dispenserId={lootBox.id} />}
+            {!!lootBox && (
+              <RewardsList
+                isFetchingInStockMintAddresses={false}
+                dispenserId={lootBox.id}
+              />
+            )}
           </div>
         </div>
       </div>

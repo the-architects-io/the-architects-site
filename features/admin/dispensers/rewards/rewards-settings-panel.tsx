@@ -18,7 +18,11 @@ export const RewardsSettingsPanel = ({
     <>
       <h2 className="text-xl uppercase mb-4">Rewards</h2>
       {!!dispenser.rewardCollections?.length && (
-        <RewardsList dispenserId={dispenser.id} className="mb-4 max-w-md" />
+        <RewardsList
+          isFetchingInStockMintAddresses={false}
+          dispenserId={dispenser.id}
+          className="mb-4 max-w-md"
+        />
       )}
     </>
   );

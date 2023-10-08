@@ -1,8 +1,11 @@
+"use client";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import WalletButton from "@/features/UI/buttons/wallet-button";
 import showToast from "@/features/toasts/show-toast";
 import { useAdmin } from "@/hooks/admin";
-import ReactJson from "react-json-view";
+import JsonView from "react18-json-view";
+import "react18-json-view/src/style.css";
+import "react18-json-view/src/dark.css";
 
 export default function AdminToolbarContent() {
   const { adminToolbarData, setShouldForceEnableClaim } = useAdmin();
@@ -27,13 +30,7 @@ export default function AdminToolbarContent() {
       <div className="w-full">
         <div className="overflow-y-auto h-52">
           {!!adminToolbarData && (
-            <ReactJson
-              style={{ padding: "1rem" }}
-              collapsed={true}
-              name={null}
-              src={!!adminToolbarData && adminToolbarData}
-              theme={"monokai"}
-            />
+            <JsonView src={adminToolbarData} dark={true} collapsed={true} />
           )}
         </div>
       </div>

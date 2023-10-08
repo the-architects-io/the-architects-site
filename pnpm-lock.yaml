@@ -185,6 +185,9 @@ dependencies:
   react-scrolllock:
     specifier: ^5.0.1
     version: 5.0.1(react@18.2.0)
+  react18-json-view:
+    specifier: ^0.2.6
+    version: 0.2.6(react@18.2.0)
   tailwindcss:
     specifier: 3.3.2
     version: 3.3.2(ts-node@10.9.1)
@@ -16049,6 +16052,14 @@ packages:
       prop-types: 15.8.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /react18-json-view@0.2.6(react@18.2.0):
+    resolution: {integrity: sha512-RHAY880UwC7SClyQBoij50q2InpSrj5zmP2DCL73vEaaVTyj/QbMPBk4FRKMQ7LF8FSxhh+VI6mK3AhlBaCBxw==}
+    peerDependencies:
+      react: '>=16.8.0'
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /react@16.13.1:

@@ -1,13 +1,12 @@
 "use client";
-import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import AdminToolbarContent from "@/features/admin/tools/admin-toolbar-content";
 import { useAdmin } from "@/hooks/admin";
 import classNames from "classnames";
 import { useState } from "react";
 
-export default function AdminToolbar() {
+export const AdminToolbar: React.FC = () => {
   const { isAdmin } = useAdmin();
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   if (!isAdmin) return <></>;
 
@@ -16,7 +15,7 @@ export default function AdminToolbar() {
       <div
         className={classNames([
           "w-full max-h-64 fixed bg-transparent pointer-events-none",
-          "transition-all duration-500  ease-out",
+          "transition-all duration-300  ease-out",
           "transform translate-y-full",
           isOpen ? "bottom-72" : "bottom-10",
         ])}
@@ -33,4 +32,6 @@ export default function AdminToolbar() {
       </div>
     </>
   );
-}
+};
+
+export default AdminToolbar;
