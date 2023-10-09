@@ -328,7 +328,6 @@ export default function DispenserUi({
         setIsDebouncingAdminToolbar(false);
       }, 1000);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     dispenser.id,
     fetchRewardTokenBalances,
@@ -337,6 +336,11 @@ export default function DispenserUi({
     rewards.length,
     updateBalances,
     isAdmin,
+    previousWalletAddress,
+    walletAddress,
+    hasUpdatedAdminToolbarData,
+    isDebouncingAdminToolbar,
+    handleUpdateAdminToolbarData,
   ]);
 
   const requestPublicKey = () => {
@@ -361,6 +365,7 @@ export default function DispenserUi({
     if (isAdmin && !walletAddress && walletAdapterWalletAddress) {
       setWalletAddress(walletAdapterWalletAddress.toString());
     }
+    debugger;
 
     if (inPortalsWalletAddress && !walletAddress) {
       setWalletAddress(inPortalsWalletAddress.toString());

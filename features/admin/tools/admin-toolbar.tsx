@@ -16,7 +16,7 @@ export const AdminToolbar: React.FC = () => {
         className={classNames([
           "w-full max-h-64 fixed bg-transparent pointer-events-none",
           "transition-all duration-300  ease-out",
-          "transform translate-y-full",
+          "transform translate-y-full z-50",
           isOpen ? "bottom-72" : "bottom-10",
         ])}
       >

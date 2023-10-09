@@ -109,7 +109,7 @@ export const DispenserControlPanel = ({
                   {isAdmin && (
                     <PrimaryButton className="mb-4">
                       <Link
-                        href={`https://preview.the-architects.io/in-portals/dispenser?id=${dispenser.id}`}
+                        href={`${BASE_URL}/in-portals/dispenser?id=${dispenser.id}`}
                       >
                         Open Admin Portals Screen
                       </Link>
