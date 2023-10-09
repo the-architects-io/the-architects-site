@@ -54,12 +54,10 @@ export const fetchNftsByHashList = async ({
 
       for (const nft of nftCollection) {
         const { json, mint } = await metaplex.nfts().load({ metadata: nft });
-        const { name, image: imageUrl } = json as NftMetadataJson;
-        const { address: mintAddress } = mint;
         const metadata: ModeledNftMetadata = {
-          name,
-          imageUrl,
-          mintAddress: mintAddress.toString(),
+          name: json?.name || "",
+          imageUrl: json?.image || "",
+          mintAddress: mint?.address?.toString() || "",
         };
         nftsWithMetadata.push(metadata);
       }
