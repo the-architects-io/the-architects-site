@@ -76,38 +76,39 @@ export const fetchDaoNfts = async ({
       });
       console.log("====================================");
 
-      if (withMetadata) {
-        const nftsWithMetadata: any[] = [];
+      // if (!withMetadata) {
+      //   setIsLoading && setIsLoading(false);
+      //   setHasBeenFetched && setHasBeenFetched(true);
+      //   resolve(
+      //     nftCollection.map(({ address, name }) => {
+      //       return {
+      //         name: name || "",
+      //         imageUrl: "",
+      //         mintAddress: address.toString(),
+      //       };
+      //     })
+      //   );
+      //   return;
+      // }
 
-        for (const nft of nftCollection) {
-          // @ts-ignore
-          const { json, mint } = await metaplex.nfts().load({ metadata: nft });
-          const { name, image: imageUrl } = json as NftMetadataJson;
-          const { address: mintAddress } = mint;
-          const metadata: ModeledNftMetadata = {
-            name,
-            imageUrl: convertImageUrl(imageUrl),
-            mintAddress: mintAddress.toString(),
-          };
-          nftsWithMetadata.push(metadata);
-        }
+      let nftsWithMetadata: any[] = [];
 
-        console.log({ nftsWithMetadata });
-
-        resolve(nftsWithMetadata);
-      } else {
-        setIsLoading && setIsLoading(false);
-        setHasBeenFetched && setHasBeenFetched(true);
-        resolve(
-          nftCollection.map(({ address, name }) => {
-            return {
-              name: name || "",
-              imageUrl: "",
-              mintAddress: address.toString(),
-            };
-          })
-        );
+      for (const nft of nftCollection) {
+        // @ts-ignore
+        const { json, mint } = await metaplex.nfts().load({ metadata: nft });
+        const { name, image: imageUrl } = json as NftMetadataJson;
+        const { address: mintAddress } = mint;
+        const metadata: ModeledNftMetadata = {
+          name,
+          imageUrl: convertImageUrl(imageUrl),
+          mintAddress: mintAddress.toString(),
+        };
+        nftsWithMetadata.push(metadata);
       }
+
+      console.log({ nftsWithMetadata });
+
+      resolve(nftsWithMetadata);
     } catch (error) {
       console.log("fetchDaoNfts error", error);
       console.error({ error });
