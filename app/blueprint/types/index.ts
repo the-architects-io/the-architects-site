@@ -427,3 +427,8 @@ export type NftMetadataJson = {
   image: string;
   mintAddress: string;
 };
+
+export enum RewardPayoutOrderTypes {
+  RANDOM = "RANDOM",
+  SEQUENTIAL = "SEQUENTIAL",
+}

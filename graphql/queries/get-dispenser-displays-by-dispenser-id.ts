@@ -23,6 +23,7 @@ export const GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID = gql`
       nameTextSize
       dispenserId
       rewardDisplayType
+      cardWidth
     }
   }
 `;

@@ -9,12 +9,14 @@ export const RewardsUI = ({
   inStockMintAddresses,
   isFetchingInStockMintAddresses,
   rewardDisplayType = RewardDisplayTypes.LIST,
+  cardWidth,
   className,
 }: {
   dispenserId: string;
   inStockMintAddresses?: string[];
   isFetchingInStockMintAddresses: boolean;
   rewardDisplayType?: RewardDisplayTypes;
+  cardWidth?: number;
   className?: string;
 }) => {
   if (isFetchingInStockMintAddresses) {
@@ -37,6 +39,7 @@ export const RewardsUI = ({
       )}
       {rewardDisplayType === RewardDisplayTypes.CARDS && (
         <RewardsCardList
+          cardWidth={cardWidth}
           dispenserId={dispenserId}
           inStockMintAddresses={inStockMintAddresses}
           isFetchingInStockMintAddresses={isFetchingInStockMintAddresses}

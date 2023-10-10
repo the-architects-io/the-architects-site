@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
     claimButtonText,
     rewardDisplayType,
     noop,
+    cardWidth,
   } = await req.json();
 
   console.log("=== UPDATE DISPENSER DISPLAY PARAMS ===");
@@ -44,6 +45,7 @@ export async function POST(req: NextRequest) {
     claimButtonText,
     rewardDisplayType,
     noop,
+    cardWidth,
   });
 
   if (noop)
@@ -101,6 +103,7 @@ export async function POST(req: NextRequest) {
     claimButtonTextSize,
     claimButtonText,
     rewardDisplayType,
+    cardWidth,
   };
 
   if (dispenserDisplay) {

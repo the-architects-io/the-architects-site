@@ -12,6 +12,7 @@ export const ADD_DISPENSER_DISPLAY = gql`
       id
       backgroundColor
       claimButtonColor
+      cardWidth
       dispenser {
         id
       }

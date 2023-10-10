@@ -6,14 +6,21 @@ interface Props extends React.ImgHTMLAttributes<HTMLImageElement> {
   src?: string;
   alt: string;
   className?: string;
+  rounded?: boolean;
 }
 
-export const ImageWithFallback = ({ src, alt, className, ...props }: Props) => {
+export const ImageWithFallback = ({
+  src,
+  alt,
+  className,
+  rounded = true,
+  ...props
+}: Props) => {
   return (
     <>
       {!!src ? (
         <Image
-          className={classNames(["rounded-2xl", className])}
+          className={classNames([rounded && "rounded-2xl", className])}
           src={src || ""}
           width={(props.width && Number(props.width)) || 60}
           height={(props.height && Number(props.height)) || 60}

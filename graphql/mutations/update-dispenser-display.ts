@@ -15,6 +15,7 @@ export const UPDATE_DISPENSER_DISPLAY = gql`
       claimButtonColor
       backgroundColor
       rewardDisplayType
+      cardWidth
       dispenser {
         id
       }

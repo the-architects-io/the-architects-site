@@ -58,7 +58,8 @@ export default function Page({ params }: { params: any }) {
       descriptionTextSize,
       claimButtonTextSize,
       claimButtonText = "Claim",
-      rewardDisplayType,
+      rewardDisplayType = RewardDisplayTypes.LIST,
+      cardWidth,
     }) => {
       try {
         const { data } = await axios.post("/api/update-dispenser-display", {
@@ -76,7 +77,8 @@ export default function Page({ params }: { params: any }) {
           descriptionTextSize,
           claimButtonTextSize,
           claimButtonText,
-          rewardDisplayType: rewardDisplayType || RewardDisplayTypes.LIST,
+          rewardDisplayType,
+          cardWidth,
         });
         showToast({
           primaryMessage: "Update successful",
@@ -96,6 +98,7 @@ export default function Page({ params }: { params: any }) {
           claimButtonTextSize,
           claimButtonText,
           rewardDisplayType,
+          cardWidth: cardWidth || 320,
         });
       } catch (error) {
         console.log(error);
@@ -138,6 +141,7 @@ export default function Page({ params }: { params: any }) {
       claimButtonText: dispenserDisplay.claimButtonText || "Claim",
       rewardDisplayType:
         dispenserDisplay.rewardDisplayType || RewardDisplayTypes.LIST,
+      cardWidth: dispenserDisplay.cardWidth || 320,
     };
 
     setInitialValues(values);
@@ -198,55 +202,58 @@ export default function Page({ params }: { params: any }) {
             </SecondaryButton>
           </Link>
 
-          <DispenserUi
-            dispenserId={params.id}
-            backgroundColor={formik.values.backgroundColor}
-            textColor={formik.values.textColor}
-            shouldDisplayRewards={formik.values.shouldDisplayRewards}
-            shouldDisplayName={formik.values.shouldDisplayName}
-            shouldDisplayDescription={formik.values.shouldDisplayDescription}
-            shouldDisplayImage={formik.values.shouldDisplayImage}
-            claimButtonColor={formik.values.claimButtonColor}
-            claimButtonTextColor={formik.values.claimButtonTextColor}
-            imageSize={formik.values.imageSize}
-            nameTextSize={formik.values.nameTextSize}
-            descriptionTextSize={formik.values.descriptionTextSize}
-            claimButtonTextSize={formik.values.claimButtonTextSize}
-            claimButtonText={formik.values.claimButtonText}
-            rewardDisplayType={formik.values.rewardDisplayType}
-            isBeingEdited={true}
-          >
-            <div
-              className={classNames([
-                "fixed flex w-full justify-center transition-all duration-500 ease-in-out pointer-events-none",
-                isFormDirty ? "bottom-0" : "-bottom-32",
-              ])}
+          <div className="overflow-y-auto w-full h-screen">
+            <DispenserUi
+              dispenserId={params.id}
+              backgroundColor={formik.values.backgroundColor}
+              textColor={formik.values.textColor}
+              shouldDisplayRewards={formik.values.shouldDisplayRewards}
+              shouldDisplayName={formik.values.shouldDisplayName}
+              shouldDisplayDescription={formik.values.shouldDisplayDescription}
+              shouldDisplayImage={formik.values.shouldDisplayImage}
+              claimButtonColor={formik.values.claimButtonColor}
+              claimButtonTextColor={formik.values.claimButtonTextColor}
+              imageSize={formik.values.imageSize}
+              nameTextSize={formik.values.nameTextSize}
+              descriptionTextSize={formik.values.descriptionTextSize}
+              claimButtonTextSize={formik.values.claimButtonTextSize}
+              claimButtonText={formik.values.claimButtonText}
+              rewardDisplayType={formik.values.rewardDisplayType}
+              cardWidth={formik.values.cardWidth}
+              isBeingEdited={true}
             >
-              <div className="bg-gray-800 p-4 px-8 rounded-t-lg pointer-events-auto shadow-lg">
-                <div className="uppercase text-sm text-center mb-4 text-gray-300">
-                  Save changes?
-                </div>
-                <div className="flex items-center">
-                  <SubmitButton
-                    className="mr-4"
-                    onClick={formik.handleSubmit}
-                    disabled={!isFormDirty}
-                    isSubmitting={formik.isSubmitting}
-                  >
-                    Save
-                  </SubmitButton>
-                  <SecondaryButton
-                    onClick={(e) => {
-                      e.preventDefault();
-                      formik.resetForm({ values: initialValues });
-                    }}
-                  >
-                    Revert
-                  </SecondaryButton>
+              <div
+                className={classNames([
+                  "fixed flex w-full justify-center transition-all duration-500 ease-in-out pointer-events-none",
+                  isFormDirty ? "bottom-0" : "-bottom-32",
+                ])}
+              >
+                <div className="bg-gray-800 p-4 px-8 rounded-t-lg pointer-events-auto shadow-lg">
+                  <div className="uppercase text-sm text-center mb-4 text-gray-300">
+                    Save changes?
+                  </div>
+                  <div className="flex items-center">
+                    <SubmitButton
+                      className="mr-4"
+                      onClick={formik.handleSubmit}
+                      disabled={!isFormDirty}
+                      isSubmitting={formik.isSubmitting}
+                    >
+                      Save
+                    </SubmitButton>
+                    <SecondaryButton
+                      onClick={(e) => {
+                        e.preventDefault();
+                        formik.resetForm({ values: initialValues });
+                      }}
+                    >
+                      Revert
+                    </SecondaryButton>
+                  </div>
                 </div>
               </div>
-            </div>
-          </DispenserUi>
+            </DispenserUi>
+          </div>
 
           <div className="flex flex-col h-screen flex-1 w-full bg-gray-800 p-8 min-w-[340px] overflow-y-auto">
             <div className="flex flex-col items-center mb-8">
@@ -388,19 +395,35 @@ export default function Page({ params }: { params: any }) {
               </div>
             </div>
             {!!formik.values.shouldDisplayRewards && (
-              <SelectInputWithLabel
-                value={formik.values.rewardDisplayType}
-                label="Reward Display Type"
-                name="rewardDisplayType"
-                options={rewardDisplayTypes.map((type) => ({
-                  label: type.label,
-                  value: type.name,
-                }))}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder="Select a reward display type"
-                hideLabel={false}
-              />
+              <div className="mb-4">
+                <SelectInputWithLabel
+                  value={formik.values.rewardDisplayType}
+                  label="Reward Display Type"
+                  name="rewardDisplayType"
+                  options={rewardDisplayTypes.map((type) => ({
+                    label: type.label,
+                    value: type.name,
+                  }))}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  placeholder="Select a reward display type"
+                  hideLabel={false}
+                />
+              </div>
+            )}
+
+            {formik.values.rewardDisplayType === RewardDisplayTypes.CARDS && (
+              <div className="flex items-center mb-4">
+                <div className="mr-2">Card Width:</div>
+                <input
+                  type="range"
+                  name="cardWidth"
+                  min={150}
+                  max={450}
+                  value={formik.values.cardWidth}
+                  onChange={formik.handleChange}
+                />
+              </div>
             )}
 
             <div className="text-2xl uppercase mb-4 pt-8">Claim Button</div>

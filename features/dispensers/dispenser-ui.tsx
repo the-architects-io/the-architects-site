@@ -52,6 +52,7 @@ interface DispenserUiProps {
   claimButtonText?: string;
   isBeingEdited?: boolean;
   rewardDisplayType?: RewardDisplayTypes;
+  cardWidth?: number;
   setDispensedInfo?: Dispatch<any>;
   children?: React.ReactNode;
 }
@@ -73,6 +74,7 @@ export default function DispenserUi({
   claimButtonText,
   isBeingEdited = false,
   rewardDisplayType,
+  cardWidth,
   setDispensedInfo,
   children,
 }: DispenserUiProps) {
@@ -139,7 +141,7 @@ export default function DispenserUi({
     SORTED = "SORTED",
   }
 
-  const handleUpdateAdminToolbarData = () => {
+  const handleUpdateAdminToolbarData = useCallback(() => {
     if (!dispenser?.id) return;
     setAdminToolbarData({
       ["Dispenser"]: dispenser,
@@ -171,7 +173,33 @@ export default function DispenserUi({
       },
     });
     setHasUpdatedAdminToolbarData(true);
-  };
+  }, [
+    dispenser,
+    fetchPayoutsError,
+    hasCooldown,
+    hasFechedPayouts,
+    hasFetchedBalances,
+    hasFetchedInPortalsWalletAddress,
+    hasFetchedRoomId,
+    hasPassedCooldownCheck,
+    hasStock,
+    hasUpdatedAdminToolbarData,
+    inPortalsWalletAddress,
+    inStockMintAddresses,
+    isAdmin,
+    isBeingEdited,
+    isFetchingBalances,
+    isFetchingPayouts,
+    lastClaimTimeString,
+    nextClaimTimeString,
+    payouts,
+    rewards,
+    roomId,
+    setAdminToolbarData,
+    shouldForceEnableClaim,
+    showReloadButton,
+    walletAddress,
+  ]);
 
   const updateBalances = useCallback(async () => {
     if (!dispenser?.rewardWalletAddress || isFetchingBalances) return;
@@ -365,7 +393,6 @@ export default function DispenserUi({
     if (isAdmin && !walletAddress && walletAdapterWalletAddress) {
       setWalletAddress(walletAdapterWalletAddress.toString());
     }
-    debugger;
 
     if (inPortalsWalletAddress && !walletAddress) {
       setWalletAddress(inPortalsWalletAddress.toString());
@@ -464,10 +491,11 @@ export default function DispenserUi({
     payouts,
     hasFechedPayouts,
     isBeingEdited,
-    lastClaimTimeString.length,
+    lastClaimTimeString?.length,
     hasCooldown,
     hasPassedCooldownCheck,
     lastClaimTimeString,
+    isAdmin,
   ]);
 
   if (
@@ -550,6 +578,7 @@ export default function DispenserUi({
 
               {!!shouldDisplayRewards && (
                 <RewardsUI
+                  cardWidth={cardWidth}
                   inStockMintAddresses={inStockMintAddresses}
                   dispenserId={dispenserId}
                   isFetchingInStockMintAddresses={isFetchingBalances}

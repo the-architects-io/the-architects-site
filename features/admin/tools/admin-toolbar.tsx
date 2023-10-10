@@ -20,9 +20,9 @@ export const AdminToolbar: React.FC = () => {
           isOpen ? "bottom-72" : "bottom-10",
         ])}
       >
-        <div className="overflow-y-hidden pointer-events-auto">
+        <div className="overflow-y-hidden">
           <button
-            className="text-stone-200 hover:text-sky-300 bg-gray-700 px-6 pt-2 pb-4 border-t rounded-lg border-gray-500 absolute top-0 left-4"
+            className="text-stone-200 hover:text-sky-300 bg-gray-700 px-6 pt-2 pb-4 border-t rounded-lg border-gray-500 absolute top-0 left-4 pointer-events-auto"
             onClick={() => setIsOpen(!isOpen)}
           >
             admin tools
