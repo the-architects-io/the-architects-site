@@ -1,5 +1,9 @@
 import { NftMetadataJson } from "@/app/blueprint/types";
-import { FindNftsByOwnerOutput, Metaplex } from "@metaplex-foundation/js";
+import {
+  FindNftsByOwnerOutput,
+  Metadata,
+  Metaplex,
+} from "@metaplex-foundation/js";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { CREATOR_ADDRESS, RPC_ENDPOINT } from "constants/constants";
 
@@ -44,8 +48,15 @@ export const fetchDaoNfts = async ({
         .nfts()
         .findAllByOwner({ owner: publicKey });
 
+      if (!nftMetasFromMetaplex.length) {
+        resolve([]);
+        return;
+      }
+
+      const { model } = nftMetasFromMetaplex[0];
+
       const nftCollection = nftMetasFromMetaplex.filter(
-        ({ creators }: { creators: any }) => {
+        ({ creators }: { creators: Metadata["creators"] }) => {
           console.log({ creators });
           return creators?.[0]?.address?.toString() === CREATOR_ADDRESS;
         }
@@ -76,20 +87,21 @@ export const fetchDaoNfts = async ({
       });
       console.log("====================================");
 
-      // if (!withMetadata) {
-      //   setIsLoading && setIsLoading(false);
-      //   setHasBeenFetched && setHasBeenFetched(true);
-      //   resolve(
-      //     nftCollection.map(({ address, name }) => {
-      //       return {
-      //         name: name || "",
-      //         imageUrl: "",
-      //         mintAddress: address.toString(),
-      //       };
-      //     })
-      //   );
-      //   return;
-      // }
+      if (!withMetadata) {
+        setIsLoading && setIsLoading(false);
+        setHasBeenFetched && setHasBeenFetched(true);
+        const collection = nftCollection as Metadata[];
+        resolve(
+          collection.map(({ mintAddress, name }) => {
+            return {
+              name: name || "",
+              imageUrl: "",
+              mintAddress: mintAddress.toString(),
+            };
+          })
+        );
+        return;
+      }
 
       let nftsWithMetadata: any[] = [];
 
