@@ -101,6 +101,9 @@ const useDispenser = (dispenserId?: string) => {
         rewardWalletAddress: null,
         rewardCollections: [],
         cooldownInMs: null,
+        owner: {
+          id: null,
+        },
       },
       costs: null,
       rewards: null,

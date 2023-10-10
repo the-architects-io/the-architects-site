@@ -6,6 +6,9 @@ export const GET_DISPENSER_BY_ID = gql`
       rewardWalletAddress
       rewardWalletBump
       cooldownInMs
+      owner {
+        id
+      }
       collectionWallet {
         id
         address

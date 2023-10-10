@@ -188,6 +188,9 @@ export type Dispenser = {
   rewardWalletAddress: string;
   rewardWalletBump: number;
   cooldownInMs?: number;
+  owner: {
+    id: string;
+  };
   collectionWallet: {
     id: string;
     address: string;

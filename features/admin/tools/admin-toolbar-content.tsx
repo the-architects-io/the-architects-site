@@ -18,7 +18,7 @@ export default function AdminToolbarContent() {
   };
 
   return (
-    <div className="h-64 bg-gray-700 border-t border-gray-600 mt-10 p-8 flex w-full">
+    <div className="h-64 bg-gray-700 border-t border-gray-600 mt-10 p-8 flex w-full pointer-events-auto">
       <div className="w-[300px]">
         <div className="mb-4">
           <WalletButton />

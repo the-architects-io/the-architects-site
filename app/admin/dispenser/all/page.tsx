@@ -4,11 +4,11 @@ import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { Card } from "@/features/UI/card";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import Spinner from "@/features/UI/spinner";
-import { GET_DISPENSERS_BY_OWNER_ID } from "@/graphql/queries/get-dispensers-by-owner-id";
+import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
+import { useAdmin } from "@/hooks/admin";
 import { useQuery } from "@apollo/client";
 import { RemoveCircleOutline } from "@mui/icons-material";
 import { useUserData } from "@nhost/nextjs";
-import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -19,32 +19,29 @@ export default function DashboardPage() {
   );
 
   const user = useUserData();
+  const { isAdmin } = useAdmin();
 
-  const { data, loading, error, refetch } = useQuery(
-    GET_DISPENSERS_BY_OWNER_ID,
-    {
-      variables: { id: user?.id },
-      skip: !user,
-      onCompleted: ({ dispensers }: { dispensers: Dispenser[] }) => {
-        const brokenDispensers = dispensers.filter(
-          (dispenser) => !dispenser.rewardWalletAddress
-        );
-        const notBrokenDispensers = dispensers.filter(
-          (dispenser) => dispenser.rewardWalletAddress
-        );
-        const setupDispensers = notBrokenDispensers.filter(
-          (dispenser) => dispenser.rewardCollections.length
-        );
-        const incompleteDispensers = notBrokenDispensers.filter(
-          (dispenser) => !dispenser.rewardCollections.length
-        );
-        setSetupDispensers(setupDispensers);
-        setIncompleteDispensers(incompleteDispensers);
-      },
-    }
-  );
+  const { data, loading, error, refetch } = useQuery(GET_DISPENSER_BY_ID, {
+    skip: !user,
+    onCompleted: ({ dispensers }: { dispensers: Dispenser[] }) => {
+      const brokenDispensers = dispensers.filter(
+        (dispenser) => !dispenser.rewardWalletAddress
+      );
+      const notBrokenDispensers = dispensers.filter(
+        (dispenser) => dispenser.rewardWalletAddress
+      );
+      const setupDispensers = notBrokenDispensers.filter(
+        (dispenser) => dispenser.rewardCollections.length
+      );
+      const incompleteDispensers = notBrokenDispensers.filter(
+        (dispenser) => !dispenser.rewardCollections.length
+      );
+      setSetupDispensers(setupDispensers);
+      setIncompleteDispensers(incompleteDispensers);
+    },
+  });
 
-  if (!user?.id) {
+  if (!isAdmin) {
     return (
       <ContentWrapper className="text-center">
         <div>Not authorized</div>
@@ -55,10 +52,7 @@ export default function DashboardPage() {
   return (
     <ContentWrapper>
       <div className="flex flex-col items-center">
-        <h1 className="text-3xl pb-8">My Dispensers</h1>
-        <PrimaryButton className="mb-4">
-          <a href="/me/dispenser/create">Create Dispenser</a>
-        </PrimaryButton>
+        <h1 className="text-3xl pb-8">All Dispensers</h1>
         {loading || error ? (
           <div className="py-4 flex w-full justify-center">
             <Spinner />
@@ -110,9 +104,7 @@ export default function DashboardPage() {
                 </>
               )}
               {!incompleteDispensers?.length && !setupDispensers?.length && (
-                <p className="w-full text-center">
-                  You don&apos;t have any dispensers yet.
-                </p>
+                <p className="w-full text-center">No dispensers yet.</p>
               )}
             </div>
           </>
