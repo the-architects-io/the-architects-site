@@ -1,5 +1,5 @@
 import { NftMetadataJson } from "@/app/blueprint/types";
-import { Metaplex } from "@metaplex-foundation/js";
+import { FindNftsByOwnerOutput, Metaplex } from "@metaplex-foundation/js";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { CREATOR_ADDRESS, RPC_ENDPOINT } from "constants/constants";
 
@@ -13,6 +13,7 @@ interface Props {
   publicKey: PublicKey;
   setIsLoading?: (isLoading: boolean) => void;
   setHasBeenFetched?: (hasBeenFetched: boolean) => void;
+  withMetadata?: boolean;
 }
 
 const convertImageUrl = (imageUrl: string): string => {
@@ -29,6 +30,7 @@ export const fetchDaoNfts = async ({
   publicKey,
   setIsLoading,
   setHasBeenFetched,
+  withMetadata = true,
 }: Props): Promise<any[]> => {
   setIsLoading && setIsLoading(true);
   return new Promise(async (resolve, reject) => {
@@ -38,7 +40,7 @@ export const fetchDaoNfts = async ({
     console.log("address", publicKey.toString());
 
     try {
-      const nftMetasFromMetaplex: any[] = await metaplex
+      const nftMetasFromMetaplex: FindNftsByOwnerOutput = await metaplex
         .nfts()
         .findAllByOwner({ owner: publicKey });
 
@@ -62,9 +64,25 @@ export const fetchDaoNfts = async ({
         return;
       }
 
+      if (!withMetadata) {
+        setIsLoading && setIsLoading(false);
+        setHasBeenFetched && setHasBeenFetched(true);
+        resolve(
+          nftCollection.map(({ address, name }) => {
+            return {
+              name: name || "",
+              imageUrl: "",
+              mintAddress: address.toString(),
+            };
+          })
+        );
+        return;
+      }
+
       let nftsWithMetadata: any[] = [];
 
       for (const nft of nftCollection) {
+        // @ts-ignore
         const { json, mint } = await metaplex.nfts().load({ metadata: nft });
         const { name, image: imageUrl } = json as NftMetadataJson;
         const { address: mintAddress } = mint;
