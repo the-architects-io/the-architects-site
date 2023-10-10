@@ -54,12 +54,15 @@ export default function DispenserClaimPage({ params }: { params: any }) {
     const walletAddress = inPortalsWalletAddress;
     //  || walletAdapterWalletAddress;
 
-    if (!walletAddress) return;
-
+    if (!inPortalsWalletAddress) {
+      console.error("No wallet address");
+      return;
+    }
+    console.log("handleFetchDaoNfts");
     setIsFetchingNfts(true);
     const nfts = await fetchDaoNfts({
       connection,
-      publicKey: new PublicKey(walletAddress),
+      publicKey: new PublicKey(inPortalsWalletAddress),
       setHasBeenFetched,
     });
 
