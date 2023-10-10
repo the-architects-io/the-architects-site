@@ -15,6 +15,16 @@ interface Props {
   setHasBeenFetched?: (hasBeenFetched: boolean) => void;
 }
 
+const convertImageUrl = (imageUrl: string): string => {
+  if (!imageUrl.includes("ipfs")) return imageUrl;
+
+  const urlParts = imageUrl.split("/");
+  const ipfsHash = urlParts[4];
+  const fileName = urlParts[5];
+  const convertedUrl = `https://${ipfsHash}.ipfs.nftstorage.link/${fileName}`;
+  return convertedUrl;
+};
+
 export const fetchDaoNfts = async ({
   publicKey,
   setIsLoading,
@@ -60,7 +70,7 @@ export const fetchDaoNfts = async ({
         const { address: mintAddress } = mint;
         const metadata: ModeledNftMetadata = {
           name,
-          imageUrl,
+          imageUrl: convertImageUrl(imageUrl),
           mintAddress: mintAddress.toString(),
         };
         nftsWithMetadata.push(metadata);
