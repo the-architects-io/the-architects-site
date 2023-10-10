@@ -64,20 +64,20 @@ export const fetchDaoNfts = async ({
         return;
       }
 
-      if (!withMetadata) {
-        setIsLoading && setIsLoading(false);
-        setHasBeenFetched && setHasBeenFetched(true);
-        resolve(
-          nftCollection.map(({ address, name }) => {
-            return {
-              name: name || "",
-              imageUrl: "",
-              mintAddress: address.toString(),
-            };
-          })
-        );
-        return;
-      }
+      // if (!withMetadata) {
+      //   setIsLoading && setIsLoading(false);
+      //   setHasBeenFetched && setHasBeenFetched(true);
+      //   resolve(
+      //     nftCollection.map(({ address, name }) => {
+      //       return {
+      //         name: name || "",
+      //         imageUrl: "",
+      //         mintAddress: address.toString(),
+      //       };
+      //     })
+      //   );
+      //   return;
+      // }
 
       let nftsWithMetadata: any[] = [];
 
