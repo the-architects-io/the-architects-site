@@ -43,6 +43,7 @@ export default function Page() {
   const [rewardDisplayType, setRewardDisplayType] = useState(
     RewardDisplayTypes.LIST
   );
+  const [cardWidth, setCardWidth] = useState(null);
   const [claimButtonText, setClaimButtonText] = useState("Claim");
   const [dispensedInfo, setDispensedInfo] =
     useState<DispenseTokensApiResponse | null>(null);
@@ -108,6 +109,7 @@ export default function Page() {
         setRewardDisplayType(
           dispenser_displays[0]?.rewardDisplayType || "list"
         );
+        setCardWidth(dispenser_displays[0]?.cardWidth || 320);
       },
     }
   );
@@ -186,6 +188,7 @@ export default function Page() {
           claimButtonText={claimButtonText}
           setDispensedInfo={setDispensedInfo}
           rewardDisplayType={rewardDisplayType}
+          cardWidth={cardWidth || 320}
         />
       )}
     </>
