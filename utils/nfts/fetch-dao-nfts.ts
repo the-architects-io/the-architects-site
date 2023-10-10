@@ -1,7 +1,7 @@
 import { NftMetadataJson } from "@/app/blueprint/types";
 import { Metaplex } from "@metaplex-foundation/js";
-import { PublicKey } from "@solana/web3.js";
-import { CREATOR_ADDRESS } from "constants/constants";
+import { Connection, PublicKey } from "@solana/web3.js";
+import { CREATOR_ADDRESS, RPC_ENDPOINT } from "constants/constants";
 
 export type ModeledNftMetadata = {
   name: string;
@@ -11,19 +11,18 @@ export type ModeledNftMetadata = {
 
 interface Props {
   publicKey: PublicKey;
-  connection: any;
   setIsLoading?: (isLoading: boolean) => void;
   setHasBeenFetched?: (hasBeenFetched: boolean) => void;
 }
 
 export const fetchDaoNfts = async ({
   publicKey,
-  connection,
   setIsLoading,
   setHasBeenFetched,
 }: Props): Promise<any[]> => {
   setIsLoading && setIsLoading(true);
   return new Promise(async (resolve, reject) => {
+    const connection = new Connection(RPC_ENDPOINT, "confirmed");
     const metaplex = Metaplex.make(connection);
 
     console.log("address", publicKey.toString());
@@ -35,6 +34,7 @@ export const fetchDaoNfts = async ({
 
       const nftCollection = nftMetasFromMetaplex.filter(
         ({ creators }: { creators: any }) => {
+          console.log({ creators });
           return creators?.[0]?.address?.toString() === CREATOR_ADDRESS;
         }
       );
@@ -42,6 +42,7 @@ export const fetchDaoNfts = async ({
       console.log({
         nftMetasFromMetaplex,
         nftCollection,
+        CREATOR_ADDRESS: CREATOR_ADDRESS,
       });
 
       if (!nftCollection.length) {
