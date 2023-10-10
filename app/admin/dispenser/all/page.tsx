@@ -5,6 +5,7 @@ import { Card } from "@/features/UI/card";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import Spinner from "@/features/UI/spinner";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
+import { GET_DISPENSERS } from "@/graphql/queries/get-dispensers";
 import { useAdmin } from "@/hooks/admin";
 import { useQuery } from "@apollo/client";
 import { RemoveCircleOutline } from "@mui/icons-material";
@@ -21,7 +22,7 @@ export default function DashboardPage() {
   const user = useUserData();
   const { isAdmin } = useAdmin();
 
-  const { data, loading, error, refetch } = useQuery(GET_DISPENSER_BY_ID, {
+  const { data, loading, error, refetch } = useQuery(GET_DISPENSERS, {
     skip: !user,
     onCompleted: ({ dispensers }: { dispensers: Dispenser[] }) => {
       const brokenDispensers = dispensers.filter(
