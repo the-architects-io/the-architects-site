@@ -46,6 +46,7 @@ export default function DispenserClaimPage({ params }: { params: any }) {
           : current;
       });
       setLastClaimTime(lastClaimTimeToken?.lastClaim?.createdAt);
+      console.log("lastClaimTimeToken", lastClaimTimeToken);
       setIsFetchingLastClaimTime(false);
     },
   });

@@ -67,6 +67,7 @@ export const DispenserClaimButton = ({
           Already claimed
         </div>
       )}
+      {!isClaimed && isEnabledClaim && hasBeenFetched ? <>1</> : <>0</>}
       {/* {!isClaimed && isEnabledClaim && hasBeenFetched && (
         <PrimaryButton onClick={handleClaimToken}>Claim</PrimaryButton>
       )} */}
