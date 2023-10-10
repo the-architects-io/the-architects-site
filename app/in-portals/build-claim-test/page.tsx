@@ -55,7 +55,6 @@ export default function DispenserClaimTestPage({ params }: { params: any }) {
 
     setIsFetchingNfts(true);
     const nfts = await fetchDaoNfts({
-      connection,
       publicKey: new PublicKey(walletAddress),
       setHasBeenFetched,
     });
@@ -64,7 +63,7 @@ export default function DispenserClaimTestPage({ params }: { params: any }) {
     setIsFetchingNfts(false);
     setHasBeenFetched(true);
     setNumberOfDaoNftsHeld(nfts?.length || 0);
-  }, [connection, inPortalsWalletAddress, walletAdapterWalletAddress]);
+  }, [inPortalsWalletAddress, walletAdapterWalletAddress]);
 
   const requestPublicKey = () => {
     PortalsSdk.requestPublicKey("https://theportal.to", (publicKey: string) => {
