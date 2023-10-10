@@ -64,6 +64,18 @@ export const fetchDaoNfts = async ({
         return;
       }
 
+      console.log("====================================");
+      console.log("nftCollection", { nftCollection });
+      console.log("addresses", {
+        addresses: nftCollection.map(({ address }) => address),
+      });
+      console.log("addressesToString", {
+        addressesToString: nftCollection.map(({ address }) =>
+          address.toString()
+        ),
+      });
+      console.log("====================================");
+
       // if (!withMetadata) {
       //   setIsLoading && setIsLoading(false);
       //   setHasBeenFetched && setHasBeenFetched(true);
