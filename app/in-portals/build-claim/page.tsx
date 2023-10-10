@@ -62,7 +62,7 @@ export default function DispenserClaimPage({ params }: { params: any }) {
     console.log("handleFetchDaoNfts");
     setIsFetchingNfts(true);
     const nfts = await fetchDaoNfts({
-      // withMetadata: false,
+      withMetadata: false,
       publicKey: new PublicKey(inPortalsWalletAddress),
       setHasBeenFetched,
     });
