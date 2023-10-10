@@ -67,9 +67,9 @@ export const DispenserClaimButton = ({
           Already claimed
         </div>
       )}
-      {!isClaimed && isEnabledClaim && hasBeenFetched && (
+      {/* {!isClaimed && isEnabledClaim && hasBeenFetched && (
         <PrimaryButton onClick={handleClaimToken}>Claim</PrimaryButton>
-      )}
+      )} */}
     </div>
   );
 };

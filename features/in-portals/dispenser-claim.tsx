@@ -175,8 +175,7 @@ export const DispenserClaim = ({
             setIsClaiming={setIsClaiming}
             setWasClaimSucessful={setWasClaimSucessful}
             hasBeenFetched={hasBeenFetched}
-            // isEnabledClaim={isEnabledClaim}
-            isEnabledClaim={false}
+            isEnabledClaim={isEnabledClaim}
             setTxAddress={setTxAddress}
             mintAddresses={collectionNfts?.map((nft) => nft.mintAddress)}
           />
