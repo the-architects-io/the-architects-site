@@ -39,6 +39,11 @@ export const fetchDaoNfts = async ({
         }
       );
 
+      console.log({
+        nftMetasFromMetaplex,
+        nftCollection,
+      });
+
       if (!nftCollection.length) {
         setIsLoading && setIsLoading(false);
         setHasBeenFetched && setHasBeenFetched(true);
@@ -59,6 +64,8 @@ export const fetchDaoNfts = async ({
         };
         nftsWithMetadata.push(metadata);
       }
+
+      console.log({ nftsWithMetadata });
 
       resolve(nftsWithMetadata);
     } catch (error) {
