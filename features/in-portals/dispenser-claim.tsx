@@ -87,10 +87,25 @@ export const DispenserClaim = ({
   });
 
   useEffect(() => {
+    console.log({
+      isFetching,
+      numberOfDaoNftsHeld,
+      lastClaimTime,
+      collectionNfts,
+      dispenser,
+    });
+
     if (wasClaimSucessful) {
       setIsEnabledClaim(false);
     }
-  }, [wasClaimSucessful]);
+  }, [
+    collectionNfts,
+    dispenser,
+    isFetching,
+    lastClaimTime,
+    numberOfDaoNftsHeld,
+    wasClaimSucessful,
+  ]);
 
   if (isLoading) {
     return (
