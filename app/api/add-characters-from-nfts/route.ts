@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         noop: true,
-        endpoint: "add-character-from-nfts",
+        endpoint: "add-characters-from-nfts",
       },
       {
         status: 200,

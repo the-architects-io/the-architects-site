@@ -1,6 +1,7 @@
 import { BlueprintApiActions } from "@/app/blueprint/types";
 import { BASE_URL, ENV } from "@/constants/constants";
 import { logMappedError, mapErrorToResponse } from "@/utils/errors/log-error";
+import { computeSignature } from "@/utils/get-signature-from-one-time-token";
 import axios from "axios";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -50,8 +51,6 @@ const BlueprintApiActionUrls: {
   [UNBIND_WALLET_FROM_USER]: `${BASE_URL}/api/unbind-wallet-from-user`,
 };
 
-//... (your imports and constants)
-
 class RequestHandlerBuilder {
   constructor(private action: string, private url: string) {}
 
@@ -100,12 +99,60 @@ const handlers = Object.keys(BlueprintApiActions).reduce((acc, actionKey) => {
   return acc;
 }, {} as Record<string, Function>);
 
-export async function POST(req: NextRequest) {
-  const { action, params } = await req.json();
+const oneTimeNoncesCache: Record<string, boolean> = {};
 
+export async function POST(req: NextRequest) {
+  const signatureHeader = req.headers.get("x-signature");
+  const timestampHeader = req.headers.get("x-timestamp");
+  const nonceHeader = req.headers.get("x-nonce");
+
+  console.log({
+    signatureHeader,
+    timestampHeader,
+    nonceHeader,
+  });
+
+  if (!signatureHeader || !timestampHeader || !nonceHeader) {
+    return NextResponse.json(
+      { error: "Missing required headers" },
+      { status: 400 }
+    );
+  }
+
+  // Check if nonce has been used before
+  if (oneTimeNoncesCache[nonceHeader]) {
+    return NextResponse.json(
+      { error: "Nonce has been used before" },
+      { status: 401 }
+    );
+  }
+
+  // Construct the payload from body and verify the signature
+  const { action, params } = await req.json();
+  const clientMetadata = req.headers.get("User-Agent") || "";
+  const dataToVerify = `${JSON.stringify(
+    params
+  )}${nonceHeader}${clientMetadata}${timestampHeader}`;
+
+  const isValidSignature = await verifySignature(
+    dataToVerify,
+    nonceHeader,
+    signatureHeader,
+    clientMetadata
+  );
+
+  if (!isValidSignature) {
+    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+  }
+
+  // Mark nonce as used
+  oneTimeNoncesCache[nonceHeader] = true;
+
+  // Existing logic follows...
   if (!action) {
     return NextResponse.json({ error: "No action provided" }, { status: 500 });
   }
+
   const typedAction = action as BlueprintApiActions | string;
 
   if (typedAction in BlueprintApiActionUrls) {
@@ -118,4 +165,31 @@ export async function POST(req: NextRequest) {
       status: 500,
     });
   }
+}
+
+async function verifySignature(
+  data: string,
+  nonce: string,
+  providedSignature: string,
+  clientMetadata: string
+): Promise<boolean> {
+  console.log({
+    data,
+    nonce,
+    providedSignature,
+    clientMetadata,
+  });
+  const computedSignature = await computeSignature(
+    data,
+    nonce,
+    Date.now().toString(),
+    clientMetadata
+  );
+
+  console.log({
+    computedSignature,
+    providedSignature,
+  });
+
+  return computedSignature === providedSignature;
 }

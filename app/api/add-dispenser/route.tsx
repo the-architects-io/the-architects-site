@@ -19,6 +19,8 @@ export async function POST(req: NextRequest) {
   const { imageUrl, name, description, noop, ownerId, apiKey } =
     await req.json();
 
+  const isValidRequest = !!(process.env.BLUEPRINT_API_KEY === apiKey);
+
   if (!process.env.API_ACCESS_HOST_LIST) {
     return NextResponse.json(
       {
@@ -44,17 +46,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error: `API access not allowed for host: ${host}`,
-        status: 500,
-      },
-      { status: 500 }
-    );
-  }
-
-  if (apiKey !== process.env.BLUEPRINT_API_KEY) {
-    console.log("Invalid API key: ", apiKey);
-    return NextResponse.json(
-      {
-        error: "Invalid API key",
         status: 500,
       },
       { status: 500 }

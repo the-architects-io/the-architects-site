@@ -14,6 +14,7 @@ import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { BlueprintApiActions, Dispenser } from "@/app/blueprint/types";
 import { useUserData } from "@nhost/nextjs";
 import { useEffect } from "react";
+import { sendBlueprintRequest } from "@/utils/send-blueprint-request";
 
 export type DispenserResponse = {
   id: string;
@@ -51,13 +52,11 @@ export const AddDispenserForm = ({
       }
 
       try {
-        const { data: dispenser }: { data: Dispenser } = await axios.post(
-          "/api/blueprint",
-          {
+        const { data: dispenser }: { data: Dispenser } =
+          await sendBlueprintRequest({
             action: BlueprintApiActions.CREATE_DISPENSER,
             params: values,
-          }
-        );
+          });
 
         console.log({ dispenser });
 
