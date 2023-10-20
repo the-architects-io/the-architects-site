@@ -14,6 +14,8 @@ type Data =
     };
 
 export async function POST(req: NextRequest) {
+  const hostWhitelist = process.env.API_ACCESS_HOST_LIST || "";
+
   const { imageUrl, name, description, noop, ownerId, apiKey } =
     await req.json();
 
@@ -27,7 +29,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const hostWhitelist = process.env.API_ACCESS_HOST_LIST;
   const host = req.headers.get("x-forwarded-host") || "";
   const isValidHost = hostWhitelist.indexOf(host) > -1 || ENV === "local";
 

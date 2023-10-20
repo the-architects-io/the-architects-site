@@ -17,13 +17,14 @@ type Data =
     };
 
 export async function POST(req: NextRequest) {
+  return NextResponse.json({ error: "Not implemented" }, { status: 500 });
   const { amount, dispenserId, imageUrl, name, itemId, noop } =
     await req.json();
 
   if (noop)
     return NextResponse.json({
       noop: true,
-      endpoint: "add-dispenser",
+      endpoint: "add-cost-collection",
       status: 200,
     });
 

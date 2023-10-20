@@ -18,6 +18,7 @@ type Data =
     };
 
 export async function POST(req: NextRequest) {
+  return NextResponse.json({ error: "Not implemented" }, { status: 500 });
   const {
     amount,
     dispenserId,
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
   if (noop)
     return NextResponse.json({
       noop: true,
-      endpoint: "add-dispenser",
+      endpoint: "add-item-reward-collection",
       status: 200,
     });
 

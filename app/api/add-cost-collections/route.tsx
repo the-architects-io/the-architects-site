@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   if (noop)
     return NextResponse.json({
       noop: true,
-      endpoint: "add-dispenser",
+      endpoint: "add-cost-collections",
       status: 200,
     });
 

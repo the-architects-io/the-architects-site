@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   if (noop)
     return NextResponse.json({
       noop: true,
-      endpoint: "add-dispenser",
+      endpoint: "add-reward-collections",
       status: 200,
     });
 

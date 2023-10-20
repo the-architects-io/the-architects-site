@@ -1,157 +1,121 @@
-import {
-  BlueprintApiActions,
-  MappedErrorResponse,
-} from "@/app/blueprint/types";
+import { BlueprintApiActions } from "@/app/blueprint/types";
 import { BASE_URL, ENV } from "@/constants/constants";
-import { logError } from "@/utils/errors/log-error";
+import { logMappedError, mapErrorToResponse } from "@/utils/errors/log-error";
 import axios from "axios";
 import { NextResponse, type NextRequest } from "next/server";
 
-const { CREATE_DISENSER, DISPENSE_TOKENS } = BlueprintApiActions;
+const {
+  ADD_CHARACTERS_FROM_NFTS,
+  ADD_COST_COLLECTIONS,
+  ADD_ITEM_COLLECTIONS,
+  ADD_ITEMS,
+  ADD_NFTS,
+  ADD_TOKEN,
+  ADD_TOKENS,
+  BIND_ITEM_TO_TOKEN,
+  CREATE_DISPENSER,
+  DISPENSE_TOKENS,
+  GET_TOKEN_BALANCES_FROM_HELIUS,
+  GET_TOKEN_METADATA_FROM_HELIUS,
+  LINK_WALLET_TO_USER,
+  MINT_TOKEN,
+  UPDATE_DISPENSER,
+  UPDATE_DISPENSER_DISPLAY,
+  UPDATE_DISPENSER_REWARDS,
+  UNBIND_ITEM_FROM_TOKEN,
+  UNBIND_WALLET_FROM_USER,
+} = BlueprintApiActions;
 
-const BlueprintApiActionUrls = {
-  [CREATE_DISENSER]: `${BASE_URL}/api/add-dispenser`,
+const BlueprintApiActionUrls: {
+  [key in BlueprintApiActions]: string;
+} = {
+  [ADD_CHARACTERS_FROM_NFTS]: `${BASE_URL}/api/add-characters-from-nfts`,
+  [ADD_COST_COLLECTIONS]: `${BASE_URL}/api/add-cost-collections`,
+  [ADD_ITEM_COLLECTIONS]: `${BASE_URL}/api/add-item-collections`,
+  [ADD_ITEMS]: `${BASE_URL}/api/add-items`,
+  [ADD_NFTS]: `${BASE_URL}/api/add-nfts`,
+  [ADD_TOKEN]: `${BASE_URL}/api/add-token`,
+  [ADD_TOKENS]: `${BASE_URL}/api/add-tokens`,
+  [BIND_ITEM_TO_TOKEN]: `${BASE_URL}/api/bind-item-to-token`,
+  [CREATE_DISPENSER]: `${BASE_URL}/api/add-dispenser`,
   [DISPENSE_TOKENS]: `${BASE_URL}/api/dispense-tokens`,
+  [GET_TOKEN_BALANCES_FROM_HELIUS]: `${BASE_URL}/api/get-token-balances-from-helius`,
+  [GET_TOKEN_METADATA_FROM_HELIUS]: `${BASE_URL}/api/get-token-metadata-from-helius`,
+  [LINK_WALLET_TO_USER]: `${BASE_URL}/api/link-wallet-to-user`,
+  [MINT_TOKEN]: `${BASE_URL}/api/mint-token`,
+  [UPDATE_DISPENSER]: `${BASE_URL}/api/update-dispenser`,
+  [UPDATE_DISPENSER_DISPLAY]: `${BASE_URL}/api/update-dispenser-display`,
+  [UPDATE_DISPENSER_REWARDS]: `${BASE_URL}/api/update-dispenser-rewards`,
+  [UNBIND_ITEM_FROM_TOKEN]: `${BASE_URL}/api/unbind-item-from-token`,
+  [UNBIND_WALLET_FROM_USER]: `${BASE_URL}/api/unbind-wallet-from-user`,
 };
 
-export const mapErrorToResponse = (error: any): MappedErrorResponse => {
-  const status =
-    error?.response?.status || error?.response?.data?.status || 500;
-  console.log({
-    statuses: {
-      "error?.response?.status": error?.response?.status,
-      "error?.response?.data?.status": error?.response?.data?.status,
-      status: status,
-    },
-  });
-  const statusText =
-    error?.response?.data?.statusText || "Internal Server Error";
-  const message = error?.response?.statusText || "Internal Server Error";
-  const errorMessage = error?.response?.data?.error;
+//... (your imports and constants)
 
-  return {
-    status: status || 500,
-    error: { message, errorMessage, status, statusText },
-  };
-};
+class RequestHandlerBuilder {
+  constructor(private action: string, private url: string) {}
 
-const handleCreateDispenser = async (params: any) => {
-  console.log({
-    BlueprintApiActionUrls,
-    CREATE_DISENSER,
-    params,
-    apiKey: process.env.BLUEPRINT_API_KEY,
-    action: CREATE_DISENSER,
-    url: BlueprintApiActionUrls[CREATE_DISENSER],
-  });
-
-  try {
-    const { data, status, statusText, config } = await axios.post(
-      BlueprintApiActionUrls[CREATE_DISENSER],
-      {
-        ...params,
-        apiKey: process.env.BLUEPRINT_API_KEY,
-      }
-    );
-
-    console.log("handleCreateDispenser", {
-      status,
-      config,
-    });
-
-    return NextResponse.json({
-      ...data,
-      status: data?.status || 500,
-      statusText: data?.status !== 200 ? data?.statusText : statusText,
-      config,
-      action: CREATE_DISENSER,
-      params,
-    });
-  } catch (rawError: any) {
-    let error = mapErrorToResponse(rawError);
-
-    logError(error);
-    return NextResponse.json({ error });
-  }
-};
-
-const handleDispenseTokens = async (params: any) => {
-  try {
-    const { data, status, statusText, config } = await axios.post(
-      BlueprintApiActionUrls[DISPENSE_TOKENS],
-      {
-        ...params,
-        apiKey: process.env.BLUEPRINT_API_KEY,
-      }
-    );
-
-    return NextResponse.json(
-      {
-        status: status || 500,
-        statusText,
-        config,
-        action: DISPENSE_TOKENS,
+  build() {
+    return async (params: any) => {
+      console.log({
+        BlueprintApiActionUrls,
+        action: this.action,
         params,
-        ...data,
-      },
-      {
-        status: status || 500,
-      }
-    );
-  } catch (rawError: any) {
-    let { error, status } = mapErrorToResponse(rawError);
+        apiKey: process.env.BLUEPRINT_API_KEY,
+        url: this.url,
+      });
 
-    logError({ error, status });
-    return NextResponse.json({ error }, { status });
+      try {
+        const { data, status, statusText, config } = await axios.post(
+          this.url,
+          {
+            ...params,
+            apiKey: process.env.BLUEPRINT_API_KEY,
+          }
+        );
+
+        return NextResponse.json({
+          ...data,
+          status: data?.status || status || 500,
+          statusText: data?.status !== 200 ? data?.statusText : statusText,
+          config,
+          action: this.action,
+          params,
+        });
+      } catch (rawError: any) {
+        const { error, status } = mapErrorToResponse(rawError);
+        logMappedError({ error, status });
+        return NextResponse.json({ error }, { status });
+      }
+    };
   }
-};
+}
+
+const handlers = Object.keys(BlueprintApiActions).reduce((acc, actionKey) => {
+  const action = actionKey as BlueprintApiActions;
+  acc[action] = new RequestHandlerBuilder(
+    action,
+    BlueprintApiActionUrls[action]
+  ).build();
+  return acc;
+}, {} as Record<string, Function>);
 
 export async function POST(req: NextRequest) {
-  const { action, params, noop } = await req.json();
+  const { action, params } = await req.json();
 
-  if (!process.env.API_ACCESS_HOST_LIST) {
-    return NextResponse.json(
-      {
-        error: "API access not configured",
-        status: 500,
-      },
-      { status: 500 }
-    );
+  if (!action) {
+    return NextResponse.json({ error: "No action provided" }, { status: 500 });
   }
+  const typedAction = action as BlueprintApiActions | string;
 
-  const hostWhitelist = process.env.API_ACCESS_HOST_LIST;
-  const host = req.headers.get("x-forwarded-host") || "";
-  const isValidHost = hostWhitelist.indexOf(host) > -1;
-
-  if (ENV !== "local" && !isValidHost) {
-    return NextResponse.json(
-      {
-        error: `API access not allowed for host: ${host}`,
-        status: 500,
-      },
-      { status: 500 }
-    );
-  }
-
-  if (noop) {
-    return NextResponse.json(
-      {
-        noop: true,
-        endpoint: "blueprint",
-      },
-      { status: 200 }
-    );
-  }
-
-  switch (action) {
-    case BlueprintApiActions.CREATE_DISENSER:
-      return handleCreateDispenser(params);
-    case BlueprintApiActions.DISPENSE_TOKENS:
-      return handleDispenseTokens(params);
-    default:
-      return NextResponse.json({
-        error: "Invalid action",
-        status: 500,
-      });
+  if (typedAction in BlueprintApiActionUrls) {
+    if (handlers[typedAction]) {
+      return handlers[typedAction](params);
+    }
+  } else {
+    return NextResponse.json({
+      error: "Invalid action",
+      status: 500,
+    });
   }
 }

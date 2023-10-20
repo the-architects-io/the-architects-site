@@ -21,6 +21,13 @@ type Data =
     };
 
 export async function POST(req: NextRequest) {
+  return NextResponse.json<Data>(
+    {
+      error: "Not implemented",
+    },
+    { status: 501 }
+  );
+
   logErrorDeprecated({
     error: {
       code: 2,

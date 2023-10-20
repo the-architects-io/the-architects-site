@@ -1,20 +1,9 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { ADD_ITEM } from "@/graphql/mutations/add-item";
 import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { Item, NoopResponse } from "@/app/blueprint/types";
+import { Item } from "@/app/blueprint/types";
 import { ADD_ITEMS } from "@/graphql/mutations/add-items";
-import { GET_ITEMS_BY_IDS } from "@/graphql/queries/get-items-by-ids";
-import { GET_ITEMS_BY_TOKEN_MINT_ADDRESSES } from "@/graphql/queries/get-items-by-token-mint-addresses";
 import { GET_ITEMS_BY_TOKEN_IDS } from "@/graphql/queries/get-items-by-token-ids";
-
-type Data =
-  | Item[]
-  | NoopResponse
-  | {
-      error: unknown;
-    };
 
 type ItemArg = {
   name: string;

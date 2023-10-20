@@ -3,7 +3,6 @@ import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { ItemCollection, NoopResponse } from "@/app/blueprint/types";
-import { ADD_ITEM_COLLECTION } from "@/graphql/mutations/add-item-collection";
 import { ADD_ITEM_COLLECTIONS } from "@/graphql/mutations/add-item-collections";
 
 type Data =
@@ -19,7 +18,7 @@ export async function POST(req: NextRequest) {
   if (noop)
     return NextResponse.json({
       noop: true,
-      endpoint: "add-item-collection",
+      endpoint: "add-item-collections",
       status: 200,
     });
 

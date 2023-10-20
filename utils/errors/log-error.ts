@@ -14,7 +14,28 @@ type Params = {
   walletId?: string;
 };
 
-export const logError = async (
+export const mapErrorToResponse = (error: any): MappedErrorResponse => {
+  const status =
+    error?.response?.status || error?.response?.data?.status || 500;
+  console.log({
+    statuses: {
+      "error?.response?.status": error?.response?.status,
+      "error?.response?.data?.status": error?.response?.data?.status,
+      status: status,
+    },
+  });
+  const statusText =
+    error?.response?.data?.statusText || "Internal Server Error";
+  const message = error?.response?.statusText || "Internal Server Error";
+  const errorMessage = error?.response?.data?.error;
+
+  return {
+    status: status || 500,
+    error: { message, errorMessage, status, statusText },
+  };
+};
+
+export const logMappedError = async (
   error: MappedErrorResponse,
   metadata: any = {}
 ) => {

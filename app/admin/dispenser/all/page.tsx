@@ -22,7 +22,7 @@ export default function DashboardPage() {
   const user = useUserData();
   const { isAdmin } = useAdmin();
 
-  const { data, loading, error, refetch } = useQuery(GET_DISPENSERS, {
+  const { loading, error } = useQuery(GET_DISPENSERS, {
     skip: !user,
     onCompleted: ({ dispensers }: { dispensers: Dispenser[] }) => {
       const brokenDispensers = dispensers.filter(
