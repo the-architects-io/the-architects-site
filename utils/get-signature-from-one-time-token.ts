@@ -1,16 +1,9 @@
 import { BASE_URL } from "@/constants/constants";
 
-export async function computeSignature(
-  data: string,
-  nonce: string,
-  timestamp: string,
-  clientMetadata: string
-) {
-  const payload = `${data}${nonce}${clientMetadata}${timestamp}`;
-
+export async function computeSignature(payload: string) {
   // Convert the string to an array of bytes
   const encoder = new TextEncoder();
-  const dataAsBytes = encoder.encode(data);
+  const dataAsBytes = encoder.encode(payload);
 
   // Hash the data
   const hashBuffer = await crypto.subtle.digest("SHA-256", dataAsBytes);
@@ -36,12 +29,9 @@ export const generateSignedPayload = async (
 
   const clientMetadata = navigator.userAgent;
   const payload = `${data}${nonce}${clientMetadata}${timestamp}`;
-  const signature = await computeSignature(
-    data,
-    nonce,
-    timestamp,
-    clientMetadata
-  );
+  const signature = await computeSignature(payload);
+
+  console.log(`generated payload: ${payload}`);
 
   return {
     signature,

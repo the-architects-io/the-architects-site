@@ -99,18 +99,29 @@ const handlers = Object.keys(BlueprintApiActions).reduce((acc, actionKey) => {
   return acc;
 }, {} as Record<string, Function>);
 
+async function verifySignature(
+  payload: string,
+  providedSignature: string
+): Promise<boolean> {
+  console.log({
+    payload,
+  });
+  const computedSignature = await computeSignature(payload);
+
+  console.log({
+    computedSignature,
+    providedSignature,
+  });
+
+  return computedSignature === providedSignature;
+}
+
 const oneTimeNoncesCache: Record<string, boolean> = {};
 
 export async function POST(req: NextRequest) {
   const signatureHeader = req.headers.get("x-signature");
   const timestampHeader = req.headers.get("x-timestamp");
   const nonceHeader = req.headers.get("x-nonce");
-
-  console.log({
-    signatureHeader,
-    timestampHeader,
-    nonceHeader,
-  });
 
   if (!signatureHeader || !timestampHeader || !nonceHeader) {
     return NextResponse.json(
@@ -130,16 +141,12 @@ export async function POST(req: NextRequest) {
   // Construct the payload from body and verify the signature
   const { action, params } = await req.json();
   const clientMetadata = req.headers.get("User-Agent") || "";
-  const dataToVerify = `${JSON.stringify(
+
+  const payload = `${JSON.stringify(
     params
   )}${nonceHeader}${clientMetadata}${timestampHeader}`;
 
-  const isValidSignature = await verifySignature(
-    dataToVerify,
-    nonceHeader,
-    signatureHeader,
-    clientMetadata
-  );
+  const isValidSignature = await verifySignature(payload, signatureHeader);
 
   if (!isValidSignature) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
@@ -165,31 +172,4 @@ export async function POST(req: NextRequest) {
       status: 500,
     });
   }
-}
-
-async function verifySignature(
-  data: string,
-  nonce: string,
-  providedSignature: string,
-  clientMetadata: string
-): Promise<boolean> {
-  console.log({
-    data,
-    nonce,
-    providedSignature,
-    clientMetadata,
-  });
-  const computedSignature = await computeSignature(
-    data,
-    nonce,
-    Date.now().toString(),
-    clientMetadata
-  );
-
-  console.log({
-    computedSignature,
-    providedSignature,
-  });
-
-  return computedSignature === providedSignature;
 }

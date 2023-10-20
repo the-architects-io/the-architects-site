@@ -9,7 +9,7 @@ export async function sendBlueprintRequest(payload: {
   const timestamp = Date.now().toString();
 
   const { signature, nonce } = await generateSignedPayload(
-    JSON.stringify(payload),
+    JSON.stringify(payload.params),
     timestamp
   );
 

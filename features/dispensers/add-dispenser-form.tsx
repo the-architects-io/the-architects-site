@@ -52,11 +52,10 @@ export const AddDispenserForm = ({
       }
 
       try {
-        const { data: dispenser }: { data: Dispenser } =
-          await sendBlueprintRequest({
-            action: BlueprintApiActions.CREATE_DISPENSER,
-            params: values,
-          });
+        const dispenser: Dispenser = await sendBlueprintRequest({
+          action: BlueprintApiActions.CREATE_DISPENSER,
+          params: values,
+        });
 
         console.log({ dispenser });
 
