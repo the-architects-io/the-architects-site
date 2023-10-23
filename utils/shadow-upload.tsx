@@ -15,9 +15,11 @@ import showToast from "@/features/toasts/show-toast";
 export default function ShadowUpload({
   drive,
   accountPublicKey,
+  onCompleted,
 }: {
   drive: ShdwDrive;
   accountPublicKey: PublicKey;
+  onCompleted?: () => void;
 }) {
   const { isAdmin } = useAdmin();
   const [files, setFiles] = useState<FileList | null>(null);
@@ -46,15 +48,39 @@ export default function ShadowUpload({
           setIsSending(true);
           let upload;
           if (files.length === 1) {
-            upload = await drive.uploadFile(accountPublicKey, files[0]);
+            try {
+              upload = await drive.uploadFile(accountPublicKey, files[0]);
+              onCompleted?.();
+            } catch (error) {
+              console.log({ error });
+              showToast({
+                primaryMessage: "Error",
+                secondaryMessage: `Failed to upload`,
+              });
+              return;
+            } finally {
+              setIsSending(false);
+              onCompleted?.();
+            }
           } else {
-            upload = await drive.uploadMultipleFiles(
-              accountPublicKey,
-              files,
-              10
-            );
+            try {
+              upload = await drive.uploadMultipleFiles(
+                accountPublicKey,
+                files,
+                10
+              );
+            } catch (error) {
+              console.log({ error });
+              showToast({
+                primaryMessage: "Error",
+                secondaryMessage: `Failed to upload`,
+              });
+              return;
+            } finally {
+              setIsSending(false);
+              onCompleted?.();
+            }
           }
-          console.log(upload);
           console.log({ upload });
           setIsSending(false);
           showToast({

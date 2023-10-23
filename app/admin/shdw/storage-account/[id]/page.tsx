@@ -135,6 +135,22 @@ export default function StorageAccountPage({
         ({`${getAbbreviatedAddress(params.id)}`})
       </h2>
 
+      {!!shadowDrive && !!storageAccount && (
+        <Panel className="flex flex-col justify-center">
+          <PrimaryButton className="mb-4" onClick={handleDeleteDrive}>
+            Delete drive
+          </PrimaryButton>
+          <PrimaryButton className="mb-4" onClick={handleDeleteAllFiles}>
+            Delete all files
+          </PrimaryButton>
+          <ShadowUpload
+            drive={shadowDrive}
+            accountPublicKey={new PublicKey(params.id)}
+            onCompleted={() => fetchStoredObjects(shadowDrive)}
+          />
+        </Panel>
+      )}
+
       <div className="mb-8 w-full max-w-xl">
         {!!storedObjectKeys?.length ? (
           <div className="flex flex-col w-full">
@@ -169,20 +185,6 @@ export default function StorageAccountPage({
           <div className="text-center py-8 italic">This drive is empty</div>
         )}
       </div>
-      {!!shadowDrive && !!storageAccount && (
-        <Panel className="flex flex-col justify-center">
-          <PrimaryButton className="mb-4" onClick={handleDeleteDrive}>
-            Delete drive
-          </PrimaryButton>
-          <PrimaryButton className="mb-4" onClick={handleDeleteAllFiles}>
-            Delete all files
-          </PrimaryButton>
-          <ShadowUpload
-            drive={shadowDrive}
-            accountPublicKey={new PublicKey(params.id)}
-          />
-        </Panel>
-      )}
     </ContentWrapper>
   );
 }
