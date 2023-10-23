@@ -160,7 +160,7 @@ export default function StorageAccountPage({
         </Panel>
       )}
 
-      <div className="mb-8 w-full max-w-xl">
+      <div className="mb-8 w-full max-w-xl my-8">
         {!!storedObjectKeys?.length ? (
           <div className="flex flex-col w-full">
             <div className="border-b border-gray-600"></div>
