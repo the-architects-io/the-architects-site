@@ -1,7 +1,10 @@
 "use client";
 import { RPC_ENDPOINT } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
+import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
+import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
+import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import { Panel } from "@/features/UI/panel";
 import showToast from "@/features/toasts/show-toast";
 import { getAbbreviatedAddress } from "@/utils/formatting";
@@ -11,6 +14,7 @@ import { PublicKey } from "@metaplex-foundation/js";
 import { ShdwDrive, StorageAccountV2 } from "@shadow-drive/sdk";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
+import { useFormik } from "formik";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -28,6 +32,17 @@ export default function StorageAccountPage({
     null
   );
   const [storedObjectKeys, setStoredObjectKeys] = useState<any[]>([]);
+  const [numberOfConcurrentUploads, setNumberOfConcurrentUploads] =
+    useState<string>("3");
+
+  const formik = useFormik({
+    initialValues: {
+      numberOfConcurrentUploads: "3",
+    },
+    onSubmit: (values) => {
+      setNumberOfConcurrentUploads(values.numberOfConcurrentUploads);
+    },
+  });
 
   const fetchStoredObjects = async (drive: ShdwDrive) => {
     const storedObjects = await drive.listObjects(new PublicKey(params.id));
@@ -152,10 +167,24 @@ export default function StorageAccountPage({
           <PrimaryButton className="mb-4" onClick={handleDeleteAllFiles}>
             Delete all files
           </PrimaryButton>
+          <FormWrapper
+            className="flex flex-col items-center"
+            onSubmit={formik.handleSubmit}
+          >
+            <FormInputWithLabel
+              label="Number of concurrent uploads"
+              name="numberOfConcurrentUploads"
+              value={formik.values.numberOfConcurrentUploads}
+              onChange={formik.handleChange}
+            />
+          </FormWrapper>
           <ShadowUpload
             drive={shadowDrive}
             accountPublicKey={new PublicKey(params.id)}
             onCompleted={() => fetchStoredObjects(shadowDrive)}
+            numberOfConcurrentUploads={parseInt(
+              formik.values.numberOfConcurrentUploads
+            )}
           />
         </Panel>
       )}

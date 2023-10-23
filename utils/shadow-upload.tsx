@@ -16,10 +16,12 @@ export default function ShadowUpload({
   drive,
   accountPublicKey,
   onCompleted,
+  numberOfConcurrentUploads = 6,
 }: {
   drive: ShdwDrive;
   accountPublicKey: PublicKey;
   onCompleted?: () => void;
+  numberOfConcurrentUploads?: number;
 }) {
   const { isAdmin } = useAdmin();
   const [files, setFiles] = useState<FileList | null>(null);
@@ -67,7 +69,7 @@ export default function ShadowUpload({
               upload = await drive.uploadMultipleFiles(
                 accountPublicKey,
                 files,
-                10
+                numberOfConcurrentUploads
               );
             } catch (error) {
               console.log({ error });
@@ -97,7 +99,11 @@ export default function ShadowUpload({
           onChange={(e) => setFiles(!!e.target.files ? e.target.files : null)}
         />
         <br />
-        <PrimaryButton type="submit" disabled={isSending}>
+        <PrimaryButton
+          type="submit"
+          disabled={isSending || isNaN(numberOfConcurrentUploads)}
+          className="w-1/2"
+        >
           {isSending ? <Spinner /> : "Upload"}
         </PrimaryButton>
       </form>
