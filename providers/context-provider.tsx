@@ -85,7 +85,7 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
       : WalletAdapterNetwork.Devnet;
 
   // You can also provide a custom RPC endpoint
-  const endpoint = useMemo(() => RPC_ENDPOINT_DEVNET, []);
+  const endpoint = useMemo(() => RPC_ENDPOINT, []);
 
   // @solana/wallet-adapter-wallets includes all the adapters but supports tree shaking and lazy loading --
   // Only the wallets you configure here will be compiled into your application, and only the dependencies
