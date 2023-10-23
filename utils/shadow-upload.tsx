@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { ShadowFile, ShdwDrive } from "@shadow-drive/sdk";
+import { ShdwDrive } from "@shadow-drive/sdk";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import FormData from "form-data";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
@@ -9,6 +9,8 @@ import { useFormik } from "formik";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { PublicKey } from "@metaplex-foundation/js";
+import Spinner from "@/features/UI/spinner";
+import showToast from "@/features/toasts/show-toast";
 
 export default function ShadowUpload({
   drive,
@@ -18,9 +20,10 @@ export default function ShadowUpload({
   accountPublicKey: PublicKey;
 }) {
   const { isAdmin } = useAdmin();
-  const [file, setFile] = useState<File | ShadowFile | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [uploadUrl, setUploadUrl] = useState<String | null>(null);
   const [txnSig, setTxnSig] = useState<String | null>(null);
+  const [isSending, setIsSending] = useState<boolean>(false);
   const { connection } = useConnection();
   const wallet = useWallet();
 
@@ -40,13 +43,14 @@ export default function ShadowUpload({
           const drive = await new ShdwDrive(connection, wallet).init();
           // const getStorageAccount = await drive.getStorageAccount(accountPublicKey);
 
-          const upload = await drive.uploadFile(accountPublicKey, {
-            name: file.name,
-            // @ts-ignore
-            file, // typed as Buffer but should be File
-          });
+          setIsSending(true);
+          const upload = await drive.uploadFile(accountPublicKey, file);
           console.log(upload);
           console.log({ upload });
+          setIsSending(false);
+          showToast({
+            primaryMessage: "Completed",
+          });
           // setUploadUrl(upload.finalized_location);
           // setTxnSig(upload.transaction_signature);
         }}
@@ -57,7 +61,9 @@ export default function ShadowUpload({
           onChange={(e) => setFile(!!e.target.files ? e.target.files[0] : null)}
         />
         <br />
-        <PrimaryButton type="submit">Upload</PrimaryButton>
+        <PrimaryButton type="submit" disabled={isSending}>
+          {isSending ? <Spinner /> : "Upload"}
+        </PrimaryButton>
       </form>
       <div>
         {uploadUrl ? (

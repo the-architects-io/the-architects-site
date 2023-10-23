@@ -58,9 +58,27 @@ export default function StorageAccountPage({
         ({`${getAbbreviatedAddress(params.id)}`})
       </h2>
 
-      <div className="mb-8">
+      <div className="mb-8 w-full max-w-xl">
         {!!storedObjectKeys?.length ? (
-          JSON.stringify(storedObjectKeys, null, 2)
+          <div className="flex flex-col w-full">
+            {storedObjectKeys.map((key) => (
+              <div
+                key={key}
+                className="flex justify-between items-center w-full border-b-2 border-t-2 border-gray-600 py-4"
+              >
+                <div>{key}</div>
+                <div>
+                  <a
+                    href={`https://shdw-drive.genesysgo.net/${params.id}/${key}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    View
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
           <div>This drive is empty.</div>
         )}
