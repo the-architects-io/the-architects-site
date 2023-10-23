@@ -17,6 +17,8 @@ import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { Line, Circle } from "rc-progress";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { useUserData } from "@nhost/nextjs";
+import { sendBlueprintRequest } from "@/utils/send-blueprint-request";
+import { BlueprintApiActions, Character, Token } from "@/app/blueprint/types";
 
 export default function FetchPage() {
   const { publicKey } = useWallet();
@@ -44,21 +46,25 @@ export default function FetchPage() {
       let returnData;
 
       try {
-        const { data: characterData } = await axios.post(
-          "/api/add-characters-from-nfts",
-          {
+        const character: Character = await sendBlueprintRequest({
+          action: BlueprintApiActions.ADD_CHARACTERS_FROM_NFTS,
+          params: {
             hashList,
             nftCollectionId,
-          }
-        );
-        const { data: nftData } = await axios.post("/api/add-nfts", {
-          hashList,
-          nftCollectionId,
+          },
+        });
+
+        const nfts: Token[] = await sendBlueprintRequest({
+          action: BlueprintApiActions.ADD_NFTS,
+          params: {
+            hashList,
+            nftCollectionId,
+          },
         });
 
         returnData = {
-          ...characterData,
-          ...nftData,
+          ...character,
+          ...nfts,
         };
 
         console.log({
@@ -66,6 +72,7 @@ export default function FetchPage() {
           total,
         });
 
+        // fix with refactor
         if (returnData.message.includes("Character already exists")) {
           setNumberOfSkips((prev) => prev + 1);
         } else {

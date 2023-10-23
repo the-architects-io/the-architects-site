@@ -32,6 +32,13 @@ export async function POST(req: Request) {
   const { noop, dispenserId, recipientAddress, mintAddress, amount, apiKey } =
     await req.json();
 
+  const isValidApiKey = process.env.BLUEPRINT_API_KEY === apiKey;
+
+  if (!isValidApiKey) {
+    console.log("API access not allowed");
+    return NextResponse.json({ error: "API access not allowed", status: 500 });
+  }
+
   if (!process.env.API_ACCESS_HOST_LIST) {
     return NextResponse.json(
       {
@@ -42,31 +49,19 @@ export async function POST(req: Request) {
     );
   }
 
-  const hostWhitelist = process.env.API_ACCESS_HOST_LIST;
-  const host = req.headers.get("x-forwarded-host") || "";
-  const isValidHost = hostWhitelist.indexOf(host) > -1 || ENV === "local";
+  // const hostWhitelist = process.env.API_ACCESS_HOST_LIST;
+  // const host = req.headers.get("x-forwarded-host") || "";
+  // const isValidHost = hostWhitelist.indexOf(host) > -1 || ENV === "local";
 
-  console.log("/api/dispense-tokens", {});
-
-  if (!isValidHost) {
-    return NextResponse.json(
-      {
-        error: `API access not allowed for host: ${host}`,
-        status: 500,
-      },
-      { status: 500 }
-    );
-  }
-
-  if (apiKey !== process.env.BLUEPRINT_API_KEY) {
-    return NextResponse.json(
-      {
-        error: "Invalid API key",
-        status: 500,
-      },
-      { status: 500 }
-    );
-  }
+  // if (!isValidHost) {
+  //   return NextResponse.json(
+  //     {
+  //       error: `API access not allowed for host: ${host}`,
+  //       status: 500,
+  //     },
+  //     { status: 500 }
+  //   );
+  // }
 
   console.log(1);
 

@@ -5,7 +5,24 @@ import { UNBIND_USER_FROM_WALLET } from "@/graphql/mutations/unbind-user-from-wa
 import { Wallet } from "@/app/blueprint/types";
 
 export async function POST(req: NextRequest) {
-  const { address, noop } = await req.json();
+  const { address, noop, apiKey } = await req.json();
+
+  const isValidApiKey = process.env.BLUEPRINT_API_KEY === apiKey;
+
+  if (!isValidApiKey) {
+    console.log("API access not allowed");
+    return NextResponse.json({ error: "API access not allowed", status: 500 });
+  }
+
+  if (!process.env.API_ACCESS_HOST_LIST) {
+    return NextResponse.json(
+      {
+        error: "API access not configured",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
 
   if (noop)
     return NextResponse.json(

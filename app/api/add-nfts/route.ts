@@ -10,7 +10,24 @@ import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import { Token } from "@/app/blueprint/types";
 
 export async function POST(req: NextRequest) {
-  const { hashList, noop, nftCollectionId } = await req.json();
+  const { hashList, noop, nftCollectionId, apiKey } = await req.json();
+
+  if (!process.env.BLUEPRINT_API_KEY) {
+    return NextResponse.json(
+      {
+        error: "API access not configured",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+
+  const isValidApiKey = process.env.BLUEPRINT_API_KEY === apiKey;
+
+  if (!isValidApiKey) {
+    console.log("API access not allowed");
+    return NextResponse.json({ error: "API access not allowed", status: 500 });
+  }
 
   if (noop)
     return NextResponse.json(

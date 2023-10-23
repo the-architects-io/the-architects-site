@@ -18,8 +18,26 @@ export async function POST(req: NextRequest) {
   const name = res.get("name") as string;
   const sellerFeeBasisPoints = res.get("sellerFeeBasisPoints") as string;
   const noop = res.get("noop");
+  const apiKey = res.get("apiKey") as string;
   const tokenOwner = res.get("tokenOwner") as string;
   const imageFile = res.get("imageFile") as File;
+
+  const isValidApiKey = process.env.BLUEPRINT_API_KEY === apiKey;
+
+  if (!isValidApiKey) {
+    console.log("API access not allowed");
+    return NextResponse.json({ error: "API access not allowed", status: 500 });
+  }
+
+  if (!process.env.API_ACCESS_HOST_LIST) {
+    return NextResponse.json(
+      {
+        error: "API access not configured",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
 
   if (noop)
     return NextResponse.json(

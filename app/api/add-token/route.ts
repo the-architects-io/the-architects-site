@@ -21,8 +21,24 @@ type Data =
     };
 
 export async function POST(req: NextRequest) {
-  const { mintAddress, noop } = await req.json();
+  const { mintAddress, noop, apiKey } = await req.json();
 
+  if (!process.env.BLUEPRINT_API_KEY) {
+    return NextResponse.json(
+      {
+        error: "API access not configured",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+
+  const isValidApiKey = process.env.BLUEPRINT_API_KEY === apiKey;
+
+  if (!isValidApiKey) {
+    console.log("API access not allowed");
+    return NextResponse.json({ error: "API access not allowed", status: 500 });
+  }
   if (noop)
     return NextResponse.json(
       {

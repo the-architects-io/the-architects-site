@@ -9,13 +9,44 @@ import type { NextRequest } from "next/server";
 import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address";
 import { Metaplex, PublicKey } from "@metaplex-foundation/js";
 import { Connection } from "@solana/web3.js";
-import { RPC_ENDPOINT } from "@/constants/constants";
+import { ENV, RPC_ENDPOINT } from "@/constants/constants";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import { addTraitsToDb } from "@/utils/nfts/add-traits-to-db";
 import { Character, NoopResponse, Token, Trait } from "@/app/blueprint/types";
 
 export async function POST(req: NextRequest) {
-  const { hashList, noop, nftCollectionId } = await req.json();
+  const { hashList, noop, nftCollectionId, apiKey } = await req.json();
+
+  if (!process.env.BLUEPRINT_API_KEY) {
+    return NextResponse.json(
+      {
+        error: "API access not configured",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+
+  const isValidApiKey = process.env.BLUEPRINT_API_KEY === apiKey;
+
+  if (!isValidApiKey) {
+    console.log("API access not allowed");
+    return NextResponse.json({ error: "API access not allowed", status: 500 });
+  }
+
+  // const hostWhitelist = process.env.API_ACCESS_HOST_LIST;
+  // const host = req.headers.get("x-forwarded-host") || "";
+  // const isValidHost = hostWhitelist.indexOf(host) > -1 || ENV === "local";
+
+  // if (!isValidHost) {
+  //   return NextResponse.json(
+  //     {
+  //       error: `API access not allowed for host: ${host}`,
+  //       status: 500,
+  //     },
+  //     { status: 500 }
+  //   );
+  // }
 
   if (noop)
     return NextResponse.json(
@@ -207,7 +238,7 @@ export async function POST(req: NextRequest) {
 
   if (!response?.length) {
     return NextResponse.json({
-      success: true,
+      success: false,
       message: "Character already exists",
     });
   }

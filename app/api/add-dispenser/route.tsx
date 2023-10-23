@@ -14,14 +14,10 @@ type Data =
     };
 
 export async function POST(req: NextRequest) {
-  const hostWhitelist = process.env.API_ACCESS_HOST_LIST || "";
-
   const { imageUrl, name, description, noop, ownerId, apiKey } =
     await req.json();
 
-  const isValidRequest = !!(process.env.BLUEPRINT_API_KEY === apiKey);
-
-  if (!process.env.API_ACCESS_HOST_LIST) {
+  if (!process.env.BLUEPRINT_API_KEY) {
     return NextResponse.json(
       {
         error: "API access not configured",
@@ -31,26 +27,26 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const host = req.headers.get("x-forwarded-host") || "";
-  const isValidHost = hostWhitelist.indexOf(host) > -1 || ENV === "local";
+  const isValidApiKey = process.env.BLUEPRINT_API_KEY === apiKey;
 
-  console.log("/api/add-dispenser", {
-    host,
-    hostWhitelist,
-    isValidHost,
-    ENV,
-  });
-
-  if (!isValidHost) {
-    console.log("API access not allowed for host: ", host);
-    return NextResponse.json(
-      {
-        error: `API access not allowed for host: ${host}`,
-        status: 500,
-      },
-      { status: 500 }
-    );
+  if (!isValidApiKey) {
+    console.log("API access not allowed");
+    return NextResponse.json({ error: "API access not allowed", status: 500 });
   }
+
+  // const hostWhitelist = process.env.API_ACCESS_HOST_LIST;
+  // const host = req.headers.get("x-forwarded-host") || "";
+  // const isValidHost = hostWhitelist.indexOf(host) > -1 || ENV === "local";
+
+  // if (!isValidHost) {
+  //   return NextResponse.json(
+  //     {
+  //       error: `API access not allowed for host: ${host}`,
+  //       status: 500,
+  //     },
+  //     { status: 500 }
+  //   );
+  // }
 
   if (noop)
     return NextResponse.json({

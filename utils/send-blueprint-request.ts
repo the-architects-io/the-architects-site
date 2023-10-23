@@ -27,5 +27,7 @@ export async function sendBlueprintRequest(payload: {
   // Handle the response as necessary
   const responseData = await response.json();
   console.log({ responseData });
+
+  // refactor response to pass message for client (e.g. "Character already exists")
   return responseData;
 }
