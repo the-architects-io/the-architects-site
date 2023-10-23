@@ -6,7 +6,7 @@ import { Panel } from "@/features/UI/panel";
 import showToast from "@/features/toasts/show-toast";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import ShadowUpload from "@/utils/shadow-upload";
-import { EyeIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { ClipboardIcon, EyeIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { PublicKey } from "@metaplex-foundation/js";
 import { ShdwDrive, StorageAccountV2 } from "@shadow-drive/sdk";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
@@ -104,6 +104,15 @@ export default function StorageAccountPage({
     fetchStoredObjects(shadowDrive);
   };
 
+  const handleCopyToClipboard = (filename: string) => {
+    navigator.clipboard.writeText(
+      `https://shdw-drive.genesysgo.net/${params.id}/${filename}`
+    );
+    showToast({
+      primaryMessage: "Copied to clipboard",
+    });
+  };
+
   useEffect(() => {
     (async () => {
       if (wallet?.publicKey) {
@@ -161,7 +170,13 @@ export default function StorageAccountPage({
                 className="flex justify-between items-center w-full border-b border-gray-600 py-4 px-2"
               >
                 <div>{filename}</div>
-                <div className="flex space-x-2">
+                <div className="flex space-x-4">
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => handleCopyToClipboard(filename)}
+                  >
+                    <ClipboardIcon className="h-6 w-6" />
+                  </div>
                   <div
                     className="cursor-pointer"
                     onClick={() => handleDeleteFile(filename)}
