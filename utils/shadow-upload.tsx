@@ -20,7 +20,7 @@ export default function ShadowUpload({
   accountPublicKey: PublicKey;
 }) {
   const { isAdmin } = useAdmin();
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<FileList | null>(null);
   const [uploadUrl, setUploadUrl] = useState<String | null>(null);
   const [txnSig, setTxnSig] = useState<String | null>(null);
   const [isSending, setIsSending] = useState<boolean>(false);
@@ -36,7 +36,7 @@ export default function ShadowUpload({
         onSubmit={async (event) => {
           event.preventDefault();
 
-          if (!file) {
+          if (!files?.length) {
             alert("No file selected");
             return;
           }
@@ -44,7 +44,16 @@ export default function ShadowUpload({
           // const getStorageAccount = await drive.getStorageAccount(accountPublicKey);
 
           setIsSending(true);
-          const upload = await drive.uploadFile(accountPublicKey, file);
+          let upload;
+          if (files.length === 1) {
+            upload = await drive.uploadFile(accountPublicKey, files[0]);
+          } else {
+            upload = await drive.uploadMultipleFiles(
+              accountPublicKey,
+              files,
+              10
+            );
+          }
           console.log(upload);
           console.log({ upload });
           setIsSending(false);
@@ -56,9 +65,10 @@ export default function ShadowUpload({
         }}
       >
         <input
+          multiple
           className="py-4"
           type="file"
-          onChange={(e) => setFile(!!e.target.files ? e.target.files[0] : null)}
+          onChange={(e) => setFiles(!!e.target.files ? e.target.files : null)}
         />
         <br />
         <PrimaryButton type="submit" disabled={isSending}>

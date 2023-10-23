@@ -1,4 +1,5 @@
 "use client";
+import { RPC_ENDPOINT } from "@/constants/constants";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
@@ -9,13 +10,13 @@ import { getAbbreviatedAddress } from "@/utils/formatting";
 import ShadowUpload from "@/utils/shadow-upload";
 import { PublicKey } from "@metaplex-foundation/js";
 import { ShdwDrive, StorageAccountV2 } from "@shadow-drive/sdk";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { Connection } from "@solana/web3.js";
 import { useFormik } from "formik";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 export default function ShdwPage() {
-  const { connection } = useConnection();
   const wallet = useWallet();
 
   const [shadowDrive, setShadowDrive] = useState<ShdwDrive | null>(null);
@@ -56,6 +57,7 @@ export default function ShdwPage() {
   useEffect(() => {
     (async () => {
       if (wallet?.publicKey) {
+        const connection = new Connection(RPC_ENDPOINT, "confirmed");
         const drive = await new ShdwDrive(connection, wallet).init();
         setShadowDrive(drive);
 
