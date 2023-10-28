@@ -206,7 +206,7 @@ export default function FetchPage() {
               ).toFixed(0)}{" "}
               %
             </div> */}
-            <div className="text-sm text-gray-100 mt-2">
+            {/* <div className="text-sm text-gray-100 mt-2">
               Est. time remaining&nbsp;
               <>
                 {(totalNftsToAdd - currentNftToAdd) * 3 >= 60 && (
@@ -221,7 +221,7 @@ export default function FetchPage() {
                   </>
                 )}
               </>
-            </div>
+            </div> */}
           </div>
         </Panel>
       ) : (
