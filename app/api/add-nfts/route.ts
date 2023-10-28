@@ -106,8 +106,8 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(
     {
       success: true,
-      message: tokensToAdd.length > 0 ? "NFTs added" : "NFTs already exist",
       characters: tokensToAdd,
+      numbeOfNftsAdded: tokensToAdd.length,
     },
     {
       status: 200,

@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
   const traitInstancesToInsert = [];
 
   // first get the tokens that are already in the db
-  const existingTokensResponse: { tokens: Token[] } = await client.request({
+  const { tokens }: { tokens: Token[] } = await client.request({
     document: GET_TOKENS_BY_MINT_ADDRESSES,
     variables: {
       mintAddresses: jsonHashList,
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
   });
 
   const existingMintAddressesSet = new Set(
-    existingTokensResponse.tokens.map((token) => token.mintAddress)
+    tokens.map((token) => token.mintAddress)
   );
 
   const nonExistingNftsWithMetadataFiltered = nftsWithMetadata.filter(
@@ -124,9 +124,7 @@ export async function POST(req: NextRequest) {
   }
 
   // then filter out the ones that are already in the db
-  const existingMintAddresses = existingTokensResponse.tokens.map(
-    (token: Token) => token.mintAddress
-  );
+  const existingMintAddresses = tokens.map((token: Token) => token.mintAddress);
 
   const tokensToAdd = tokensToInsert.filter(
     (token) => !existingMintAddresses.includes(token.mintAddress)
@@ -193,12 +191,15 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(
     {
       success: true,
-      tokensAdded: tokensResponse?.insert_tokens?.affected_rows || 0,
-      traitsAdded: traitsResponse?.insert_traits?.affected_rows || 0,
-      traitInstancesAdded:
+      numberOfTokensSkipped: existingMintAddressesSet.size,
+      numberOfTokensAdded: tokensToAdd.length,
+      numberOfCharactersAdded:
+        nftsWithMetadata.length - existingMintAddressesSet.size,
+      numberOfCharactersSkipped: existingMintAddressesSet.size,
+      numberOfTraitsSkipped: traitsResponse?.insert_traits?.affected_rows || 0,
+      numberOfTraitsAdded: traitsResponse?.insert_traits?.affected_rows || 0,
+      numberOfTraitInstancesAdded:
         traitInstancesResponse?.insert_traitInstances?.affected_rows || 0,
-      charactersAdded:
-        charactersResponse?.insert_characters?.affected_rows || 0,
     },
     { status: 200 }
   );

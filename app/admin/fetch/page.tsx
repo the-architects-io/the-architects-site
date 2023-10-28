@@ -14,11 +14,23 @@ import { NftCollectionsSelectInput } from "@/features/nft-collections/nft-collec
 import Spinner from "@/features/UI/spinner";
 import { Panel } from "@/features/UI/panel";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
-import { Line, Circle } from "rc-progress";
+import { Line } from "rc-progress";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { useUserData } from "@nhost/nextjs";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
+
+type AddCharactersFromNftsResponse = {
+  data: {
+    success: boolean;
+    numberOfTokensSkipped: number;
+    numberOfTokensAdded: number;
+    numberOfCharactersAdded: number;
+    numberOfCharactersSkipped: number;
+    numberOfTraitsSkipped: number;
+    numberOfTraitsAdded: number;
+  };
+};
 
 function chunkArray<T>(array: T[], size: number): T[][] {
   const chunked_arr = [];
@@ -37,7 +49,7 @@ export default function FetchPage() {
   const user = useUserData();
   const [isSaving, setIsSaving] = useState(false);
   const [totalNftsToAdd, setTotalNftsToAdd] = useState<number>(0);
-  const [currentNftToAdd, setCurrentNftToAdd] = useState<number>(0);
+  const [currentNftsToAdd, setCurrentNftsToAdd] = useState<number>(0);
   const [numberOfSuccesses, setNumberOfSuccesses] = useState<number>(0);
   const [numberOfSkips, setNumberOfSkips] = useState<number>(0);
   const [failedAdditions, setFailedAdditions] = useState<string[]>([]);
@@ -53,7 +65,7 @@ export default function FetchPage() {
     initialValues: {
       hashList: "",
       nftCollectionId: "",
-      chunkSize: 30,
+      chunkSize: 20,
     },
     onSubmit: async ({ hashList, nftCollectionId }) => {
       setIsSaving(true);
@@ -76,7 +88,7 @@ export default function FetchPage() {
 
       try {
         // Send the entire array of hashes instead of just one
-        const { data: characterData } = await axios.post(
+        const { data }: AddCharactersFromNftsResponse = await axios.post(
           "/api/add-characters-from-nfts",
           {
             hashList: JSON.stringify(hashes),
@@ -84,32 +96,14 @@ export default function FetchPage() {
           }
         );
 
-        const { data: nftData } = await axios.post("/api/add-nfts", {
-          hashList: JSON.stringify(hashes),
-          nftCollectionId,
-        });
-
-        const messages = [];
-        if (characterData?.message) messages.push(characterData.message);
-        if (nftData?.message) messages.push(nftData.message);
-
-        returnData = {
-          ...characterData,
-          ...nftData,
-          messages,
-        };
-
-        // Handling the response for each hash in the list
-        returnData.messages.forEach((message: string) => {
-          if (
-            message.includes("Character already exists") ||
-            message.includes("NFTs already exist")
-          ) {
-            // setNumberOfSkips((prev) => prev + hashes.length);
-          } else {
-            setNumberOfSuccesses((prev) => prev + formik.values.chunkSize);
-          }
-        });
+        const {
+          numberOfCharactersAdded,
+          numberOfCharactersSkipped,
+          numberOfTokensAdded,
+          numberOfTokensSkipped,
+          numberOfTraitsAdded,
+          numberOfTraitsSkipped,
+        } = data;
 
         if (startIndex + hashes.length === total) {
           showToast({
@@ -117,29 +111,26 @@ export default function FetchPage() {
           });
           setIsSaving(false);
           setTotalNftsToAdd(0);
-          setCurrentNftToAdd(0);
+          setCurrentNftsToAdd(0);
+          setNumberOfSuccesses(0);
+          setNumberOfSkips(0);
+          setFailedAdditions([]);
+          formik.setFieldValue("hashList", "");
+          return;
         }
+
+        setNumberOfSuccesses((prev) => prev + numberOfCharactersAdded);
+        setNumberOfSkips((prev) => prev + numberOfCharactersSkipped);
       } catch (error) {
         console.log(error);
 
         showToast({
           primaryMessage: "Error adding characters to db",
         });
-        setFailedAdditions((prev) => [...prev, ...hashes]);
-        if (startIndex + hashes.length === total) {
-          setIsSaving(false);
-          setTotalNftsToAdd(0);
-          setCurrentNftToAdd(0);
-
-          showToast({
-            primaryMessage: "Successfully added to db",
-          });
-        }
+        // setFailedAdditions((prev) => [...prev, ...hashes]);
       }
-
-      console.log(returnData);
     },
-    [publicKey, connection]
+    [publicKey, connection, formik]
   );
 
   const fetchNftsInCollection = useCallback(
@@ -152,13 +143,13 @@ export default function FetchPage() {
       setTotalNftsToAdd(jsonHashList.length);
 
       for (const [chunkIndex, chunk] of chunks.entries()) {
-        setCurrentNftToAdd((chunkIndex + 1) * formik.values.chunkSize);
         await saveCharactersToDb(
           chunk,
           chunkIndex * formik.values.chunkSize,
           jsonHashList.length,
           nftCollectionId
         );
+        setCurrentNftsToAdd((chunkIndex + 1) * formik.values.chunkSize);
       }
     },
     [formik.values.chunkSize, saveCharactersToDb]
@@ -187,13 +178,13 @@ export default function FetchPage() {
             <div className="text-2xl mb-8">Adding {totalNftsToAdd} NFTs</div>
             <div className="text-xl mb-4">
               {Math.floor(
-                ((currentNftToAdd + 1) / totalNftsToAdd) * 100
+                ((currentNftsToAdd + 1) / totalNftsToAdd) * 100
               ).toFixed(0)}{" "}
               <span className="text-sm">%</span>
             </div>
             <Line
               className="px-4"
-              percent={((currentNftToAdd + 1) / totalNftsToAdd) * 100}
+              percent={((currentNftsToAdd + 1) / totalNftsToAdd) * 100}
               strokeWidth={2}
               trailWidth={0.04}
               trailColor="#121212"
