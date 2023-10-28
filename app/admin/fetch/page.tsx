@@ -112,9 +112,6 @@ export default function FetchPage() {
           setIsSaving(false);
           setTotalNftsToAdd(0);
           setCurrentNftsToAdd(0);
-          setNumberOfSuccesses(0);
-          setNumberOfSkips(0);
-          setFailedAdditions([]);
           formik.setFieldValue("hashList", "");
           return;
         }
