@@ -256,7 +256,8 @@ export default function FetchPage() {
               onClick={formik.handleSubmit}
               disabled={
                 !formik.values.hashList.length ||
-                !formik.values.nftCollectionId.length
+                !formik.values.nftCollectionId.length ||
+                !publicKey
               }
             />
           </div>
