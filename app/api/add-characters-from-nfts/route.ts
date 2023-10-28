@@ -1,21 +1,47 @@
 import { client } from "@/graphql/backend-client";
-import { ADD_TOKEN } from "@/graphql/mutations/add-token";
-import { ADD_CHARACTER } from "@/graphql/mutations/add-character";
-import { ADD_TRAIT_INSTANCE } from "@/graphql/mutations/add-trait-instance";
-import { GET_TRAIT_BY_NAME } from "@/graphql/queries/get-trait-by-name";
-import { GET_CHARACTER_BY_TOKEN_MINT_ADDRESS } from "@/graphql/queries/get-character-by-token-mint-address";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address";
 import { Metaplex, PublicKey } from "@metaplex-foundation/js";
 import { Connection } from "@solana/web3.js";
 import { RPC_ENDPOINT } from "@/constants/constants";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
-import { addTraitsToDb } from "@/utils/nfts/add-traits-to-db";
-import { Character, NoopResponse, Token, Trait } from "@/app/blueprint/types";
+import { ADD_TOKENS } from "@/graphql/mutations/add-tokens";
+import { Character, Token, Trait, TraitInstance } from "@/app/blueprint/types";
+import { ADD_TRAITS } from "@/graphql/mutations/add-traits";
+import { ADD_TRAIT_INSTANCES } from "@/graphql/mutations/add-trait-instances";
+import { ADD_CHARACTERS } from "@/graphql/mutations/add-characters";
+import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
+
+type AddTokensResponse = {
+  insert_tokens: {
+    affected_rows: number;
+    returning: Token[];
+  };
+};
+
+type AddCharactersResponse = {
+  insert_characters: {
+    affected_rows: number;
+    returning: Character[];
+  };
+};
+
+type AddTraitsResponse = {
+  insert_traits: {
+    affected_rows: number;
+    returning: Trait[];
+  };
+};
+
+type AddTraitInstancesResponse = {
+  insert_traitInstances: {
+    affected_rows: number;
+    returning: TraitInstance[];
+  };
+};
 
 export async function POST(req: NextRequest) {
-  const { hashList, noop, nftCollectionId } = await req.json();
+  const { hashList, noop } = await req.json();
 
   if (noop)
     return NextResponse.json(
@@ -23,20 +49,10 @@ export async function POST(req: NextRequest) {
         noop: true,
         endpoint: "add-character-from-nfts",
       },
-      {
-        status: 200,
-      }
+      { status: 200 }
     );
 
-  if (!hashList.length || !nftCollectionId) {
-    return NextResponse.json(
-      { error: "Required fields not set" },
-      { status: 500 }
-    );
-  }
-
-  const jsonHashList = JSON.parse(hashList);
-  console.log("jsonHashList", jsonHashList);
+  const jsonHashList: string[] = JSON.parse(hashList);
   if (!jsonHashList.length) {
     return NextResponse.json(
       { error: "Could not resolve hash list" },
@@ -44,48 +60,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (jsonHashList.length === 1) {
-    const { characters }: { characters: Character[] } = await client.request({
-      document: GET_CHARACTER_BY_TOKEN_MINT_ADDRESS,
-      variables: {
-        mintAddress: jsonHashList[0],
-      },
-    });
-
-    const { tokens }: { tokens: Token[] } = await client.request({
-      document: GET_TOKEN_BY_MINT_ADDRESS,
-      variables: {
-        mintAddress: jsonHashList[0],
-      },
-    });
-
-    let token = tokens?.[0];
-
-    const character = characters?.[0];
-    if (character && token) {
-      return NextResponse.json(
-        {
-          message: `Character ${character.name} already exists, skipping`,
-        },
-        { status: 200 }
-      );
-    }
-  }
-
-  const response = [];
-
-  // save traits
   const connection = new Connection(RPC_ENDPOINT);
   const metaplex = Metaplex.make(connection);
-  const mints = jsonHashList.map((address: string) => new PublicKey(address));
-  const nftMetasFromMetaplex: any[] = await metaplex
+  const mints = jsonHashList.map((address) => new PublicKey(address));
+  const nftMetasFromMetaplex = await metaplex
     .nfts()
     .findAllByMintList({ mints });
 
   if (!nftMetasFromMetaplex.length) {
-    console.log("No nfts fetched from metaplex");
     return NextResponse.json(
-      { error: "Could not resolve nfts" },
+      { error: "No nfts fetched from metaplex" },
       { status: 500 }
     );
   }
@@ -95,125 +79,127 @@ export async function POST(req: NextRequest) {
     metaplex
   );
 
-  await addTraitsToDb(nftsWithMetadata, nftCollectionId);
-  console.log("traits saved");
+  const tokensToInsert = [];
+  const charactersToInsert = [];
+  const traitsToInsert = new Set();
+  const traitInstancesToInsert = [];
+
+  // first get the tokens that are already in the db
+  const existingTokensResponse: { tokens: Token[] } = await client.request({
+    document: GET_TOKENS_BY_MINT_ADDRESSES,
+    variables: {
+      mintAddresses: jsonHashList,
+    },
+  });
+
+  const existingMintAddressesSet = new Set(
+    existingTokensResponse.tokens.map((token) => token.mintAddress)
+  );
+
+  const nonExistingNftsWithMetadataFiltered = nftsWithMetadata.filter(
+    (nft) => !existingMintAddressesSet.has(nft.mintAddress)
+  );
+
+  for (let nft of nonExistingNftsWithMetadataFiltered) {
+    const { mintAddress, imageUrl, symbol, name, traits } = nft;
+
+    tokensToInsert.push({
+      decimals: 0,
+      imageUrl,
+      mintAddress,
+      symbol,
+      name,
+    });
+    charactersToInsert.push({
+      name,
+      imageUrl,
+      tokenId: mintAddress,
+    });
+
+    if (!traits?.length) continue;
+
+    for (let trait of traits) {
+      traitsToInsert.add(trait.name);
+    }
+  }
+
+  // then filter out the ones that are already in the db
+  const existingMintAddresses = existingTokensResponse.tokens.map(
+    (token: Token) => token.mintAddress
+  );
+
+  const tokensToAdd = tokensToInsert.filter(
+    (token) => !existingMintAddresses.includes(token.mintAddress)
+  );
+
+  const tokensResponse: AddTokensResponse = await client.request({
+    document: ADD_TOKENS,
+    variables: {
+      tokens: tokensToInsert,
+    },
+  });
+
+  const mintAddressToTokenId: Record<string, string> = {};
+  tokensResponse?.insert_tokens?.returning.forEach((token) => {
+    mintAddressToTokenId[token.mintAddress] = token.id;
+  });
+
+  const traitsResponse: AddTraitsResponse = await client.request({
+    document: ADD_TRAITS,
+    variables: {
+      traits: Array.from(traitsToInsert).map((traitName) => ({
+        name: traitName,
+      })),
+    },
+  });
+
+  const traitNameToId: Record<string, string> = {};
+  traitsResponse?.insert_traits?.returning.forEach((trait) => {
+    traitNameToId[trait.name] = trait.id;
+  });
+
+  const charactersResponse: AddCharactersResponse = await client.request({
+    document: ADD_CHARACTERS,
+    variables: {
+      characters: charactersToInsert.map((character) => {
+        return {
+          ...character,
+          tokenId: mintAddressToTokenId[character.tokenId],
+        };
+      }),
+    },
+  });
 
   for (let nft of nftsWithMetadata) {
-    const { mintAddress, imageUrl, symbol, traits, name } = nft;
-    if (!traits?.length) {
-      return NextResponse.json(
-        { error: "Could not resolve traits" },
-        { status: 500 }
-      );
-    }
+    const { traits, mintAddress } = nft;
+    if (!traits?.length) continue;
 
-    try {
-      const { characters }: { characters: Character[] } = await client.request({
-        document: GET_CHARACTER_BY_TOKEN_MINT_ADDRESS,
-        variables: {
-          mintAddress,
-        },
+    for (let trait of traits) {
+      traitInstancesToInsert.push({
+        value: trait.value,
+        traitId: traitNameToId[trait.name],
       });
-
-      const character = characters?.[0];
-
-      const { tokens }: { tokens: Token[] } = await client.request({
-        document: GET_TOKEN_BY_MINT_ADDRESS,
-        variables: {
-          mintAddress,
-        },
-      });
-
-      let token = tokens?.[0];
-
-      if (character && token) {
-        console.log(`Character ${character.name} already exists, skipping`);
-        continue;
-      }
-
-      if (!token) {
-        const { insert_tokens_one }: { insert_tokens_one: Token } =
-          await client.request({
-            document: ADD_TOKEN,
-            variables: {
-              decimals: 0,
-              imageUrl,
-              mintAddress,
-              symbol,
-              name,
-            },
-          });
-
-        token = insert_tokens_one;
-      }
-
-      const { insert_characters_one }: { insert_characters_one: Character } =
-        await client.request({
-          document: ADD_CHARACTER,
-          variables: {
-            name,
-            tokenId: token.id,
-            imageUrl,
-          },
-        });
-      console.log(`Character ${name} added`);
-
-      // TODO add trait hash
-      for (let trait of traits) {
-        let traitId;
-        try {
-          const { traits }: { traits: Trait[] } = await client.request({
-            document: GET_TRAIT_BY_NAME,
-            variables: {
-              name: trait.name,
-            },
-          });
-          traitId = traits[0]?.id;
-        } catch (error) {
-          console.log("```````````FAIL error: ", error);
-          return NextResponse.json({ error }, { status: 500 });
-        }
-        const {
-          insert_traitInstances_one,
-        }: { insert_traitInstances_one: any } = await client.request({
-          document: ADD_TRAIT_INSTANCE,
-          variables: {
-            traitId,
-            characterId: insert_characters_one.id,
-            value: trait.value,
-          },
-        });
-        // console.log(
-        //   "```````````insert_traitInstances_one: ",
-        //   insert_traitInstances_one
-        // );
-      }
-      traits.forEach(async (trait: Trait) => {});
-
-      // console.log("Token added: ", {
-      //   mintAddress: token.mintAddress,
-      //   name: token.name,
-      //   imageUrl: token.imageUrl,
-      // });
-      // console.log("Character added: ", {
-      //   name: insert_characters_one.name,
-      // });
-      response.push(insert_characters_one);
-    } catch (error) {
-      console.log("```````````FAIL error: ", error);
-      return NextResponse.json({ error }, { status: 500 });
     }
   }
 
-  if (!response?.length) {
-    return NextResponse.json({
-      success: true,
-      message: "Character already exists",
+  const traitInstancesResponse: AddTraitInstancesResponse =
+    await client.request({
+      document: ADD_TRAIT_INSTANCES,
+      variables: {
+        traitInstances: traitInstancesToInsert,
+      },
     });
-  }
 
   return NextResponse.json(
-    { success: true, message: "Character added", chatacter: response },
+    {
+      success: true,
+      tokensAdded: tokensResponse?.insert_tokens?.affected_rows || 0,
+      traitsAdded: traitsResponse?.insert_traits?.affected_rows || 0,
+      traitInstancesAdded:
+        traitInstancesResponse?.insert_traitInstances?.affected_rows || 0,
+      charactersAdded:
+        charactersResponse?.insert_characters?.affected_rows || 0,
+    },
     { status: 200 }
   );
 }

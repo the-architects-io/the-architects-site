@@ -373,6 +373,12 @@ export type Trait = {
   value: string;
 };
 
+export type TraitInstance = {
+  id: string;
+  value: string;
+  trait: Trait;
+};
+
 export enum BlueprintApiActions {
   CREATE_DISENSER = "CREATE_DISENSER",
   DISPENSE_TOKENS = "DISPENSE_TOKENS",

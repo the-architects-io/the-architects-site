@@ -1,8 +1,8 @@
 import { client } from "@/graphql/backend-client";
-import { ADD_TOKEN } from "@/graphql/mutations/add-token";
+import { ADD_TOKENS } from "@/graphql/mutations/add-tokens";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address";
+import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
 import { Metaplex, PublicKey } from "@metaplex-foundation/js";
 import { Connection } from "@solana/web3.js";
 import { RPC_ENDPOINT } from "@/constants/constants";
@@ -12,7 +12,7 @@ import { Token } from "@/app/blueprint/types";
 export async function POST(req: NextRequest) {
   const { hashList, noop, nftCollectionId } = await req.json();
 
-  if (noop)
+  if (noop) {
     return NextResponse.json(
       {
         noop: true,
@@ -22,24 +22,30 @@ export async function POST(req: NextRequest) {
         status: 200,
       }
     );
+  }
 
   if (!hashList.length || !nftCollectionId) {
     return NextResponse.json(
-      { error: "Required fields not set" },
-      { status: 500 }
+      {
+        error: "Required fields not set",
+      },
+      {
+        status: 500,
+      }
     );
   }
 
   const jsonHashList = JSON.parse(hashList);
-  console.log("jsonHashList", jsonHashList);
   if (!jsonHashList.length) {
     return NextResponse.json(
-      { error: "Could not resolve hash list" },
-      { status: 500 }
+      {
+        error: "Could not resolve hash list",
+      },
+      {
+        status: 500,
+      }
     );
   }
-
-  const response = [];
 
   const connection = new Connection(RPC_ENDPOINT);
   const metaplex = Metaplex.make(connection);
@@ -49,10 +55,13 @@ export async function POST(req: NextRequest) {
     .findAllByMintList({ mints });
 
   if (!nftMetasFromMetaplex.length) {
-    console.log("No nfts fetched from metaplex");
     return NextResponse.json(
-      { error: "No nfts fetched from metaplex" },
-      { status: 500 }
+      {
+        error: "No nfts fetched from metaplex",
+      },
+      {
+        status: 500,
+      }
     );
   }
 
@@ -61,59 +70,47 @@ export async function POST(req: NextRequest) {
     metaplex
   );
 
-  // await addTraitsToDb(nftsWithMetadata, nftCollectionId);
-  // console.log("traits saved");
+  const existingTokensResponse: { tokens: Token[] } = await client.request({
+    document: GET_TOKENS_BY_MINT_ADDRESSES,
+    variables: {
+      mintAddresses: jsonHashList,
+    },
+  });
 
-  for (let nft of nftsWithMetadata) {
-    const { mintAddress, imageUrl, symbol, name } = nft;
+  const existingMintAddresses = existingTokensResponse.tokens.map(
+    (token: Token) => token.mintAddress
+  );
+  const newNFTs = nftsWithMetadata.filter(
+    (nft) => !existingMintAddresses.includes(nft.mintAddress)
+  );
 
-    try {
-      const { tokens }: { tokens: Token[] } = await client.request({
-        document: GET_TOKEN_BY_MINT_ADDRESS,
-        variables: {
-          mintAddress,
-        },
-      });
+  const tokensToAdd = newNFTs.map(
+    ({ mintAddress, imageUrl, symbol, name }) => ({
+      decimals: 0,
+      imageUrl,
+      mintAddress,
+      symbol,
+      name,
+    })
+  );
 
-      let token = tokens?.[0];
-
-      if (token) {
-        console.log(`${token.mintAddress} already exists, skipping`);
-        continue;
-      }
-
-      if (!token) {
-        const { insert_tokens_one }: { insert_tokens_one: Token } =
-          await client.request({
-            document: ADD_TOKEN,
-            variables: {
-              decimals: 0,
-              imageUrl,
-              mintAddress,
-              symbol,
-              name,
-            },
-          });
-
-        token = insert_tokens_one;
-      }
-
-      response.push(token);
-    } catch (error) {
-      console.log("```````````FAIL error: ", error);
-      return NextResponse.json({ error }, { status: 500 });
-    }
-  }
-
-  if (!response?.length) {
-    return NextResponse.json({
-      success: true,
-      message: "NFT already exists",
+  if (tokensToAdd.length > 0) {
+    await client.request({
+      document: ADD_TOKENS,
+      variables: {
+        tokens: tokensToAdd,
+      },
     });
   }
 
   return NextResponse.json(
-    { success: true, message: "NFT added", chatacter: response },
-    { status: 200 }
+    {
+      success: true,
+      message: tokensToAdd.length > 0 ? "NFTs added" : "NFTs already exist",
+      characters: tokensToAdd,
+    },
+    {
+      status: 200,
+    }
   );
 }

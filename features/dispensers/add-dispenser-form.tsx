@@ -14,6 +14,8 @@ import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { BlueprintApiActions, Dispenser } from "@/app/blueprint/types";
 import { useUserData } from "@nhost/nextjs";
 import { useEffect } from "react";
+import { Connection } from "@solana/web3.js";
+import { RPC_ENDPOINT_DEVNET } from "@/constants/constants";
 
 export type DispenserResponse = {
   id: string;
@@ -28,11 +30,13 @@ export const AddDispenserForm = ({
   setDispenserId: (id: string) => void;
   setStep: (step: number) => void;
 }) => {
-  const { connection } = useConnection();
+  // const { connection } = useConnection();
   const anchorWallet = useAnchorWallet();
   const router = useRouter();
 
   const user = useUserData();
+
+  const connection = new Connection(RPC_ENDPOINT_DEVNET, "confirmed");
 
   const formik = useFormik({
     initialValues: {
@@ -70,7 +74,6 @@ export const AddDispenserForm = ({
           });
           return;
         }
-
         const { txHash, dispenserAddress, dispenserBump } =
           await createOnChainDispenser(
             dispenser.id,
