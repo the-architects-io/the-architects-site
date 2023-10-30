@@ -6,39 +6,20 @@ import { Connection } from "@solana/web3.js";
 import { RPC_ENDPOINT } from "@/constants/constants";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import { ADD_TOKENS } from "@/graphql/mutations/add-tokens";
-import { Character, Token, Trait, TraitInstance } from "@/app/blueprint/types";
+import {
+  AddCharactersResponse,
+  AddTokensResponse,
+  AddTraitInstancesResponse,
+  AddTraitsResponse,
+  Character,
+  Token,
+  Trait,
+  TraitInstance,
+} from "@/app/blueprint/types";
 import { ADD_TRAITS } from "@/graphql/mutations/add-traits";
 import { ADD_TRAIT_INSTANCES } from "@/graphql/mutations/add-trait-instances";
 import { ADD_CHARACTERS } from "@/graphql/mutations/add-characters";
 import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
-
-type AddTokensResponse = {
-  insert_tokens: {
-    affected_rows: number;
-    returning: Token[];
-  };
-};
-
-type AddCharactersResponse = {
-  insert_characters: {
-    affected_rows: number;
-    returning: Character[];
-  };
-};
-
-type AddTraitsResponse = {
-  insert_traits: {
-    affected_rows: number;
-    returning: Trait[];
-  };
-};
-
-type AddTraitInstancesResponse = {
-  insert_traitInstances: {
-    affected_rows: number;
-    returning: TraitInstance[];
-  };
-};
 
 export async function POST(req: NextRequest) {
   const { hashList, noop } = await req.json();

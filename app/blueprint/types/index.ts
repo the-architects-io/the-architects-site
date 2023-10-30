@@ -441,3 +441,31 @@ export enum RewardPayoutOrderTypes {
   RANDOM = "RANDOM",
   SEQUENTIAL = "SEQUENTIAL",
 }
+
+export type AddTokensResponse = {
+  insert_tokens: {
+    affected_rows: number;
+    returning: Token[];
+  };
+};
+
+export type AddCharactersResponse = {
+  insert_characters: {
+    affected_rows: number;
+    returning: Character[];
+  };
+};
+
+export type AddTraitsResponse = {
+  insert_traits: {
+    affected_rows: number;
+    returning: Trait[];
+  };
+};
+
+export type AddTraitInstancesResponse = {
+  insert_traitInstances: {
+    affected_rows: number;
+    returning: TraitInstance[];
+  };
+};

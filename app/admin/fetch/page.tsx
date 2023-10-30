@@ -19,6 +19,11 @@ import { XCircleIcon } from "@heroicons/react/24/outline";
 import { useUserData } from "@nhost/nextjs";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
+import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
+import { Connection } from "@solana/web3.js";
+import { RPC_ENDPOINT } from "@/constants/constants";
+import { Metaplex, PublicKey } from "@metaplex-foundation/js";
+import { Helius } from "helius-sdk";
 
 type AddCharactersFromNftsResponse = {
   data: {
@@ -49,11 +54,11 @@ export default function FetchPage() {
   const user = useUserData();
   const [isSaving, setIsSaving] = useState(false);
   const [totalNftsToAdd, setTotalNftsToAdd] = useState<number>(0);
-  const [currentNftsToAdd, setCurrentNftsToAdd] = useState<number>(0);
   const [numberOfSuccesses, setNumberOfSuccesses] = useState<number>(0);
   const [numberOfSkips, setNumberOfSkips] = useState<number>(0);
   const [failedAdditions, setFailedAdditions] = useState<string[]>([]);
   const [hashList, setHashList] = useState<string>("");
+  const [progress, setProgress] = useState<number>(0);
 
   const clearReport = () => {
     setFailedAdditions([]);
@@ -65,62 +70,91 @@ export default function FetchPage() {
     initialValues: {
       hashList: "",
       nftCollectionId: "",
-      chunkSize: 20,
+      chunkSize: 200,
+      collectionAddress: "",
+      creatorAddress: "",
+      isManualMode: false,
     },
-    onSubmit: async ({ hashList, nftCollectionId }) => {
+    onSubmit: async ({
+      hashList,
+      nftCollectionId,
+      isManualMode,
+      collectionAddress,
+      creatorAddress,
+    }) => {
       setIsSaving(true);
       clearReport();
-      fetchNftsInCollection(hashList, nftCollectionId);
+      if (isManualMode) {
+        fetchNftsInCollectionByHashlist(hashList, nftCollectionId);
+      } else {
+        fetchNftsInCollectionByCollectionAddress(
+          creatorAddress,
+          collectionAddress
+        );
+      }
       formik.setFieldValue("hashList", "");
     },
   });
 
   const saveCharactersToDb = useCallback(
-    async (
-      hashes: string[], // Changed from a single hash string to a list
-      startIndex: number,
-      total: number,
-      nftCollectionId: string
-    ) => {
+    async (hashes: string[], total: number, nftCollectionId: string) => {
       if (!publicKey || !connection) return;
 
       let returnData;
 
       try {
-        // Send the entire array of hashes instead of just one
-        const { data }: AddCharactersFromNftsResponse = await axios.post(
-          "/api/add-characters-from-nfts",
-          {
+        // Send the entire array of hashes
+        const response = await fetch("/api/add-characters-from-nfts-stream", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
             hashList: JSON.stringify(hashes),
             nftCollectionId,
-          }
-        );
+          }),
+        });
 
-        const {
-          numberOfCharactersAdded,
-          numberOfCharactersSkipped,
-          numberOfTokensAdded,
-          numberOfTokensSkipped,
-          numberOfTraitsAdded,
-          numberOfTraitsSkipped,
-        } = data;
-
-        if (startIndex + hashes.length === total) {
-          showToast({
-            primaryMessage: "Successfully added NFTs to db",
-          });
-          setIsSaving(false);
-          setTotalNftsToAdd(0);
-          setCurrentNftsToAdd(0);
-          formik.setFieldValue("hashList", "");
-          return;
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
         }
 
-        setNumberOfSuccesses((prev) => prev + numberOfCharactersAdded);
-        setNumberOfSkips((prev) => prev + numberOfCharactersSkipped);
+        if (!response?.body) {
+          throw new Error("No response body");
+        }
+
+        const reader = response.body.getReader();
+
+        while (true) {
+          const { done, value } = await reader.read();
+
+          console.log({ done, value });
+
+          if (done) {
+            break;
+          }
+
+          try {
+            const res = new TextDecoder().decode(value);
+            const { progress, numberOfTokensAdded, numberOfTokensSkipped } =
+              JSON.parse(res);
+            setProgress(progress);
+            setNumberOfSuccesses((prev) => prev + numberOfTokensAdded);
+            setNumberOfSkips((prev) => prev + numberOfTokensSkipped);
+          } catch (e) {
+            // Not enough data for a complete JSON object yet, just keep accumulating
+          }
+        }
+
+        showToast({
+          primaryMessage: "Successfully added NFTs to db",
+        });
+        setIsSaving(false);
+        setTotalNftsToAdd(0);
+        setProgress(0);
+        formik.setFieldValue("hashList", "");
       } catch (error) {
         console.log(error);
-
         showToast({
           primaryMessage: "Error adding characters to db",
         });
@@ -130,26 +164,35 @@ export default function FetchPage() {
     [publicKey, connection, formik]
   );
 
-  const fetchNftsInCollection = useCallback(
+  const fetchNftsInCollectionByCollectionAddress = useCallback(
+    async (creatorAddress: string, collectionAddress: string) => {
+      if (!publicKey) return;
+
+      const { data }: AddCharactersFromNftsResponse = await axios.post(
+        "/api/get-nfts-by-collection-mint-address",
+        {
+          collectionAddress,
+          creatorAddress,
+        }
+      );
+      console.log(data);
+    },
+    [publicKey]
+  );
+
+  const fetchNftsInCollectionByHashlist = useCallback(
     async (hashList: string, nftCollectionId: string) => {
       const jsonHashList = JSON.parse(hashList);
-      const chunks: string[][] = chunkArray(
-        jsonHashList,
-        formik.values.chunkSize
-      );
+
       setTotalNftsToAdd(jsonHashList.length);
 
-      for (const [chunkIndex, chunk] of chunks.entries()) {
-        await saveCharactersToDb(
-          chunk,
-          chunkIndex * formik.values.chunkSize,
-          jsonHashList.length,
-          nftCollectionId
-        );
-        setCurrentNftsToAdd((chunkIndex + 1) * formik.values.chunkSize);
-      }
+      await saveCharactersToDb(
+        jsonHashList,
+        jsonHashList.length,
+        nftCollectionId
+      );
     },
-    [formik.values.chunkSize, saveCharactersToDb]
+    [saveCharactersToDb]
   );
 
   const retryFailedAdditions = async (
@@ -158,7 +201,10 @@ export default function FetchPage() {
   ) => {
     setIsSaving(true);
     clearReport();
-    fetchNftsInCollection(JSON.stringify(failedHashlist), nftCollectionId);
+    fetchNftsInCollectionByHashlist(
+      JSON.stringify(failedHashlist),
+      nftCollectionId
+    );
     formik.setFieldValue("hashList", "");
   };
 
@@ -174,14 +220,12 @@ export default function FetchPage() {
             </div>
             <div className="text-2xl mb-8">Adding {totalNftsToAdd} NFTs</div>
             <div className="text-xl mb-4">
-              {Math.floor(
-                ((currentNftsToAdd + 1) / totalNftsToAdd) * 100
-              ).toFixed(0)}{" "}
+              {progress}
               <span className="text-sm">%</span>
             </div>
             <Line
               className="px-4"
-              percent={((currentNftsToAdd + 1) / totalNftsToAdd) * 100}
+              percent={Number(progress)}
               strokeWidth={2}
               trailWidth={0.04}
               trailColor="#121212"
@@ -215,17 +259,46 @@ export default function FetchPage() {
       ) : (
         <>
           <FormWrapper onSubmit={formik.handleSubmit}>
-            <NftCollectionsSelectInput
-              value={formik.values.nftCollectionId}
-              handleBlur={formik.handleBlur}
-              handleChange={formik.handleChange}
-            />
-            <FormTextareaWithLabel
-              label="Hashlist"
-              name="hashList"
-              value={formik.values.hashList}
-              onChange={formik.handleChange}
-            />
+            <div className="py-4 flex w-full">
+              <FormCheckboxWithLabel
+                label="Manual entry (hashlist)"
+                name="isManualMode"
+                value={formik.values.isManualMode}
+                onChange={(e: any) => {
+                  formik.setFieldValue("isManualMode", e.target.checked);
+                }}
+              />
+            </div>
+            {formik.values.isManualMode ? (
+              <>
+                <NftCollectionsSelectInput
+                  value={formik.values.nftCollectionId}
+                  handleBlur={formik.handleBlur}
+                  handleChange={formik.handleChange}
+                />
+                <FormTextareaWithLabel
+                  label="Hashlist"
+                  name="hashList"
+                  value={formik.values.hashList}
+                  onChange={formik.handleChange}
+                />
+              </>
+            ) : (
+              <>
+                <FormInputWithLabel
+                  label="Collection Address"
+                  name="collectionAddress"
+                  value={formik.values.collectionAddress}
+                  onChange={formik.handleChange}
+                />
+                <FormInputWithLabel
+                  label="Creator Address"
+                  name="creatorAddress"
+                  value={formik.values.creatorAddress}
+                  onChange={formik.handleChange}
+                />
+              </>
+            )}
             <div className="w-full flex justify-center">
               <div className="w-32">
                 <FormInputWithLabel
@@ -243,9 +316,12 @@ export default function FetchPage() {
               isSubmitting={formik.isSubmitting || isSaving}
               onClick={formik.handleSubmit}
               disabled={
-                !formik.values.hashList.length ||
-                !formik.values.nftCollectionId.length ||
-                !publicKey
+                false
+                // !formik.values.hashList.length ||
+                // !formik.values.nftCollectionId.length ||
+                // (!formik.values.collectionAddress.length &&
+                //   !formik.values.creatorAddress.length) ||
+                // !publicKey
               }
             />
           </div>
