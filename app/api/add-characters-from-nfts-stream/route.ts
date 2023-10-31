@@ -216,9 +216,6 @@ const handleHashListChunk = async (
     numberOfTokensAdded: tokensResponse?.insert_tokens?.affected_rows || 0,
     numberOfTokensSkipped:
       hashListChunk.length - tokensResponse?.insert_tokens?.affected_rows || 0,
-    numberOfCharactersAdded:
-      charactersResponse?.insert_characters?.affected_rows || 0,
-    numberOfCharactersSkipped: hashListChunk.length - charactersToInsert.length,
   };
 };
 

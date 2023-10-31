@@ -35,10 +35,6 @@ type AddCharactersFromNftsResponse = {
     success: boolean;
     numberOfTokensSkipped: number;
     numberOfTokensAdded: number;
-    numberOfCharactersAdded: number;
-    numberOfCharactersSkipped: number;
-    numberOfTraitsSkipped: number;
-    numberOfTraitsAdded: number;
   };
 };
 
