@@ -72,7 +72,6 @@ export default function FetchPage() {
       nftCollectionId: "",
       chunkSize: 200,
       collectionAddress: "",
-      creatorAddress: "",
       isManualMode: false,
     },
     onSubmit: async ({
@@ -80,17 +79,13 @@ export default function FetchPage() {
       nftCollectionId,
       isManualMode,
       collectionAddress,
-      creatorAddress,
     }) => {
       setIsSaving(true);
       clearReport();
       if (isManualMode) {
         fetchNftsInCollectionByHashlist(hashList, nftCollectionId);
       } else {
-        fetchNftsInCollectionByCollectionAddress(
-          creatorAddress,
-          collectionAddress
-        );
+        fetchNftsInCollectionByCollectionAddress(collectionAddress);
       }
       formik.setFieldValue("hashList", "");
     },
@@ -165,17 +160,59 @@ export default function FetchPage() {
   );
 
   const fetchNftsInCollectionByCollectionAddress = useCallback(
-    async (creatorAddress: string, collectionAddress: string) => {
+    async (collectionAddress: string) => {
       if (!publicKey) return;
 
-      const { data }: AddCharactersFromNftsResponse = await axios.post(
-        "/api/get-nfts-by-collection-mint-address",
-        {
-          collectionAddress,
-          creatorAddress,
+      try {
+        const response = await fetch(
+          "/api/get-nfts-by-collection-mint-address",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ collectionAddress }),
+          }
+        );
+
+        if (!response.body) {
+          console.error("The response does not contain a readable stream.");
+          return;
         }
-      );
-      console.log(data);
+
+        const reader = response.body.getReader();
+        let decoder = new TextDecoder();
+        let receivedData = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          receivedData += decoder.decode(value, { stream: true });
+
+          // Try to parse the accumulated data
+          let startIdx = receivedData.indexOf("[");
+          let endIdx = receivedData.lastIndexOf("]");
+
+          if (startIdx !== -1 && endIdx !== -1) {
+            const jsonData = receivedData.slice(startIdx, endIdx + 1);
+            try {
+              const parsedData = JSON.parse(jsonData);
+              console.log(parsedData); // Handle or store this data as required
+
+              debugger;
+
+              // Clear the processed data
+              receivedData = receivedData.slice(endIdx + 1);
+            } catch (error) {
+              // If there's an error, it's likely because the complete JSON hasn't been received yet.
+              // Just continue and wait for more data.
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching NFTs:", error);
+      }
     },
     [publicKey]
   );
@@ -291,12 +328,6 @@ export default function FetchPage() {
                   value={formik.values.collectionAddress}
                   onChange={formik.handleChange}
                 />
-                <FormInputWithLabel
-                  label="Creator Address"
-                  name="creatorAddress"
-                  value={formik.values.creatorAddress}
-                  onChange={formik.handleChange}
-                />
               </>
             )}
             <div className="w-full flex justify-center">
@@ -319,8 +350,7 @@ export default function FetchPage() {
                 false
                 // !formik.values.hashList.length ||
                 // !formik.values.nftCollectionId.length ||
-                // (!formik.values.collectionAddress.length &&
-                //   !formik.values.creatorAddress.length) ||
+                // !formik.values.collectionAddress.length ||
                 // !publicKey
               }
             />
