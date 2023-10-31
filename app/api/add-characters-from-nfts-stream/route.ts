@@ -229,7 +229,7 @@ async function* makeProcessingIterator(
   shouldOverwrite: boolean
 ) {
   // Acknowledge the receipt to the client
-  yield new TextEncoder().encode("Received hashlist. Starting processing...\n");
+  // yield new TextEncoder().encode("Received hashlist. Starting processing...\n");
 
   const jsonHashList = JSON.parse(hashList);
 

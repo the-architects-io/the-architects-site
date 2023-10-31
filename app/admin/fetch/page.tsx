@@ -415,28 +415,32 @@ export default function FetchPage() {
       )}
       {collectionInfo && !isSaving && !existingNftCollection && (
         <div className="flex flex-col items-center justify-center">
-          <div className="text-xl uppercase mb-8">Collection Info</div>
           <Image
             src={collectionInfo.image}
-            width={200}
-            height={200}
-            className="mb-4"
+            width={300}
+            height={300}
+            className="mb-12 rounded"
             alt="Collection Image"
           />
-          <div className="flex mb-8">
-            <div className="text-2xl">{collectionInfo.name}</div>
+          <div className="flex mb-16">
+            <div className="text-5xl">{collectionInfo.name}</div>
           </div>
-          <PrimaryButton
-            onClick={() =>
-              fetchCollectionNftMintAddresses(collectionInfo.mintAddress, true)
-            }
-          >
-            {isFetchingCollectionMintAddresses ? (
-              <Spinner />
-            ) : (
-              "Save to Blueprint"
-            )}
-          </PrimaryButton>
+          {!isComplete && (
+            <PrimaryButton
+              onClick={() =>
+                fetchCollectionNftMintAddresses(
+                  collectionInfo.mintAddress,
+                  true
+                )
+              }
+            >
+              {isFetchingCollectionMintAddresses ? (
+                <Spinner />
+              ) : (
+                "Save to Blueprint"
+              )}
+            </PrimaryButton>
+          )}
         </div>
       )}
       {isSaving || isFetchingCollectionInfo ? (
@@ -544,6 +548,11 @@ export default function FetchPage() {
                 <SubmitButton
                   isSubmitting={formik.isSubmitting || isSaving}
                   onClick={formik.handleSubmit}
+                  buttonText={
+                    formik.values.isManualMode
+                      ? "Save collection"
+                      : "Find collection"
+                  }
                   disabled={
                     false
                     // !formik.values.hashList.length ||
@@ -567,7 +576,7 @@ export default function FetchPage() {
           </button>
           <div className="uppercase mb-8 text-2xl">Report</div>
           {
-            <div className="mb-2 max-w-xs flex justify-between w-full">
+            <div className="mb-4 max-w-xs flex justify-between w-full">
               <div className="mb-2">Time Elapsed</div>
               <Stopwatch start={shouldStartStopwatch} />
             </div>
