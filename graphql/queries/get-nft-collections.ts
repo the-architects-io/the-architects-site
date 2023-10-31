@@ -14,7 +14,7 @@ export const GET_NFT_COLLECTIONS = gql`
       imageUrl
       name
       updatedAt
-      verifiedCollectionAddress
+      collectionAddress
     }
   }
 `;

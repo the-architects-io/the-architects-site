@@ -6,9 +6,17 @@ import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 
 let umiClient: ReturnType<typeof createUmi> | null = null; // Replace ReturnType<typeof createUmi> with the appropriate type if you know it
 
-export function getUmiClient() {
+export function getUmiClient(
+  endpoint:
+    | typeof RPC_ENDPOINT
+    | typeof RPC_ENDPOINT_DEVNET = RPC_ENDPOINT_DEVNET
+) {
+  if (endpoint !== RPC_ENDPOINT && endpoint !== RPC_ENDPOINT_DEVNET) {
+    throw new Error("Invalid endpoint");
+  }
+
   if (!umiClient) {
-    umiClient = createUmi(RPC_ENDPOINT_DEVNET)
+    umiClient = createUmi(endpoint)
       .use(
         nftStorageUploader({
           token: process.env.NFT_STORAGE_API_KEY || "",

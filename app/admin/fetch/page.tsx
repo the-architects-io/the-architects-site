@@ -20,10 +20,15 @@ import { useUserData } from "@nhost/nextjs";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
-import { Connection } from "@solana/web3.js";
-import { RPC_ENDPOINT } from "@/constants/constants";
+import { BASE_URL, RPC_ENDPOINT } from "@/constants/constants";
 import { Metaplex, PublicKey } from "@metaplex-foundation/js";
 import { Helius } from "helius-sdk";
+import Image from "next/image";
+import { useLazyQuery, useQuery } from "@apollo/client";
+import { GET_NFT_COLLECTION_BY_MINT_ADDRESS } from "@/graphql/queries/get-nft-collection-by-mint-address";
+import { NftCollection } from "@/features/admin/nft-collections/nfts-collection-list-item";
+import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
+import Stopwatch from "@/features/stopwatch/stopwatch";
 
 type AddCharactersFromNftsResponse = {
   data: {
@@ -59,6 +64,18 @@ export default function FetchPage() {
   const [failedAdditions, setFailedAdditions] = useState<string[]>([]);
   const [hashList, setHashList] = useState<string>("");
   const [progress, setProgress] = useState<number>(0);
+  const [collectionInfo, setCollectionInfo] = useState<any>(null);
+  const [
+    isFetchingCollectionMintAddresses,
+    setIsFetchingCollectionMintAddresses,
+  ] = useState<boolean>(false);
+  const [isFetchingCollectionInfo, setIsFetchingCollectionInfo] =
+    useState<boolean>(false);
+  const [existingNftCollection, setExistingNftCollection] =
+    useState<NftCollection | null>(null);
+  const [shouldStartStopwatch, setShouldStartStopwatch] =
+    useState<boolean>(false);
+  const [isComplete, setIsComplete] = useState<boolean>(false);
 
   const clearReport = () => {
     setFailedAdditions([]);
@@ -70,34 +87,65 @@ export default function FetchPage() {
     initialValues: {
       hashList: "",
       nftCollectionId: "",
-      chunkSize: 200,
       collectionAddress: "",
       isManualMode: false,
+      shouldOverwrite: false,
     },
     onSubmit: async ({
       hashList,
       nftCollectionId,
       isManualMode,
       collectionAddress,
+      shouldOverwrite,
     }) => {
-      setIsSaving(true);
       clearReport();
       if (isManualMode) {
-        fetchNftsInCollectionByHashlist(hashList, nftCollectionId);
+        fetchNftsInCollectionByHashlist(
+          hashList,
+          nftCollectionId,
+          shouldOverwrite
+        );
       } else {
-        fetchNftsInCollectionByCollectionAddress(collectionAddress);
+        const existingCollection = await fetchExistingNftCollection(
+          collectionAddress
+        );
+        if (existingCollection) {
+          setExistingNftCollection(existingCollection);
+          formik.setFieldValue("nftCollectionId", existingCollection.id);
+          return;
+        }
+        fetchCollectionInfo(collectionAddress, shouldOverwrite);
       }
       formik.setFieldValue("hashList", "");
     },
   });
 
+  const { loading: isFetchingExistingCollection } = useQuery(
+    GET_NFT_COLLECTION_BY_MINT_ADDRESS,
+    {
+      variables: {
+        mintAddress: formik.values.collectionAddress,
+      },
+      skip: !formik.values.collectionAddress,
+      onCompleted: (data) => {
+        setExistingNftCollection(data?.nftCollection);
+      },
+    }
+  );
+
   const saveCharactersToDb = useCallback(
-    async (hashes: string[], total: number, nftCollectionId: string) => {
+    async (
+      hashes: string[],
+      total: number,
+      nftCollectionId: string,
+      shouldOverwrite: boolean
+    ) => {
       if (!publicKey || !connection) return;
 
       let returnData;
 
       try {
+        setShouldStartStopwatch(true);
         // Send the entire array of hashes
         const response = await fetch("/api/add-characters-from-nfts-stream", {
           method: "POST",
@@ -107,6 +155,7 @@ export default function FetchPage() {
           body: JSON.stringify({
             hashList: JSON.stringify(hashes),
             nftCollectionId,
+            shouldOverwrite,
           }),
         });
 
@@ -131,6 +180,8 @@ export default function FetchPage() {
 
           try {
             const res = new TextDecoder().decode(value);
+            console.log({ res });
+
             const { progress, numberOfTokensAdded, numberOfTokensSkipped } =
               JSON.parse(res);
             setProgress(progress);
@@ -148,20 +199,110 @@ export default function FetchPage() {
         setTotalNftsToAdd(0);
         setProgress(0);
         formik.setFieldValue("hashList", "");
+        setShouldStartStopwatch(false);
       } catch (error) {
         console.log(error);
         showToast({
           primaryMessage: "Error adding characters to db",
         });
-        // setFailedAdditions((prev) => [...prev, ...hashes]);
       }
     },
     [publicKey, connection, formik]
   );
 
-  const fetchNftsInCollectionByCollectionAddress = useCallback(
-    async (collectionAddress: string) => {
+  const fetchExistingNftCollection = async (collectionAddress: string) => {
+    if (!collectionAddress) return;
+
+    const { data } = await axios.post(
+      `${BASE_URL}/api/get-nft-collection-by-mint-address`,
+      { mintAddress: collectionAddress }
+    );
+
+    if (!data?.nftCollection?.id) {
+      return null;
+    }
+
+    return data.nftCollection;
+  };
+
+  const fetchCollectionInfo = useCallback(
+    async (collectionAddress: string, shouldOverwrite: boolean) => {
+      setIsFetchingCollectionInfo(true);
+
+      // first search for existing collection
+      const { data: existingNftCollectionData } = await axios.post(
+        `${BASE_URL}/api/get-nft-collection-by-mint-address`,
+        { mintAddress: collectionAddress }
+      );
+
+      if (existingNftCollectionData?.nftCollection?.id) {
+        setExistingNftCollection(existingNftCollectionData.nftCollection);
+        formik.setFieldValue("nftCollectionId", existingNftCollectionData.id);
+        return;
+      }
+
+      // if not found, fetch from on chain
+      const { data } = await axios.post(
+        `${BASE_URL}/api/get-collection-info-by-mint-address`,
+        { collectionAddress }
+      );
+
+      // then save to db
+      const { data: nftCollectionData } = await axios.post(
+        `${BASE_URL}/api/add-nft-collection`,
+        {
+          name: data?.name,
+          symbol: data?.symbol,
+          mintAddress: collectionAddress,
+          imageUrl: data?.image,
+        }
+      );
+
+      formik.setFieldValue("nftCollectionId", nftCollectionData?.id);
+
+      if (!data?.name) {
+        showToast({
+          primaryMessage: "Error fetching collection info",
+        });
+        return;
+      }
+
+      setCollectionInfo(data);
+      setIsFetchingCollectionInfo(false);
+    },
+    [formik]
+  );
+
+  const fetchNftsInCollectionByHashlist = useCallback(
+    async (
+      hashList: string,
+      nftCollectionId: string,
+      shouldOverwrite: boolean
+    ) => {
+      const jsonHashList = JSON.parse(hashList);
+
+      setIsSaving(true);
+
+      setTotalNftsToAdd(jsonHashList.length);
+
+      await saveCharactersToDb(
+        jsonHashList,
+        jsonHashList.length,
+        nftCollectionId,
+        shouldOverwrite
+      );
+
+      setIsSaving(false);
+      setIsComplete(true);
+    },
+    [saveCharactersToDb]
+  );
+
+  const fetchCollectionNftMintAddresses = useCallback(
+    async (collectionAddress: string, shouldOverwrite: boolean) => {
       if (!publicKey) return;
+
+      setIsFetchingCollectionMintAddresses(true);
 
       try {
         const response = await fetch(
@@ -171,7 +312,10 @@ export default function FetchPage() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ collectionAddress }),
+            body: JSON.stringify({
+              collectionAddress,
+              mintAddressesOnly: true,
+            }),
           }
         );
 
@@ -183,6 +327,8 @@ export default function FetchPage() {
         const reader = response.body.getReader();
         let decoder = new TextDecoder();
         let receivedData = "";
+
+        const mintAddressess: string[] = [];
 
         while (true) {
           const { done, value } = await reader.read();
@@ -200,7 +346,7 @@ export default function FetchPage() {
               const parsedData = JSON.parse(jsonData);
               console.log(parsedData); // Handle or store this data as required
 
-              debugger;
+              mintAddressess.push(...parsedData);
 
               // Clear the processed data
               receivedData = receivedData.slice(endIdx + 1);
@@ -210,65 +356,118 @@ export default function FetchPage() {
             }
           }
         }
+
+        // The stream has been completely read.
+        showToast({
+          primaryMessage: "Successfully fetched collection",
+          secondaryMessage: `Saving ${mintAddressess.length} NFTs to db...`,
+        });
+
+        console.log({
+          mintAddressess,
+          nftCollectionId: formik.values.nftCollectionId,
+        });
+
+        fetchNftsInCollectionByHashlist(
+          JSON.stringify(mintAddressess),
+          formik.values.nftCollectionId,
+          shouldOverwrite
+        );
       } catch (error) {
         console.error("Error fetching NFTs:", error);
       }
     },
-    [publicKey]
+    [fetchNftsInCollectionByHashlist, publicKey, formik]
   );
-
-  const fetchNftsInCollectionByHashlist = useCallback(
-    async (hashList: string, nftCollectionId: string) => {
-      const jsonHashList = JSON.parse(hashList);
-
-      setTotalNftsToAdd(jsonHashList.length);
-
-      await saveCharactersToDb(
-        jsonHashList,
-        jsonHashList.length,
-        nftCollectionId
-      );
-    },
-    [saveCharactersToDb]
-  );
-
-  const retryFailedAdditions = async (
-    failedHashlist: string[],
-    nftCollectionId: string
-  ) => {
-    setIsSaving(true);
-    clearReport();
-    fetchNftsInCollectionByHashlist(
-      JSON.stringify(failedHashlist),
-      nftCollectionId
-    );
-    formik.setFieldValue("hashList", "");
-  };
 
   if (!isAdmin) return <NotAdminBlocker />;
 
   return (
     <ContentWrapper>
-      {isSaving ? (
+      {existingNftCollection && !isSaving && !isComplete && (
+        <div className="flex flex-col items-center justify-center">
+          <div className="mb-2 text-lg">
+            This collection already exists in the db.
+          </div>
+          <div className="mb-8 text-lg">
+            Are you sure you want to overwrite it?
+          </div>
+          <div className="flex space-x-4">
+            <PrimaryButton
+              onClick={() =>
+                fetchCollectionNftMintAddresses(
+                  formik.values.collectionAddress,
+                  true
+                )
+              }
+            >
+              {isFetchingCollectionMintAddresses ? (
+                <Spinner />
+              ) : (
+                "Save to Blueprint"
+              )}
+            </PrimaryButton>
+            <SecondaryButton onClick={() => setExistingNftCollection(null)}>
+              Cancel
+            </SecondaryButton>
+          </div>
+        </div>
+      )}
+      {collectionInfo && !isSaving && !existingNftCollection && (
+        <div className="flex flex-col items-center justify-center">
+          <div className="text-xl uppercase mb-8">Collection Info</div>
+          <Image
+            src={collectionInfo.image}
+            width={200}
+            height={200}
+            className="mb-4"
+            alt="Collection Image"
+          />
+          <div className="flex mb-8">
+            <div className="text-2xl">{collectionInfo.name}</div>
+          </div>
+          <PrimaryButton
+            onClick={() =>
+              fetchCollectionNftMintAddresses(collectionInfo.mintAddress, true)
+            }
+          >
+            {isFetchingCollectionMintAddresses ? (
+              <Spinner />
+            ) : (
+              "Save to Blueprint"
+            )}
+          </PrimaryButton>
+        </div>
+      )}
+      {isSaving || isFetchingCollectionInfo ? (
         <Panel className="mb-8">
           <div className="py-4 flex flex-col justify-center items-center">
-            <div className="mb-4">
+            <div className="mb-4 w-full flex flex-col justify-center items-center">
               <Spinner />
+              {isFetchingCollectionInfo && (
+                <div className="text-xl mt-4">Fetching collection info</div>
+              )}
             </div>
-            <div className="text-2xl mb-8">Adding {totalNftsToAdd} NFTs</div>
-            <div className="text-xl mb-4">
-              {progress}
-              <span className="text-sm">%</span>
-            </div>
-            <Line
-              className="px-4"
-              percent={Number(progress)}
-              strokeWidth={2}
-              trailWidth={0.04}
-              trailColor="#121212"
-              // sky-400
-              strokeColor="#38bdf8"
-            />
+            {isSaving && (
+              <>
+                <div className="text-2xl mb-8">
+                  Adding {totalNftsToAdd} NFTs
+                </div>
+                <div className="text-xl mb-4">
+                  {progress}
+                  <span className="text-sm">%</span>
+                </div>
+                <Line
+                  className="px-4"
+                  percent={Number(progress)}
+                  strokeWidth={2}
+                  trailWidth={0.04}
+                  trailColor="#121212"
+                  // sky-400
+                  strokeColor="#38bdf8"
+                />
+              </>
+            )}
             {/* <div className="text-sm text-gray-100 mt-4">
               {Math.floor(
                 ((currentNftToAdd + 1) / totalNftsToAdd) * 100
@@ -295,66 +494,67 @@ export default function FetchPage() {
         </Panel>
       ) : (
         <>
-          <FormWrapper onSubmit={formik.handleSubmit}>
-            <div className="py-4 flex w-full">
-              <FormCheckboxWithLabel
-                label="Manual entry (hashlist)"
-                name="isManualMode"
-                value={formik.values.isManualMode}
-                onChange={(e: any) => {
-                  formik.setFieldValue("isManualMode", e.target.checked);
-                }}
-              />
-            </div>
-            {formik.values.isManualMode ? (
-              <>
-                <NftCollectionsSelectInput
-                  value={formik.values.nftCollectionId}
-                  handleBlur={formik.handleBlur}
-                  handleChange={formik.handleChange}
-                />
-                <FormTextareaWithLabel
-                  label="Hashlist"
-                  name="hashList"
-                  value={formik.values.hashList}
-                  onChange={formik.handleChange}
-                />
-              </>
-            ) : (
-              <>
-                <FormInputWithLabel
-                  label="Collection Address"
-                  name="collectionAddress"
-                  value={formik.values.collectionAddress}
-                  onChange={formik.handleChange}
-                />
-              </>
-            )}
-            <div className="w-full flex justify-center">
-              <div className="w-32">
-                <FormInputWithLabel
-                  label="Chunk Size"
-                  name="chunkSize"
-                  type="number"
-                  value={formik.values.chunkSize}
-                  onChange={formik.handleChange}
+          {!collectionInfo && !existingNftCollection && (
+            <>
+              <FormWrapper onSubmit={formik.handleSubmit}>
+                <div className="py-4 w-full space-y-2">
+                  <FormCheckboxWithLabel
+                    label="Manual entry (hashlist)"
+                    name="isManualMode"
+                    value={formik.values.isManualMode}
+                    onChange={(e: any) => {
+                      formik.setFieldValue("isManualMode", e.target.checked);
+                    }}
+                  />
+                  <FormCheckboxWithLabel
+                    label="Overwrite existing db records"
+                    name="shouldOverwrite"
+                    value={formik.values.shouldOverwrite}
+                    onChange={(e: any) => {
+                      formik.setFieldValue("shouldOverwrite", e.target.checked);
+                    }}
+                  />
+                </div>
+                {formik.values.isManualMode ? (
+                  <>
+                    <NftCollectionsSelectInput
+                      value={formik.values.nftCollectionId}
+                      handleBlur={formik.handleBlur}
+                      handleChange={formik.handleChange}
+                    />
+                    <FormTextareaWithLabel
+                      label="Hashlist"
+                      name="hashList"
+                      value={formik.values.hashList}
+                      onChange={formik.handleChange}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <FormInputWithLabel
+                      label="Collection Address"
+                      name="collectionAddress"
+                      value={formik.values.collectionAddress}
+                      onChange={formik.handleChange}
+                    />
+                  </>
+                )}
+              </FormWrapper>
+              <div className="flex w-full justify-center mt-4 mb-12">
+                <SubmitButton
+                  isSubmitting={formik.isSubmitting || isSaving}
+                  onClick={formik.handleSubmit}
+                  disabled={
+                    false
+                    // !formik.values.hashList.length ||
+                    // !formik.values.nftCollectionId.length ||
+                    // !formik.values.collectionAddress.length ||
+                    // !publicKey
+                  }
                 />
               </div>
-            </div>
-          </FormWrapper>
-          <div className="flex w-full justify-center mt-4 mb-12">
-            <SubmitButton
-              isSubmitting={formik.isSubmitting || isSaving}
-              onClick={formik.handleSubmit}
-              disabled={
-                false
-                // !formik.values.hashList.length ||
-                // !formik.values.nftCollectionId.length ||
-                // !formik.values.collectionAddress.length ||
-                // !publicKey
-              }
-            />
-          </div>
+            </>
+          )}
         </>
       )}
       {numberOfSuccesses + failedAdditions.length + numberOfSkips > 0 && (
@@ -366,6 +566,12 @@ export default function FetchPage() {
             />
           </button>
           <div className="uppercase mb-8 text-2xl">Report</div>
+          {
+            <div className="mb-2 max-w-xs flex justify-between w-full">
+              <div className="mb-2">Time Elapsed</div>
+              <Stopwatch start={shouldStartStopwatch} />
+            </div>
+          }
           {numberOfSuccesses > 0 && (
             <div className="mb-2 max-w-xs flex justify-between w-full">
               <div>Added</div>
@@ -377,29 +583,6 @@ export default function FetchPage() {
               <div className="mb-2">Skipped (Already exists):</div>
               <div className="font-bold">{numberOfSkips}</div>
             </div>
-          )}
-          {failedAdditions.length > 0 && (
-            <>
-              <div className="mb-2 max-w-xs flex justify-between w-full">
-                <div>Failed</div>
-                <div className="font-bold">{failedAdditions.length}</div>
-              </div>
-              <div className="flex flex-col justify-center items-center bg-red-700 text-xs">
-                {failedAdditions.map((mint) => (
-                  <div key={mint}>{mint}</div>
-                ))}
-                <PrimaryButton
-                  onClick={() =>
-                    retryFailedAdditions(
-                      failedAdditions,
-                      formik.values.nftCollectionId
-                    )
-                  }
-                >
-                  Retry Failed
-                </PrimaryButton>
-              </div>
-            </>
           )}
           <div className="w-full border-b border-gray-500 mb-2" />
           {numberOfSuccesses + failedAdditions.length + numberOfSkips > 0 && (

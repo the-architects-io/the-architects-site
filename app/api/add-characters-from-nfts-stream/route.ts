@@ -11,6 +11,8 @@ import { ADD_CHARACTERS } from "@/graphql/mutations/add-characters";
 import { ADD_TOKENS } from "@/graphql/mutations/add-tokens";
 import { ADD_TRAIT_INSTANCES } from "@/graphql/mutations/add-trait-instances";
 import { ADD_TRAITS } from "@/graphql/mutations/add-traits";
+import { REMOVE_CHARACTERS_BY_MINT_ADDRESSES } from "@/graphql/mutations/remove-characters-by-mint-addresses";
+import { REMOVE_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/mutations/remove-tokens-by-mint-addresses";
 import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import { Metaplex, PublicKey } from "@metaplex-foundation/js";
@@ -53,7 +55,11 @@ function iteratorToStream(iterator: AsyncGenerator) {
   });
 }
 
-const handleHashListChunk = async (hashListChunk: string[]) => {
+const handleHashListChunk = async (
+  hashListChunk: string[],
+  nftCollectionId: string,
+  shouldOverwrite: boolean
+) => {
   if (!hashListChunk?.length) {
     throw new Error("Could not resolve hash list");
   }
@@ -95,7 +101,29 @@ const handleHashListChunk = async (hashListChunk: string[]) => {
     (nft) => !existingMintAddressesSet.has(nft.mintAddress)
   );
 
-  for (let nft of nonExistingNftsWithMetadataFiltered) {
+  const metadatasToProcess = shouldOverwrite
+    ? nftsWithMetadata
+    : nonExistingNftsWithMetadataFiltered;
+
+  if (shouldOverwrite) {
+    // delete all existing characters for this collection
+    await client.request({
+      document: REMOVE_CHARACTERS_BY_MINT_ADDRESSES,
+      variables: {
+        mintAddresses: hashListChunk,
+      },
+    });
+
+    // delete all existing tokens for this collection
+    await client.request({
+      document: REMOVE_TOKENS_BY_MINT_ADDRESSES,
+      variables: {
+        mintAddresses: hashListChunk,
+      },
+    });
+  }
+
+  for (let nft of metadatasToProcess) {
     const { mintAddress, imageUrl, symbol, name, traits } = nft;
 
     tokensToInsert.push({
@@ -158,6 +186,7 @@ const handleHashListChunk = async (hashListChunk: string[]) => {
         return {
           ...character,
           tokenId: mintAddressToTokenId[character.tokenId],
+          nftCollectionId,
         };
       }),
     },
@@ -184,20 +213,21 @@ const handleHashListChunk = async (hashListChunk: string[]) => {
     });
 
   return {
-    numberOfTokensSkipped: existingMintAddressesSet.size,
-    numberOfTokensAdded: tokensToAdd.length,
+    numberOfTokensAdded: tokensResponse?.insert_tokens?.affected_rows || 0,
+    numberOfTokensSkipped:
+      hashListChunk.length - tokensResponse?.insert_tokens?.affected_rows || 0,
     numberOfCharactersAdded:
-      nftsWithMetadata.length - existingMintAddressesSet.size,
-    numberOfCharactersSkipped: existingMintAddressesSet.size,
-    numberOfTraitsSkipped: traitsResponse?.insert_traits?.affected_rows || 0,
-    numberOfTraitsAdded: traitsResponse?.insert_traits?.affected_rows || 0,
-    numberOfTraitInstancesAdded:
-      traitInstancesResponse?.insert_traitInstances?.affected_rows || 0,
+      charactersResponse?.insert_characters?.affected_rows || 0,
+    numberOfCharactersSkipped: hashListChunk.length - charactersToInsert.length,
   };
 };
 
 // Generator function for processing hashlist and streaming updates
-async function* makeProcessingIterator(hashList: string) {
+async function* makeProcessingIterator(
+  hashList: string,
+  nftCollectionId: string,
+  shouldOverwrite: boolean
+) {
   // Acknowledge the receipt to the client
   yield new TextEncoder().encode("Received hashlist. Starting processing...\n");
 
@@ -206,12 +236,14 @@ async function* makeProcessingIterator(hashList: string) {
   // Split the hashList into manageable chunks
   const chunks = chunkArray(jsonHashList, CHUNK_SIZE);
 
-  console.log({ chunks });
-
   for (let i = 0; i < chunks.length; i++) {
     const chunk = chunks[i];
     try {
-      const chunkRes = await handleHashListChunk(chunk);
+      const chunkRes = await handleHashListChunk(
+        chunk,
+        nftCollectionId,
+        shouldOverwrite
+      );
       const progress = calculateProgress(i, chunks.length);
       yield new TextEncoder().encode(JSON.stringify({ progress, ...chunkRes }));
     } catch (error) {
@@ -226,11 +258,18 @@ async function* makeProcessingIterator(hashList: string) {
 }
 
 export async function POST(req: NextRequest) {
-  const { hashList } = await req.json();
+  const { hashList, nftCollectionId, shouldOverwrite } = await req.json();
 
-  // Begin streaming and processing right away
-  const iterator = makeProcessingIterator(hashList);
+  const iterator = makeProcessingIterator(
+    hashList,
+    nftCollectionId,
+    shouldOverwrite
+  );
   const stream = iteratorToStream(iterator);
+
+  console.log({
+    shouldOverwrite,
+  });
 
   return new Response(stream);
 }

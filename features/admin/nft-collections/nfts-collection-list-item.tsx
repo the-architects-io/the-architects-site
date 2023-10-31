@@ -12,7 +12,7 @@ export interface NftCollection {
   createdAt: string;
   name: string;
   firstVerifiedCreator: string;
-  verifiedCollectionAddress: string;
+  collectionAddress: string;
   imageUrl: string;
   community: {
     id: string;
@@ -44,10 +44,8 @@ export const NftCollectionsListItem = ({
       <div className="flex items-center space-x-12">
         <div>{collection.name}</div>
         <div className="my-4 w-1/4 flex items-center space-x-12">
-          {!!collection.verifiedCollectionAddress && (
-            <div>
-              {getAbbreviatedAddress(collection.verifiedCollectionAddress)}
-            </div>
+          {!!collection.collectionAddress && (
+            <div>{getAbbreviatedAddress(collection.collectionAddress)}</div>
           )}
           {!!collection.firstVerifiedCreator && (
             <div>{getAbbreviatedAddress(collection.firstVerifiedCreator)}</div>

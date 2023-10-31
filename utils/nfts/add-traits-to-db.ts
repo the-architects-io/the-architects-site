@@ -4,7 +4,6 @@ import { ADD_TRAIT } from "@/graphql/mutations/add-trait";
 import { GET_TRAITS_BY_NFT_COLLECTION } from "@/graphql/queries/get-traits-by-nft-collection";
 
 export const addTraitsToDb = async (nfts: any[], nftCollectionId: string) => {
-  // throw new Error("Not implemented");
   const { traits: traitsFromDb }: { traits: Trait[] } = await client.request({
     document: GET_TRAITS_BY_NFT_COLLECTION,
     variables: {

@@ -2,7 +2,7 @@ import { Helius } from "helius-sdk";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { collectionAddress } = await req.json();
+  const { collectionAddress, mintAddressesOnly } = await req.json();
 
   if (!collectionAddress || !process.env.HELIUS_API_KEY) {
     return NextResponse.json(
@@ -34,7 +34,14 @@ export async function POST(req: NextRequest) {
       });
 
       if (response.items && response.items.length) {
-        const chunk = encoder.encode(JSON.stringify(response.items));
+        let chunk;
+        if (mintAddressesOnly) {
+          chunk = encoder.encode(
+            JSON.stringify(response.items.map(({ id }) => id))
+          );
+        } else {
+          chunk = encoder.encode(JSON.stringify(response.items));
+        }
         await writer.write(chunk);
         page++;
       } else {
