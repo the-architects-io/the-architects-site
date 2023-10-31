@@ -254,6 +254,10 @@ async function* makeProcessingIterator(
   yield new TextEncoder().encode("Processing complete.\n");
 }
 
+export const config = {
+  runtime: "edge",
+};
+
 export async function POST(req: NextRequest) {
   const { hashList, nftCollectionId, shouldOverwrite } = await req.json();
 
