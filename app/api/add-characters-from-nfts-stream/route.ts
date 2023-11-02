@@ -1,22 +1,20 @@
+import { isAsset } from "@/app/api/add-tokens/route";
 import {
   AddCharactersResponse,
-  AddTokensResponse,
   AddTraitInstancesResponse,
   AddTraitsResponse,
+  Attribute,
+  ModeledNftMetadata,
   Token,
+  Trait,
 } from "@/app/blueprint/types";
-import { RPC_ENDPOINT } from "@/constants/constants";
+import { BASE_URL, RPC_ENDPOINT } from "@/constants/constants";
 import { client } from "@/graphql/backend-client";
 import { ADD_CHARACTERS } from "@/graphql/mutations/add-characters";
-import { ADD_TOKENS } from "@/graphql/mutations/add-tokens";
 import { ADD_TRAIT_INSTANCES } from "@/graphql/mutations/add-trait-instances";
 import { ADD_TRAITS } from "@/graphql/mutations/add-traits";
-import { REMOVE_CHARACTERS_BY_MINT_ADDRESSES } from "@/graphql/mutations/remove-characters-by-mint-addresses";
-import { REMOVE_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/mutations/remove-tokens-by-mint-addresses";
-import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
-import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
-import { Metaplex, PublicKey } from "@metaplex-foundation/js";
-import { Connection } from "@solana/web3.js";
+// import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
+import { DigitalAsset } from "@metaplex-foundation/mpl-token-metadata";
 import { NextRequest } from "next/server";
 
 const CHUNK_SIZE = 10;
@@ -64,79 +62,111 @@ const handleHashListChunk = async (
     throw new Error("Could not resolve hash list");
   }
 
-  const connection = new Connection(RPC_ENDPOINT);
-  const metaplex = Metaplex.make(connection);
-  const mints = hashListChunk.map((address) => new PublicKey(address));
-  const nftMetasFromMetaplex = await metaplex
-    .nfts()
-    .findAllByMintList({ mints });
+  // const connection = new Connection(RPC_ENDPOINT);
+  // const metaplex = Metaplex.make(connection);
+  // const mints = hashListChunk.map((address) => new PublicKey(address));
+  // const nftMetasFromMetaplex = await metaplex
+  //   .nfts()
+  //   .findAllByMintList({ mints });
 
-  if (!nftMetasFromMetaplex.length) {
-    throw new Error("No nfts fetched from metaplex");
-  }
+  // if (!nftMetasFromMetaplex.length) {
+  //   throw new Error("No nfts fetched from metaplex");
+  // }
 
-  const nftsWithMetadata = await fetchNftsWithMetadata(
-    nftMetasFromMetaplex,
-    metaplex
-  );
-
+  // const nftsWithMetadata = await fetchNftsWithMetadata(
+  //   nftMetasFromMetaplex,
+  //   metaplex
+  // );
+  const nftsWithMetadata: ModeledNftMetadata[] = [];
   const tokensToInsert = [];
   const charactersToInsert = [];
   const traitsToInsert = new Set();
   const traitInstancesToInsert = [];
 
   // first get the tokens that are already in the db
-  const { tokens }: { tokens: Token[] } = await client.request({
-    document: GET_TOKENS_BY_MINT_ADDRESSES,
-    variables: {
+  // const res = await fetch(`${BASE_URL}/api/get-tokens-by-mint-addresses`, {
+  //   method: "POST",
+  //   body: JSON.stringify({
+  //     mintAddresses: hashListChunk,
+  //   }),
+  // });
+
+  // const { tokens }: { tokens: Token[] } = await res.json();
+
+  // instead of fetching all tokens we'll let add-tokens handle it
+  // and pass back all tokens that were added
+  const tokens: Token[] = [];
+
+  const res = await fetch(`${BASE_URL}/api/add-tokens`, {
+    method: "POST",
+    body: JSON.stringify({
       mintAddresses: hashListChunk,
-    },
+    }),
   });
 
-  const existingMintAddressesSet = new Set(
-    tokens.map((token) => token.mintAddress)
-  );
+  const {
+    assets: allTokens,
+    addedTokens,
+  }: { assets: DigitalAsset[]; addedTokens: Token[] } = await res.json();
 
-  const nonExistingNftsWithMetadataFiltered = nftsWithMetadata.filter(
-    (nft) => !existingMintAddressesSet.has(nft.mintAddress)
-  );
-
-  const metadatasToProcess = shouldOverwrite
-    ? nftsWithMetadata
-    : nonExistingNftsWithMetadataFiltered;
+  const metadatasToProcess = shouldOverwrite ? allTokens : addedTokens;
 
   if (shouldOverwrite) {
-    // delete all existing characters for this collection
-    await client.request({
-      document: REMOVE_CHARACTERS_BY_MINT_ADDRESSES,
-      variables: {
-        mintAddresses: hashListChunk,
-      },
-    });
+    const charactersRes = await fetch(
+      `${BASE_URL}/api/remove-characters-by-mint-addresses`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          mintAddresses: hashListChunk,
+        }),
+      }
+    );
 
-    // delete all existing tokens for this collection
-    await client.request({
-      document: REMOVE_TOKENS_BY_MINT_ADDRESSES,
-      variables: {
-        mintAddresses: hashListChunk,
-      },
-    });
+    const { status: charactersStatus } = await charactersRes.json();
+
+    if (charactersStatus !== 200) {
+      throw new Error("Could not remove characters");
+    }
+
+    const tokensRes = await fetch(
+      `${BASE_URL}/api/remove-tokens-by-mint-addresses`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          mintAddresses: hashListChunk,
+        }),
+      }
+    );
+
+    const { status: tokensStatus } = await tokensRes.json();
+
+    if (tokensStatus !== 200) {
+      throw new Error("Could not remove tokens");
+    }
   }
 
   for (let nft of metadatasToProcess) {
-    const { mintAddress, imageUrl, symbol, name, traits } = nft;
+    if (!isAsset(nft)) {
+      continue;
+    }
+    const { metadata, publicKey } = nft;
+    const { symbol, name, uri } = metadata;
 
-    tokensToInsert.push({
-      decimals: 0,
-      imageUrl,
-      mintAddress,
-      symbol,
-      name,
-    });
+    const { image, attributes } = await fetch(uri).then((res) => res.json());
+
+    const traits =
+      attributes
+        ?.map(({ trait_type, value }: Attribute) => ({
+          name: trait_type || "",
+          value: value || "",
+        }))
+        .filter(({ name, value }: Trait) => name !== "" && value !== "") || [];
+
     charactersToInsert.push({
       name,
-      imageUrl,
-      tokenId: mintAddress,
+      imageUrl: image,
+      mintAddress: publicKey.toString(),
+      traits,
     });
 
     if (!traits?.length) continue;
@@ -146,22 +176,8 @@ const handleHashListChunk = async (
     }
   }
 
-  // then filter out the ones that are already in the db
-  const existingMintAddresses = tokens.map((token: Token) => token.mintAddress);
-
-  const tokensToAdd = tokensToInsert.filter(
-    (token) => !existingMintAddresses.includes(token.mintAddress)
-  );
-
-  const tokensResponse: AddTokensResponse = await client.request({
-    document: ADD_TOKENS,
-    variables: {
-      tokens: tokensToInsert,
-    },
-  });
-
   const mintAddressToTokenId: Record<string, string> = {};
-  tokensResponse?.insert_tokens?.returning.forEach((token) => {
+  addedTokens.forEach((token) => {
     mintAddressToTokenId[token.mintAddress] = token.id;
   });
 
@@ -185,7 +201,7 @@ const handleHashListChunk = async (
       characters: charactersToInsert.map((character) => {
         return {
           ...character,
-          tokenId: mintAddressToTokenId[character.tokenId],
+          tokenId: mintAddressToTokenId[character.mintAddress],
           nftCollectionId,
         };
       }),
@@ -213,9 +229,9 @@ const handleHashListChunk = async (
     });
 
   return {
-    numberOfTokensAdded: tokensResponse?.insert_tokens?.affected_rows || 0,
+    numberOfTokensAdded: addedTokens?.length || 0,
     numberOfTokensSkipped:
-      hashListChunk.length - tokensResponse?.insert_tokens?.affected_rows || 0,
+      hashListChunk.length - (addedTokens?.length || 0) || 0,
   };
 };
 
@@ -255,6 +271,7 @@ async function* makeProcessingIterator(
 }
 
 export const runtime = "edge";
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   const { hashList, nftCollectionId, shouldOverwrite } = await req.json();
@@ -265,10 +282,6 @@ export async function POST(req: NextRequest) {
     shouldOverwrite
   );
   const stream = iteratorToStream(iterator);
-
-  console.log({
-    shouldOverwrite,
-  });
 
   return new Response(stream);
 }

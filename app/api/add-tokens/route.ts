@@ -56,7 +56,9 @@ type ModeledToken = {
   decimals: number;
 };
 
-const isAsset = (entity: DigitalAsset | Mint): entity is DigitalAsset => {
+export const isAsset = (
+  entity: DigitalAsset | Mint | Token
+): entity is DigitalAsset => {
   return "mint" in entity && entity.mint ? true : false;
 };
 
@@ -242,6 +244,7 @@ export async function POST(req: NextRequest) {
       });
     return NextResponse.json(
       {
+        assets,
         addedTokens: addedTokens?.returning,
         allTokens: [...tokensInDb, ...addedTokens?.returning],
       } || [],

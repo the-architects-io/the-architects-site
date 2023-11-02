@@ -1,24 +1,4 @@
-import { Trait } from "@/app/blueprint/types";
-
-export type Attribute = {
-  trait_type: string;
-  value: string;
-};
-
-export type ModeledNftMetadata = {
-  traits?: Trait[];
-  description: string;
-  edition: number;
-  url: string;
-  name: string;
-  imageUrl: string;
-  mintAddress: string;
-  creators: string[];
-  fee: number;
-  symbol: string;
-  freezeAuthorityAddress: string;
-  mintAuthorityAddress: string;
-};
+import { Attribute, ModeledNftMetadata, Trait } from "@/app/blueprint/types";
 
 export const fetchNftsWithMetadata = async (
   nfts: any[],
