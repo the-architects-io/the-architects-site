@@ -1,5 +1,5 @@
 "use client";
-import { RPC_ENDPOINT } from "@/constants/constants";
+import { BASE_URL, RPC_ENDPOINT } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Panel } from "@/features/UI/panel";
@@ -11,6 +11,7 @@ import { PublicKey } from "@metaplex-foundation/js";
 import { ShdwDrive, StorageAccountV2 } from "@shadow-drive/sdk";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function DriveInstancePage({
@@ -28,8 +29,10 @@ export default function DriveInstancePage({
   const [storedObjectKeys, setStoredObjectKeys] = useState<any[]>([]);
   const [numberOfConcurrentUploads, setNumberOfConcurrentUploads] =
     useState<string>("3");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fetchStoredObjects = async (drive: ShdwDrive) => {
+    setIsLoading(true);
     const storedObjects = await drive.listObjects(new PublicKey(params.id));
 
     if (!storedObjects) {
@@ -38,6 +41,7 @@ export default function DriveInstancePage({
     }
 
     setStoredObjectKeys(storedObjects.keys);
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -62,32 +66,36 @@ export default function DriveInstancePage({
   }, [wallet?.publicKey]);
 
   return (
-    <div className="flex flex-col items-center pt-32 w-full">
+    <ContentWrapper className="flex flex-col items-center pt-32 w-full">
+      <div className="-mt-8 mb-8 ml-8 self-start uppercase">
+        <Link href={`${BASE_URL}/drive`}> &larr; Back to drives</Link>
+      </div>
       {!!shadowDrive && !!storageAccount && (
         <div className="w-full flex flex-1">
           <DriveFileList
+            isLoading={isLoading}
             files={storedObjectKeys}
             driveAddress={params.id}
             shadowDrive={shadowDrive}
             storageAccount={storageAccount}
             refetchFiles={() => fetchStoredObjects(shadowDrive)}
           />
-          <div className="w-[300px]">
+          <div className="w-[320px]">
             <DriveInfo
               driveAddress={params.id}
               storageAccount={storageAccount}
               shadowDrive={shadowDrive}
               refetchFiles={() => fetchStoredObjects(shadowDrive)}
             />
-            {/* <DriveControls
+            <DriveControls
               shadowDrive={shadowDrive}
               driveAddress={params.id}
               files={storedObjectKeys}
               refetchFiles={() => fetchStoredObjects(shadowDrive)}
-            /> */}
+            />
           </div>
         </div>
       )}
-    </div>
+    </ContentWrapper>
   );
 }

@@ -28,15 +28,13 @@ export default function ShadowUpload({
   const [uploadUrl, setUploadUrl] = useState<String | null>(null);
   const [txnSig, setTxnSig] = useState<String | null>(null);
   const [isSending, setIsSending] = useState<boolean>(false);
-  const { connection } = useConnection();
-  const wallet = useWallet();
 
   if (!isAdmin) return <NotAdminBlocker />;
 
   return (
     <div>
       <form
-        className="flex flex-col items-center py-4"
+        className="flex flex-col py-4"
         onSubmit={async (event) => {
           event.preventDefault();
 
@@ -44,7 +42,6 @@ export default function ShadowUpload({
             alert("No file selected");
             return;
           }
-          const drive = await new ShdwDrive(connection, wallet).init();
           // const getStorageAccount = await drive.getStorageAccount(accountPublicKey);
 
           setIsSending(true);
@@ -102,7 +99,7 @@ export default function ShadowUpload({
         <PrimaryButton
           type="submit"
           disabled={isSending || isNaN(numberOfConcurrentUploads)}
-          className="w-1/2"
+          className="w-1/2 flex justify-center"
         >
           {isSending ? <Spinner /> : "Upload"}
         </PrimaryButton>

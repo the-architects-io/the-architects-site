@@ -26,7 +26,7 @@ export default function DriveInfo({
       </div>
       <div className="flex flex-col mb-2">
         <div className="uppercase text-gray-400 text-sm font-bold mr-2">
-          Marked to Delete
+          Marked for Deletion
         </div>
         <div>{storageAccount?.toBeDeleted ? "Yes" : "No"}</div>
       </div>

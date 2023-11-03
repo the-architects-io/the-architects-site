@@ -58,19 +58,19 @@ export default function DriveControls({
   if (!shadowDrive) return null;
 
   return (
-    <Panel className="flex flex-col justify-center">
-      <PrimaryButton className="mb-4" onClick={handleDeleteDrive}>
+    <div className="flex flex-col justify-center px-4">
+      <PrimaryButton className="my-4 w-[160px]" onClick={handleDeleteDrive}>
         Delete drive
       </PrimaryButton>
-      <PrimaryButton className="mb-4" onClick={handleDeleteAllFiles}>
+      {/* <PrimaryButton className="mb-4 w-[160px]" onClick={handleDeleteAllFiles}>
         Delete all files
-      </PrimaryButton>
+      </PrimaryButton> */}
       <ShadowUpload
         drive={shadowDrive}
         accountPublicKey={new PublicKey(driveAddress)}
         onCompleted={() => refetchFiles(shadowDrive)}
         numberOfConcurrentUploads={3}
       />
-    </Panel>
+    </div>
   );
 }
