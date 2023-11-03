@@ -406,12 +406,12 @@ export default function DriveFileList({
 
   return (
     <div className="p-2 w-full px-8 max-h-screen overflow-y-auto">
-      <DebouncedInput
+      {/* <DebouncedInput
         value={globalFilter ?? ""}
         onChange={(value) => setGlobalFilter(String(value))}
         className="p-2 font-lg shadow border border-block text-black"
         placeholder="Search all columns..."
-      />
+      /> */}
       <TableVirtuoso
         style={{
           // get height of window minus header
