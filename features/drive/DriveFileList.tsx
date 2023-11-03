@@ -270,72 +270,121 @@ export default function DriveFileList({
     [driveAddress, isBeingDeletedFiles, refetchFiles, shadowDrive]
   );
 
-  const renderFiles = useCallback(
-    (files: string[]) => {
-      setData(
-        files.map((filename) => {
-          return {
-            filename: (
-              <div className="flex items-center">
-                <a
-                  href={`https://shdw-drive.genesysgo.net/${driveAddress}/${filename}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:underline"
-                >
-                  <div className="mr-4">{filename}</div>
-                </a>
-              </div>
-            ),
-            copy: (
-              <div
-                className="cursor-pointer w-3"
-                onClick={() => handleCopyToClipboard(filename)}
-              >
-                <ClipboardIcon
-                  height="1.5rem"
-                  width="1.5rem"
-                  className="h-6 w-6 flex-none hover:bg-sky-200"
-                />
-              </div>
-            ),
-            delete: (
-              <div
-                className="cursor-pointer flex justify-center flex-none w-3"
-                onClick={
-                  isBeingDeletedFiles.includes(filename)
-                    ? () => {}
-                    : () => handleDeleteFile(filename)
-                }
-              >
-                {isBeingDeletedFiles.includes(filename) ? (
-                  <Spinner />
-                ) : (
-                  <TrashIcon
-                    height="1.5rem"
-                    width="1.5rem"
-                    className="h-6 w-6 flex-none hover:bg-red-300"
-                  />
-                )}
-              </div>
-            ),
-          };
-        })
-      );
-    },
-    [driveAddress, handleCopyToClipboard, handleDeleteFile, isBeingDeletedFiles]
-  );
+  // const renderFiles = useCallback(
+  //   (files: string[]) => {
+  //     setData(
+  //       files.map((filename) => {
+  //         return {
+  //           filename: (
+  //             <div className="flex items-center">
+  //               <a
+  //                 href={`https://shdw-drive.genesysgo.net/${driveAddress}/${filename}`}
+  //                 target="_blank"
+  //                 rel="noreferrer"
+  //                 className="hover:underline"
+  //               >
+  //                 <div className="mr-4">{filename}</div>
+  //               </a>
+  //             </div>
+  //           ),
+  //           copy: (
+  //             <div
+  //               className="cursor-pointer w-3"
+  //               onClick={() => handleCopyToClipboard(filename)}
+  //             >
+  //               <ClipboardIcon
+  //                 height="1.5rem"
+  //                 width="1.5rem"
+  //                 className="h-6 w-6 flex-none hover:bg-sky-200"
+  //               />
+  //             </div>
+  //           ),
+  //           delete: (
+  //             <div
+  //               className="cursor-pointer flex justify-center flex-none w-3"
+  //               onClick={
+  //                 isBeingDeletedFiles.includes(filename)
+  //                   ? () => {}
+  //                   : () => handleDeleteFile(filename)
+  //               }
+  //             >
+  //               {isBeingDeletedFiles.includes(filename) ? (
+  //                 <Spinner />
+  //               ) : (
+  //                 <TrashIcon
+  //                   height="1.5rem"
+  //                   width="1.5rem"
+  //                   className="h-6 w-6 flex-none hover:bg-red-300"
+  //                 />
+  //               )}
+  //             </div>
+  //           ),
+  //         };
+  //       })
+  //     );
+  //   },
+  //   [driveAddress, handleCopyToClipboard, handleDeleteFile, isBeingDeletedFiles]
+  // );
 
   useEffect(() => {
     if (!files?.length) return;
 
-    renderFiles(files);
+    setData(
+      files.map((filename) => {
+        return {
+          filename: (
+            <div className="flex items-center">
+              <a
+                href={`https://shdw-drive.genesysgo.net/${driveAddress}/${filename}`}
+                target="_blank"
+                rel="noreferrer"
+                className="hover:underline"
+              >
+                <div className="mr-4">{filename}</div>
+              </a>
+            </div>
+          ),
+          copy: (
+            <div
+              className="cursor-pointer w-3"
+              onClick={() => handleCopyToClipboard(filename)}
+            >
+              <ClipboardIcon
+                height="1.5rem"
+                width="1.5rem"
+                className="h-6 w-6 flex-none hover:bg-sky-200"
+              />
+            </div>
+          ),
+          delete: (
+            <div
+              className="cursor-pointer flex justify-center flex-none w-3"
+              onClick={
+                isBeingDeletedFiles.includes(filename)
+                  ? () => {}
+                  : () => handleDeleteFile(filename)
+              }
+            >
+              {isBeingDeletedFiles.includes(filename) ? (
+                <Spinner />
+              ) : (
+                <TrashIcon
+                  height="1.5rem"
+                  width="1.5rem"
+                  className="h-6 w-6 flex-none hover:bg-red-300"
+                />
+              )}
+            </div>
+          ),
+        };
+      })
+    );
   }, [
+    driveAddress,
     files,
     handleCopyToClipboard,
     handleDeleteFile,
     isBeingDeletedFiles,
-    renderFiles,
   ]);
 
   if (isLoading) {
@@ -357,12 +406,12 @@ export default function DriveFileList({
 
   return (
     <div className="p-2 w-full px-8 max-h-screen overflow-y-auto">
-      {/* <DebouncedInput
+      <DebouncedInput
         value={globalFilter ?? ""}
         onChange={(value) => setGlobalFilter(String(value))}
         className="p-2 font-lg shadow border border-block text-black"
         placeholder="Search all columns..."
-      /> */}
+      />
       <TableVirtuoso
         style={{
           // get height of window minus header

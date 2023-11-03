@@ -10,8 +10,7 @@ import { DispenserClaimButton } from "@/features/UI/buttons/dispenser-claim-butt
 import { BASE_URL, BUILD_REWARD_WALLET } from "@/constants/constants";
 import axios from "axios";
 import { BuildTokenVestingDetails } from "@/features/dispensers/details/build-token-vesting-details";
-import { ModeledNftMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
-import { Dispenser } from "@/app/blueprint/types";
+import { Dispenser, ModeledNftMetadata } from "@/app/blueprint/types";
 import { useUserData } from "@nhost/nextjs";
 
 export interface ITokenClaim {

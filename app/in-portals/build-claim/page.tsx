@@ -7,11 +7,10 @@ import PortalsSdk from "@/utils/portals-sdk-v2";
 import { ENV } from "@/constants/constants";
 import { DispenserClaim } from "@/features/in-portals/dispenser-claim";
 import { fetchDaoNfts } from "@/utils/nfts/fetch-dao-nfts";
-import { ModeledNftMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import WalletButton from "@/features/UI/buttons/wallet-button";
 import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
 import { useQuery } from "@apollo/client";
-import { Token } from "@/app/blueprint/types";
+import { ModeledNftMetadata, Token } from "@/app/blueprint/types";
 
 // Deprecated, used for BUILD claim only
 
