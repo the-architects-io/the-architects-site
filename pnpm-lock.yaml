@@ -86,12 +86,18 @@ dependencies:
   '@solana/web3.js':
     specifier: ^1.77.2
     version: 1.87.0(encoding@0.1.13)
+  '@tanstack/match-sorter-utils':
+    specifier: ^8.8.4
+    version: 8.8.4
   '@tanstack/react-table':
     specifier: ^8.10.7
     version: 8.10.7(react-dom@18.2.0)(react@18.2.0)
   '@tanstack/react-virtual':
     specifier: 3.0.0-alpha.0
     version: 3.0.0-alpha.0(react@18.2.0)
+  '@tanstack/table-core':
+    specifier: ^8.10.7
+    version: 8.10.7
   '@types/node':
     specifier: 20.2.5
     version: 20.2.5
@@ -5545,6 +5551,13 @@ packages:
     resolution: {integrity: sha512-sJ902EfIzn1Fa+qYmjdQqh8tPsoxyBz+8yBKC2HKUxyezKJFwPGOn7pv4WY6QuQW//ySQi5lJjA/ZT9sNWWNTg==}
     dependencies:
       tslib: 2.6.2
+    dev: false
+
+  /@tanstack/match-sorter-utils@8.8.4:
+    resolution: {integrity: sha512-rKH8LjZiszWEvmi01NR72QWZ8m4xmXre0OOwlRGnjU01Eqz/QnN+cqpty2PJ0efHblq09+KilvyR7lsbzmXVEw==}
+    engines: {node: '>=12'}
+    dependencies:
+      remove-accents: 0.4.2
     dev: false
 
   /@tanstack/react-table@8.10.7(react-dom@18.2.0)(react@18.2.0):
@@ -16413,6 +16426,10 @@ packages:
     hasBin: true
     dependencies:
       jsesc: 0.5.0
+    dev: false
+
+  /remove-accents@0.4.2:
+    resolution: {integrity: sha512-7pXIJqJOq5tFgG1A2Zxti3Ht8jJF337m4sowbuHsW30ZnkQFnDzy9qBNhgzX8ZLW4+UBcXiiR7SwR6pokHsxiA==}
     dev: false
 
   /remove-trailing-separator@1.1.0:

@@ -6,23 +6,33 @@ import { ClipboardIcon, EyeIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { PublicKey } from "@metaplex-foundation/js";
 import { ShdwDrive, StorageAccountV2 } from "@shadow-drive/sdk";
 import {
+  RankingInfo,
+  compareItems,
+  rankItem,
+} from "@tanstack/match-sorter-utils";
+import {
   ColumnDef,
+  ColumnFiltersState,
+  FilterFn,
+  SortingFn,
   SortingState,
   createColumnHelper,
-  createTable,
   flexRender,
   getCoreRowModel,
+  getFacetedMinMaxValues,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFilteredRowModel,
   getSortedRowModel,
+  sortingFns,
   useReactTable,
 } from "@tanstack/react-table";
-import classNames from "classnames";
-import Link from "next/link";
 import {
+  InputHTMLAttributes,
   useCallback,
   useEffect,
   useMemo,
   useReducer,
-  useRef,
   useState,
 } from "react";
 import { TableVirtuoso } from "react-virtuoso";
@@ -32,6 +42,48 @@ type DriveFileList = {
   copy: JSX.Element;
   delete: JSX.Element;
 };
+
+function DebouncedInput({
+  value: initialValue,
+  onChange,
+  debounce = 500,
+  ...props
+}: {
+  value: string | number;
+  onChange: (value: string | number) => void;
+  debounce?: number;
+} & Omit<InputHTMLAttributes<HTMLInputElement>, "onChange">) {
+  const [value, setValue] = useState(initialValue);
+
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      onChange(value);
+    }, debounce);
+
+    return () => clearTimeout(timeout);
+  }, [debounce, onChange, value]);
+
+  return (
+    <input
+      {...props}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+    />
+  );
+}
+
+declare module "@tanstack/table-core" {
+  interface FilterFns {
+    fuzzy: FilterFn<unknown>;
+  }
+  interface FilterMeta {
+    itemRank: RankingInfo;
+  }
+}
 
 export default function DriveFileList({
   files,
@@ -51,8 +103,40 @@ export default function DriveFileList({
   const [data, setData] = useState<DriveFileList[]>([]);
   const [isBeingDeletedFiles, setIsBeingDeletedFiles] = useState<string[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = useState("");
 
   const columnHelper = createColumnHelper<DriveFileList>();
+
+  const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+    // Rank the item
+    const itemRank = rankItem(row.getValue(columnId), value);
+
+    // Store the itemRank info
+    addMeta({
+      itemRank,
+    });
+
+    // Return if the item should be filtered in/out
+    return itemRank.passed;
+  };
+
+  const fuzzySort: SortingFn<any> = (rowA, rowB, columnId) => {
+    let dir = 0;
+
+    // Only sort by rank if the column has ranking information
+    if (rowA.columnFiltersMeta[columnId]) {
+      dir = compareItems(
+        // @ts-ignore
+        rowA.columnFiltersMeta[columnId]?.itemRank!,
+        // @ts-ignore
+        rowB.columnFiltersMeta[columnId]?.itemRank!
+      );
+    }
+
+    // Provide an alphanumeric fallback for when the item ranks are equal
+    return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir;
+  };
 
   const columns = useMemo<ColumnDef<DriveFileList>[]>(
     () => [
@@ -61,6 +145,7 @@ export default function DriveFileList({
         accessorKey: "filename",
         cell: (info) => info.getValue(),
         accessorFn: (row) => row.filename,
+        // sortingFn: fuzzySort,
       },
       {
         header: () => "",
@@ -104,12 +189,24 @@ export default function DriveFileList({
   const table = useReactTable({
     data,
     columns,
+    filterFns: {
+      fuzzy: fuzzyFilter,
+    },
     state: {
+      columnFilters,
+      globalFilter,
       sorting,
     },
+    globalFilterFn: fuzzyFilter,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
     debugTable: true,
   });
 
@@ -151,7 +248,6 @@ export default function DriveFileList({
         setIsBeingDeletedFiles((prev) => [...prev, filename]);
       }
 
-      // throw error if message does not containe `successfully deleted`
       if (!response?.message?.includes("successfully deleted")) {
         showToast({
           primaryMessage: "Error",
@@ -261,6 +357,12 @@ export default function DriveFileList({
 
   return (
     <div className="p-2 w-full px-8 max-h-screen overflow-y-auto">
+      {/* <DebouncedInput
+        value={globalFilter ?? ""}
+        onChange={(value) => setGlobalFilter(String(value))}
+        className="p-2 font-lg shadow border border-block text-black"
+        placeholder="Search all columns..."
+      /> */}
       <TableVirtuoso
         style={{
           // get height of window minus header
