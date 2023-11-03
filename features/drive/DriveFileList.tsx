@@ -25,6 +25,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { TableVirtuoso } from "react-virtuoso";
 
 type DriveFileList = {
   filename: JSX.Element | string;
@@ -56,7 +57,7 @@ export default function DriveFileList({
   const columns = useMemo<ColumnDef<DriveFileList>[]>(
     () => [
       {
-        header: () => <div className="uppercase">Filenames</div>,
+        header: () => <div className="uppercase mr-4">Filename</div>,
         accessorKey: "filename",
         cell: (info) => info.getValue(),
         accessorFn: (row) => row.filename,
@@ -133,10 +134,22 @@ export default function DriveFileList({
 
       setIsBeingDeletedFiles((prev) => [...prev, filename]);
 
-      const response = await shadowDrive.deleteFile(
-        new PublicKey(driveAddress),
-        `https://shdw-drive.genesysgo.net/${driveAddress}/${filename}`
-      );
+      let response;
+
+      try {
+        response = await shadowDrive.deleteFile(
+          new PublicKey(driveAddress),
+          `https://shdw-drive.genesysgo.net/${driveAddress}/${filename}`
+        );
+      } catch {
+        showToast({
+          primaryMessage: "Error",
+          secondaryMessage: `Failed to delete ${filename}`,
+        });
+        return;
+      } finally {
+        setIsBeingDeletedFiles((prev) => [...prev, filename]);
+      }
 
       // throw error if message does not containe `successfully deleted`
       if (!response?.message?.includes("successfully deleted")) {
@@ -144,6 +157,7 @@ export default function DriveFileList({
           primaryMessage: "Error",
           secondaryMessage: `Failed to delete ${filename}`,
         });
+        setIsBeingDeletedFiles((prev) => [...prev, filename]);
         return;
       }
 
@@ -153,23 +167,12 @@ export default function DriveFileList({
       });
 
       refetchFiles(shadowDrive);
-
       setIsBeingDeletedFiles((prev) =>
         prev.filter((isBeingDeletedFile) => isBeingDeletedFile !== filename)
       );
     },
     [driveAddress, isBeingDeletedFiles, refetchFiles, shadowDrive]
   );
-
-  const tableContainerRef = useRef<HTMLDivElement>(null);
-
-  // const { rows } = table.getRowModel();
-  // const rowVirtualizer = useVirtual({
-  //   parentRef: tableContainerRef,
-  //   size: rows.length,
-  //   overscan: 10,
-  // })
-  // const { virtualItems: virtualRows, totalSize } = rowVirtualizer
 
   const renderFiles = useCallback(
     (files: string[]) => {
@@ -182,6 +185,7 @@ export default function DriveFileList({
                   href={`https://shdw-drive.genesysgo.net/${driveAddress}/${filename}`}
                   target="_blank"
                   rel="noreferrer"
+                  className="hover:underline"
                 >
                   <div className="mr-4">{filename}</div>
                 </a>
@@ -192,7 +196,11 @@ export default function DriveFileList({
                 className="cursor-pointer w-3"
                 onClick={() => handleCopyToClipboard(filename)}
               >
-                <ClipboardIcon className="h-6 w-6 flex-none" />
+                <ClipboardIcon
+                  height="1.5rem"
+                  width="1.5rem"
+                  className="h-6 w-6 flex-none hover:bg-sky-200"
+                />
               </div>
             ),
             delete: (
@@ -207,7 +215,11 @@ export default function DriveFileList({
                 {isBeingDeletedFiles.includes(filename) ? (
                   <Spinner />
                 ) : (
-                  <TrashIcon className="h-6 w-6 flex-none" />
+                  <TrashIcon
+                    height="1.5rem"
+                    width="1.5rem"
+                    className="h-6 w-6 flex-none hover:bg-red-300"
+                  />
                 )}
               </div>
             ),
@@ -245,9 +257,91 @@ export default function DriveFileList({
     );
   }
 
+  const { rows } = table.getRowModel();
+
   return (
     <div className="p-2 w-full px-8 max-h-screen overflow-y-auto">
-      <table className="w-full">
+      <TableVirtuoso
+        style={{
+          // get height of window minus header
+          height: window.innerHeight - 168,
+        }}
+        totalCount={rows.length}
+        components={{
+          Table: ({ style, ...props }) => {
+            return (
+              <table
+                {...props}
+                style={{
+                  ...style,
+                  width: "100%",
+                  tableLayout: "fixed",
+                  borderCollapse: "collapse",
+                  borderSpacing: 0,
+                }}
+              />
+            );
+          },
+          TableRow: (props) => {
+            const index = props["data-index"];
+            const row = rows[index];
+
+            return (
+              <tr {...props} className="hover:bg-gray-800">
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="px-4 py-2 whitespace-nowrap">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            );
+          },
+        }}
+        fixedHeaderContent={() => {
+          return table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header, i) => {
+                if (i !== 0) {
+                  return <th key={header.id} className="w-3 bg-black" />;
+                }
+                return (
+                  <th
+                    className="text-left text-lg p-4 pb-6 bg-black"
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    style={{
+                      width: header.getSize(),
+                    }}
+                  >
+                    {header.isPlaceholder ? null : (
+                      // eslint-disable-next-line jsx-a11y/click-events-have-key-events
+                      <div
+                        className="flex items-center"
+                        {...{
+                          style: header.column.getCanSort()
+                            ? { cursor: "pointer", userSelect: "none" }
+                            : {},
+                          onClick: header.column.getToggleSortingHandler(),
+                        }}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {{
+                          asc: <ArrowUpIcon className="h-4 w-4" />,
+                          desc: <ArrowDownIcon className="h-4 w-4" />,
+                        }[header.column.getIsSorted() as string] ?? null}
+                      </div>
+                    )}
+                  </th>
+                );
+              })}
+            </tr>
+          ));
+        }}
+      />
+      {/* <table className="w-full">
         <thead>
           {table.getHeaderGroups().map((headerGroup, i) => (
             <>
@@ -308,47 +402,7 @@ export default function DriveFileList({
             </tr>
           ))}
         </tbody>
-      </table>
+      </table> */}
     </div>
-    // <div className="mb-8 w-full px-8 pt-2">
-    //   {!!files?.length ? (
-    //     <div className="flex flex-col w-full">
-    //       <div className="border-b border-gray-600"></div>
-    //       {files.map((filename) => (
-    //         <div
-    //           key={filename}
-    //           className="flex justify-between items-center w-full border-b border-gray-600 py-4 px-2"
-    //         >
-    //           <div>{filename}</div>
-    //           <div className="flex space-x-4">
-    //             <div
-    //               className="cursor-pointer"
-    //               onClick={() => handleCopyToClipboard(filename)}
-    //             >
-    //               <ClipboardIcon className="h-6 w-6" />
-    //             </div>
-    //             <div
-    //               className="cursor-pointer"
-    //               onClick={() => handleDeleteFile(filename)}
-    //             >
-    //               <TrashIcon className="h-6 w-6" />
-    //             </div>
-    //             <div>
-    //               <a
-    //                 href={`https://shdw-drive.genesysgo.net/${driveAddress}/${filename}`}
-    //                 target="_blank"
-    //                 rel="noreferrer"
-    //               >
-    //                 <EyeIcon className="h-6 w-6" />
-    //               </a>
-    //             </div>
-    //           </div>
-    //         </div>
-    //       ))}
-    //     </div>
-    //   ) : (
-    //     <div className="text-center py-8 italic">This drive is empty</div>
-    //   )}
-    // </div>
   );
 }
