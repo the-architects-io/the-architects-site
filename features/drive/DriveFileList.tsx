@@ -27,6 +27,7 @@ import {
   sortingFns,
   useReactTable,
 } from "@tanstack/react-table";
+import classNames from "classnames";
 import {
   InputHTMLAttributes,
   useCallback,
@@ -36,60 +37,28 @@ import {
   useState,
 } from "react";
 import { TableVirtuoso } from "react-virtuoso";
+import dataJSON from "./MOCK_DATA.json";
+import { DebouncedInput } from "@/features/UI/forms/debounced-input";
 
 type DriveFileList = {
   filename: JSX.Element | string;
-  copy: JSX.Element;
-  delete: JSX.Element;
+  copy: JSX.Element | string;
+  delete: JSX.Element | string;
 };
 
-function DebouncedInput({
-  value: initialValue,
-  onChange,
-  debounce = 500,
-  ...props
-}: {
-  value: string | number;
-  onChange: (value: string | number) => void;
-  debounce?: number;
-} & Omit<InputHTMLAttributes<HTMLInputElement>, "onChange">) {
-  const [value, setValue] = useState(initialValue);
-
-  useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      onChange(value);
-    }, debounce);
-
-    return () => clearTimeout(timeout);
-  }, [debounce, onChange, value]);
-
-  return (
-    <input
-      {...props}
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-    />
-  );
-}
-
-declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
-}
+// declare module "@tanstack/table-core" {
+//   interface FilterFns {
+//     fuzzy: FilterFn<unknown>;
+//   }
+//   interface FilterMeta {
+//     itemRank: RankingInfo;
+//   }
+// }
 
 export default function DriveFileList({
   files,
   driveAddress,
   shadowDrive,
-  storageAccount,
   refetchFiles,
   isLoading,
 }: {
@@ -105,8 +74,10 @@ export default function DriveFileList({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [tableIsInitialized, setTableIsInitialized] = useState(false);
 
   const columnHelper = createColumnHelper<DriveFileList>();
+  const rerender = useReducer(() => ({}), {})[1];
 
   const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     // Rank the item
@@ -138,80 +109,6 @@ export default function DriveFileList({
     return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir;
   };
 
-  const columns = useMemo<ColumnDef<DriveFileList>[]>(
-    () => [
-      {
-        header: () => <div className="uppercase mr-4">Filename</div>,
-        accessorKey: "filename",
-        cell: (info) => info.getValue(),
-        accessorFn: (row) => row.filename,
-        // sortingFn: fuzzySort,
-      },
-      {
-        header: () => "",
-        accessorKey: "copy",
-        cell: (info) => info.renderValue(),
-        accessorFn: (row) => row.copy,
-      },
-      {
-        header: () => "",
-        accessorKey: "delete",
-        cell: (info) => info.renderValue(),
-        accessorFn: (row) => row.delete,
-      },
-    ],
-    []
-  );
-
-  // const columns = useMemo<ColumnDef<DriveFileList | string | JSX.Element>[]>(
-  //   () => [
-  //     columnHelper.accessor("filename", {
-  //       header: () => (
-  //         <div className="self-start text-left uppercase mb-2">Filename</div>
-  //       ),
-  //       cell: (info) => info.getValue(),
-  //       sortingFn: "alphanumericCaseSensitive",
-  //     }),
-  //     columnHelper.accessor((row) => row.copy, {
-  //       header: () => "",
-  //       id: "copy",
-  //       cell: (info) => info.renderValue(),
-  //     }),
-  //     columnHelper.accessor("delete", {
-  //       header: () => "",
-  //       id: "delete",
-  //       cell: (info) => info.renderValue(),
-  //     }),
-  //   ],
-  //   []
-  // );
-
-  const table = useReactTable({
-    data,
-    columns,
-    filterFns: {
-      fuzzy: fuzzyFilter,
-    },
-    state: {
-      columnFilters,
-      globalFilter,
-      sorting,
-    },
-    globalFilterFn: fuzzyFilter,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
-    debugTable: true,
-  });
-
-  const rerender = useReducer(() => ({}), {})[1];
-
   const handleCopyToClipboard = useCallback(
     (filename: string) => {
       navigator.clipboard.writeText(
@@ -241,19 +138,23 @@ export default function DriveFileList({
       } catch {
         showToast({
           primaryMessage: "Error",
-          secondaryMessage: `Failed to delete ${filename}`,
+          secondaryMessage: `Failed to delete file`,
         });
         return;
       } finally {
-        setIsBeingDeletedFiles((prev) => [...prev, filename]);
+        setIsBeingDeletedFiles((prev) =>
+          prev.filter((isBeingDeletedFile) => isBeingDeletedFile !== filename)
+        );
       }
 
       if (!response?.message?.includes("successfully deleted")) {
         showToast({
           primaryMessage: "Error",
-          secondaryMessage: `Failed to delete ${filename}`,
+          secondaryMessage: `Failed to delete file`,
         });
-        setIsBeingDeletedFiles((prev) => [...prev, filename]);
+        setIsBeingDeletedFiles((prev) =>
+          prev.filter((isBeingDeletedFile) => isBeingDeletedFile !== filename)
+        );
         return;
       }
 
@@ -262,124 +163,109 @@ export default function DriveFileList({
         secondaryMessage: "File deleted",
       });
 
-      refetchFiles(shadowDrive);
+      // refetchFiles(shadowDrive);
+      // instead of refetching, just remove the file from the list
       setIsBeingDeletedFiles((prev) =>
         prev.filter((isBeingDeletedFile) => isBeingDeletedFile !== filename)
       );
+      console.log({
+        deletedFile: filename,
+        file: files[0],
+      });
+      refetchFiles(shadowDrive);
     },
-    [driveAddress, isBeingDeletedFiles, refetchFiles, shadowDrive]
+    [driveAddress, files, isBeingDeletedFiles, refetchFiles, shadowDrive]
   );
 
-  // const renderFiles = useCallback(
-  //   (files: string[]) => {
-  //     setData(
-  //       files.map((filename) => {
-  //         return {
-  //           filename: (
-  //             <div className="flex items-center">
-  //               <a
-  //                 href={`https://shdw-drive.genesysgo.net/${driveAddress}/${filename}`}
-  //                 target="_blank"
-  //                 rel="noreferrer"
-  //                 className="hover:underline"
-  //               >
-  //                 <div className="mr-4">{filename}</div>
-  //               </a>
-  //             </div>
-  //           ),
-  //           copy: (
-  //             <div
-  //               className="cursor-pointer w-3"
-  //               onClick={() => handleCopyToClipboard(filename)}
-  //             >
-  //               <ClipboardIcon
-  //                 height="1.5rem"
-  //                 width="1.5rem"
-  //                 className="h-6 w-6 flex-none hover:bg-sky-200"
-  //               />
-  //             </div>
-  //           ),
-  //           delete: (
-  //             <div
-  //               className="cursor-pointer flex justify-center flex-none w-3"
-  //               onClick={
-  //                 isBeingDeletedFiles.includes(filename)
-  //                   ? () => {}
-  //                   : () => handleDeleteFile(filename)
-  //               }
-  //             >
-  //               {isBeingDeletedFiles.includes(filename) ? (
-  //                 <Spinner />
-  //               ) : (
-  //                 <TrashIcon
-  //                   height="1.5rem"
-  //                   width="1.5rem"
-  //                   className="h-6 w-6 flex-none hover:bg-red-300"
-  //                 />
-  //               )}
-  //             </div>
-  //           ),
-  //         };
-  //       })
-  //     );
-  //   },
-  //   [driveAddress, handleCopyToClipboard, handleDeleteFile, isBeingDeletedFiles]
-  // );
-
-  useEffect(() => {
-    if (!files?.length) return;
-
-    setData(
-      files.map((filename) => {
-        return {
-          filename: (
-            <div className="flex items-center">
-              <a
-                href={`https://shdw-drive.genesysgo.net/${driveAddress}/${filename}`}
-                target="_blank"
-                rel="noreferrer"
-                className="hover:underline"
-              >
-                <div className="mr-4">{filename}</div>
-              </a>
-            </div>
-          ),
-          copy: (
-            <div
-              className="cursor-pointer w-3"
-              onClick={() => handleCopyToClipboard(filename)}
+  const columns = useMemo<ColumnDef<DriveFileList>[]>(
+    () => [
+      {
+        header: () => <div className="uppercase mr-4">Filename</div>,
+        accessorKey: "filename",
+        cell: (info) => (
+          <div className="flex items-center">
+            <a
+              href={`https://shdw-drive.genesysgo.net/${driveAddress}/${info.getValue()}`}
+              target="_blank"
+              rel="noreferrer"
+              className="hover:underline"
             >
-              <ClipboardIcon
+              <div className="mr-4">
+                <>{info.getValue()}</>
+              </div>
+            </a>
+          </div>
+        ),
+        accessorFn: (row) => row.filename,
+        // sortingFn: fuzzySort,
+      },
+      {
+        header: () => "",
+        accessorKey: "copy",
+        cell: (info) => (
+          <div
+            className="cursor-pointer w-3"
+            onClick={() => handleCopyToClipboard(info.row.getValue("filename"))}
+          >
+            <ClipboardIcon
+              height="1.5rem"
+              width="1.5rem"
+              className="h-6 w-6 flex-none hover:text-sky-200"
+            />
+          </div>
+        ),
+        accessorFn: (row) => row.copy,
+      },
+      {
+        header: () => "",
+        accessorKey: "delete",
+        cell: (info) => (
+          <div
+            className="cursor-pointer flex justify-center flex-none w-3"
+            onClick={
+              isBeingDeletedFiles.includes(info.row.getValue("filename"))
+                ? () => {}
+                : () => handleDeleteFile(info.row.getValue("filename"))
+            }
+          >
+            {isBeingDeletedFiles.includes(info.row.getValue("filename")) ? (
+              <Spinner />
+            ) : (
+              <TrashIcon
                 height="1.5rem"
                 width="1.5rem"
-                className="h-6 w-6 flex-none hover:bg-sky-200"
+                className="h-6 w-6 flex-none hover:text-red-400"
               />
-            </div>
-          ),
-          delete: (
-            <div
-              className="cursor-pointer flex justify-center flex-none w-3"
-              onClick={
-                isBeingDeletedFiles.includes(filename)
-                  ? () => {}
-                  : () => handleDeleteFile(filename)
-              }
-            >
-              {isBeingDeletedFiles.includes(filename) ? (
-                <Spinner />
-              ) : (
-                <TrashIcon
-                  height="1.5rem"
-                  width="1.5rem"
-                  className="h-6 w-6 flex-none hover:bg-red-300"
-                />
-              )}
-            </div>
-          ),
-        };
-      })
-    );
+            )}
+          </div>
+        ),
+        accessorFn: (row) => row.delete,
+      },
+    ],
+    [driveAddress, handleCopyToClipboard, handleDeleteFile, isBeingDeletedFiles]
+  );
+
+  const table = useReactTable({
+    data,
+    columns,
+    state: {
+      columnFilters,
+      globalFilter,
+      sorting,
+    },
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    onSortingChange: setSorting,
+    debugTable: true,
+  });
+
+  useEffect(() => {
+    if (!files?.length && !tableIsInitialized) return;
+    setData(files.map((filename) => ({ filename })) as DriveFileList[]);
+    setTableIsInitialized(true);
   }, [
+    tableIsInitialized,
     driveAddress,
     files,
     handleCopyToClipboard,
@@ -405,13 +291,16 @@ export default function DriveFileList({
   const { rows } = table.getRowModel();
 
   return (
-    <div className="p-2 w-full px-8 max-h-screen overflow-y-auto">
-      {/* <DebouncedInput
-        value={globalFilter ?? ""}
-        onChange={(value) => setGlobalFilter(String(value))}
-        className="p-2 font-lg shadow border border-block text-black"
-        placeholder="Search all columns..."
-      /> */}
+    <div className="p-2 w-full px-8 max-h-screen overflow-y-auto relative">
+      <div className="absolute top-0 right-0 z-10 pr-16 pt-3">
+        <DebouncedInput
+          value={globalFilter ?? ""}
+          onChange={(value) => setGlobalFilter(String(value))}
+          className="bg-gray-900 text-gray-200 border border-gray-700 rounded-lg px-4 py-2 w-64 ring-1 ring-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600"
+          placeholder="Search files..."
+        />
+      </div>
+
       <TableVirtuoso
         style={{
           // get height of window minus header
@@ -492,68 +381,6 @@ export default function DriveFileList({
           ));
         }}
       />
-      {/* <table className="w-full">
-        <thead>
-          {table.getHeaderGroups().map((headerGroup, i) => (
-            <>
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <th
-                      key={header.id}
-                      colSpan={header.colSpan}
-                      className="flex justify-start items-center mb-1"
-                    >
-                      {header.isPlaceholder ? null : (
-                        <div
-                          {...{
-                            className: header.column.getCanSort()
-                              ? "cursor-pointer select-none"
-                              : "",
-                            onClick: header.column.getToggleSortingHandler(),
-                          }}
-                        >
-                          <div className="flex justify-center items-center">
-                            <div className="mr-3">
-                              {flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                            </div>
-                            {{
-                              asc: <ArrowUpIcon className="h-4 w-4" />,
-                              desc: <ArrowDownIcon className="h-4 w-4" />,
-                            }[header.column.getIsSorted() as string] ?? null}
-                          </div>
-                        </div>
-                      )}
-                    </th>
-                  );
-                })}
-              </tr>
-            </>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <td
-                  className={classNames([
-                    "py-2 whitespace-nowrap",
-                    cell.id.endsWith("copy") || cell.id.endsWith("delete")
-                      ? "w-12"
-                      : "",
-                  ])}
-                  key={cell.id}
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table> */}
     </div>
   );
 }

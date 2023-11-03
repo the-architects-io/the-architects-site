@@ -6,8 +6,10 @@ import { Panel } from "@/features/UI/panel";
 import DriveControls from "@/features/drive/DriveControls";
 import DriveFileList from "@/features/drive/DriveFileList";
 import DriveInfo from "@/features/drive/DriveInfo";
+import SortTable from "@/features/drive/SortTable";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { PublicKey } from "@metaplex-foundation/js";
+import { ArrowLeft } from "@mui/icons-material";
 import { ShdwDrive, StorageAccountV2 } from "@shadow-drive/sdk";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
@@ -67,8 +69,11 @@ export default function DriveInstancePage({
 
   return (
     <ContentWrapper className="flex flex-col items-center pt-32 w-full">
-      <div className="-mt-8 mb-8 ml-8 self-start uppercase">
-        <Link href={`${BASE_URL}/drive`}> &larr; Back to drives</Link>
+      <div className="-mt-8 mb-8 ml-10 self-start uppercase">
+        <Link href={`${BASE_URL}/drive`} className="flex items-center">
+          <ArrowLeft className="mr-2 h-6 w-6" />
+          <div>Back to drives</div>
+        </Link>
       </div>
       {!!shadowDrive && !!storageAccount && (
         <div className="w-full flex flex-1">
@@ -80,6 +85,7 @@ export default function DriveInstancePage({
             storageAccount={storageAccount}
             refetchFiles={() => fetchStoredObjects(shadowDrive)}
           />
+          {/* <SortTable /> */}
           <div className="w-[320px]">
             <DriveInfo
               driveAddress={params.id}
