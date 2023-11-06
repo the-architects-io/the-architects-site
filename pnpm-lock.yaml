@@ -170,6 +170,9 @@ dependencies:
   next:
     specifier: 13.4.19
     version: 13.4.19(@babel/core@7.23.0)(react-dom@18.2.0)(react@18.2.0)
+  nextjs-google-analytics:
+    specifier: ^2.3.3
+    version: 2.3.3(next@13.4.19)(react@18.2.0)
   notistack:
     specifier: ^3.0.1
     version: 3.0.1(csstype@3.1.2)(react-dom@18.2.0)(react@18.2.0)
@@ -14210,6 +14213,18 @@ packages:
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
+    dev: false
+
+  /nextjs-google-analytics@2.3.3(next@13.4.19)(react@18.2.0):
+    resolution: {integrity: sha512-Y6sI6A7wt5dji8hYBnVkOh9LTyImSLFZXx3FpyQgVW7W4b4qEFHjH2u3fhDJsrRZeLlUGM8/RuHD/mhHc2Axfg==}
+    peerDependencies:
+      next: '>=11.0.0'
+      react: '>=17.0.0'
+    dependencies:
+      next: 13.4.19(@babel/core@7.23.0)(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
+    optionalDependencies:
+      fsevents: 2.3.3
     dev: false
 
   /nft.storage@5.2.5(encoding@0.1.13)(node-fetch@2.7.0):
