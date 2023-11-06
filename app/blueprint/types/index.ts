@@ -362,9 +362,8 @@ export type Item = {
 };
 
 export enum TokenType {
-  SPL,
-  NFT,
-  SFT,
+  NFT = "NFT",
+  CNFT = "CNFT",
 }
 
 export type Trait = {

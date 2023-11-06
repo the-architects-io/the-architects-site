@@ -1,3 +1,4 @@
+import { TokenType } from "@/app/blueprint/types";
 import { BASE_URL } from "@/constants/constants";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
@@ -37,6 +38,7 @@ export const TokenMintingForm = ({
       formData.append("description", description);
       formData.append("sellerFeeBasisPoints", String(sellerFeeBasisPoints));
       formData.append("imageFile", imageFile);
+      formData.append("toeknType", TokenType.NFT);
 
       if (tokenOwnerAddress) {
         formData.append("tokenOwner", tokenOwnerAddress);

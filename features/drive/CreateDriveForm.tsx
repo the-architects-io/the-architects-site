@@ -37,7 +37,10 @@ export default function CreateDriveForm() {
 
         const mintAddress = shdw_bucket.replace("%7D", "");
         formik.setValues({ storageName: "", sizeInMb: "" });
-        router.push(`${BASE_URL}/drive/${mintAddress}}`);
+        // setTimeout(() => {
+        //   router.push(`${BASE_URL}/drive/${mintAddress}}`);
+        // },  1000);
+        router.push(`${BASE_URL}/drive`);
       } else {
         showToast({
           primaryMessage: "Error creating drive",

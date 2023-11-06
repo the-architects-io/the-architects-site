@@ -11,23 +11,27 @@ import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { PublicKey } from "@metaplex-foundation/js";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
+import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
+import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 
 export default function ShadowUpload({
   drive,
   accountPublicKey,
   onCompleted,
-  numberOfConcurrentUploads = 6,
 }: {
   drive: ShdwDrive;
   accountPublicKey: PublicKey;
   onCompleted?: () => void;
-  numberOfConcurrentUploads?: number;
 }) {
   const { isAdmin } = useAdmin();
   const [files, setFiles] = useState<FileList | null>(null);
   const [uploadUrl, setUploadUrl] = useState<String | null>(null);
   const [txnSig, setTxnSig] = useState<String | null>(null);
   const [isSending, setIsSending] = useState<boolean>(false);
+  const [shouldShowAdvancedSettings, setShouldShowAdvancedSettings] =
+    useState<boolean>(false);
+  const [numberOfConcurrentUploads, setNumberOfConcurrentUploads] =
+    useState<number>(6);
 
   if (!isAdmin) return <NotAdminBlocker />;
 
@@ -66,7 +70,7 @@ export default function ShadowUpload({
               upload = await drive.uploadMultipleFiles(
                 accountPublicKey,
                 files,
-                numberOfConcurrentUploads
+                numberOfConcurrentUploads || 6
               );
             } catch (error) {
               console.log({ error });
@@ -89,6 +93,29 @@ export default function ShadowUpload({
           // setTxnSig(upload.transaction_signature);
         }}
       >
+        <FormCheckboxWithLabel
+          label="Show Advanced Settings"
+          name="advancedSettings"
+          value={shouldShowAdvancedSettings}
+          onChange={() =>
+            setShouldShowAdvancedSettings(!shouldShowAdvancedSettings)
+          }
+        />
+        {shouldShowAdvancedSettings && (
+          <div className="flex flex-col py-4">
+            <FormInputWithLabel
+              type="number"
+              label="Number of concurrent uploads"
+              value={numberOfConcurrentUploads}
+              name="numberOfConcurrentUploads"
+              min={1}
+              max={200}
+              onChange={(e) =>
+                setNumberOfConcurrentUploads(Number(e.target.value))
+              }
+            />
+          </div>
+        )}
         <input
           multiple
           className="py-4"

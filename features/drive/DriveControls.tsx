@@ -69,7 +69,6 @@ export default function DriveControls({
         drive={shadowDrive}
         accountPublicKey={new PublicKey(driveAddress)}
         onCompleted={() => refetchFiles(shadowDrive)}
-        numberOfConcurrentUploads={3}
       />
     </div>
   );
