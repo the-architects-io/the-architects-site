@@ -39,6 +39,8 @@ import {
 import { TableVirtuoso } from "react-virtuoso";
 import dataJSON from "./MOCK_DATA.json";
 import { DebouncedInput } from "@/features/UI/forms/debounced-input";
+import { decryptData } from "@/utils/encryption";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 type DriveFileList = {
   filename: JSX.Element | string;
@@ -69,6 +71,7 @@ export default function DriveFileList({
   refetchFiles: (arg0: ShdwDrive) => void;
   isLoading: boolean;
 }) {
+  const { publicKey } = useWallet();
   const [data, setData] = useState<DriveFileList[]>([]);
   const [isBeingDeletedFiles, setIsBeingDeletedFiles] = useState<string[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -92,22 +95,27 @@ export default function DriveFileList({
     return itemRank.passed;
   };
 
-  const fuzzySort: SortingFn<any> = (rowA, rowB, columnId) => {
-    let dir = 0;
-
-    // Only sort by rank if the column has ranking information
-    if (rowA.columnFiltersMeta[columnId]) {
-      dir = compareItems(
-        // @ts-ignore
-        rowA.columnFiltersMeta[columnId]?.itemRank!,
-        // @ts-ignore
-        rowB.columnFiltersMeta[columnId]?.itemRank!
+  const handleDecrypt = useCallback(
+    async (filename: string) => {
+      if (!publicKey) return;
+      const res = await fetch(
+        `https://shdw-drive.genesysgo.net/${driveAddress}/${filename}`
       );
-    }
+      const encryptedBlob = await res.blob();
 
-    // Provide an alphanumeric fallback for when the item ranks are equal
-    return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir;
-  };
+      try {
+        const decryptedData = await decryptData(encryptedBlob, publicKey);
+        const decryptedBlob = new Blob([decryptedData], {
+          type: "application/octet-stream",
+        });
+        const url = URL.createObjectURL(decryptedBlob);
+        window.open(url);
+      } catch (err) {
+        console.error("Error during decryption:", err);
+      }
+    },
+    [driveAddress, publicKey]
+  );
 
   const handleCopyToClipboard = useCallback(
     (filename: string) => {
@@ -194,10 +202,15 @@ export default function DriveFileList({
                 <>{info.getValue()}</>
               </div>
             </a>
+            <button
+              className="text-xs uppercase"
+              onClick={() => handleDecrypt(`${info.getValue()}`)}
+            >
+              decrypt
+            </button>
           </div>
         ),
         accessorFn: (row) => row.filename,
-        // sortingFn: fuzzySort,
       },
       {
         header: () => "",

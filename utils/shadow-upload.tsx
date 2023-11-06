@@ -1,18 +1,16 @@
 "use client";
 import React, { useState } from "react";
 import { ShdwDrive } from "@shadow-drive/sdk";
-import { useWallet, useConnection } from "@solana/wallet-adapter-react";
-import FormData from "form-data";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import { useAdmin } from "@/hooks/admin";
-import { useFormik } from "formik";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
-import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { PublicKey } from "@metaplex-foundation/js";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
+import { encryptFileList } from "@/utils/encryption";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export default function ShadowUpload({
   drive,
@@ -23,8 +21,9 @@ export default function ShadowUpload({
   accountPublicKey: PublicKey;
   onCompleted?: () => void;
 }) {
+  const { publicKey } = useWallet();
   const { isAdmin } = useAdmin();
-  const [files, setFiles] = useState<FileList | null>(null);
+  const [files, setFiles] = useState<FileList | File[] | null>(null);
   const [uploadUrl, setUploadUrl] = useState<String | null>(null);
   const [txnSig, setTxnSig] = useState<String | null>(null);
   const [isSending, setIsSending] = useState<boolean>(false);
@@ -32,67 +31,76 @@ export default function ShadowUpload({
     useState<boolean>(false);
   const [numberOfConcurrentUploads, setNumberOfConcurrentUploads] =
     useState<number>(6);
+  const [shouldEncrypt, setShouldEncrypt] = useState<boolean>(false);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!publicKey) return;
+
+    if (!files?.length) {
+      alert("No file selected");
+      return;
+    }
+
+    let filesToUpload = files;
+
+    if (shouldEncrypt) {
+      const encryptedFiles = await encryptFileList(files, publicKey);
+      filesToUpload = encryptedFiles;
+    }
+
+    setIsSending(true);
+    let upload;
+    if (files.length === 1) {
+      try {
+        upload = await drive.uploadFile(accountPublicKey, filesToUpload[0]);
+        onCompleted?.();
+      } catch (error) {
+        console.log({ error });
+        showToast({
+          primaryMessage: "Error",
+          secondaryMessage: `Failed to upload`,
+        });
+        return;
+      } finally {
+        setIsSending(false);
+        onCompleted?.();
+      }
+    } else {
+      try {
+        upload = await drive.uploadMultipleFiles(
+          accountPublicKey,
+          // @ts-ignore
+          filesToUpload,
+          numberOfConcurrentUploads || 6
+        );
+      } catch (error) {
+        console.log({ error });
+        showToast({
+          primaryMessage: "Error",
+          secondaryMessage: `Failed to upload`,
+        });
+        return;
+      } finally {
+        setIsSending(false);
+        onCompleted?.();
+      }
+    }
+    console.log({ upload });
+    setIsSending(false);
+    showToast({
+      primaryMessage: "Completed",
+    });
+    // setUploadUrl(upload.finalized_location);
+    // setTxnSig(upload.transaction_signature);
+  };
 
   if (!isAdmin) return <NotAdminBlocker />;
 
   return (
     <div>
-      <form
-        className="flex flex-col py-4"
-        onSubmit={async (event) => {
-          event.preventDefault();
-
-          if (!files?.length) {
-            alert("No file selected");
-            return;
-          }
-          // const getStorageAccount = await drive.getStorageAccount(accountPublicKey);
-
-          setIsSending(true);
-          let upload;
-          if (files.length === 1) {
-            try {
-              upload = await drive.uploadFile(accountPublicKey, files[0]);
-              onCompleted?.();
-            } catch (error) {
-              console.log({ error });
-              showToast({
-                primaryMessage: "Error",
-                secondaryMessage: `Failed to upload`,
-              });
-              return;
-            } finally {
-              setIsSending(false);
-              onCompleted?.();
-            }
-          } else {
-            try {
-              upload = await drive.uploadMultipleFiles(
-                accountPublicKey,
-                files,
-                numberOfConcurrentUploads || 6
-              );
-            } catch (error) {
-              console.log({ error });
-              showToast({
-                primaryMessage: "Error",
-                secondaryMessage: `Failed to upload`,
-              });
-              return;
-            } finally {
-              setIsSending(false);
-              onCompleted?.();
-            }
-          }
-          console.log({ upload });
-          setIsSending(false);
-          showToast({
-            primaryMessage: "Completed",
-          });
-          // setUploadUrl(upload.finalized_location);
-          // setTxnSig(upload.transaction_signature);
-        }}
-      >
+      <form className="flex flex-col py-4" onSubmit={handleSubmit}>
         <FormCheckboxWithLabel
           label="Show Advanced Settings"
           name="advancedSettings"
@@ -103,16 +111,24 @@ export default function ShadowUpload({
         />
         {shouldShowAdvancedSettings && (
           <div className="flex flex-col py-4">
-            <FormInputWithLabel
-              type="number"
-              label="Number of concurrent uploads"
-              value={numberOfConcurrentUploads}
-              name="numberOfConcurrentUploads"
-              min={1}
-              max={200}
-              onChange={(e) =>
-                setNumberOfConcurrentUploads(Number(e.target.value))
-              }
+            <div className="mb-4">
+              <FormInputWithLabel
+                type="number"
+                label="Number of concurrent uploads"
+                value={numberOfConcurrentUploads}
+                name="numberOfConcurrentUploads"
+                min={1}
+                max={200}
+                onChange={(e) =>
+                  setNumberOfConcurrentUploads(Number(e.target.value))
+                }
+              />
+            </div>
+            <FormCheckboxWithLabel
+              label="Encrypt"
+              name="shouldEncrypt"
+              value={shouldEncrypt}
+              onChange={() => setShouldEncrypt(!shouldEncrypt)}
             />
           </div>
         )}
