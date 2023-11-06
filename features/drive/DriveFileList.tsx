@@ -1,7 +1,12 @@
 import { BASE_URL } from "@/constants/constants";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
-import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/20/solid";
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  DocumentIcon,
+  LockClosedIcon,
+} from "@heroicons/react/20/solid";
 import { ClipboardIcon, EyeIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { PublicKey } from "@metaplex-foundation/js";
 import { ShdwDrive, StorageAccountV2 } from "@shadow-drive/sdk";
@@ -108,8 +113,17 @@ export default function DriveFileList({
         const decryptedBlob = new Blob([decryptedData], {
           type: "application/octet-stream",
         });
+
         const url = URL.createObjectURL(decryptedBlob);
-        window.open(url);
+
+        // Create a download link for the user
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename.replace(".arc", "");
+        a.click();
+        a.remove();
+
+        // window.open(url);
       } catch (err) {
         console.error("Error during decryption:", err);
       }
@@ -193,21 +207,35 @@ export default function DriveFileList({
         cell: (info) => (
           <div className="flex items-center">
             <a
-              href={`https://shdw-drive.genesysgo.net/${driveAddress}/${info.getValue()}`}
+              href={
+                `${info.getValue()}`.includes(".arc")
+                  ? undefined
+                  : `https://shdw-drive.genesysgo.net/${driveAddress}/${info.getValue()}`
+              }
               target="_blank"
               rel="noreferrer"
-              className="hover:underline"
+              className={classNames([
+                "flex items-center",
+                `${info.getValue()}`.includes(".arc") ? "" : "hover:underline",
+              ])}
             >
-              <div className="mr-4">
-                <>{info.getValue()}</>
+              {`${info.getValue()}`.includes(".arc") ? (
+                <LockClosedIcon className="h-4 w-4" />
+              ) : (
+                <DocumentIcon className="h-4 w-4" />
+              )}
+              <div className="ml-4">
+                <>{`${info.getValue()}`.replace(".arc", "")}</>
               </div>
             </a>
-            <button
-              className="text-xs uppercase"
-              onClick={() => handleDecrypt(`${info.getValue()}`)}
-            >
-              decrypt
-            </button>
+            {`${info.getValue()}`.includes(".arc") && (
+              <button
+                className="text-xs uppercase ml-12 mt-1"
+                onClick={() => handleDecrypt(`${info.getValue()}`)}
+              >
+                Decrypt
+              </button>
+            )}
           </div>
         ),
         accessorFn: (row) => row.filename,
