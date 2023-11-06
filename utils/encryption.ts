@@ -25,18 +25,21 @@ function encryptWithAESKey(
   data: ArrayBuffer
 ): {
   iv: string;
-  encryptedData: string;
+  encryptedData: Buffer;
   authTag: string;
 } {
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
-  const dataStr = new TextDecoder().decode(data);
-  let encrypted = cipher.update(dataStr, "utf8", "hex");
-  encrypted += cipher.final("hex");
+
+  const encryptedDataBuffer = Buffer.concat([
+    cipher.update(Buffer.from(data)),
+    cipher.final(),
+  ]);
   const tag = cipher.getAuthTag();
+
   return {
     iv: iv.toString("hex"),
-    encryptedData: encrypted,
+    encryptedData: encryptedDataBuffer,
     authTag: tag.toString("hex"),
   };
 }
@@ -44,7 +47,7 @@ function encryptWithAESKey(
 export function decryptData(
   encryptedBlob: Blob,
   publicKey: PublicKey
-): Promise<string> {
+): Promise<ArrayBuffer> {
   return new Promise(async (resolve, reject) => {
     const symmetricKey = deriveSymmetricKey(publicKey);
 
@@ -70,13 +73,12 @@ export function decryptData(
         ivBytes
       );
       decipher.setAuthTag(authTagBytes);
-      let decrypted = decipher.update(encryptedDataBytes, undefined, "utf8");
-      try {
-        decrypted += decipher.final("utf8");
-        resolve(decrypted);
-      } catch (err) {
-        reject(new Error("Decryption failed: " + err));
-      }
+      const decryptedBuffer = Buffer.concat([
+        decipher.update(encryptedDataBytes),
+        decipher.final(),
+      ]);
+
+      resolve(decryptedBuffer.buffer);
     };
     reader.onerror = function () {
       reject(new Error("Error reading the encrypted blob"));
@@ -120,10 +122,8 @@ export async function encryptFileList(
 
     // Convert hex strings to byte arrays
     const ivBytes = Buffer.from(encryptedDataObject.iv, "hex");
-    const encryptedDataBytes = Buffer.from(
-      encryptedDataObject.encryptedData,
-      "hex"
-    );
+    const encryptedDataBytes = encryptedDataObject.encryptedData;
+
     const authTagBytes = Buffer.from(encryptedDataObject.authTag, "hex");
 
     // Combine the byte arrays
