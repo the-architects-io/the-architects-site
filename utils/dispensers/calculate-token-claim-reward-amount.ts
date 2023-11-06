@@ -19,6 +19,10 @@ export const caluclateBuildVestingRewardAmount = (
 
   const daysSinceLastClaim = diffInDays(lastClaimTime);
 
+  console.log({
+    daysSinceLastClaim,
+  });
+
   if (daysSinceLastClaim < 1) {
     return 0;
   }
