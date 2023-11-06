@@ -10,7 +10,7 @@ import Toaster from "@/features/toasts/toaster";
 import { DebugModeProvider } from "@/hooks/debug-mode";
 import Navbar from "@/features/navigation/navbar";
 import AdminToolbar from "@/features/admin/tools/admin-toolbar";
-import { GoogleAnalytics } from "nextjs-google-analytics";
+import GoogleAnalytics from "@/features/google-analytics";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <GoogleAnalytics trackPageViews />
+      <GoogleAnalytics GA_TRACKING_ID={process.env.GA_TRACKING_ID as string} />
       <body className={classNames([inter.className, "relative"])}>
         <ContextProvider>
           <DebugModeProvider>
