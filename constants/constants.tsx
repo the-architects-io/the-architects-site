@@ -25,3 +25,4 @@ export const BUILD_REWARD_WALLET =
   process.env.NEXT_PUBLIC_BUILD_REWARD_WALLET || "";
 export const COLLECTION_WALLET_ADDRESS =
   process.env.NEXT_PUBLIC_COLLECTION_WALLET_ADDRESS || "";
+export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACKING_ID || "";

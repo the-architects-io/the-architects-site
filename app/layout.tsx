@@ -11,6 +11,7 @@ import { DebugModeProvider } from "@/hooks/debug-mode";
 import Navbar from "@/features/navigation/navbar";
 import AdminToolbar from "@/features/admin/tools/admin-toolbar";
 import GoogleAnalytics from "@/features/google-analytics";
+import { GA_TRACKING_ID } from "@/constants/constants";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,7 +27,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <GoogleAnalytics GA_TRACKING_ID={process.env.GA_TRACKING_ID as string} />
+      <GoogleAnalytics GA_TRACKING_ID={GA_TRACKING_ID as string} />
       <body className={classNames([inter.className, "relative"])}>
         <ContextProvider>
           <DebugModeProvider>
