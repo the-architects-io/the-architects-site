@@ -1,5 +1,6 @@
 import { PublicKey } from "@metaplex-foundation/js";
 import crypto from "crypto";
+import pako from "pako";
 
 // Assuming you have a Solana wallet's public key as a string or byte array
 
@@ -78,7 +79,9 @@ export function decryptData(
         decipher.final(),
       ]);
 
-      resolve(decryptedBuffer.buffer);
+      const decompressedData = pako.inflate(decryptedBuffer);
+
+      resolve(decompressedData.buffer);
     };
     reader.onerror = function () {
       reject(new Error("Error reading the encrypted blob"));
@@ -118,7 +121,12 @@ export async function encryptFileList(
       };
     });
 
-    const encryptedDataObject = encryptWithAESKey(symmetricKey, arrayBuffer);
+    const compressedData = pako.deflate(new Uint8Array(arrayBuffer));
+
+    const encryptedDataObject = encryptWithAESKey(
+      symmetricKey,
+      compressedData.buffer
+    );
 
     // Convert hex strings to byte arrays
     const ivBytes = Buffer.from(encryptedDataObject.iv, "hex");

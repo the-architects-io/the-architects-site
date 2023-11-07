@@ -116,14 +116,11 @@ export default function DriveFileList({
 
         const url = URL.createObjectURL(decryptedBlob);
 
-        // Create a download link for the user
         const a = document.createElement("a");
         a.href = url;
         a.download = filename.replace(".arc", "");
         a.click();
         a.remove();
-
-        // window.open(url);
       } catch (err) {
         console.error("Error during decryption:", err);
       }
