@@ -2,9 +2,11 @@
 import { BASE_URL, RPC_ENDPOINT } from "@/constants/constants";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
+import WalletButton from "@/features/UI/buttons/wallet-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
+import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import ShadowUpload from "@/utils/shadow-upload";
@@ -21,6 +23,7 @@ export default function DrivePage() {
   const wallet = useWallet();
 
   const [shadowDrive, setShadowDrive] = useState<ShdwDrive | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [storageAccounts, setStorageAccounts] = useState<
     { account: StorageAccountV2; publicKey: PublicKey }[]
   >([]);
@@ -31,6 +34,7 @@ export default function DrivePage() {
     if (accounts.length === 0) return;
 
     setStorageAccounts(accounts);
+    setIsLoading(false);
   };
 
   const getFormattedSize = (amount: number) => {
@@ -48,12 +52,19 @@ export default function DrivePage() {
         const connection = new Connection(RPC_ENDPOINT, "confirmed");
         const drive = await new ShdwDrive(connection, wallet).init();
         setShadowDrive(drive);
-
         fetchStorageAccounts(drive);
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wallet?.publicKey]);
+
+  if (isLoading || !wallet?.publicKey)
+    return (
+      <ContentWrapper className="w-full flex justify-center pt-64">
+        {isLoading && <Spinner />}
+        {!isLoading && !wallet?.publicKey && <WalletButton />}
+      </ContentWrapper>
+    );
 
   return (
     <div className="min-h-screen">

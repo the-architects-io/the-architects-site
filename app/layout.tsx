@@ -34,6 +34,7 @@ export default function RootLayout({
             <SidebarProvider>
               <AdminProvider>
                 {children}
+                <Navbar />
                 <GoogleAnalytics GA_TRACKING_ID={GA_TRACKING_ID as string} />
                 <Analytics />
 

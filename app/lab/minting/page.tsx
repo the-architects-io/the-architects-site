@@ -4,7 +4,6 @@ import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Panel } from "@/features/UI/panel";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
-import { TokenMintingForm } from "@/features/dispensers/token-minting-form";
 import { useAdmin } from "@/hooks/admin";
 import {
   createTree,
@@ -23,6 +22,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import showToast from "@/features/toasts/show-toast";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import Spinner from "@/features/UI/spinner";
+import WalletButton from "@/features/UI/buttons/wallet-button";
 
 export default function Page() {
   const { isAdmin } = useAdmin();
@@ -88,7 +88,7 @@ export default function Page() {
     <ContentWrapper>
       <Panel>
         <h1 className="text-center py-4 text-2xl">Minting Lab</h1>
-        {!!wallet?.connected && (
+        {!!wallet?.connected ? (
           <>
             <div className="flex justify-center py-2 w-full">
               {merkleTree ? (
@@ -102,8 +102,11 @@ export default function Page() {
                 </PrimaryButton>
               )}
             </div>
-            {/* <TokenMintingForm /> */}
           </>
+        ) : (
+          <div className="flex justify-center w-full py-4">
+            <WalletButton />
+          </div>
         )}
       </Panel>
     </ContentWrapper>
