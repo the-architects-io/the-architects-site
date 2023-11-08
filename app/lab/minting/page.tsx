@@ -24,8 +24,8 @@ import { useCallback, useEffect, useState } from "react";
 import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
 import { useWallet } from "@solana/wallet-adapter-react";
 import WalletButton from "@/features/UI/buttons/wallet-button";
-import MerkleTreeForm from "@/features/cnfts/merkle-tree-form";
-import CnftMintForm from "@/features/cnfts/cnft-mint-form";
+import MerkleTreeForm from "@/features/nfts/merkle-tree-form";
+import CnftMintForm from "@/features/nfts/cnft-mint-form";
 import {
   DasApiAsset,
   DasApiAssetList,
