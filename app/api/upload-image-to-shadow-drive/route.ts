@@ -15,11 +15,11 @@ export type UploadAssetsToShadowDriveResponse = {
   errors: Array<ShadowUploadResponse>;
 };
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// export const config = {
+//   api: {
+//     bodyParser: false,
+//   },
+// };
 
 export async function POST(req: NextRequest) {
   if (
