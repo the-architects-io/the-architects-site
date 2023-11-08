@@ -52,7 +52,6 @@ export default function DriveInstancePage({
         const connection = new Connection(RPC_ENDPOINT, "confirmed");
 
         const drive = await new ShdwDrive(connection, wallet).init();
-
         setShadowDrive(drive);
 
         // @ts-ignore

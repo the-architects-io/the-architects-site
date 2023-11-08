@@ -28,3 +28,7 @@ export const round = (num: number, decimalPlaces = 0) => {
   var n = num * p * (1 + Number.EPSILON);
   return Math.round(n) / p;
 };
+
+export const getSlug = (string: string) => {
+  return string.toLowerCase().split(" ").join("-");
+};

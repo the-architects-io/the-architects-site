@@ -1,9 +1,5 @@
 "use client";
-import {
-  EXECUTION_WALLET_ADDRESS,
-  RPC_ENDPOINT,
-  RPC_ENDPOINT_DEVNET,
-} from "@/constants/constants";
+import { BASE_URL, RPC_ENDPOINT } from "@/constants/constants";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Panel } from "@/features/UI/panel";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
@@ -12,10 +8,7 @@ import {
   MerkleTree,
   findLeafAssetIdPda,
 } from "@metaplex-foundation/mpl-bubblegum";
-import {
-  DigitalAsset,
-  mplTokenMetadata,
-} from "@metaplex-foundation/mpl-token-metadata";
+import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
 import { mplToolbox } from "@metaplex-foundation/mpl-toolbox";
 import { KeypairSigner, publicKey } from "@metaplex-foundation/umi";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
@@ -28,10 +21,13 @@ import MerkleTreeForm from "@/features/nfts/merkle-tree-form";
 import CnftMintForm from "@/features/nfts/cnft-mint-form";
 import {
   DasApiAsset,
-  DasApiAssetList,
   dasApi,
 } from "@metaplex-foundation/digital-asset-standard-api";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
+import { ShdwDrive } from "@shadow-drive/sdk";
+import { Connection } from "@solana/web3.js";
+import NftCollectionForm from "@/features/nfts/nft-collection-form";
+import axios from "axios";
 
 export default function Page() {
   const { isAdmin } = useAdmin();
@@ -40,27 +36,14 @@ export default function Page() {
   const [merkleTree, setMerkleTree] = useState<
     KeypairSigner | MerkleTree | null
   >(null);
-  const [builder, setBuilder] = useState<any>(null);
-  const [assets, setAssets] = useState<DasApiAsset[] | null>(null);
+  const [drive, setDrive] = useState<ShdwDrive | null>(null);
 
+  const [assets, setAssets] = useState<DasApiAsset[] | null>(null);
   const wallet = useWallet();
 
-  const handleFetch = useCallback(async () => {
-    if (!umi || !wallet?.publicKey) return;
-
-    const [assetId, bump] = await findLeafAssetIdPda(umi, {
-      merkleTree: publicKey(merkleTree?.publicKey.toString() || ""),
-      leafIndex: 0,
-    });
-    const asset = await umi.rpc.getAsset(assetId);
-
-    setAssets([asset]);
-  }, [merkleTree?.publicKey, umi, wallet?.publicKey]);
-
   const handleCreateUmiClient = useCallback(async () => {
-    if (!wallet?.connected) return;
+    await wallet?.connect();
 
-    await wallet.connect();
     const umi = await createUmi(RPC_ENDPOINT)
       .use(mplToolbox())
       .use(mplTokenMetadata())
@@ -70,13 +53,33 @@ export default function Page() {
     setUmi(umi);
   }, [wallet]);
 
+  const handleCreateDriveClient = useCallback(async () => {
+    await wallet?.connect();
+
+    const connection = new Connection(RPC_ENDPOINT, "confirmed");
+    const drive = await new ShdwDrive(connection, wallet).init();
+    setDrive(drive);
+  }, [wallet]);
+
   useEffect(() => {
+    if (!wallet?.publicKey) return;
+
     if (!umi) {
       handleCreateUmiClient();
     }
-  }, [umi, handleCreateUmiClient]);
+    if (!drive) {
+      handleCreateDriveClient();
+    }
+  }, [umi, handleCreateUmiClient, drive, wallet, handleCreateDriveClient]);
 
   if (!isAdmin) return <NotAdminBlocker />;
+
+  if (!wallet?.publicKey)
+    return (
+      <ContentWrapper className="flex flex-col justify-center items-center w-full mb-4 space-y-4">
+        <WalletButton />
+      </ContentWrapper>
+    );
 
   return (
     <ContentWrapper>
@@ -84,14 +87,17 @@ export default function Page() {
         <h1 className="text-center py-4 text-2xl">Minting Lab</h1>
         {!!wallet?.connected ? (
           <>
-            <PrimaryButton onClick={handleFetch}>Fetch</PrimaryButton>
-            {JSON.stringify(assets, null, 2)}
             <div className="flex flex-col justify-center py-2 w-full">
               {merkleTree ? (
                 <div className="flex flex-col w-full justify-center items-center">
                   <div className="bold mb-4">Using tree:</div>
                   <div className="mb-8">{merkleTree.publicKey.toString()}</div>
-                  <CnftMintForm
+                  {/* <CnftMintForm
+                    umi={umi}
+                    merkleTreeAddress={merkleTree.publicKey.toString()}
+                  /> */}
+                  <NftCollectionForm
+                    drive={drive}
                     umi={umi}
                     merkleTreeAddress={merkleTree.publicKey.toString()}
                   />

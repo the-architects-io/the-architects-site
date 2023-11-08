@@ -32,12 +32,11 @@ export default function CnftMintForm({
       mint: collectionMint,
       name: "Test Barrel Collection",
       uri: "https://shdw-drive.genesysgo.net/6V8LykNmNhn9oJ3t5qTSsv7r6FjJ3VUSmmjx6ggG3wa8/test-collection-meta.json",
-      sellerFeeBasisPoints: percentAmount(10), // 5.5%
+      sellerFeeBasisPoints: percentAmount(10), // 10%
       isCollection: true,
     }).sendAndConfirm(umi);
 
     console.log({ mintRes });
-    debugger;
   };
 
   const handleMintCnftsToCollection = async () => {
@@ -85,7 +84,6 @@ export default function CnftMintForm({
     }).sendAndConfirm(umi);
 
     console.log({ mintRes });
-    debugger;
   };
 
   if (!umi || !merkleTreeAddress) return null;

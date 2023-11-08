@@ -22,9 +22,10 @@ export default function CreateDriveForm() {
     },
     onSubmit: async ({ storageName, sizeInMb }) => {
       if (!wallet?.publicKey || !shadowDrive) return;
+      const sizeInKb = parseInt(sizeInMb) * 1024;
 
       const { shdw_bucket, transaction_signature: tx } =
-        await shadowDrive.createStorageAccount(storageName, `${sizeInMb}MB`);
+        await shadowDrive.createStorageAccount(storageName, `${sizeInKb}KB`);
 
       if (tx) {
         showToast({

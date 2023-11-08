@@ -28,3 +28,5 @@ export const COLLECTION_WALLET_ADDRESS =
 export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACKING_ID || "";
 export const EXECUTION_WALLET_ADDRESS =
   process.env.NEXT_PUBLIC_EXECUTION_WALLET_ADDRESS || "";
+export const ASSET_SHDW_DRIVE_URL =
+  process.env.NEXT_PUBLIC_ASSET_SHDW_DRIVE_URL || "";
