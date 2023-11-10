@@ -85,19 +85,16 @@ export default function AirdropPage() {
         return;
       }
 
-      const connection = new Connection(getRpcEndpoint());
-      const metaplex = Metaplex.make(connection);
-      const { creators } = await metaplex
-        .nfts()
-        .findByMint({ mintAddress: new PublicKey(collectionNftAddress) });
+      // const connection = new Connection(getRpcEndpoint());
+      // const metaplex = Metaplex.make(connection);
+      // const { creators } = await metaplex
+      //   .nfts()
+      //   .findByMint({ mintAddress: new PublicKey(collectionNftAddress) });
 
-      const firstCreator = creators[0];
-      const { address, share } = firstCreator;
-      const creatorAddress = address.toString();
-
-      setSellerFeeBasisPoints(share);
+      // const firstCreator = creators[0];
+      // const creatorAddress = address.toString();
+      // setCreatorAddress(creatorAddress);
       setCollectionNftAddress(collectionNftAddress);
-      setCreatorAddress(creatorAddress);
       setStep(step + 1);
     },
   });
