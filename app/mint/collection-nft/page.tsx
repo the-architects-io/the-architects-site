@@ -18,9 +18,6 @@ export default function Page() {
   const [collectionNftAddress, setCollectionNftAddress] = useState<
     string | null
   >(null);
-  const [creatorAddress, setCreatorAddress] = useState<string | null>(
-    "4ionNE2Tc7nB8w6CVLQx2FioNTjbaa5JxYJ7nbDkwxdt"
-  );
   const [sellerFeeBasisPoints, setSellerFeeBasisPoints] = useState<
     number | null
   >(null);
