@@ -1,31 +1,16 @@
 import axios from "axios";
 import {
   DigitalAsset,
-  Metadata,
-  fetchAllDigitalAsset,
   fetchDigitalAsset,
 } from "@metaplex-foundation/mpl-token-metadata";
 
-import { RPC_ENDPOINT } from "@/constants/constants";
 import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { NoopResponse, Token } from "@/app/blueprint/types";
 import { ADD_TOKENS } from "@/graphql/mutations/add-tokens";
-import { Connection } from "@solana/web3.js";
-import {
-  Metaplex,
-  PublicKey,
-  TokenWithMint,
-  findMetadataPda,
-} from "@metaplex-foundation/js";
 import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
-import {
-  Mint,
-  SPL_TOKEN_PROGRAM_ID,
-  fetchAllMint,
-} from "@metaplex-foundation/mpl-toolbox";
-import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
+import { Mint, fetchAllMint } from "@metaplex-foundation/mpl-toolbox";
 import { publicKey } from "@metaplex-foundation/umi";
 import { getUmiClient } from "@/utils/umi";
 

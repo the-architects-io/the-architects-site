@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
   if (
     !process.env.EXECUTION_WALLET_PRIVATE_KEY ||
-    !process.env.ASSET_SHDW_DRIVE_ADDRESS
+    !process.env.NEXT_PUBLIC_ASSET_SHDW_DRIVE_ADDRESS
   ) {
     return NextResponse.json(
       {
@@ -47,12 +47,13 @@ export async function POST(req: NextRequest) {
 
     const wallet = new NodeWallet(keypair);
 
+    // Always use mainnet
     const connection = new Connection(RPC_ENDPOINT, "confirmed");
     const drive = await new ShdwDrive(connection, wallet).init();
 
     const { upload_errors, finalized_locations, message } =
       await drive.uploadFile(
-        new PublicKey(process.env.ASSET_SHDW_DRIVE_ADDRESS),
+        new PublicKey(process.env.NEXT_PUBLIC_ASSET_SHDW_DRIVE_ADDRESS),
         {
           name: getSlug(fileName),
           file,

@@ -8,7 +8,7 @@ import {
   Token,
   Trait,
 } from "@/app/blueprint/types";
-import { BASE_URL, RPC_ENDPOINT } from "@/constants/constants";
+import { BASE_URL } from "@/constants/constants";
 import { client } from "@/graphql/backend-client";
 import { ADD_CHARACTERS } from "@/graphql/mutations/add-characters";
 import { ADD_TRAIT_INSTANCES } from "@/graphql/mutations/add-trait-instances";
@@ -62,7 +62,7 @@ const handleHashListChunk = async (
     throw new Error("Could not resolve hash list");
   }
 
-  // const connection = new Connection(RPC_ENDPOINT);
+  // const connection = new Connection(getRpcEndpoint());
   // const metaplex = Metaplex.make(connection);
   // const mints = hashListChunk.map((address) => new PublicKey(address));
   // const nftMetasFromMetaplex = await metaplex

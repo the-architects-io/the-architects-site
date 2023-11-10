@@ -18,10 +18,26 @@ export default function NftCollectionForm({
   umi,
   drive,
   merkleTreeAddress,
+  isLoading,
+  creatorAddress,
+  setIsLoading,
+  step,
+  setStep,
+  setSellerFeeBasisPoints,
+  setCollectionNftAddress,
+  setCreatorAddress,
 }: {
   umi: Umi | null;
   drive: ShdwDrive | null;
   merkleTreeAddress: string;
+  isLoading?: boolean;
+  creatorAddress: string;
+  setIsLoading?: (isLoading: boolean) => void;
+  step: number;
+  setStep?: (step: number) => void;
+  setSellerFeeBasisPoints: (fee: number) => void;
+  setCollectionNftAddress: (address: string) => void;
+  setCreatorAddress: (address: string) => void;
 }) {
   const wallet = useWallet();
   const [files, setFiles] = useState<FileList | File[] | null>(null);
@@ -108,6 +124,7 @@ export default function NftCollectionForm({
           uri,
           sellerFeeBasisPoints,
           isCollection: true,
+          creatorAddress,
         });
 
         const { address } = mintRes;
@@ -119,8 +136,10 @@ export default function NftCollectionForm({
             url: `https://solscan.io/token/${address}`,
           },
         });
+        setCollectionNftAddress(address);
+        setSellerFeeBasisPoints(sellerFeeBasisPoints);
+        setStep?.(step + 1);
       } catch (error) {
-        console.log("huzzah");
         console.log({ error });
       }
     },
@@ -130,24 +149,18 @@ export default function NftCollectionForm({
 
   return (
     <div className="flex flex-col justify-center items-center w-full mb-4 space-y-4">
-      {/* {collectionImageUrl && (
-        <Image
-          src={collectionImageUrl}
-          alt="Collection Image"
-          width={256}
-          height={256}
-        />
-      )} */}
       <FormWrapper>
-        <label className="mb-2">Collection Image</label>
-        <input
-          type="file"
-          className="pb-4"
-          onChange={(e) => {
-            e.preventDefault();
-            setFiles(!!e.target.files ? e.target.files : null);
-          }}
-        />
+        <div className="flex flex-col justify-center w-full mb-4 space-y-4">
+          <label className="mb-2">Collection Image</label>
+          <input
+            type="file"
+            className="pb-4"
+            onChange={(e) => {
+              e.preventDefault();
+              setFiles(!!e.target.files ? e.target.files : null);
+            }}
+          />
+        </div>
         <FormInputWithLabel
           label="Collection Name"
           name="collectionName"

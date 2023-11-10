@@ -16,7 +16,6 @@ import { ModeledNftMetadata, Token } from "@/app/blueprint/types";
 
 export default function DispenserClaimPage({ params }: { params: any }) {
   // const { publicKey: walletAdapterWalletAddress } = useWallet();
-  const { connection } = useConnection();
   const [inPortalsWalletAddress, setInPortalsWalletAddress] =
     useState<PublicKey | null>(null);
   const [roomId, setRoomId] = useState<string | null>(null);

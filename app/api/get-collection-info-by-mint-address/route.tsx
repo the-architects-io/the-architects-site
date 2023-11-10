@@ -1,4 +1,3 @@
-import { RPC_ENDPOINT } from "@/constants/constants";
 import { getUmiClient } from "@/utils/umi";
 import { safeFetchMetadata } from "@metaplex-foundation/mpl-token-metadata";
 import { publicKey } from "@metaplex-foundation/umi";
@@ -11,6 +10,7 @@ import {
 } from "@metaplex-foundation/mpl-token-metadata";
 import secureJson from "secure-json-parse";
 import axios from "axios";
+import { getRpcEndpoint } from "@/utils/rpc";
 
 export async function POST(req: NextRequest) {
   const { collectionAddress } = await req.json();
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
   const helius = new Helius(process.env.HELIUS_API_KEY);
 
-  const umi = await getUmiClient(RPC_ENDPOINT);
+  const umi = await getUmiClient(getRpcEndpoint());
   // const collectionNft = await umi.rpc.getAccount(publicKey(collectionAddress));
   const { metadata } = await fetchDigitalAsset(umi, collectionAddress);
 

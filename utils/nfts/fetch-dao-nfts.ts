@@ -1,11 +1,12 @@
 import { NftMetadataJson } from "@/app/blueprint/types";
+import { getRpcEndpoint } from "@/utils/rpc";
 import {
   FindNftsByOwnerOutput,
   Metadata,
   Metaplex,
 } from "@metaplex-foundation/js";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { CREATOR_ADDRESS, RPC_ENDPOINT } from "constants/constants";
+import { CREATOR_ADDRESS } from "constants/constants";
 
 export type ModeledNftMetadata = {
   name: string;
@@ -38,7 +39,7 @@ export const fetchDaoNfts = async ({
 }: Props): Promise<any[]> => {
   setIsLoading && setIsLoading(true);
   return new Promise(async (resolve, reject) => {
-    const connection = new Connection(RPC_ENDPOINT, "confirmed");
+    const connection = new Connection(getRpcEndpoint());
     const metaplex = Metaplex.make(connection);
 
     console.log("address", publicKey.toString());

@@ -1,22 +1,14 @@
 "use client";
 import { BASE_URL, RPC_ENDPOINT } from "@/constants/constants";
-import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
-import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import WalletButton from "@/features/UI/buttons/wallet-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
-import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
-import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import Spinner from "@/features/UI/spinner";
-import showToast from "@/features/toasts/show-toast";
-import { getAbbreviatedAddress } from "@/utils/formatting";
-import ShadowUpload from "@/utils/shadow-upload";
 import { FolderIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import { PublicKey } from "@metaplex-foundation/js";
 import { ShdwDrive, StorageAccountV2 } from "@shadow-drive/sdk";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
 import classNames from "classnames";
-import { useFormik } from "formik";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
@@ -50,6 +42,7 @@ export default function DrivePage() {
   useEffect(() => {
     (async () => {
       if (wallet?.publicKey) {
+        // Always use mainnet
         const connection = new Connection(RPC_ENDPOINT, "confirmed");
         const drive = await new ShdwDrive(connection, wallet).init();
         setShadowDrive(drive);

@@ -1,35 +1,30 @@
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
-import { ShadowUploadResponse, ShdwDrive } from "@shadow-drive/sdk";
-import { Connection, Keypair, TransactionSignature } from "@solana/web3.js";
+import { TransactionSignature } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 import {
-  KeypairSigner,
   RpcConfirmTransactionResult,
-  Umi,
-  generateSigner,
+  createSignerFromKeypair,
   keypairIdentity,
-  none,
-  percentAmount,
   publicKey,
+  signerIdentity,
 } from "@metaplex-foundation/umi";
-import {
-  createNft,
-  mplTokenMetadata,
-} from "@metaplex-foundation/mpl-token-metadata";
+import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { mplToolbox } from "@metaplex-foundation/mpl-toolbox";
 import { dasApi } from "@metaplex-foundation/digital-asset-standard-api";
 import { getRpcEndpoint } from "@/utils/rpc";
-
-export type UploadAssetsToShadowDriveResponse = {
-  urls: string[];
-  message: string;
-  errors: Array<ShadowUploadResponse>;
-};
+import { mintToCollectionV1 } from "@metaplex-foundation/mpl-bubblegum";
 
 export async function POST(req: NextRequest) {
-  const { name, uri, sellerFeeBasisPoints, isCollection, creatorAddress } =
-    await req.json();
+  const {
+    merkleTreeAddress,
+    collectionNftAddress,
+    creatorAddress,
+    sellerFeeBasisPoints,
+    name,
+    uri,
+    leafOwnerAddress,
+  } = await req.json();
 
   if (
     !process.env.EXECUTION_WALLET_PRIVATE_KEY ||
@@ -47,7 +42,11 @@ export async function POST(req: NextRequest) {
     !name ||
     !uri ||
     sellerFeeBasisPoints === undefined ||
-    isNaN(sellerFeeBasisPoints)
+    isNaN(sellerFeeBasisPoints) ||
+    !merkleTreeAddress ||
+    !collectionNftAddress ||
+    !creatorAddress ||
+    !leafOwnerAddress
   ) {
     return NextResponse.json(null, { status: 400 });
   }
@@ -56,7 +55,7 @@ export async function POST(req: NextRequest) {
     let mintRes: {
       signature: TransactionSignature;
       result: RpcConfirmTransactionResult;
-      address: string;
+      collectionAddress: string;
     } | null = null;
 
     const umi = await createUmi(getRpcEndpoint())
@@ -69,21 +68,31 @@ export async function POST(req: NextRequest) {
     );
 
     umi.use(keypairIdentity(keypair));
+    umi.use(signerIdentity(createSignerFromKeypair(umi, keypair)));
 
-    const collectionMint = generateSigner(umi);
-
-    const { signature, result } = await createNft(umi, {
-      mint: collectionMint,
-      name,
-      uri,
-      sellerFeeBasisPoints: percentAmount(sellerFeeBasisPoints),
-      isCollection,
+    const { signature, result } = await mintToCollectionV1(umi, {
+      leafOwner: publicKey(leafOwnerAddress),
+      merkleTree: publicKey(merkleTreeAddress),
+      collectionMint: publicKey(collectionNftAddress),
+      metadata: {
+        name,
+        uri,
+        sellerFeeBasisPoints,
+        collection: { key: publicKey(collectionNftAddress), verified: false },
+        creators: [
+          {
+            address: publicKey(creatorAddress),
+            verified: false,
+            share: 100,
+          },
+        ],
+      },
     }).sendAndConfirm(umi);
 
     mintRes = {
       signature: signature.toString(),
       result,
-      address: collectionMint.publicKey.toString(),
+      collectionAddress: collectionNftAddress,
     };
 
     return NextResponse.json(

@@ -1,4 +1,4 @@
-import { RPC_ENDPOINT } from "@/constants/constants";
+import { getRpcEndpoint } from "@/utils/rpc";
 import {
   Metaplex,
   PublicKey,
@@ -21,7 +21,7 @@ export const sendNft = async (
   //   signAllTransactions: async (txs) => txs,
   // };
 
-  const web3Conn = new Connection(RPC_ENDPOINT);
+  const web3Conn = new Connection(getRpcEndpoint());
   const metaplex = new Metaplex(web3Conn);
   metaplex.use(
     walletAdapterIdentity({

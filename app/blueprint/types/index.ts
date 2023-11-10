@@ -488,3 +488,8 @@ export type ModeledNftMetadata = {
   freezeAuthorityAddress: string;
   mintAuthorityAddress: string;
 };
+
+export enum LOCAL_OR_REMOTE {
+  LOCAL = "local",
+  REMOTE = "remote",
+}

@@ -2,12 +2,7 @@
 import * as anchor from "@coral-xyz/anchor";
 import { NextResponse } from "next/server";
 import { Connection, Keypair } from "@solana/web3.js";
-import {
-  DISPENSER_PROGRAM_ID,
-  ENV,
-  RPC_ENDPOINT,
-  RPC_ENDPOINT_DEVNET,
-} from "@/constants/constants";
+import { DISPENSER_PROGRAM_ID, ENV } from "@/constants/constants";
 import { IDL } from "@/idl/types/dispenser";
 import { createHash } from "@/utils/hashing";
 import { PublicKey } from "@metaplex-foundation/js";
@@ -28,6 +23,7 @@ import { mapErrorToResponse } from "@/app/api/blueprint/route";
 import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address";
 import { GET_ITEMS_BY_TOKEN_IDS } from "@/graphql/queries/get-items-by-token-ids";
 import { fromBaseUnit } from "@/utils/currency";
+import { getRpcEndpoint } from "@/utils/rpc";
 
 export async function POST(req: Request) {
   const { noop, dispenserId, recipientAddress, mintAddress, amount, apiKey } =
@@ -141,7 +137,7 @@ export async function POST(req: Request) {
   console.log(5);
 
   const anchorWallet = new NodeWallet(rewardKeypair);
-  const connection = new Connection(RPC_ENDPOINT_DEVNET, "confirmed");
+  const connection = new Connection(getRpcEndpoint(), "confirmed");
 
   console.log(6);
 

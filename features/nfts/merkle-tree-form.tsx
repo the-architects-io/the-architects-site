@@ -1,6 +1,7 @@
+import { LOCAL_OR_REMOTE } from "@/app/blueprint/types";
+import { BASE_URL, DEVNET_TREE_ADDRESS } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
-import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import Spinner from "@/features/UI/spinner";
@@ -16,6 +17,7 @@ import {
   generateSigner,
   publicKey,
 } from "@metaplex-foundation/umi";
+import axios from "axios";
 import { useFormik } from "formik";
 import { useCallback } from "react";
 
@@ -24,15 +26,29 @@ export default function MerkleTreeForm({
   setMerkleTree,
   setIsLoading,
   isLoading,
+  localOrRemote = "local",
 }: {
   umi: Umi | null;
   setMerkleTree: (merkleTree: MerkleTree | KeypairSigner) => void;
   setIsLoading: (isLoading: boolean) => void;
   isLoading: boolean;
+  localOrRemote?: "local" | "remote";
 }) {
+  // 8 NFTs
+  // const selectedMaxDepth = 3;
+  // const selectedMaxBufferSize = 8;
+
+  // 32 NFTs
+  // const selectedMaxDepth = 5;
+  // const selectedMaxBufferSize = 8;
+
+  // 16,384 NFTs
+  const selectedMaxDepth = 14;
+  const selectedMaxBufferSize = 64;
+
   const formik = useFormik({
     initialValues: {
-      merkleTreeAddress: "3iKR49oEAQ6SigJfH7ApmwmPZsFQLeg4vJWCqWJP16p3",
+      merkleTreeAddress: DEVNET_TREE_ADDRESS,
       isCreatingNewTree: false,
     },
     onSubmit: async ({ merkleTreeAddress }) => {
@@ -46,24 +62,31 @@ export default function MerkleTreeForm({
     },
   });
 
-  const handleCreateTree = useCallback(async () => {
+  const handleRemoteCreateTree = useCallback(async () => {
     if (!umi) return;
-
     setIsLoading(true);
 
     try {
-      const merkleTree = generateSigner(umi);
-      const builder = await createTree(umi, {
-        merkleTree,
-        maxDepth: 3,
-        maxBufferSize: 8,
+      const { data } = await axios.post(`${BASE_URL}/api/create-tree`, {
+        maxDepth: selectedMaxDepth,
+        maxBufferSize: selectedMaxBufferSize,
       });
-      await builder.sendAndConfirm(umi);
+      const { merkleTreeAddress } = data;
+      const merkleTree = await fetchMerkleTree(
+        umi,
+        publicKey(merkleTreeAddress)
+      );
       showToast({
         primaryMessage: "Merkle Tree Created",
+        link: {
+          url: `https://solscan.io/account/${merkleTreeAddress}?cluster=devnet`,
+          title: "View account",
+        },
       });
       setMerkleTree(merkleTree);
+      setMerkleTree(merkleTree);
     } catch (error) {
+      console.log({ error });
       showToast({
         primaryMessage: "Error creating Merkle Tree",
       });
@@ -72,49 +95,62 @@ export default function MerkleTreeForm({
     }
   }, [setIsLoading, setMerkleTree, umi]);
 
+  const handleCreateTree = useCallback(async () => {
+    if (localOrRemote === LOCAL_OR_REMOTE.REMOTE) {
+      handleRemoteCreateTree();
+      return;
+    }
+
+    if (!umi) return;
+    setIsLoading(true);
+
+    try {
+      const merkleTree = generateSigner(umi);
+      const builder = await createTree(umi, {
+        merkleTree,
+        maxDepth: selectedMaxDepth,
+        maxBufferSize: selectedMaxBufferSize,
+      });
+      await builder.sendAndConfirm(umi);
+    } catch (error) {
+      showToast({
+        primaryMessage: "Error creating Merkle Tree",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [handleRemoteCreateTree, localOrRemote, setIsLoading, umi]);
+
   return (
     <FormWrapper
       onSubmit={formik.handleSubmit}
       className="w-full flex flex-col"
     >
-      <div className="pb-4">
-        <FormCheckboxWithLabel
-          label="Create New Merkle Tree"
-          name="isCreatingNewTree"
-          value={formik.values.isCreatingNewTree}
-          onChange={formik.handleChange}
-        />
+      <FormInputWithLabel
+        label="Load Merkle Tree by Address"
+        name="merkleTreeAddress"
+        value={formik.values.merkleTreeAddress}
+        onChange={formik.handleChange}
+      />
+      <div className="flex w-full justify-center">
+        <SubmitButton
+          disabled={isLoading}
+          isSubmitting={formik.isSubmitting}
+          onClick={formik.handleSubmit}
+        >
+          Load Tree
+        </SubmitButton>
       </div>
-
-      <>
-        {formik.values.isCreatingNewTree ? (
-          <PrimaryButton
-            onClick={handleCreateTree}
-            className="flex w-full justify-center"
-          >
-            {isLoading ? <Spinner /> : "Create Merkle Tree"}
-          </PrimaryButton>
-        ) : (
-          <>
-            <FormInputWithLabel
-              label="Merkle Tree Address"
-              name="merkleTreeAddress"
-              value={formik.values.merkleTreeAddress}
-              onChange={formik.handleChange}
-            />
-            <div className="flex pt-4 w-full justify-center">
-              <SubmitButton
-                className=""
-                disabled={isLoading}
-                isSubmitting={formik.isSubmitting}
-                onClick={formik.handleSubmit}
-              >
-                Load Tree
-              </SubmitButton>
-            </div>
-          </>
-        )}
-      </>
+      <div className="py-8 text-4xl">- OR -</div>
+      <PrimaryButton
+        onClick={(e) => {
+          e.preventDefault();
+          handleCreateTree();
+        }}
+        className="flex w-full justify-center"
+      >
+        {isLoading ? <Spinner /> : "Create Merkle Tree"}
+      </PrimaryButton>
     </FormWrapper>
   );
 }

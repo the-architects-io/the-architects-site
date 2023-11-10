@@ -1,10 +1,10 @@
 "use client";
-import { RPC_ENDPOINT } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Panel } from "@/features/UI/panel";
 import showToast from "@/features/toasts/show-toast";
 import { getAbbreviatedAddress } from "@/utils/formatting";
+import { getRpcEndpoint } from "@/utils/rpc";
 import ShadowUpload from "@/utils/shadow-upload";
 import { ClipboardIcon, EyeIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { PublicKey } from "@metaplex-foundation/js";
@@ -115,7 +115,7 @@ export default function StorageAccountPage({
   useEffect(() => {
     (async () => {
       if (wallet?.publicKey) {
-        const connection = new Connection(RPC_ENDPOINT, "confirmed");
+        const connection = new Connection(getRpcEndpoint(), "confirmed");
 
         const drive = await new ShdwDrive(connection, wallet).init();
 

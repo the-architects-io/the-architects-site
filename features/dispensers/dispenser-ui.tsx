@@ -1,15 +1,9 @@
-import {
-  BASE_URL,
-  DISPENSER_PROGRAM_ID,
-  ENV,
-  RPC_ENDPOINT_DEVNET,
-} from "@/constants/constants";
+import { BASE_URL, DISPENSER_PROGRAM_ID, ENV } from "@/constants/constants";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Dispatch, useCallback, useEffect, useState } from "react";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import axios from "axios";
-import WalletButton from "@/features/UI/buttons/wallet-button";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
 import { toBaseUnit } from "@/utils/currency";
@@ -34,6 +28,7 @@ import { fetchNftsByHashList } from "@/utils/nfts/fetch-nfts-by-hash-list";
 import { Connection } from "@solana/web3.js";
 import { useAdmin } from "@/hooks/admin";
 import usePrevious from "@/hooks/previous";
+import { getRpcEndpoint } from "@/utils/rpc";
 
 interface DispenserUiProps {
   dispenserId: string;
@@ -204,7 +199,7 @@ export default function DispenserUi({
   const updateBalances = useCallback(async () => {
     if (!dispenser?.rewardWalletAddress || isFetchingBalances) return;
     setIsFetchingBalances(true);
-    const umi = createUmi(RPC_ENDPOINT_DEVNET);
+    const umi = createUmi(getRpcEndpoint());
 
     const onChainDispenserAssets = await fetchAllDigitalAssetWithTokenByOwner(
       umi,
@@ -216,7 +211,7 @@ export default function DispenserUi({
         walletAddress: dispenser?.rewardWalletAddress,
       });
 
-    const connection = new Connection(RPC_ENDPOINT_DEVNET);
+    const connection = new Connection(getRpcEndpoint());
 
     const hashList = onChainDispenserAssets.map((asset) =>
       asset.publicKey.toString()

@@ -13,11 +13,7 @@ import {
   TokenBalance,
 } from "@/app/blueprint/types";
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  BASE_URL,
-  RPC_ENDPOINT,
-  RPC_ENDPOINT_DEVNET,
-} from "@/constants/constants";
+import { BASE_URL } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { fromBaseUnit } from "@/utils/currency";
@@ -35,6 +31,7 @@ import {
 import { publicKey } from "@metaplex-foundation/umi";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
+import { getRpcEndpoint } from "@/utils/rpc";
 
 type Reward = {
   mint: string;
@@ -94,7 +91,7 @@ export const DispenserRewardForm = ({
       console.log({ allTokens });
 
       try {
-        const umi = createUmi(RPC_ENDPOINT_DEVNET);
+        const umi = createUmi(getRpcEndpoint());
         const nfts = await fetchAllDigitalAsset(
           umi,
           allTokens
@@ -207,7 +204,7 @@ export const DispenserRewardForm = ({
           walletAddress: dispenser?.rewardWalletAddress,
         }
       );
-      const umi = createUmi(RPC_ENDPOINT_DEVNET);
+      const umi = createUmi(getRpcEndpoint());
 
       const assets = await fetchAllDigitalAssetByOwner(
         umi,

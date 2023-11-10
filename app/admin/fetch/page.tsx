@@ -20,7 +20,7 @@ import { useUserData } from "@nhost/nextjs";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
-import { BASE_URL, RPC_ENDPOINT } from "@/constants/constants";
+import { BASE_URL } from "@/constants/constants";
 import { Metaplex, PublicKey } from "@metaplex-foundation/js";
 import { Helius } from "helius-sdk";
 import Image from "next/image";

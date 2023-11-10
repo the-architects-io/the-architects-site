@@ -32,3 +32,7 @@ export const round = (num: number, decimalPlaces = 0) => {
 export const getSlug = (string: string) => {
   return string.toLowerCase().split(" ").join("-");
 };
+
+export const makeNumberArray = (amountOfItems: number) => {
+  return Array.from({ length: amountOfItems }, (_, index) => index + 1);
+};

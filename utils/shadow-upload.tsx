@@ -55,6 +55,7 @@ export default function ShadowUpload({
     if (files.length === 1) {
       try {
         upload = await drive.uploadFile(accountPublicKey, filesToUpload[0]);
+        setIsSending(false);
         onCompleted?.();
       } catch (error) {
         console.log({ error });
@@ -75,6 +76,7 @@ export default function ShadowUpload({
           filesToUpload,
           numberOfConcurrentUploads || 6
         );
+        setIsSending(false);
       } catch (error) {
         console.log({ error });
         showToast({

@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { Metaplex, PublicKey } from "@metaplex-foundation/js";
 import { Connection } from "@solana/web3.js";
-import { RPC_ENDPOINT } from "@/constants/constants";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import { ADD_TOKENS } from "@/graphql/mutations/add-tokens";
 import {
@@ -11,15 +10,13 @@ import {
   AddTokensResponse,
   AddTraitInstancesResponse,
   AddTraitsResponse,
-  Character,
   Token,
-  Trait,
-  TraitInstance,
 } from "@/app/blueprint/types";
 import { ADD_TRAITS } from "@/graphql/mutations/add-traits";
 import { ADD_TRAIT_INSTANCES } from "@/graphql/mutations/add-trait-instances";
 import { ADD_CHARACTERS } from "@/graphql/mutations/add-characters";
 import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
+import { getRpcEndpoint } from "@/utils/rpc";
 
 export async function POST(req: NextRequest) {
   const { hashList, noop } = await req.json();
@@ -41,7 +38,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const connection = new Connection(RPC_ENDPOINT);
+  const connection = new Connection(getRpcEndpoint(), "confirmed");
   const metaplex = Metaplex.make(connection);
   const mints = jsonHashList.map((address) => new PublicKey(address));
   const nftMetasFromMetaplex = await metaplex

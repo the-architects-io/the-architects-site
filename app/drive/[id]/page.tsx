@@ -1,13 +1,10 @@
 "use client";
 import { BASE_URL, RPC_ENDPOINT } from "@/constants/constants";
-import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Panel } from "@/features/UI/panel";
 import DriveControls from "@/features/drive/DriveControls";
 import DriveFileList from "@/features/drive/DriveFileList";
 import DriveInfo from "@/features/drive/DriveInfo";
-import SortTable from "@/features/drive/SortTable";
-import { getAbbreviatedAddress } from "@/utils/formatting";
 import { PublicKey } from "@metaplex-foundation/js";
 import { ArrowLeft } from "@mui/icons-material";
 import { ShdwDrive, StorageAccountV2 } from "@shadow-drive/sdk";
@@ -49,6 +46,7 @@ export default function DriveInstancePage({
   useEffect(() => {
     (async () => {
       if (wallet?.publicKey) {
+        // Always use mainnet
         const connection = new Connection(RPC_ENDPOINT, "confirmed");
 
         const drive = await new ShdwDrive(connection, wallet).init();

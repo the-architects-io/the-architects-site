@@ -1,13 +1,11 @@
-import { RPC_ENDPOINT } from "@/constants/constants";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { ShadowUploadResponse, ShdwDrive } from "@shadow-drive/sdk";
 import { Connection, Keypair } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
-import { promises as fs } from "fs";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
-import { publicKey } from "@metaplex-foundation/umi";
 import { PublicKey } from "@metaplex-foundation/js";
 import { getSlug } from "@/utils/formatting";
+import { RPC_ENDPOINT } from "@/constants/constants";
 
 export type UploadAssetsToShadowDriveResponse = {
   urls: string[];
@@ -24,7 +22,7 @@ export type UploadAssetsToShadowDriveResponse = {
 export async function POST(req: NextRequest) {
   if (
     !process.env.EXECUTION_WALLET_PRIVATE_KEY ||
-    !process.env.ASSET_SHDW_DRIVE_ADDRESS
+    !process.env.NEXT_PUBLIC_ASSET_SHDW_DRIVE_ADDRESS
   ) {
     return NextResponse.json(
       {
@@ -49,6 +47,7 @@ export async function POST(req: NextRequest) {
 
     const wallet = new NodeWallet(keypair);
 
+    // Always use mainnet
     const connection = new Connection(RPC_ENDPOINT, "confirmed");
     const drive = await new ShdwDrive(connection, wallet).init();
 
@@ -57,7 +56,7 @@ export async function POST(req: NextRequest) {
 
     const { upload_errors, finalized_locations, message } =
       await drive.uploadFile(
-        new PublicKey(process.env.ASSET_SHDW_DRIVE_ADDRESS),
+        new PublicKey(process.env.NEXT_PUBLIC_ASSET_SHDW_DRIVE_ADDRESS),
         {
           name: getSlug(fileName),
           file: fileBuffer,

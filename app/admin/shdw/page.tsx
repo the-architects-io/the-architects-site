@@ -1,5 +1,4 @@
 "use client";
-import { RPC_ENDPOINT } from "@/constants/constants";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
@@ -7,6 +6,7 @@ import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import showToast from "@/features/toasts/show-toast";
 import { getAbbreviatedAddress } from "@/utils/formatting";
+import { getRpcEndpoint } from "@/utils/rpc";
 import ShadowUpload from "@/utils/shadow-upload";
 import { PublicKey } from "@metaplex-foundation/js";
 import { ShdwDrive, StorageAccountV2 } from "@shadow-drive/sdk";
@@ -57,7 +57,7 @@ export default function ShdwPage() {
   useEffect(() => {
     (async () => {
       if (wallet?.publicKey) {
-        const connection = new Connection(RPC_ENDPOINT, "confirmed");
+        const connection = new Connection(getRpcEndpoint(), "confirmed");
         const drive = await new ShdwDrive(connection, wallet).init();
         setShadowDrive(drive);
 

@@ -9,7 +9,6 @@ import {
 import bs58 from "bs58";
 import { client } from "@/graphql/backend-client";
 import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
-import { RPC_ENDPOINT } from "@/constants/constants";
 import { ADD_ITEM_PAYOUT } from "@/graphql/mutations/add-item-payout";
 import {
   createAssociatedTokenAccountInstruction,
@@ -21,6 +20,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
 import { Dispenser, Wallet } from "@/app/blueprint/types";
+import { getRpcEndpoint } from "@/utils/rpc";
 
 type Data =
   | {
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
         rewardCollections[0].itemCollection.item.token.mintAddress
       );
 
-      const connection = new Connection(RPC_ENDPOINT);
+      const connection = new Connection(getRpcEndpoint());
       payoutAmount = 1;
 
       const rewardKeypair = Keypair.fromSecretKey(

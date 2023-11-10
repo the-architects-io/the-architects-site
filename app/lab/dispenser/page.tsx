@@ -1,11 +1,6 @@
 "use client";
 import * as anchor from "@coral-xyz/anchor";
-import {
-  BASE_URL,
-  DISPENSER_PROGRAM_ID,
-  RPC_ENDPOINT,
-  RPC_ENDPOINT_DEVNET,
-} from "@/constants/constants";
+import { BASE_URL, DISPENSER_PROGRAM_ID } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Panel } from "@/features/UI/panel";
@@ -25,6 +20,7 @@ import { fetchAllDigitalAssetWithTokenByOwner } from "@metaplex-foundation/mpl-t
 import { publicKey } from "@metaplex-foundation/umi";
 import { Dispenser, TokenBalance } from "@/app/blueprint/types";
 import { toBaseUnit } from "@/utils/currency";
+import { getRpcEndpoint } from "@/utils/rpc";
 
 export default function Page({ params }: { params: any }) {
   const user = useUserData();
@@ -53,7 +49,7 @@ export default function Page({ params }: { params: any }) {
     try {
       setIsClaiming(true);
 
-      const umi = createUmi(RPC_ENDPOINT_DEVNET);
+      const umi = createUmi(getRpcEndpoint());
 
       const onChainDispenserAssets = await fetchAllDigitalAssetWithTokenByOwner(
         umi,

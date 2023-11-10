@@ -5,9 +5,9 @@ import type { NextRequest } from "next/server";
 import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
 import { Metaplex, PublicKey } from "@metaplex-foundation/js";
 import { Connection } from "@solana/web3.js";
-import { RPC_ENDPOINT } from "@/constants/constants";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import { Token } from "@/app/blueprint/types";
+import { getRpcEndpoint } from "@/utils/rpc";
 
 export async function POST(req: NextRequest) {
   const { hashList, noop, nftCollectionId } = await req.json();
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const connection = new Connection(RPC_ENDPOINT);
+  const connection = new Connection(getRpcEndpoint());
   const metaplex = Metaplex.make(connection);
   const mints = jsonHashList.map((address: string) => new PublicKey(address));
   const nftMetasFromMetaplex: any[] = await metaplex

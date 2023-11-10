@@ -15,7 +15,7 @@ import { BlueprintApiActions, Dispenser } from "@/app/blueprint/types";
 import { useUserData } from "@nhost/nextjs";
 import { useEffect } from "react";
 import { Connection } from "@solana/web3.js";
-import { RPC_ENDPOINT_DEVNET } from "@/constants/constants";
+import { getRpcEndpoint } from "@/utils/rpc";
 
 export type DispenserResponse = {
   id: string;
@@ -36,7 +36,7 @@ export const AddDispenserForm = ({
 
   const user = useUserData();
 
-  const connection = new Connection(RPC_ENDPOINT_DEVNET, "confirmed");
+  const connection = new Connection(getRpcEndpoint());
 
   const formik = useFormik({
     initialValues: {

@@ -53,6 +53,7 @@ export default function CreateDriveForm() {
   useEffect(() => {
     (async () => {
       if (wallet?.publicKey) {
+        // Always use mainnet
         const connection = new Connection(RPC_ENDPOINT, "confirmed");
         const drive = await new ShdwDrive(connection, wallet).init();
         setShadowDrive(drive);

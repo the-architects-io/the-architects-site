@@ -30,3 +30,6 @@ export const EXECUTION_WALLET_ADDRESS =
   process.env.NEXT_PUBLIC_EXECUTION_WALLET_ADDRESS || "";
 export const ASSET_SHDW_DRIVE_URL =
   process.env.NEXT_PUBLIC_ASSET_SHDW_DRIVE_URL || "";
+
+export const DEVNET_TREE_ADDRESS =
+  process.env.NEXT_PUBLIC_DEVNET_TREE_ADDRESS || "";

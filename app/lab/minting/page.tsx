@@ -1,13 +1,10 @@
 "use client";
-import { BASE_URL, RPC_ENDPOINT } from "@/constants/constants";
+
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Panel } from "@/features/UI/panel";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import { useAdmin } from "@/hooks/admin";
-import {
-  MerkleTree,
-  findLeafAssetIdPda,
-} from "@metaplex-foundation/mpl-bubblegum";
+import { MerkleTree } from "@metaplex-foundation/mpl-bubblegum";
 import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
 import { mplToolbox } from "@metaplex-foundation/mpl-toolbox";
 import { KeypairSigner, publicKey } from "@metaplex-foundation/umi";
@@ -27,7 +24,10 @@ import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ShdwDrive } from "@shadow-drive/sdk";
 import { Connection } from "@solana/web3.js";
 import NftCollectionForm from "@/features/nfts/nft-collection-form";
-import axios from "axios";
+import { getRpcEndpoint } from "@/utils/rpc";
+import { LOCAL_OR_REMOTE } from "@/app/blueprint/types";
+
+const { LOCAL, REMOTE } = LOCAL_OR_REMOTE;
 
 export default function Page() {
   const { isAdmin } = useAdmin();
@@ -44,7 +44,7 @@ export default function Page() {
   const handleCreateUmiClient = useCallback(async () => {
     await wallet?.connect();
 
-    const umi = await createUmi(RPC_ENDPOINT)
+    const umi = await createUmi(getRpcEndpoint())
       .use(mplToolbox())
       .use(mplTokenMetadata())
       .use(dasApi())
@@ -56,7 +56,7 @@ export default function Page() {
   const handleCreateDriveClient = useCallback(async () => {
     await wallet?.connect();
 
-    const connection = new Connection(RPC_ENDPOINT, "confirmed");
+    const connection = new Connection(getRpcEndpoint(), "confirmed");
     const drive = await new ShdwDrive(connection, wallet).init();
     setDrive(drive);
   }, [wallet]);
@@ -92,14 +92,13 @@ export default function Page() {
                 <div className="flex flex-col w-full justify-center items-center">
                   <div className="bold mb-4">Using tree:</div>
                   <div className="mb-8">{merkleTree.publicKey.toString()}</div>
-                  {/* <CnftMintForm
-                    umi={umi}
-                    merkleTreeAddress={merkleTree.publicKey.toString()}
-                  /> */}
                   <NftCollectionForm
+                    creatorAddress={wallet.publicKey.toString()}
+                    setCreatorAddress={() => {}}
                     drive={drive}
                     umi={umi}
                     merkleTreeAddress={merkleTree.publicKey.toString()}
+                    setCollectionNftAddress={() => {}}
                   />
                 </div>
               ) : (
@@ -108,6 +107,7 @@ export default function Page() {
                   setMerkleTree={setMerkleTree}
                   isLoading={isLoading}
                   setIsLoading={setIsLoading}
+                  localOrRemote={REMOTE}
                 />
               )}
             </div>
