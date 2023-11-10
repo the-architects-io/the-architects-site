@@ -17,27 +17,21 @@ import { useState } from "react";
 export default function NftCollectionForm({
   umi,
   drive,
-  merkleTreeAddress,
   isLoading,
-  creatorAddress,
   setIsLoading,
   step,
   setStep,
   setSellerFeeBasisPoints,
   setCollectionNftAddress,
-  setCreatorAddress,
 }: {
   umi: Umi | null;
   drive: ShdwDrive | null;
-  merkleTreeAddress: string;
   isLoading?: boolean;
-  creatorAddress: string;
   setIsLoading?: (isLoading: boolean) => void;
-  step: number;
+  step?: number;
   setStep?: (step: number) => void;
   setSellerFeeBasisPoints: (fee: number) => void;
   setCollectionNftAddress: (address: string) => void;
-  setCreatorAddress: (address: string) => void;
 }) {
   const wallet = useWallet();
   const [files, setFiles] = useState<FileList | File[] | null>(null);
@@ -59,7 +53,7 @@ export default function NftCollectionForm({
       description,
       sellerFeeBasisPoints,
     }) => {
-      if (!umi || !merkleTreeAddress || !wallet?.publicKey || !drive) return;
+      if (!umi || !wallet?.publicKey || !drive) return;
 
       if (!files?.length) return;
 
@@ -124,7 +118,6 @@ export default function NftCollectionForm({
           uri,
           sellerFeeBasisPoints,
           isCollection: true,
-          creatorAddress,
         });
 
         const { address } = mintRes;
@@ -138,14 +131,16 @@ export default function NftCollectionForm({
         });
         setCollectionNftAddress(address);
         setSellerFeeBasisPoints(sellerFeeBasisPoints);
-        setStep?.(step + 1);
+        if (step && setStep) {
+          setStep?.(step + 1);
+        }
       } catch (error) {
         console.log({ error });
       }
     },
   });
 
-  if (!umi || !merkleTreeAddress) return null;
+  if (!umi) return null;
 
   return (
     <div className="flex flex-col justify-center items-center w-full mb-4 space-y-4">

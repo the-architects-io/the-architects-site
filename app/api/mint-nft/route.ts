@@ -76,13 +76,6 @@ export async function POST(req: NextRequest) {
       mint: collectionMint,
       name,
       uri,
-      creators: [
-        {
-          address: publicKey(creatorAddress),
-          verified: true,
-          share: 100,
-        },
-      ],
       sellerFeeBasisPoints: percentAmount(sellerFeeBasisPoints),
       isCollection,
     }).sendAndConfirm(umi);

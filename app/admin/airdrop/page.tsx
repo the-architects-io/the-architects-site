@@ -265,9 +265,6 @@ export default function AirdropPage() {
                 <NftCollectionForm
                   setCollectionNftAddress={setCollectionNftAddress}
                   setSellerFeeBasisPoints={setSellerFeeBasisPoints}
-                  creatorAddress={creatorAddress}
-                  setCreatorAddress={setCreatorAddress}
-                  merkleTreeAddress={merkleTree?.publicKey.toString()}
                   setIsLoading={setIsLoading}
                   isLoading={isLoading}
                   umi={umi}
