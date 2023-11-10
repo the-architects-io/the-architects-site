@@ -1,3 +1,4 @@
+"use client";
 import NftCollectionForm from "@/features/nfts/nft-collection-form";
 import { Umi } from "@metaplex-foundation/umi";
 import { ShdwDrive } from "@shadow-drive/sdk";
