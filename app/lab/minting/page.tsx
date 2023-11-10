@@ -92,14 +92,20 @@ export default function Page() {
                 <div className="flex flex-col w-full justify-center items-center">
                   <div className="bold mb-4">Using tree:</div>
                   <div className="mb-8">{merkleTree.publicKey.toString()}</div>
-                  <NftCollectionForm
+                  {/* <NftCollectionForm
                     creatorAddress={wallet.publicKey.toString()}
                     setCreatorAddress={() => {}}
                     drive={drive}
                     umi={umi}
                     merkleTreeAddress={merkleTree.publicKey.toString()}
                     setCollectionNftAddress={() => {}}
-                  />
+                    isLoading={isLoading}
+                    setIsLoading={setIsLoading}
+                    setStep={() => {}}
+                    setSellerFeeBasisPoints=""
+                    setCollectionNftAddress=""
+                    setCreatorAddress=""
+                  /> */}
                 </div>
               ) : (
                 <MerkleTreeForm
