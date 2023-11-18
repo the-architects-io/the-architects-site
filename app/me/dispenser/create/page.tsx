@@ -10,7 +10,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function DashboardPage() {
+export default function CreateDispenserPage() {
   const searchParams = useSearchParams();
   const [step, setStep] = useState(0);
   const [dispenserId, setDispenserId] = useState<string | null>(null);

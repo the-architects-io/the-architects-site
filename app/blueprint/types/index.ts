@@ -493,3 +493,28 @@ export enum LOCAL_OR_REMOTE {
   LOCAL = "local",
   REMOTE = "remote",
 }
+
+export type Airdrop = {
+  name: string;
+  id: string;
+  collectionNft: {
+    id: string;
+    name: string;
+    mintAddress: string;
+  };
+};
+
+export type AddWalletsResponse = {
+  message: string;
+  wallets: Wallet[];
+  existingWalletsCount: number;
+  insertedWalletsCount: number;
+};
+
+export type AddAirdropResponse = {
+  message: string;
+  existingWalletsCount: number;
+  insertedWalletsCount: number;
+  addedReipientsCount: number;
+  addedAirdrop: Airdrop;
+};

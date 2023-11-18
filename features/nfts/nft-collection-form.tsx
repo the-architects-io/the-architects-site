@@ -82,12 +82,14 @@ export default function NftCollectionForm({
 
       setCollectionImageUrl(uploadUrl);
 
+      const basisPoints = sellerFeeBasisPoints * 100;
+
       // first build json file and upload to shdw
       const json = {
         name: collectionName,
         symbol,
         description,
-        seller_fee_basis_points: sellerFeeBasisPoints * 100,
+        seller_fee_basis_points: basisPoints,
         image: `${driveUrl}/${collectionNameSlug}-collection.png`,
       };
 
@@ -130,7 +132,7 @@ export default function NftCollectionForm({
           },
         });
         setCollectionNftAddress(address);
-        setSellerFeeBasisPoints(sellerFeeBasisPoints);
+        setSellerFeeBasisPoints(basisPoints);
         if (step && setStep) {
           setStep?.(step + 1);
         }

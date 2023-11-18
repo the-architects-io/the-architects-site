@@ -12,17 +12,12 @@ import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-ad
 import { MerkleTree } from "@metaplex-foundation/mpl-bubblegum";
 import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
 import { mplToolbox } from "@metaplex-foundation/mpl-toolbox";
-import {
-  KeypairSigner,
-  isPublicKey,
-  publicKey,
-} from "@metaplex-foundation/umi";
+import { KeypairSigner, isPublicKey } from "@metaplex-foundation/umi";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { Umi } from "@metaplex-foundation/umi/dist/types/Umi";
 import { ShdwDrive } from "@shadow-drive/sdk";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useCallback, useEffect, useState } from "react";
-import { divMode } from "tsparticles-engine";
 import { Connection } from "@solana/web3.js";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
@@ -90,9 +85,7 @@ export default function AirdropPage() {
       const { json } = await metaplex
         .nfts()
         .findByMint({ mintAddress: new PublicKey(collectionNftAddress) });
-      // const firstCreator = creators[0];
-      // const creatorAddress = address.toString();
-      // setCreatorAddress(creatorAddress);
+
       setCollectionNftAddress(collectionNftAddress);
       if (
         !json?.seller_fee_basis_points ||
@@ -181,20 +174,41 @@ export default function AirdropPage() {
           </div>
         </div>
         {merkleTree && (
-          <div className="flex justify-between">
-            <div className="flex space-x-2">
-              <div>Merkle Tree Address:</div>
-              <div>
-                {getAbbreviatedAddress(merkleTree.publicKey.toString())}
+          <>
+            <div className="flex justify-between">
+              <div className="flex space-x-2">
+                <div>Merkle Tree Address:</div>
+                <div>
+                  {getAbbreviatedAddress(merkleTree.publicKey.toString())}
+                </div>
+              </div>
+
+              <ClipboardIcon
+                className="h-6 w-6 cursor-pointer"
+                onClick={() =>
+                  copyTextToClipboard(merkleTree.publicKey.toString())
+                }
+              />
+            </div>
+            <div className="flex justify-between">
+              <div className="flex space-x-2">
+                <div>Max depth:</div>
+                <div>
+                  {/* @ts-ignore */}
+                  {merkleTree?.treeHeader?.maxDepth}
+                </div>
               </div>
             </div>
-            <ClipboardIcon
-              className="h-6 w-6 cursor-pointer"
-              onClick={() =>
-                copyTextToClipboard(merkleTree.publicKey.toString())
-              }
-            />
-          </div>
+            <div className="flex justify-between">
+              <div className="flex space-x-2">
+                <div>Max buffer size:</div>
+                <div>
+                  {/* @ts-ignore */}
+                  {merkleTree?.treeHeader?.maxBufferSize}
+                </div>
+              </div>
+            </div>
+          </>
         )}
         {collectionNftAddress && (
           <div className="flex justify-between">

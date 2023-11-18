@@ -8,9 +8,7 @@ import {
   Umi,
   generateSigner,
   keypairIdentity,
-  none,
   percentAmount,
-  publicKey,
 } from "@metaplex-foundation/umi";
 import {
   createNft,
@@ -71,6 +69,15 @@ export async function POST(req: NextRequest) {
     umi.use(keypairIdentity(keypair));
 
     const collectionMint = generateSigner(umi);
+
+    console.log({
+      name,
+      uri,
+      collectionMint,
+      creatorAddress,
+      isCollection,
+      sellerFeeBasisPoints,
+    });
 
     const { signature, result } = await createNft(umi, {
       mint: collectionMint,

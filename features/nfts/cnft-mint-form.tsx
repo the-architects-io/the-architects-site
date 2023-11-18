@@ -1,5 +1,9 @@
 import { LOCAL_OR_REMOTE } from "@/app/blueprint/types";
-import { BASE_URL } from "@/constants/constants";
+import {
+  BASE_URL,
+  DDK_ASSET_SHDW_DRIVE_ADDRESS,
+  EXECUTION_WALLET_ADDRESS,
+} from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { FormTextareaWithLabel } from "@/features/UI/forms/form-textarea-with-label";
@@ -80,36 +84,20 @@ export default function CnftMintForm({
 
   const handleMintCnftsToCollectionRemote = useCallback(async () => {
     setIsLoading(true);
-    if (!recipientList.length) return;
+    // if (!recipientList.length) return;
 
     showToast({
       primaryMessage: "Minting cNFTs",
       secondaryMessage: "Please wait...",
     });
 
-    for (const recipient of recipientList) {
-      if (!isPublicKey(recipient)) {
-        showToast({
-          primaryMessage: "Invalid recipient address",
-        });
-        return;
-      }
+    const nftIds = makeNumberArray(5000);
 
-      const nftIds = makeNumberArray(5000);
+    const recipient = "7PXwQ5dByCmVAb3EHHniS8t9Z4mhdSLKzoTBfX25X22C";
 
-      console.log(nftIds.slice(0, 10));
-
-      const randomNftId = nftIds[Math.floor(Math.random() * nftIds.length)];
-      const randomNftUri = `https://shdw-drive.genesysgo.net/HpcJWPrVGyFyVBGsv9T6VyjNm8bLtXsPhpVj1VwQura1/${randomNftId}.json`;
-      debugger;
-      const { data: randomNftMetadata } = await axios.get(randomNftUri);
-
-      if (!randomNftMetadata) {
-        console.log(`No metadata found for cNFT #${randomNftId}`);
-        continue;
-      }
-
-      console.log(`Minting cNFT #${randomNftId} to ${recipient}`);
+    for (const id of nftIds) {
+      const uri = `https://shdw-drive.genesysgo.net/${DDK_ASSET_SHDW_DRIVE_ADDRESS}/${id}.json`;
+      const { data: nftMetadata } = await axios.get(uri);
 
       try {
         const { data } = await axios.post(`${BASE_URL}/api/mint-cnft`, {
@@ -117,31 +105,77 @@ export default function CnftMintForm({
           collectionNftAddress,
           creatorAddress,
           sellerFeeBasisPoints,
-          name: randomNftMetadata.name,
-          uri: randomNftUri,
+          name: nftMetadata.name,
+          uri,
           leafOwnerAddress: recipient,
         });
-        setMintedIds((mintedIds) => [...mintedIds, randomNftId]);
-        setSuccessfulRecipients((successfulRecipients) => [
-          ...successfulRecipients,
-          recipient,
-        ]);
-        console.log(
-          `Successfully minted cNFT #${randomNftId} to ${recipient}`,
-          { data }
-        );
+
+        console.log(`Successfully minted cNFT #${id} to ${recipient}`, {
+          data,
+        });
+
+        setMintedIds((mintedIds) => [...mintedIds, id]);
       } catch (error) {
-        setFailedMintedIds((failedMintedIds) => [
-          ...failedMintedIds,
-          randomNftId,
-        ]);
-        setFailedRecipients((failedRecipients) => [
-          ...failedRecipients,
-          recipient,
-        ]);
+        setFailedMintedIds((failedMintedIds) => [...failedMintedIds, id]);
         console.log({ error });
       }
     }
+
+    // for (const recipient of recipientList) {
+    //   if (!isPublicKey(recipient)) {
+    //     showToast({
+    //       primaryMessage: "Invalid recipient address",
+    //     });
+    //     return;
+    //   }
+
+    //   const nftIds = makeNumberArray(5000);
+
+    //   console.log(nftIds.slice(0, 10));
+
+    //   const randomNftId = nftIds[Math.floor(Math.random() * nftIds.length)];
+    //   const randomNftUri = `https://shdw-drive.genesysgo.net/${DDK_ASSET_SHDW_DRIVE_ADDRESS}/${randomNftId}.json`;
+    //   debugger;
+    //   const { data: randomNftMetadata } = await axios.get(randomNftUri);
+
+    //   if (!randomNftMetadata) {
+    //     console.log(`No metadata found for cNFT #${randomNftId}`);
+    //     continue;
+    //   }
+
+    //   console.log(`Minting cNFT #${randomNftId} to ${recipient}`);
+
+    //   try {
+    //     const { data } = await axios.post(`${BASE_URL}/api/mint-cnft`, {
+    //       merkleTreeAddress,
+    //       collectionNftAddress,
+    //       creatorAddress,
+    //       sellerFeeBasisPoints,
+    //       name: randomNftMetadata.name,
+    //       uri: randomNftUri,
+    //       leafOwnerAddress: recipient,
+    //     });
+    //     setMintedIds((mintedIds) => [...mintedIds, randomNftId]);
+    //     setSuccessfulRecipients((successfulRecipients) => [
+    //       ...successfulRecipients,
+    //       recipient,
+    //     ]);
+    //     console.log(
+    //       `Successfully minted cNFT #${randomNftId} to ${recipient}`,
+    //       { data }
+    //     );
+    //   } catch (error) {
+    //     setFailedMintedIds((failedMintedIds) => [
+    //       ...failedMintedIds,
+    //       randomNftId,
+    //     ]);
+    //     setFailedRecipients((failedRecipients) => [
+    //       ...failedRecipients,
+    //       recipient,
+    //     ]);
+    //     console.log({ error });
+    //   }
+    // }
 
     console.log({
       mintedIds,
@@ -157,7 +191,6 @@ export default function CnftMintForm({
     setIsLoading(false);
   }, [
     setIsLoading,
-    recipientList,
     mintedIds,
     failedMintedIds,
     successfulRecipients,
@@ -225,24 +258,25 @@ export default function CnftMintForm({
 
   return (
     <div className="flex flex-col justify-center items-center w-full mb-4 space-y-4">
-      {!!recipientList.length && (
-        <Panel>
-          <div className="flex flex-col justify-center space-y-2 text-lg">
+      <Panel>
+        <div className="flex flex-col justify-center space-y-2 text-lg">
+          {!!recipientList.length && (
             <div className="flex space-x-2">
               <div className="mr-4">Recipients:</div>
               {recipientList.length}
             </div>
-            <div className="flex space-x-2">
-              <div className="mr-4">Minted cNFTs:</div>
-              {mintedIds.length}
-            </div>
-            <div className="flex space-x-2">
-              <div className="mr-4">Failed cNFTs:</div>
-              {failedMintedIds.length}
-            </div>
+          )}
+          <div className="flex space-x-2">
+            <div className="mr-4">Minted cNFTs:</div>
+            {mintedIds.length}
           </div>
-        </Panel>
-      )}
+          <div className="flex space-x-2">
+            <div className="mr-4">Failed cNFTs:</div>
+            {failedMintedIds.length}
+          </div>
+        </div>
+      </Panel>
+
       <FormWrapper onSubmit={formik.handleSubmit}>
         <FormTextareaWithLabel
           label="Recipient list"
@@ -265,7 +299,7 @@ export default function CnftMintForm({
           e.preventDefault();
           handleMintCnftsToCollection();
         }}
-        disabled={isLoading || !recipientList.length}
+        disabled={isLoading}
       >
         {isLoading ? <Spinner /> : "Mint cNFTs"}
       </PrimaryButton>

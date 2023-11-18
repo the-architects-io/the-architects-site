@@ -4,6 +4,7 @@ import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
+import { Panel } from "@/features/UI/panel";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
 import {
@@ -20,6 +21,35 @@ import {
 import axios from "axios";
 import { useFormik } from "formik";
 import { useCallback } from "react";
+// 8 NFTs
+// const selectedMaxDepth = 3;
+// const selectedMaxBufferSize = 8;
+
+// 32 NFTs
+// const selectedMaxDepth = 5;
+// const selectedMaxBufferSize = 8;
+
+// 16,384 NFTs
+const selectedMaxDepth = 14;
+const selectedMaxBufferSize = 64;
+
+const NftAmounts = [
+  {
+    maxDepth: 3,
+    maxBufferSize: 8,
+    mftAmount: 8,
+  },
+  {
+    maxDepth: 5,
+    maxBufferSize: 8,
+    mftAmount: 32,
+  },
+  {
+    maxDepth: 14,
+    maxBufferSize: 64,
+    mftAmount: 16384,
+  },
+];
 
 export default function MerkleTreeForm({
   umi,
@@ -34,18 +64,6 @@ export default function MerkleTreeForm({
   isLoading: boolean;
   localOrRemote?: "local" | "remote";
 }) {
-  // 8 NFTs
-  // const selectedMaxDepth = 3;
-  // const selectedMaxBufferSize = 8;
-
-  // 32 NFTs
-  // const selectedMaxDepth = 5;
-  // const selectedMaxBufferSize = 8;
-
-  // 16,384 NFTs
-  const selectedMaxDepth = 14;
-  const selectedMaxBufferSize = 64;
-
   const formik = useFormik({
     initialValues: {
       merkleTreeAddress: DEVNET_TREE_ADDRESS,
@@ -71,11 +89,32 @@ export default function MerkleTreeForm({
         maxDepth: selectedMaxDepth,
         maxBufferSize: selectedMaxBufferSize,
       });
+
       const { merkleTreeAddress } = data;
-      const merkleTree = await fetchMerkleTree(
-        umi,
-        publicKey(merkleTreeAddress)
-      );
+      console.log({ merkleTreeAddress });
+
+      let tree: MerkleTree | null = null;
+
+      const interval = setInterval(async () => {
+        console.log("fetching merkle tree");
+        try {
+          const merkleTree = await fetchMerkleTree(
+            umi,
+            publicKey(merkleTreeAddress)
+          );
+          if (merkleTree) {
+            tree = merkleTree;
+            console.log("found tree", merkleTree);
+            clearInterval(interval);
+            setMerkleTree(merkleTree);
+          } else {
+            console.log("no tree found, trying again");
+          }
+        } catch (error) {
+          console.log({ error });
+        }
+      }, 3000);
+
       showToast({
         primaryMessage: "Merkle Tree Created",
         link: {
@@ -83,8 +122,7 @@ export default function MerkleTreeForm({
           title: "View account",
         },
       });
-      setMerkleTree(merkleTree);
-      setMerkleTree(merkleTree);
+      if (tree) setMerkleTree(tree);
     } catch (error) {
       console.log({ error });
       showToast({
@@ -142,15 +180,36 @@ export default function MerkleTreeForm({
         </SubmitButton>
       </div>
       <div className="py-8 text-4xl">- OR -</div>
-      <PrimaryButton
-        onClick={(e) => {
-          e.preventDefault();
-          handleCreateTree();
-        }}
-        className="flex w-full justify-center"
-      >
-        {isLoading ? <Spinner /> : "Create Merkle Tree"}
-      </PrimaryButton>
+      <Panel className="space-y-2 mb-8">
+        <div className="flex">
+          <div className="mr-4">Max Depth:</div>
+          {selectedMaxDepth}
+        </div>
+        <div className="flex">
+          <div className="mr-4">Max Buffer Size:</div>
+          {selectedMaxBufferSize}
+        </div>
+        <div className="flex">
+          <div className="mr-4">NFT Amount:</div>
+          {
+            NftAmounts.find(
+              ({ maxDepth, maxBufferSize }) =>
+                maxDepth === selectedMaxDepth &&
+                maxBufferSize === selectedMaxBufferSize
+            )?.mftAmount
+          }
+        </div>
+      </Panel>
+      <div className="flex w-full justify-center">
+        <PrimaryButton
+          onClick={(e) => {
+            e.preventDefault();
+            handleCreateTree();
+          }}
+        >
+          {isLoading ? <Spinner /> : "Create Merkle Tree"}
+        </PrimaryButton>
+      </div>
     </FormWrapper>
   );
 }

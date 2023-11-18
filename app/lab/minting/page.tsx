@@ -4,7 +4,12 @@ import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Panel } from "@/features/UI/panel";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import { useAdmin } from "@/hooks/admin";
-import { MerkleTree } from "@metaplex-foundation/mpl-bubblegum";
+import {
+  MerkleTree,
+  fetchMerkleTree,
+  fetchTreeConfigFromSeeds,
+  findLeafAssetIdPda,
+} from "@metaplex-foundation/mpl-bubblegum";
 import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
 import { mplToolbox } from "@metaplex-foundation/mpl-toolbox";
 import { KeypairSigner, publicKey } from "@metaplex-foundation/umi";
@@ -49,6 +54,50 @@ export default function Page() {
       .use(mplTokenMetadata())
       .use(dasApi())
       .use(walletAdapterIdentity(wallet));
+    const merkleTreeAddress = "GnDaZo2Z6kVoXAMPMGttNKv5FUG46m7VghNVTX8t3K8P";
+    const collectionMint = "7SRqQZuLDvtPDAsb1GufE7Vgt83UBzzoUmtyDx5w6jP7";
+
+    const merkleTree = await fetchMerkleTree(umi, publicKey(merkleTreeAddress));
+
+    const { items: itemsOne } = await umi.rpc.getAssetsByGroup({
+      groupKey: "collection",
+      groupValue: collectionMint,
+      page: 1,
+    });
+    const { items: itemsTwo } = await umi.rpc.getAssetsByGroup({
+      groupKey: "collection",
+      groupValue: collectionMint,
+      page: 2,
+    });
+
+    // get name from each item at `iten.content.metadata.name`
+    // sort by number in name, e.g. "Dinodawgs Airdrops #999" should be #999 in the list
+    const items = [...itemsOne, ...itemsTwo];
+    const sortedRpcAssetList = items.sort((a, b) => {
+      const aName = a.content.metadata.name;
+      const bName = b.content.metadata.name;
+      const aNumber = parseInt(aName.split("#")[1]);
+      const bNumber = parseInt(bName.split("#")[1]);
+      return aNumber - bNumber;
+    });
+
+    const treeConfig = await fetchTreeConfigFromSeeds(umi, {
+      merkleTree: publicKey(merkleTreeAddress),
+    });
+
+    console.log("tree", merkleTree);
+    console.log("treeConfig", treeConfig);
+    console.log("sortedRpcAssetList", sortedRpcAssetList);
+
+    debugger;
+
+    const [assetId, bump] = await findLeafAssetIdPda(umi, {
+      merkleTree: publicKey(merkleTreeAddress),
+      leafIndex: 0,
+    });
+
+    console.log("assetId", assetId.toString());
+    console.log("bump", bump);
 
     setUmi(umi);
   }, [wallet]);
