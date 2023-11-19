@@ -5,7 +5,7 @@ import { DispenserControlPanel } from "@/features/dispensers/dispenser-control-p
 import { useAdmin } from "@/hooks/admin";
 import { useUserData } from "@nhost/nextjs";
 
-export default function DispenserControlPanelPage({ params }: { params: any }) {
+export default function DispenserDetailsPage({ params }: { params: any }) {
   const user = useUserData();
   const { isAdmin } = useAdmin();
   const { dispenser } = useDispenser(params?.id);

@@ -494,9 +494,19 @@ export enum LOCAL_OR_REMOTE {
   REMOTE = "remote",
 }
 
+export type Recipient = {
+  id: string;
+  amount: number;
+  wallet: Wallet;
+};
+
 export type Airdrop = {
   name: string;
   id: string;
+  owner: {
+    id: string;
+  };
+  recipients: Recipient[];
   collectionNft: {
     id: string;
     name: string;

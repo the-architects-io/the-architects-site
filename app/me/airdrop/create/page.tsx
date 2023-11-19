@@ -16,7 +16,7 @@ export default function AirdropCreatePage() {
 
   useEffect(() => {
     if (step === 2) {
-      router.push(`/airdrop/${airdropId}`);
+      router.push(`/me/airdrop/${airdropId}`);
     }
   }, [step, airdropId, router]);
 

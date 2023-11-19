@@ -3,8 +3,10 @@ import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import showToast from "@/features/toasts/show-toast";
+import { useUserData } from "@nhost/nextjs";
 import axios from "axios";
 import { useFormik } from "formik";
+import { useEffect } from "react";
 
 export default function CreateAirdropForm({
   setAirdropId,
@@ -13,9 +15,12 @@ export default function CreateAirdropForm({
   setAirdropId: (id: string) => void;
   setStep: (step: number) => void;
 }) {
+  const user = useUserData();
+
   const formik = useFormik({
     initialValues: {
       name: "",
+      ownerId: user?.id,
     },
     onSubmit: async ({ name }) => {
       const {
@@ -36,6 +41,13 @@ export default function CreateAirdropForm({
       }
     },
   });
+
+  useEffect(() => {
+    if (user?.id) {
+      formik.setFieldValue("ownerId", user?.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   return (
     <FormWrapper onSubmit={formik.handleSubmit}>

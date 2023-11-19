@@ -7,7 +7,7 @@ export const ADD_AIRDROP_RECIPIENTS = gql`
     insert_airdrop_recipients(objects: $recipients) {
       affected_rows
       returning {
-        airdrops {
+        airdrop {
           id
         }
       }
