@@ -281,18 +281,16 @@ export default function AirdropPage() {
                 </div>
               </>
               <div className="py-8 text-4xl text-center">- OR -</div>
-              {creatorAddress && (
+              {/* {creatorAddress && (
                 <CreateCollectionNftForm
                   setCollectionNftAddress={setCollectionNftAddress}
                   setSellerFeeBasisPoints={setSellerFeeBasisPoints}
                   setIsLoading={setIsLoading}
                   isLoading={isLoading}
-                  umi={umi}
-                  drive={drive}
                   setStep={setStep}
                   step={step}
                 />
-              )}
+              )} */}
             </div>
           ) : (
             <>

@@ -26,13 +26,26 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  let file: Buffer;
+
   const formData = await req.formData();
-  const imageFile = formData.get("file") as unknown as File | null;
+  const image = formData.get("image") as unknown as File | null;
+  const json = formData.get("json") as string;
+
   const fileName = formData.get("fileName") as string;
   const driveAddress = formData.get("driveAddress") as string;
 
-  if (!imageFile) {
-    return NextResponse.json(null, { status: 400 });
+  if (image) {
+    file = Buffer.from(await image.arrayBuffer());
+  } else if (json) {
+    file = Buffer.from(JSON.stringify(json));
+  } else {
+    return NextResponse.json(
+      {
+        error: "No file provided",
+      },
+      { status: 400 }
+    );
   }
 
   try {
@@ -46,18 +59,24 @@ export async function POST(req: NextRequest) {
     const connection = new Connection(RPC_ENDPOINT, "confirmed");
     const drive = await new ShdwDrive(connection, wallet).init();
 
-    const buffer = await imageFile.arrayBuffer();
-    const fileBuffer = Buffer.from(buffer);
-
     const { upload_errors, finalized_locations, message } =
       await drive.uploadFile(new PublicKey(driveAddress), {
         name: getSlug(fileName),
-        file: fileBuffer,
+        file,
       });
+
+    if (upload_errors.length > 0) {
+      return NextResponse.json(
+        {
+          errors: upload_errors,
+          message,
+        },
+        { status: 400 }
+      );
+    }
 
     return NextResponse.json(
       {
-        errors: upload_errors,
         url: finalized_locations[0],
         message,
       },

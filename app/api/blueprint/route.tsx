@@ -20,7 +20,7 @@ const BlueprintApiActionUrls = {
   [CREATE_AIRDROP]: `${BASE_URL}/api/add-airdrop`,
   [CREATE_DISENSER]: `${BASE_URL}/api/add-dispenser`,
   [DISPENSE_TOKENS]: `${BASE_URL}/api/dispense-tokens`,
-  [UPLOAD_FILE]: `${BASE_URL}/api/upload-image-to-shadow-drive`,
+  [UPLOAD_FILE]: `${BASE_URL}/api/upload-file-to-shadow-drive`,
 };
 
 export const mapErrorToResponse = (error: any): MappedErrorResponse => {
@@ -99,27 +99,41 @@ const handleUploadFile = async (formData: FormData | undefined) => {
     );
   }
 
-  const image = formData.get("image");
-  const fileName = formData.get("fileName");
-
-  if (!image || !fileName) {
+  const body = new FormData();
+  if (formData.get("json")) {
+    body.set("json", JSON.stringify(formData.get("json")));
+  }
+  if (formData.get("image")) {
+    body.set("image", formData.get("image") as string);
+  }
+  if (formData.get("driveAddress")) {
+    body.set("driveAddress", formData.get("driveAddress") as string);
+  } else {
     return NextResponse.json(
       {
-        error: "Missing image or fileName",
+        error: "Missing drive address",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+  if (formData.get("fileName")) {
+    body.set("fileName", formData.get("fileName") as string);
+  } else {
+    return NextResponse.json(
+      {
+        error: "Missing file name",
         status: 500,
       },
       { status: 500 }
     );
   }
 
-  const body = new FormData();
-  body.set("image", image);
-  body.set("fileName", fileName);
   body.set("apiKey", process.env.BLUEPRINT_API_KEY);
 
   try {
     const { data, status, statusText } = await axios.post(
-      `${BASE_URL}/api/upload-image-to-shadow-drive`,
+      `${BASE_URL}/api/upload-file-to-shadow-drive`,
       body,
       {
         headers: {

@@ -552,7 +552,8 @@ export type AirdropRecipientsResponse = BaseBlueprintResponse & {
 };
 
 export type UploadFileInput = {
-  file: File;
+  image?: File;
+  json?: any;
   fileName: string;
   driveAddress: string;
 };

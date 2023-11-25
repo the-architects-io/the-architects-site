@@ -10,7 +10,12 @@ import {
 import { BASE_URL } from "@/constants/constants";
 import axios from "axios";
 
-export const createAirdrop = async (
+export type BlueprintClientOptions = {
+  cluster: "devnet" | "testnet" | "mainnet-beta";
+};
+
+const createAirdrop = async (
+  options: BlueprintClientOptions,
   params: CreateAirdropInput
 ): Promise<CreateAirdropResponse> => {
   const response = await fetch("/api/blueprint", {
@@ -28,7 +33,8 @@ export const createAirdrop = async (
   return data;
 };
 
-export const addAirdropRecipients = async (
+const addAirdropRecipients = async (
+  options: BlueprintClientOptions,
   params: AddAirdropRecipientsInput
 ): Promise<AirdropRecipientsResponse> => {
   const response = await fetch("/api/blueprint", {
@@ -46,16 +52,27 @@ export const addAirdropRecipients = async (
   return data;
 };
 
-export const uploadFile = async (
+const uploadFile = async (
+  options: BlueprintClientOptions,
   params: UploadFileInput
 ): Promise<UploadFileResponse> => {
-  const { fileName, file } = params;
+  const { json, fileName, image, driveAddress } = params;
+
+  if (!json && !image) {
+    throw new Error("No file or json provided");
+  }
+
+  if (json && image) {
+    throw new Error("Only image or json can be provided, not both");
+  }
 
   const body = new FormData();
 
-  body.set("file", file);
+  if (json) body.set("json", JSON.stringify(json));
+  if (image) body.set("image", image);
   body.set("fileName", fileName);
   body.set("action", BlueprintApiActions.UPLOAD_FILE);
+  body.set("driveAddress", driveAddress);
 
   const { data } = await axios.post(`${BASE_URL}/api/blueprint`, body, {
     headers: {
@@ -64,4 +81,14 @@ export const uploadFile = async (
   });
 
   return data;
+};
+
+export const createBlueprintClient = (options: BlueprintClientOptions) => {
+  return {
+    createAirdrop: (params: CreateAirdropInput) =>
+      createAirdrop(options, params),
+    addAirdropRecipients: (params: AddAirdropRecipientsInput) =>
+      addAirdropRecipients(options, params),
+    uploadFile: (params: UploadFileInput) => uploadFile(options, params),
+  };
 };

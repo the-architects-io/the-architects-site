@@ -1,4 +1,4 @@
-import { createAirdrop } from "@/app/blueprint/client";
+import { createBlueprintClient } from "@/app/blueprint/client";
 import { AddAirdropResponse, BlueprintApiActions } from "@/app/blueprint/types";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
@@ -27,7 +27,10 @@ export default function CreateAirdropForm({
       shouldKickoffManually: false,
     },
     onSubmit: async ({ name }) => {
-      const { success, airdrop } = await createAirdrop({ name });
+      const blueprint = createBlueprintClient({
+        cluster: "devnet",
+      });
+      const { success, airdrop } = await blueprint.createAirdrop({ name });
 
       if (success && airdrop?.id) {
         setAirdropId(airdrop.id);

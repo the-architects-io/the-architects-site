@@ -1,5 +1,5 @@
-import { UploadAssetsToShadowDriveResponse } from "@/app/api/upload-image-to-shadow-drive/route";
-import { uploadFile } from "@/app/blueprint/client";
+import { UploadAssetsToShadowDriveResponse } from "@/app/api/upload-file-to-shadow-drive/route";
+import { createBlueprintClient } from "@/app/blueprint/client";
 import {
   ASSET_SHDW_DRIVE_ADDRESS,
   ASSET_SHDW_DRIVE_URL,
@@ -59,8 +59,12 @@ export default function CreateCollectionNftForm({
 
       const collectionNameSlug = getSlug(collectionName);
 
-      const { url } = await uploadFile({
-        file: files[0],
+      const blueprint = createBlueprintClient({
+        cluster: "devnet",
+      });
+
+      const { url } = await blueprint.uploadFile({
+        image: files[0],
         fileName: `${collectionNameSlug}-collection.png`,
         driveAddress: ASSET_SHDW_DRIVE_ADDRESS,
       });
@@ -83,18 +87,13 @@ export default function CreateCollectionNftForm({
       let uri = "";
 
       try {
-        const { data: jsonUploadRes } =
-          await axios.post<UploadAssetsToShadowDriveResponse>(
-            `${BASE_URL}/api/upload-json-to-shadow-drive`,
-            {
-              json,
-              fileName: `${collectionName
-                .split(" ")
-                .join("-")}-collection.json`,
-            }
-          );
+        const { url } = await blueprint.uploadFile({
+          json,
+          fileName: `${collectionName.split(" ").join("-")}-collection.json`,
+          driveAddress: ASSET_SHDW_DRIVE_ADDRESS,
+        });
 
-        uri = jsonUploadRes?.urls[0];
+        uri = url;
       } catch (error) {
         console.log({ error });
       }
@@ -102,23 +101,23 @@ export default function CreateCollectionNftForm({
       try {
         console.log({ collectionName, uri, sellerFeeBasisPoints });
 
-        const { data: mintRes } = await axios.post(`${BASE_URL}/api/mint-nft`, {
-          name: collectionName,
-          uri,
-          sellerFeeBasisPoints,
-          isCollection: true,
-        });
+        // const { data: mintRes } = await axios.post(`${BASE_URL}/api/mint-nft`, {
+        //   name: collectionName,
+        //   uri,
+        //   sellerFeeBasisPoints,
+        //   isCollection: true,
+        // });
 
-        const { address } = mintRes;
+        // const { address } = mintRes;
 
-        showToast({
-          primaryMessage: "Collection NFT Minted",
-          link: {
-            title: "View NFT",
-            url: `https://solscan.io/token/${address}`,
-          },
-        });
-        setCollectionNftAddress(address);
+        // showToast({
+        //   primaryMessage: "Collection NFT Minted",
+        //   link: {
+        //     title: "View NFT",
+        //     url: `https://solscan.io/token/${address}`,
+        //   },
+        // });
+        // setCollectionNftAddress(address);
         setSellerFeeBasisPoints(basisPoints);
         if (step && setStep) {
           setStep?.(step + 1);

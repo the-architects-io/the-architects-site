@@ -13,12 +13,6 @@ export type UploadAssetsToShadowDriveResponse = {
   errors: Array<ShadowUploadResponse>;
 };
 
-// export const config = {
-//   api: {
-//     bodyParser: false,
-//   },
-// };
-
 export async function POST(req: NextRequest) {
   const { json, fileName } = await req.json();
 
