@@ -1,4 +1,5 @@
-import { AddAirdropResponse } from "@/app/blueprint/types";
+import { createAirdrop } from "@/app/blueprint/client";
+import { AddAirdropResponse, BlueprintApiActions } from "@/app/blueprint/types";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
@@ -26,16 +27,10 @@ export default function CreateAirdropForm({
       shouldKickoffManually: false,
     },
     onSubmit: async ({ name }) => {
-      const {
-        data,
-      }: {
-        data: AddAirdropResponse;
-      } = await axios.post("/api/add-airdrop", {
-        name,
-      });
+      const { success, airdrop } = await createAirdrop({ name });
 
-      if (data?.addedAirdrop?.id) {
-        setAirdropId(data.addedAirdrop.id);
+      if (success && airdrop?.id) {
+        setAirdropId(airdrop.id);
         setStep(1);
       } else {
         showToast({

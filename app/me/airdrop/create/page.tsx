@@ -17,11 +17,10 @@ import { useEffect, useState } from "react";
 export default function AirdropCreatePage() {
   const { publicKey } = useWallet();
   const router = useRouter();
-  const [step, setStep] = useState(0);
-  const [airdropId, setAirdropId] = useState<string | null>(null);
-  const [umi, setUmi] = useState<Umi | null>(null);
-  const [hasInitializedUmiClient, setHasInitializedUmiClient] =
-    useState<boolean>(false);
+  const [step, setStep] = useState(1);
+  const [airdropId, setAirdropId] = useState<string | null>(
+    "18928e38-a519-4123-96d7-a617f4d781eb"
+  );
   const [drive, setDrive] = useState<ShdwDrive | null>(null);
   const [sellerFeeBasisPoints, setSellerFeeBasisPoints] = useState<
     number | null
@@ -60,7 +59,6 @@ export default function AirdropCreatePage() {
             step={step}
             setStep={setStep}
             airdropId={airdropId}
-            umi={umi}
             drive={drive}
             setSellerFeeBasisPoints={setSellerFeeBasisPoints}
             setCollectionNftAddress={setCollectionNftAddress}

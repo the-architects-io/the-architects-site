@@ -7,11 +7,20 @@ import { logError } from "@/utils/errors/log-error";
 import axios from "axios";
 import { NextResponse, type NextRequest } from "next/server";
 
-const { CREATE_DISENSER, DISPENSE_TOKENS } = BlueprintApiActions;
+const {
+  ADD_AIRDROP_RECIPIENTS,
+  CREATE_DISENSER,
+  DISPENSE_TOKENS,
+  CREATE_AIRDROP,
+  UPLOAD_FILE,
+} = BlueprintApiActions;
 
 const BlueprintApiActionUrls = {
+  [ADD_AIRDROP_RECIPIENTS]: `${BASE_URL}/api/add-airdrop-recipients`,
+  [CREATE_AIRDROP]: `${BASE_URL}/api/add-airdrop`,
   [CREATE_DISENSER]: `${BASE_URL}/api/add-dispenser`,
   [DISPENSE_TOKENS]: `${BASE_URL}/api/dispense-tokens`,
+  [UPLOAD_FILE]: `${BASE_URL}/api/upload-image-to-shadow-drive`,
 };
 
 export const mapErrorToResponse = (error: any): MappedErrorResponse => {
@@ -35,18 +44,117 @@ export const mapErrorToResponse = (error: any): MappedErrorResponse => {
   };
 };
 
-const handleCreateDispenser = async (params: any) => {
-  console.log({
-    BlueprintApiActionUrls,
-    CREATE_DISENSER,
-    params,
-    apiKey: process.env.BLUEPRINT_API_KEY,
-    action: CREATE_DISENSER,
-    url: BlueprintApiActionUrls[CREATE_DISENSER],
-  });
+const handleBlueprintAction = async (
+  action: BlueprintApiActions,
+  params: any
+) => {
+  try {
+    const { data, status, statusText } = await axios.post(
+      BlueprintApiActionUrls[action],
+      {
+        ...params,
+        apiKey: process.env.BLUEPRINT_API_KEY,
+      }
+    );
+
+    return NextResponse.json(
+      {
+        status: status || 500,
+        statusText,
+        success: status === 200,
+        action,
+        params,
+        ...data,
+      },
+      {
+        status: status || 500,
+      }
+    );
+  } catch (rawError: any) {
+    let { error, status } = mapErrorToResponse(rawError);
+
+    logError({ error, status });
+    return NextResponse.json({ error }, { status });
+  }
+};
+
+const handleUploadFile = async (formData: FormData | undefined) => {
+  if (!process.env.BLUEPRINT_API_KEY) {
+    return NextResponse.json(
+      {
+        error: "Blueprint API key not configured",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+
+  if (!formData) {
+    return NextResponse.json(
+      {
+        error: "Missing form data",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+
+  const image = formData.get("image");
+  const fileName = formData.get("fileName");
+
+  if (!image || !fileName) {
+    return NextResponse.json(
+      {
+        error: "Missing image or fileName",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+
+  const body = new FormData();
+  body.set("image", image);
+  body.set("fileName", fileName);
+  body.set("apiKey", process.env.BLUEPRINT_API_KEY);
 
   try {
-    const { data, status, statusText, config } = await axios.post(
+    const { data, status, statusText } = await axios.post(
+      `${BASE_URL}/api/upload-image-to-shadow-drive`,
+      body,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    if (data?.errors?.length) {
+      return NextResponse.json({
+        error: data?.errors[0],
+        status: 500,
+        statusText: "Error with upload to shadow drive",
+        action: UPLOAD_FILE,
+      });
+    }
+
+    return NextResponse.json({
+      ...data,
+      status: status || 500,
+      statusText,
+      action: UPLOAD_FILE,
+      success: status === 200,
+    });
+  } catch (rawError: any) {
+    let error = mapErrorToResponse(rawError);
+
+    logError(error);
+    return NextResponse.json({ error });
+  }
+};
+
+const handleCreateDispenser = async (params: any) => {
+  try {
+    const { data, status, statusText } = await axios.post(
       BlueprintApiActionUrls[CREATE_DISENSER],
       {
         ...params,
@@ -54,16 +162,10 @@ const handleCreateDispenser = async (params: any) => {
       }
     );
 
-    console.log("handleCreateDispenser", {
-      status,
-      config,
-    });
-
     return NextResponse.json({
       ...data,
       status: data?.status || 500,
       statusText: data?.status !== 200 ? data?.statusText : statusText,
-      config,
       action: CREATE_DISENSER,
       params,
     });
@@ -77,7 +179,7 @@ const handleCreateDispenser = async (params: any) => {
 
 const handleDispenseTokens = async (params: any) => {
   try {
-    const { data, status, statusText, config } = await axios.post(
+    const { data, status, statusText } = await axios.post(
       BlueprintApiActionUrls[DISPENSE_TOKENS],
       {
         ...params,
@@ -89,7 +191,6 @@ const handleDispenseTokens = async (params: any) => {
       {
         status: status || 500,
         statusText,
-        config,
         action: DISPENSE_TOKENS,
         params,
         ...data,
@@ -107,7 +208,18 @@ const handleDispenseTokens = async (params: any) => {
 };
 
 export async function POST(req: NextRequest) {
-  const { action, params, noop } = await req.json();
+  let action, params;
+
+  console.log({ headers: req.headers.get("content-type") });
+
+  if (req.headers.get("content-type") === "application/json") {
+    const json = await req.json();
+    action = json.action;
+    params = json.params;
+  } else {
+    params = await req.formData();
+    action = params.get("action");
+  }
 
   if (!process.env.API_ACCESS_HOST_LIST) {
     return NextResponse.json(
@@ -119,31 +231,26 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const hostWhitelist = process.env.API_ACCESS_HOST_LIST;
-  const host = req.headers.get("x-forwarded-host") || "";
-  const isValidHost = hostWhitelist.indexOf(host) > -1;
+  // const hostWhitelist = process.env.API_ACCESS_HOST_LIST;
+  // const host = req.headers.get("x-forwarded-host") || "";
+  // const isValidHost = hostWhitelist.indexOf(host) > -1;
 
-  if (ENV !== "local" && !isValidHost) {
-    return NextResponse.json(
-      {
-        error: `API access not allowed for host: ${host}`,
-        status: 500,
-      },
-      { status: 500 }
-    );
-  }
-
-  if (noop) {
-    return NextResponse.json(
-      {
-        noop: true,
-        endpoint: "blueprint",
-      },
-      { status: 200 }
-    );
-  }
+  // if (ENV !== "local" && !isValidHost) {
+  //   return NextResponse.json(
+  //     {
+  //       error: `API access not allowed for host: ${host}`,
+  //       status: 500,
+  //     },
+  //     { status: 500 }
+  //   );
+  // }
 
   switch (action) {
+    case BlueprintApiActions.ADD_AIRDROP_RECIPIENTS:
+    case BlueprintApiActions.CREATE_AIRDROP:
+      return handleBlueprintAction(action, params);
+    case BlueprintApiActions.UPLOAD_FILE:
+      return handleUploadFile(params);
     case BlueprintApiActions.CREATE_DISENSER:
       return handleCreateDispenser(params);
     case BlueprintApiActions.DISPENSE_TOKENS:

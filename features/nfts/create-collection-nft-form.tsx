@@ -1,30 +1,28 @@
 import { UploadAssetsToShadowDriveResponse } from "@/app/api/upload-image-to-shadow-drive/route";
-import { ASSET_SHDW_DRIVE_URL, BASE_URL } from "@/constants/constants";
+import { uploadFile } from "@/app/blueprint/client";
+import {
+  ASSET_SHDW_DRIVE_ADDRESS,
+  ASSET_SHDW_DRIVE_URL,
+  BASE_URL,
+} from "@/constants/constants";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormTextareaWithLabel } from "@/features/UI/forms/form-textarea-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import showToast from "@/features/toasts/show-toast";
 import { getSlug } from "@/utils/formatting";
-import { Umi } from "@metaplex-foundation/umi";
-import { ShdwDrive } from "@shadow-drive/sdk";
 import { useWallet } from "@solana/wallet-adapter-react";
 import axios from "axios";
 import { useFormik } from "formik";
-import Image from "next/image";
 import { useState } from "react";
 
 export default function CreateCollectionNftForm({
-  umi,
-  drive,
   step,
   setStep,
   setSellerFeeBasisPoints,
   setCollectionNftAddress,
   airdropId,
 }: {
-  umi: Umi | null;
-  drive: ShdwDrive | null;
   isLoading?: boolean;
   setIsLoading?: (isLoading: boolean) => void;
   step?: number;
@@ -53,7 +51,7 @@ export default function CreateCollectionNftForm({
       description,
       sellerFeeBasisPoints,
     }) => {
-      if (!umi || !wallet?.publicKey || !drive) return;
+      if (!wallet?.publicKey) return;
 
       if (!files?.length) return;
 
@@ -61,26 +59,15 @@ export default function CreateCollectionNftForm({
 
       const collectionNameSlug = getSlug(collectionName);
 
-      const body = new FormData();
-      body.set("image", files[0]);
-      const fileName = `${collectionNameSlug}-collection.png`;
-      body.set("fileName", fileName);
+      const { url } = await uploadFile({
+        file: files[0],
+        fileName: `${collectionNameSlug}-collection.png`,
+        driveAddress: ASSET_SHDW_DRIVE_ADDRESS,
+      });
 
-      const { data: uploadImageRes } =
-        await axios.post<UploadAssetsToShadowDriveResponse>(
-          `${BASE_URL}/api/upload-image-to-shadow-drive`,
-          body,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+      console.log({ url });
 
-      const uploadUrl = uploadImageRes?.urls[0];
-      console.log({ uploadUrl });
-
-      setCollectionImageUrl(uploadUrl);
+      setCollectionImageUrl(url);
 
       const basisPoints = sellerFeeBasisPoints * 100;
 
@@ -142,10 +129,9 @@ export default function CreateCollectionNftForm({
     },
   });
 
-  if (!umi) return null;
-
   return (
     <div className="flex flex-col justify-center items-center w-full mb-4 space-y-4">
+      {airdropId}
       <FormWrapper>
         <div className="flex flex-col justify-center w-full mb-4 space-y-4">
           <label className="mb-2">Collection Image</label>

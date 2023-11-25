@@ -378,11 +378,6 @@ export type TraitInstance = {
   trait: Trait;
 };
 
-export enum BlueprintApiActions {
-  CREATE_DISENSER = "CREATE_DISENSER",
-  DISPENSE_TOKENS = "DISPENSE_TOKENS",
-}
-
 export type MappedErrorResponse = {
   error: {
     message: string;
@@ -506,8 +501,8 @@ export type Airdrop = {
   owner: {
     id: string;
   };
-  recipients: Recipient[];
-  collectionNft: {
+  recipients?: Recipient[];
+  collectionNft?: {
     id: string;
     name: string;
     mintAddress: string;
@@ -528,3 +523,48 @@ export type AddAirdropResponse = {
   addedReipientsCount: number;
   addedAirdrop: Airdrop;
 };
+
+export type CreateAirdropInput = {
+  name: string;
+  collectionNftId?: string;
+  startTimestamp?: number;
+};
+
+export type BaseBlueprintResponse = {
+  status: number;
+  statusText: string;
+  message: string;
+  success: boolean;
+  error?: string;
+};
+
+export type CreateAirdropResponse = BaseBlueprintResponse & {
+  airdrop: Airdrop;
+};
+
+export type AddAirdropRecipientsInput = {
+  airdropId: string;
+  recipients: string[];
+};
+
+export type AirdropRecipientsResponse = BaseBlueprintResponse & {
+  airdrop: Airdrop;
+};
+
+export type UploadFileInput = {
+  file: File;
+  fileName: string;
+  driveAddress: string;
+};
+
+export type UploadFileResponse = BaseBlueprintResponse & {
+  url: string;
+};
+
+export enum BlueprintApiActions {
+  ADD_AIRDROP_RECIPIENTS = "ADD_AIRDROP_RECIPIENTS",
+  CREATE_AIRDROP = "CREATE_AIRDROP",
+  CREATE_DISENSER = "CREATE_DISENSER",
+  DISPENSE_TOKENS = "DISPENSE_TOKENS",
+  UPLOAD_FILE = "UPLOAD_FILE",
+}

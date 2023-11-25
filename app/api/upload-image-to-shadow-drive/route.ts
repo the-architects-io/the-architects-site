@@ -13,12 +13,6 @@ export type UploadAssetsToShadowDriveResponse = {
   errors: Array<ShadowUploadResponse>;
 };
 
-// export const config = {
-//   api: {
-//     bodyParser: false,
-//   },
-// };
-
 export async function POST(req: NextRequest) {
   if (
     !process.env.EXECUTION_WALLET_PRIVATE_KEY ||
@@ -33,8 +27,9 @@ export async function POST(req: NextRequest) {
   }
 
   const formData = await req.formData();
-  const imageFile = formData.get("image") as unknown as File | null;
+  const imageFile = formData.get("file") as unknown as File | null;
   const fileName = formData.get("fileName") as string;
+  const driveAddress = formData.get("driveAddress") as string;
 
   if (!imageFile) {
     return NextResponse.json(null, { status: 400 });
@@ -55,18 +50,15 @@ export async function POST(req: NextRequest) {
     const fileBuffer = Buffer.from(buffer);
 
     const { upload_errors, finalized_locations, message } =
-      await drive.uploadFile(
-        new PublicKey(process.env.NEXT_PUBLIC_ASSET_SHDW_DRIVE_ADDRESS),
-        {
-          name: getSlug(fileName),
-          file: fileBuffer,
-        }
-      );
+      await drive.uploadFile(new PublicKey(driveAddress), {
+        name: getSlug(fileName),
+        file: fileBuffer,
+      });
 
     return NextResponse.json(
       {
         errors: upload_errors,
-        urls: finalized_locations,
+        url: finalized_locations[0],
         message,
       },
       { status: 200 }
