@@ -1,5 +1,5 @@
 "use client";
-import NftCollectionForm from "@/features/nfts/nft-collection-form";
+import CreateCollectionNftForm from "@/features/nfts/create-collection-nft-form";
 import { Umi } from "@metaplex-foundation/umi";
 import { ShdwDrive } from "@shadow-drive/sdk";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -26,7 +26,7 @@ export default function Page() {
     <div>
       <div className="text-3xl">Mint Collection NFT</div>
       {!!publicKey && (
-        <NftCollectionForm
+        <CreateCollectionNftForm
           setCollectionNftAddress={setCollectionNftAddress}
           setSellerFeeBasisPoints={setSellerFeeBasisPoints}
           setIsLoading={setIsLoading}

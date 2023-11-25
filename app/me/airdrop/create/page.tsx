@@ -2,8 +2,14 @@
 import WalletButton from "@/features/UI/buttons/wallet-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Panel } from "@/features/UI/panel";
+import AddAirdropMetadatasForm from "@/features/airdrop/add-airdrop-metadatas-form";
 import AddAirdropRecipientsForm from "@/features/airdrop/add-airdrop-recipients-form";
+import AddImagesForm from "@/features/airdrop/add-images-form";
 import CreateAirdropForm from "@/features/airdrop/create-airdrop-form";
+import CreateCollectionNftForm from "@/features/nfts/create-collection-nft-form";
+import { Umi } from "@metaplex-foundation/umi/dist/types/Umi";
+import { ShdwDrive } from "@shadow-drive/sdk";
+
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -13,6 +19,16 @@ export default function AirdropCreatePage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [airdropId, setAirdropId] = useState<string | null>(null);
+  const [umi, setUmi] = useState<Umi | null>(null);
+  const [hasInitializedUmiClient, setHasInitializedUmiClient] =
+    useState<boolean>(false);
+  const [drive, setDrive] = useState<ShdwDrive | null>(null);
+  const [sellerFeeBasisPoints, setSellerFeeBasisPoints] = useState<
+    number | null
+  >(null);
+  const [collectionNftAddress, setCollectionNftAddress] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     if (step === 2) {
@@ -40,6 +56,27 @@ export default function AirdropCreatePage() {
           <CreateAirdropForm setAirdropId={setAirdropId} setStep={setStep} />
         )}
         {step === 1 && airdropId && (
+          <CreateCollectionNftForm
+            step={step}
+            setStep={setStep}
+            airdropId={airdropId}
+            umi={umi}
+            drive={drive}
+            setSellerFeeBasisPoints={setSellerFeeBasisPoints}
+            setCollectionNftAddress={setCollectionNftAddress}
+          />
+        )}
+        {step === 2 && airdropId && (
+          <AddAirdropMetadatasForm
+            step={step}
+            setStep={setStep}
+            airdropId={airdropId}
+          />
+        )}
+        {step === 3 && airdropId && (
+          <AddImagesForm step={step} setStep={setStep} airdropId={airdropId} />
+        )}
+        {step === 4 && airdropId && (
           <AddAirdropRecipientsForm
             step={step}
             setStep={setStep}

@@ -43,25 +43,6 @@ export const RecipientListTable = ({
           </div>
         ),
       },
-      // {
-      //   accessorKey: "age",
-      //   header: () => "Age",
-      //   size: 50,
-      // },
-      // {
-      //   accessorKey: "visits",
-      //   header: () => <span>Visits</span>,
-      //   size: 50,
-      // },
-      // {
-      //   accessorKey: "status",
-      //   header: "Status",
-      // },
-      // {
-      //   accessorKey: "progress",
-      //   header: "Profile Progress",
-      //   size: 80,
-      // },
     ],
     []
   );

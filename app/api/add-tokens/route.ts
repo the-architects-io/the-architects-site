@@ -77,8 +77,6 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  console.log("tokensInDb: ", tokensInDb);
-
   const umi = getUmiClient();
 
   const mintAccounts: Mint[] = await fetchAllMint(umi, mintAddresses);

@@ -28,7 +28,7 @@ import {
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ShdwDrive } from "@shadow-drive/sdk";
 import { Connection } from "@solana/web3.js";
-import NftCollectionForm from "@/features/nfts/nft-collection-form";
+import CreateCollectionNftForm from "@/features/nfts/create-collection-nft-form";
 import { getRpcEndpoint } from "@/utils/rpc";
 import { LOCAL_OR_REMOTE } from "@/app/blueprint/types";
 
@@ -141,7 +141,7 @@ export default function Page() {
                 <div className="flex flex-col w-full justify-center items-center">
                   <div className="bold mb-4">Using tree:</div>
                   <div className="mb-8">{merkleTree.publicKey.toString()}</div>
-                  {/* <NftCollectionForm
+                  {/* <CreateCollectionNftForm
                     creatorAddress={wallet.publicKey.toString()}
                     setCreatorAddress={() => {}}
                     drive={drive}

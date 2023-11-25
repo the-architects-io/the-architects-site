@@ -2,7 +2,7 @@
 import { LOCAL_OR_REMOTE } from "@/app/blueprint/types";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import MerkleTreeForm from "@/features/nfts/merkle-tree-form";
-import NftCollectionForm from "@/features/nfts/nft-collection-form";
+import CreateCollectionNftForm from "@/features/nfts/create-collection-nft-form";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { useAdmin } from "@/hooks/admin";
@@ -282,7 +282,7 @@ export default function AirdropPage() {
               </>
               <div className="py-8 text-4xl text-center">- OR -</div>
               {creatorAddress && (
-                <NftCollectionForm
+                <CreateCollectionNftForm
                   setCollectionNftAddress={setCollectionNftAddress}
                   setSellerFeeBasisPoints={setSellerFeeBasisPoints}
                   setIsLoading={setIsLoading}

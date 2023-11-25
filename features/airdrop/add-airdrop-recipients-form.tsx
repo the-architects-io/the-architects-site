@@ -1,12 +1,7 @@
-import { AddAirdropResponse } from "@/app/blueprint/types";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
-import { SubmitButton } from "@/features/UI/buttons/submit-button";
-import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
-import axios from "axios";
-import { useFormik } from "formik";
 import { useState } from "react";
 
 export default function AddAirdropRecipientsForm({

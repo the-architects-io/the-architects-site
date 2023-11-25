@@ -14,15 +14,14 @@ import { useFormik } from "formik";
 import Image from "next/image";
 import { useState } from "react";
 
-export default function NftCollectionForm({
+export default function CreateCollectionNftForm({
   umi,
   drive,
-  isLoading,
-  setIsLoading,
   step,
   setStep,
   setSellerFeeBasisPoints,
   setCollectionNftAddress,
+  airdropId,
 }: {
   umi: Umi | null;
   drive: ShdwDrive | null;
@@ -32,6 +31,7 @@ export default function NftCollectionForm({
   setStep?: (step: number) => void;
   setSellerFeeBasisPoints: (fee: number) => void;
   setCollectionNftAddress: (address: string) => void;
+  airdropId?: string;
 }) {
   const wallet = useWallet();
   const [files, setFiles] = useState<FileList | File[] | null>(null);

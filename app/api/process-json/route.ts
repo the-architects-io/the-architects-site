@@ -6,7 +6,6 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   const jsonFile = await getFileFromRequest(req);
   const formData = await req.formData();
-  const handoffEndpoint = formData.get("handoffEndpoint") as string | null;
 
   if (!jsonFile) {
     return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
