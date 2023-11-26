@@ -1,3 +1,4 @@
+import { createBlueprintClient } from "@/app/blueprint/client";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import Spinner from "@/features/UI/spinner";
@@ -27,27 +28,28 @@ export default function AddAirdropRecipientsForm({
     setIsSending(true);
 
     const formData = new FormData();
-    Array.from(files).forEach((file) => formData.append("file", file));
+    formData.append("file", files[0]);
     formData.append("airdropId", airdropId);
 
     try {
       showToast({
         primaryMessage: "Adding recipients",
       });
-      const response = await fetch("/api/add-airdrop-recipients", {
-        method: "POST",
-        body: formData,
-      });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      const blueprint = createBlueprintClient({ cluster: "devnet" });
+
+      const { success, status, message, addedReipientsCount } =
+        await blueprint.addAirdropRecipients({
+          airdropId,
+          recipientsJsonFile: files[0],
+        });
+
+      if (!success) {
+        throw new Error(`HTTP error! status: ${status}`);
       }
 
-      const { message: primaryMessage, addedReipientsCount } =
-        await response.json();
-
       showToast({
-        primaryMessage,
+        primaryMessage: message,
         secondaryMessage: `${addedReipientsCount} recipients added`,
       });
     } catch (error) {

@@ -544,16 +544,19 @@ export type CreateAirdropResponse = BaseBlueprintResponse & {
 
 export type AddAirdropRecipientsInput = {
   airdropId: string;
-  recipients: string[];
+  recipients?: string[];
+  recipientsJsonFile?: File;
 };
 
 export type AirdropRecipientsResponse = BaseBlueprintResponse & {
   airdrop: Airdrop;
+  existingWalletsCount: number;
+  insertedWalletsCount: number;
+  addedReipientsCount: number;
 };
 
 export type UploadFileInput = {
-  image?: File;
-  json?: any;
+  file: File;
   fileName: string;
   driveAddress: string;
 };
@@ -562,10 +565,33 @@ export type UploadFileResponse = BaseBlueprintResponse & {
   url: string;
 };
 
+export type MintNftInput = {
+  name: string;
+  uri: string;
+  sellerFeeBasisPoints: number;
+  isCollection: boolean;
+};
+
+export type MintNftResponse = BaseBlueprintResponse & {
+  mintAddress: string;
+};
+
+export type UploadJsonInput = {
+  json: any;
+  fileName: string;
+  driveAddress: string;
+};
+
+export type UploadJsonResponse = BaseBlueprintResponse & {
+  url: string;
+};
+
 export enum BlueprintApiActions {
   ADD_AIRDROP_RECIPIENTS = "ADD_AIRDROP_RECIPIENTS",
   CREATE_AIRDROP = "CREATE_AIRDROP",
   CREATE_DISENSER = "CREATE_DISENSER",
   DISPENSE_TOKENS = "DISPENSE_TOKENS",
+  MINT_NFT = "MINT_NFT",
   UPLOAD_FILE = "UPLOAD_FILE",
+  UPLOAD_JSON = "UPLOAD_JSON",
 }

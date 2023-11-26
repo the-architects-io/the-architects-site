@@ -1,11 +1,10 @@
 import { RPC_ENDPOINT } from "@/constants/constants";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { ShadowUploadResponse, ShdwDrive } from "@shadow-drive/sdk";
-import { Connection, Keypair } from "@solana/web3.js";
+import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
-import { PublicKey } from "@metaplex-foundation/js";
-import { getSlug } from "@/utils/formatting";
+import { UploadJsonInput } from "@/app/blueprint/types";
 
 export type UploadAssetsToShadowDriveResponse = {
   urls: string[];
@@ -14,15 +13,23 @@ export type UploadAssetsToShadowDriveResponse = {
 };
 
 export async function POST(req: NextRequest) {
-  const { json, fileName } = await req.json();
+  const { json, fileName, driveAddress }: UploadJsonInput = await req.json();
+
+  console.log({
+    json,
+    fileName,
+    driveAddress,
+  });
 
   if (
     !process.env.EXECUTION_WALLET_PRIVATE_KEY ||
-    !process.env.NEXT_PUBLIC_ASSET_SHDW_DRIVE_ADDRESS
+    !driveAddress ||
+    !fileName ||
+    !json
   ) {
     return NextResponse.json(
       {
-        error: "Configuration error",
+        error: "Missing required parameters",
       },
       { status: 500 }
     );
@@ -31,8 +38,6 @@ export async function POST(req: NextRequest) {
   if (!json) {
     return NextResponse.json(null, { status: 400 });
   }
-
-  const file = Buffer.from(JSON.stringify(json));
 
   try {
     const keypair = Keypair.fromSecretKey(
@@ -45,19 +50,27 @@ export async function POST(req: NextRequest) {
     const connection = new Connection(RPC_ENDPOINT, "confirmed");
     const drive = await new ShdwDrive(connection, wallet).init();
 
-    const { upload_errors, finalized_locations, message } =
-      await drive.uploadFile(
-        new PublicKey(process.env.NEXT_PUBLIC_ASSET_SHDW_DRIVE_ADDRESS),
+    const buffer = Buffer.from(JSON.stringify({ ...json }));
+
+    const { message, finalized_locations, upload_errors } =
+      await drive.uploadFile(new PublicKey(driveAddress), {
+        name: fileName,
+        file: buffer,
+      });
+
+    if (upload_errors.length > 0) {
+      return NextResponse.json(
         {
-          name: getSlug(fileName),
-          file,
-        }
+          message,
+          errors: upload_errors,
+        },
+        { status: 500 }
       );
+    }
 
     return NextResponse.json(
       {
-        errors: upload_errors,
-        urls: finalized_locations,
+        url: finalized_locations[0],
         message,
       },
       { status: 200 }

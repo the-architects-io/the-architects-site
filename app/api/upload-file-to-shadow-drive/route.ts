@@ -26,27 +26,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let file: Buffer;
-
   const formData = await req.formData();
-  const image = formData.get("image") as unknown as File | null;
-  const json = formData.get("json") as string;
-
+  const formDataFile = formData.get("file") as unknown as File | null;
   const fileName = formData.get("fileName") as string;
   const driveAddress = formData.get("driveAddress") as string;
 
-  if (image) {
-    file = Buffer.from(await image.arrayBuffer());
-  } else if (json) {
-    file = Buffer.from(JSON.stringify(json));
-  } else {
-    return NextResponse.json(
-      {
-        error: "No file provided",
-      },
-      { status: 400 }
-    );
+  if (!formDataFile || !fileName || !driveAddress) {
+    return NextResponse.json(null, { status: 400 });
   }
+
+  const file = Buffer.from(await formDataFile.arrayBuffer());
 
   try {
     const keypair = Keypair.fromSecretKey(
@@ -65,18 +54,9 @@ export async function POST(req: NextRequest) {
         file,
       });
 
-    if (upload_errors.length > 0) {
-      return NextResponse.json(
-        {
-          errors: upload_errors,
-          message,
-        },
-        { status: 400 }
-      );
-    }
-
     return NextResponse.json(
       {
+        errors: upload_errors,
         url: finalized_locations[0],
         message,
       },

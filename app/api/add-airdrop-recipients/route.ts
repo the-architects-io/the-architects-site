@@ -8,26 +8,49 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
-  const recipientsListFile = formData.get("file") as unknown as File | null;
+  const recipientsJsonFile = formData.get(
+    "recipientsJsonFile"
+  ) as unknown as File | null;
+  const recipients = formData.get("recipients");
   const airdropId = formData.get("airdropId");
 
-  if (!recipientsListFile || !airdropId) {
-    return NextResponse.json({ error: "No file provided" }, { status: 400 });
+  if (!airdropId) {
+    return NextResponse.json(
+      { error: "No airdropId provided" },
+      { status: 400 }
+    );
   }
 
-  const recipientsList: string[] = await jsonFileToJson(recipientsListFile);
+  if (recipientsJsonFile && recipients) {
+    throw new Error(
+      "Only recipients or recipientsJsonFile can be provided, not both"
+    );
+  }
+
+  let addresses: string[];
+
+  if (recipientsJsonFile) {
+    addresses = await jsonFileToJson(recipientsJsonFile);
+  } else if (recipients) {
+    addresses = JSON.parse(recipients as string);
+  } else {
+    return NextResponse.json(
+      { error: "No recipients provided" },
+      { status: 400 }
+    );
+  }
 
   try {
     const { data: addedWallets }: { data: AddWalletsResponse } =
       await axios.post(`${BASE_URL}/api/add-wallets`, {
-        addresses: recipientsList,
+        addresses,
       });
 
     const { existingWalletsCount, insertedWalletsCount, wallets } =
       addedWallets;
 
     // create map where key is address and value is count
-    const addressMap = recipientsList.reduce((acc: any, address: string) => {
+    const addressMap = addresses.reduce((acc: any, address: string) => {
       if (acc[address]) {
         acc[address] += 1;
       } else {

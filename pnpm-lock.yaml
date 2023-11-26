@@ -152,6 +152,9 @@ dependencies:
   form-data:
     specifier: ^4.0.0
     version: 4.0.0
+  formdata-node:
+    specifier: ^6.0.3
+    version: 6.0.3
   formidable:
     specifier: ^3.5.1
     version: 3.5.1
@@ -10463,6 +10466,11 @@ packages:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       mime-types: 2.1.35
+
+  /formdata-node@6.0.3:
+    resolution: {integrity: sha512-8e1++BCiTzUno9v5IZ2J6bv4RU+3UKDmqWUQD0MIMVCd9AdhWkO1gw57oo1mNEX1dMq2EGI+FbWz4B92pscSQg==}
+    engines: {node: '>= 18'}
+    dev: false
 
   /formidable-serverless@1.1.1:
     resolution: {integrity: sha512-IUVI2m7d46YnWRZ9RG+wvmLoX0tTrk9P6oFc53QVjM9k0XhqzeyjwDi05PLvpGNKbyLvB3gfsAc+Lk6efM3FGQ==}

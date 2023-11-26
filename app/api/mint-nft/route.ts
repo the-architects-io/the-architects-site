@@ -17,7 +17,8 @@ import {
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { mplToolbox } from "@metaplex-foundation/mpl-toolbox";
 import { dasApi } from "@metaplex-foundation/digital-asset-standard-api";
-import { getRpcEndpoint } from "@/utils/rpc";
+import { getRpcEndpoint, isValidCluster } from "@/utils/rpc";
+import { PublicKey } from "@metaplex-foundation/js";
 
 export type UploadAssetsToShadowDriveResponse = {
   urls: string[];
@@ -26,8 +27,14 @@ export type UploadAssetsToShadowDriveResponse = {
 };
 
 export async function POST(req: NextRequest) {
-  const { name, uri, sellerFeeBasisPoints, isCollection, creatorAddress } =
-    await req.json();
+  const {
+    name,
+    uri,
+    sellerFeeBasisPoints,
+    isCollection,
+    creatorAddress,
+    cluster,
+  } = await req.json();
 
   if (
     !process.env.EXECUTION_WALLET_PRIVATE_KEY ||
@@ -50,14 +57,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(null, { status: 400 });
   }
 
+  if (!isValidCluster(cluster)) {
+    return NextResponse.json(
+      {
+        error: "Invalid cluster",
+      },
+      { status: 400 }
+    );
+  }
+
   try {
     let mintRes: {
       signature: TransactionSignature;
       result: RpcConfirmTransactionResult;
-      address: string;
+      mintAddress: string;
     } | null = null;
 
-    const umi = await createUmi(getRpcEndpoint())
+    const umi = await createUmi(getRpcEndpoint(cluster))
       .use(mplToolbox())
       .use(mplTokenMetadata())
       .use(dasApi());
@@ -70,32 +86,24 @@ export async function POST(req: NextRequest) {
 
     const collectionMint = generateSigner(umi);
 
-    console.log({
-      name,
-      uri,
-      collectionMint,
-      creatorAddress,
-      isCollection,
-      sellerFeeBasisPoints,
-    });
-
     const { signature, result } = await createNft(umi, {
       mint: collectionMint,
       name,
       uri,
-      sellerFeeBasisPoints: percentAmount(sellerFeeBasisPoints),
+      sellerFeeBasisPoints,
       isCollection,
     }).sendAndConfirm(umi);
 
-    mintRes = {
-      signature: signature.toString(),
-      result,
-      address: collectionMint.publicKey.toString(),
-    };
+    // convert Uint8Array signature to public key string
+    const signaturePublicKey = new TextDecoder().decode(
+      new Uint8Array(signature)
+    );
 
     return NextResponse.json(
       {
-        ...mintRes,
+        signature: signaturePublicKey,
+        result,
+        mintAddress: collectionMint.publicKey.toString(),
       },
       { status: 200 }
     );

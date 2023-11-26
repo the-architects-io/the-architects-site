@@ -12,6 +12,8 @@ const {
   CREATE_DISENSER,
   DISPENSE_TOKENS,
   CREATE_AIRDROP,
+  MINT_NFT,
+  UPLOAD_JSON,
   UPLOAD_FILE,
 } = BlueprintApiActions;
 
@@ -20,6 +22,8 @@ const BlueprintApiActionUrls = {
   [CREATE_AIRDROP]: `${BASE_URL}/api/add-airdrop`,
   [CREATE_DISENSER]: `${BASE_URL}/api/add-dispenser`,
   [DISPENSE_TOKENS]: `${BASE_URL}/api/dispense-tokens`,
+  [MINT_NFT]: `${BASE_URL}/api/mint-nft`,
+  [UPLOAD_JSON]: `${BASE_URL}/api/upload-json-to-shadow-drive`,
   [UPLOAD_FILE]: `${BASE_URL}/api/upload-file-to-shadow-drive`,
 };
 
@@ -78,6 +82,87 @@ const handleBlueprintAction = async (
   }
 };
 
+const handleAddAirdropRecipients = async (params: any) => {
+  const { airdropId, recipients, recipientsJsonFile } = params;
+
+  if (recipients && recipientsJsonFile) {
+    return NextResponse.json(
+      {
+        error: "Cannot have both recipients and recipientsJsonFile",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+
+  if (!airdropId) {
+    return NextResponse.json(
+      {
+        error: "Missing airdropId",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+
+  if (!process.env.BLUEPRINT_API_KEY) {
+    return NextResponse.json(
+      {
+        error: "Blueprint API key not configured",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+
+  const body = new FormData();
+  body.set("airdropId", airdropId);
+  if (recipients) {
+    body.set("recipients", recipients);
+  } else if (recipientsJsonFile) {
+    body.set("recipientsJsonFile", recipientsJsonFile);
+  } else {
+    return NextResponse.json(
+      {
+        error: "Missing recipients",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+  body.set("apiKey", process.env.BLUEPRINT_API_KEY);
+
+  try {
+    const { data, status, statusText } = await axios.post(
+      BlueprintApiActionUrls[ADD_AIRDROP_RECIPIENTS],
+      body,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return NextResponse.json(
+      {
+        status: status || 500,
+        statusText,
+        action: ADD_AIRDROP_RECIPIENTS,
+        params,
+        ...data,
+      },
+      {
+        status: status || 500,
+      }
+    );
+  } catch (rawError: any) {
+    let { error, status } = mapErrorToResponse(rawError);
+
+    logError({ error, status });
+    return NextResponse.json({ error }, { status });
+  }
+};
+
 const handleUploadFile = async (formData: FormData | undefined) => {
   if (!process.env.BLUEPRINT_API_KEY) {
     return NextResponse.json(
@@ -99,42 +184,12 @@ const handleUploadFile = async (formData: FormData | undefined) => {
     );
   }
 
-  const body = new FormData();
-  if (formData.get("json")) {
-    body.set("json", JSON.stringify(formData.get("json")));
-  }
-  if (formData.get("image")) {
-    body.set("image", formData.get("image") as string);
-  }
-  if (formData.get("driveAddress")) {
-    body.set("driveAddress", formData.get("driveAddress") as string);
-  } else {
-    return NextResponse.json(
-      {
-        error: "Missing drive address",
-        status: 500,
-      },
-      { status: 500 }
-    );
-  }
-  if (formData.get("fileName")) {
-    body.set("fileName", formData.get("fileName") as string);
-  } else {
-    return NextResponse.json(
-      {
-        error: "Missing file name",
-        status: 500,
-      },
-      { status: 500 }
-    );
-  }
-
-  body.set("apiKey", process.env.BLUEPRINT_API_KEY);
+  formData.set("apiKey", process.env.BLUEPRINT_API_KEY);
 
   try {
     const { data, status, statusText } = await axios.post(
       `${BASE_URL}/api/upload-file-to-shadow-drive`,
-      body,
+      formData,
       {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -260,11 +315,14 @@ export async function POST(req: NextRequest) {
   // }
 
   switch (action) {
-    case BlueprintApiActions.ADD_AIRDROP_RECIPIENTS:
     case BlueprintApiActions.CREATE_AIRDROP:
+    case BlueprintApiActions.MINT_NFT:
+    case BlueprintApiActions.UPLOAD_JSON:
       return handleBlueprintAction(action, params);
     case BlueprintApiActions.UPLOAD_FILE:
       return handleUploadFile(params);
+    case BlueprintApiActions.ADD_AIRDROP_RECIPIENTS:
+      return handleAddAirdropRecipients(params);
     case BlueprintApiActions.CREATE_DISENSER:
       return handleCreateDispenser(params);
     case BlueprintApiActions.DISPENSE_TOKENS:

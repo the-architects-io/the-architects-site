@@ -64,7 +64,7 @@ export default function CreateCollectionNftForm({
       });
 
       const { url } = await blueprint.uploadFile({
-        image: files[0],
+        file: files[0],
         fileName: `${collectionNameSlug}-collection.png`,
         driveAddress: ASSET_SHDW_DRIVE_ADDRESS,
       });
@@ -75,7 +75,8 @@ export default function CreateCollectionNftForm({
 
       const basisPoints = sellerFeeBasisPoints * 100;
 
-      // first build json file and upload to shdw
+      let uri = "";
+
       const json = {
         name: collectionName,
         symbol,
@@ -84,10 +85,8 @@ export default function CreateCollectionNftForm({
         image: `${driveUrl}/${collectionNameSlug}-collection.png`,
       };
 
-      let uri = "";
-
       try {
-        const { url } = await blueprint.uploadFile({
+        const { url } = await blueprint.uploadJson({
           json,
           fileName: `${collectionName.split(" ").join("-")}-collection.json`,
           driveAddress: ASSET_SHDW_DRIVE_ADDRESS,
@@ -101,23 +100,28 @@ export default function CreateCollectionNftForm({
       try {
         console.log({ collectionName, uri, sellerFeeBasisPoints });
 
-        // const { data: mintRes } = await axios.post(`${BASE_URL}/api/mint-nft`, {
-        //   name: collectionName,
-        //   uri,
-        //   sellerFeeBasisPoints,
-        //   isCollection: true,
-        // });
+        const { success, mintAddress } = await blueprint.mintNft({
+          name: collectionName,
+          uri,
+          sellerFeeBasisPoints: basisPoints,
+          isCollection: true,
+        });
 
-        // const { address } = mintRes;
+        if (!success) {
+          showToast({
+            primaryMessage: "Collection NFT Mint Failed",
+          });
+          return;
+        }
 
-        // showToast({
-        //   primaryMessage: "Collection NFT Minted",
-        //   link: {
-        //     title: "View NFT",
-        //     url: `https://solscan.io/token/${address}`,
-        //   },
-        // });
-        // setCollectionNftAddress(address);
+        showToast({
+          primaryMessage: "Collection NFT Minted",
+          link: {
+            title: "View NFT",
+            url: `https://solscan.io/token/${mintAddress}`,
+          },
+        });
+        setCollectionNftAddress(mintAddress);
         setSellerFeeBasisPoints(basisPoints);
         if (step && setStep) {
           setStep?.(step + 1);
