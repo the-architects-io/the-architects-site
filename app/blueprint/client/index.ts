@@ -4,13 +4,17 @@ import {
   BlueprintApiActions,
   CreateAirdropInput,
   CreateAirdropResponse,
+  CreateTreeInput,
+  CreateTreeResponse,
+  MintCnftInput,
+  MintCnftResponse,
   MintNftInput,
   MintNftResponse,
   UploadFileInput,
   UploadFileResponse,
   UploadJsonInput,
 } from "@/app/blueprint/types";
-import { jsonFileToJson, jsonToJSONFile } from "@/app/blueprint/utils";
+import { jsonFileToJson } from "@/app/blueprint/utils";
 import { BASE_URL } from "@/constants/constants";
 import axios from "axios";
 
@@ -75,6 +79,49 @@ const addAirdropRecipients = async (
     },
   });
 
+  return data;
+};
+
+const createTree = async (
+  options: BlueprintClientOptions,
+  params: CreateTreeInput
+): Promise<CreateTreeResponse> => {
+  const response = await fetch("/api/blueprint", {
+    method: "POST",
+    body: JSON.stringify({
+      action: BlueprintApiActions.CREATE_TREE,
+      params,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await response.json();
+  return data;
+};
+
+const mintCnft = async (
+  options: BlueprintClientOptions,
+  params: MintCnftInput
+): Promise<MintCnftResponse> => {
+  const { cluster } = options;
+
+  const response = await fetch("/api/blueprint", {
+    method: "POST",
+    body: JSON.stringify({
+      action: BlueprintApiActions.MINT_CNFT,
+      params: {
+        ...params,
+        cluster,
+      },
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await response.json();
   return data;
 };
 
@@ -152,10 +199,12 @@ const uploadFile = async (
 
 export const createBlueprintClient = (options: BlueprintClientOptions) => {
   return {
-    createAirdrop: (params: CreateAirdropInput) =>
-      createAirdrop(options, params),
     addAirdropRecipients: (params: AddAirdropRecipientsInput) =>
       addAirdropRecipients(options, params),
+    createAirdrop: (params: CreateAirdropInput) =>
+      createAirdrop(options, params),
+    createTree: (params: CreateTreeInput) => createTree(options, params),
+    mintCnft: (params: MintCnftInput) => mintCnft(options, params),
     mintNft: (params: MintNftInput) => mintNft(options, params),
     uploadFile: (params: UploadFileInput) => uploadFile(options, params),
     uploadJson: (params: UploadJsonInput) => uploadJson(options, params),

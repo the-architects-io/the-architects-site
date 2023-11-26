@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
     name,
     uri,
     leafOwnerAddress,
+    cluster,
   } = await req.json();
 
   if (
@@ -52,13 +53,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    let mintRes: {
-      signature: TransactionSignature;
-      result: RpcConfirmTransactionResult;
-      collectionAddress: string;
-    } | null = null;
-
-    const umi = await createUmi(getRpcEndpoint())
+    const umi = await createUmi(getRpcEndpoint(cluster))
       .use(mplToolbox())
       .use(mplTokenMetadata())
       .use(dasApi());
@@ -89,15 +84,11 @@ export async function POST(req: NextRequest) {
       },
     }).sendAndConfirm(umi);
 
-    mintRes = {
-      signature: signature.toString(),
-      result,
-      collectionAddress: collectionNftAddress,
-    };
-
     return NextResponse.json(
       {
-        ...mintRes,
+        signature: signature.toString(),
+        result,
+        collectionAddress: collectionNftAddress,
       },
       { status: 200 }
     );

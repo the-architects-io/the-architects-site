@@ -1,3 +1,4 @@
+import { createBlueprintClient } from "@/app/blueprint/client";
 import { LOCAL_OR_REMOTE } from "@/app/blueprint/types";
 import { BASE_URL, DEVNET_TREE_ADDRESS } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
@@ -84,14 +85,17 @@ export default function MerkleTreeForm({
     if (!umi) return;
     setIsLoading(true);
 
+    const blueprint = createBlueprintClient({
+      cluster: "devnet",
+    });
+
     try {
-      const { data } = await axios.post(`${BASE_URL}/api/create-tree`, {
+      const { success, merkleTreeAddress } = await blueprint.createTree({
         maxDepth: selectedMaxDepth,
         maxBufferSize: selectedMaxBufferSize,
       });
 
-      const { merkleTreeAddress } = data;
-      console.log({ merkleTreeAddress });
+      if (!success) throw new Error("Error creating Merkle Tree");
 
       let tree: MerkleTree | null = null;
 

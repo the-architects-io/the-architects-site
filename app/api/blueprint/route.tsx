@@ -10,8 +10,10 @@ import { NextResponse, type NextRequest } from "next/server";
 const {
   ADD_AIRDROP_RECIPIENTS,
   CREATE_DISENSER,
+  CREATE_TREE,
   DISPENSE_TOKENS,
   CREATE_AIRDROP,
+  MINT_CNFT,
   MINT_NFT,
   UPLOAD_JSON,
   UPLOAD_FILE,
@@ -21,7 +23,9 @@ const BlueprintApiActionUrls = {
   [ADD_AIRDROP_RECIPIENTS]: `${BASE_URL}/api/add-airdrop-recipients`,
   [CREATE_AIRDROP]: `${BASE_URL}/api/add-airdrop`,
   [CREATE_DISENSER]: `${BASE_URL}/api/add-dispenser`,
+  [CREATE_TREE]: `${BASE_URL}/api/create-tree`,
   [DISPENSE_TOKENS]: `${BASE_URL}/api/dispense-tokens`,
+  [MINT_CNFT]: `${BASE_URL}/api/mint-cnft`,
   [MINT_NFT]: `${BASE_URL}/api/mint-nft`,
   [UPLOAD_JSON]: `${BASE_URL}/api/upload-json-to-shadow-drive`,
   [UPLOAD_FILE]: `${BASE_URL}/api/upload-file-to-shadow-drive`,
@@ -288,6 +292,8 @@ export async function POST(req: NextRequest) {
 
   switch (action) {
     case BlueprintApiActions.CREATE_AIRDROP:
+    case BlueprintApiActions.CREATE_TREE:
+    case BlueprintApiActions.MINT_CNFT:
     case BlueprintApiActions.MINT_NFT:
     case BlueprintApiActions.UPLOAD_JSON:
       return handleBlueprintAction(action, params);

@@ -1,3 +1,5 @@
+import { RpcConfirmTransactionResult } from "@metaplex-foundation/umi";
+
 export type ErrorResponse = {
   success: boolean;
   message: string;
@@ -585,11 +587,38 @@ export type UploadJsonResponse = BaseBlueprintResponse & {
   url: string;
 };
 
+export type MintCnftInput = {
+  merkleTreeAddress: string;
+  collectionNftAddress: string;
+  creatorAddress: string;
+  sellerFeeBasisPoints: number;
+  name: string;
+  uri: string;
+  leafOwnerAddress: string;
+};
+
+export type MintCnftResponse = BaseBlueprintResponse & {
+  signature: string;
+  result: RpcConfirmTransactionResult;
+  collectionAddress: string;
+};
+
+export type CreateTreeInput = {
+  maxDepth: number;
+  maxBufferSize: number;
+};
+
+export type CreateTreeResponse = BaseBlueprintResponse & {
+  merkleTreeAddress: string;
+};
+
 export enum BlueprintApiActions {
   ADD_AIRDROP_RECIPIENTS = "ADD_AIRDROP_RECIPIENTS",
   CREATE_AIRDROP = "CREATE_AIRDROP",
   CREATE_DISENSER = "CREATE_DISENSER",
+  CREATE_TREE = "CREATE_TREE",
   DISPENSE_TOKENS = "DISPENSE_TOKENS",
+  MINT_CNFT = "MINT_CNFT",
   MINT_NFT = "MINT_NFT",
   UPLOAD_FILE = "UPLOAD_FILE",
   UPLOAD_JSON = "UPLOAD_JSON",

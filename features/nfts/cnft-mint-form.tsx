@@ -1,3 +1,4 @@
+import { createBlueprintClient } from "@/app/blueprint/client";
 import { LOCAL_OR_REMOTE } from "@/app/blueprint/types";
 import {
   BASE_URL,
@@ -28,16 +29,6 @@ import { useFormik } from "formik";
 import { useCallback, useState } from "react";
 
 const { LOCAL, REMOTE } = LOCAL_OR_REMOTE;
-
-type MintCnftInput = {
-  name: string;
-  uri: string;
-  sellerFeeBasisPoints: number;
-  creators: {
-    address: PublicKey;
-    share: number;
-  }[];
-};
 
 export default function CnftMintForm({
   umi,
@@ -84,7 +75,7 @@ export default function CnftMintForm({
 
   const handleMintCnftsToCollectionRemote = useCallback(async () => {
     setIsLoading(true);
-    // if (!recipientList.length) return;
+    if (!recipientList.length) return;
 
     showToast({
       primaryMessage: "Minting cNFTs",
@@ -93,25 +84,34 @@ export default function CnftMintForm({
 
     const nftIds = makeNumberArray(5000);
 
-    const recipient = "7PXwQ5dByCmVAb3EHHniS8t9Z4mhdSLKzoTBfX25X22C";
+    const blueprint = createBlueprintClient({
+      cluster: "devnet",
+    });
 
-    for (const id of nftIds) {
+    for (let i = 0; i < nftIds.length; i++) {
+      const id = nftIds[i];
+
       const uri = `https://shdw-drive.genesysgo.net/${DDK_ASSET_SHDW_DRIVE_ADDRESS}/${id}.json`;
       const { data: nftMetadata } = await axios.get(uri);
 
+      const recipient = recipientList[i];
+
       try {
-        const { data } = await axios.post(`${BASE_URL}/api/mint-cnft`, {
-          merkleTreeAddress,
-          collectionNftAddress,
-          creatorAddress,
-          sellerFeeBasisPoints,
-          name: nftMetadata.name,
-          uri,
-          leafOwnerAddress: recipient,
-        });
+        const { success, collectionAddress, signature } =
+          await blueprint.mintCnft({
+            merkleTreeAddress,
+            collectionNftAddress,
+            creatorAddress,
+            sellerFeeBasisPoints,
+            name: nftMetadata.name,
+            uri,
+            leafOwnerAddress: recipient,
+          });
 
         console.log(`Successfully minted cNFT #${id} to ${recipient}`, {
-          data,
+          success,
+          collectionAddress,
+          signature,
         });
 
         setMintedIds((mintedIds) => [...mintedIds, id]);
@@ -120,62 +120,6 @@ export default function CnftMintForm({
         console.log({ error });
       }
     }
-
-    // for (const recipient of recipientList) {
-    //   if (!isPublicKey(recipient)) {
-    //     showToast({
-    //       primaryMessage: "Invalid recipient address",
-    //     });
-    //     return;
-    //   }
-
-    //   const nftIds = makeNumberArray(5000);
-
-    //   console.log(nftIds.slice(0, 10));
-
-    //   const randomNftId = nftIds[Math.floor(Math.random() * nftIds.length)];
-    //   const randomNftUri = `https://shdw-drive.genesysgo.net/${DDK_ASSET_SHDW_DRIVE_ADDRESS}/${randomNftId}.json`;
-    //   debugger;
-    //   const { data: randomNftMetadata } = await axios.get(randomNftUri);
-
-    //   if (!randomNftMetadata) {
-    //     console.log(`No metadata found for cNFT #${randomNftId}`);
-    //     continue;
-    //   }
-
-    //   console.log(`Minting cNFT #${randomNftId} to ${recipient}`);
-
-    //   try {
-    //     const { data } = await axios.post(`${BASE_URL}/api/mint-cnft`, {
-    //       merkleTreeAddress,
-    //       collectionNftAddress,
-    //       creatorAddress,
-    //       sellerFeeBasisPoints,
-    //       name: randomNftMetadata.name,
-    //       uri: randomNftUri,
-    //       leafOwnerAddress: recipient,
-    //     });
-    //     setMintedIds((mintedIds) => [...mintedIds, randomNftId]);
-    //     setSuccessfulRecipients((successfulRecipients) => [
-    //       ...successfulRecipients,
-    //       recipient,
-    //     ]);
-    //     console.log(
-    //       `Successfully minted cNFT #${randomNftId} to ${recipient}`,
-    //       { data }
-    //     );
-    //   } catch (error) {
-    //     setFailedMintedIds((failedMintedIds) => [
-    //       ...failedMintedIds,
-    //       randomNftId,
-    //     ]);
-    //     setFailedRecipients((failedRecipients) => [
-    //       ...failedRecipients,
-    //       recipient,
-    //     ]);
-    //     console.log({ error });
-    //   }
-    // }
 
     console.log({
       mintedIds,
@@ -191,6 +135,7 @@ export default function CnftMintForm({
     setIsLoading(false);
   }, [
     setIsLoading,
+    recipientList,
     mintedIds,
     failedMintedIds,
     successfulRecipients,
@@ -234,24 +179,24 @@ export default function CnftMintForm({
       return;
     }
 
-    await mintToCollectionV1(umi, {
-      leafOwner: publicKey(wallet.publicKey),
-      merkleTree: publicKey(merkleTreeAddress),
-      collectionMint,
-      metadata: {
-        name: "TEST Dinodawgs Airdrops #0",
-        uri: "https://shdw-drive.genesysgo.net/6V8LykNmNhn9oJ3t5qTSsv7r6FjJ3VUSmmjx6ggG3wa8/0-test.json",
-        sellerFeeBasisPoints: 1000,
-        collection: { key: collectionMint, verified: false },
-        creators: [
-          {
-            address: creatorAddressPublicKey,
-            verified: false,
-            share: 100,
-          },
-        ],
-      },
-    }).sendAndConfirm(umi);
+    // await mintToCollectionV1(umi, {
+    //   leafOwner: publicKey(wallet.publicKey),
+    //   merkleTree: publicKey(merkleTreeAddress),
+    //   collectionMint,
+    //   metadata: {
+    //     name: "TEST Dinodawgs Airdrops #0",
+    //     uri: "https://shdw-drive.genesysgo.net/6V8LykNmNhn9oJ3t5qTSsv7r6FjJ3VUSmmjx6ggG3wa8/0-test.json",
+    //     sellerFeeBasisPoints: 1000,
+    //     collection: { key: collectionMint, verified: false },
+    //     creators: [
+    //       {
+    //         address: creatorAddressPublicKey,
+    //         verified: false,
+    //         share: 100,
+    //       },
+    //     ],
+    //   },
+    // }).sendAndConfirm(umi);
   };
 
   if (!umi || !merkleTreeAddress) return null;
