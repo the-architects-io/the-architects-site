@@ -83,22 +83,12 @@ const handleBlueprintAction = async (
 };
 
 const handleAddAirdropRecipients = async (params: any) => {
-  const { airdropId, recipients, recipientsJsonFile } = params;
+  const { airdropId, recipients } = params;
 
-  if (recipients && recipientsJsonFile) {
+  if (!airdropId || !recipients) {
     return NextResponse.json(
       {
-        error: "Cannot have both recipients and recipientsJsonFile",
-        status: 500,
-      },
-      { status: 500 }
-    );
-  }
-
-  if (!airdropId) {
-    return NextResponse.json(
-      {
-        error: "Missing airdropId",
+        error: "Missing required params",
         status: 500,
       },
       { status: 500 }
@@ -115,41 +105,23 @@ const handleAddAirdropRecipients = async (params: any) => {
     );
   }
 
-  const body = new FormData();
-  body.set("airdropId", airdropId);
-  if (recipients) {
-    body.set("recipients", recipients);
-  } else if (recipientsJsonFile) {
-    body.set("recipientsJsonFile", recipientsJsonFile);
-  } else {
-    return NextResponse.json(
-      {
-        error: "Missing recipients",
-        status: 500,
-      },
-      { status: 500 }
-    );
-  }
-  body.set("apiKey", process.env.BLUEPRINT_API_KEY);
-
   try {
+    console.log("!!!!!!!!!");
     const { data, status, statusText } = await axios.post(
       BlueprintApiActionUrls[ADD_AIRDROP_RECIPIENTS],
-      body,
       {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        ...params,
+        apiKey: process.env.BLUEPRINT_API_KEY,
       }
     );
 
     return NextResponse.json(
       {
+        ...data,
         status: status || 500,
         statusText,
-        action: ADD_AIRDROP_RECIPIENTS,
-        params,
-        ...data,
+        action: UPLOAD_FILE,
+        success: status === 200,
       },
       {
         status: status || 500,

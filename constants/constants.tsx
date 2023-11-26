@@ -28,8 +28,6 @@ export const COLLECTION_WALLET_ADDRESS =
 export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACKING_ID || "";
 export const EXECUTION_WALLET_ADDRESS =
   process.env.NEXT_PUBLIC_EXECUTION_WALLET_ADDRESS || "";
-export const ASSET_SHDW_DRIVE_URL =
-  process.env.NEXT_PUBLIC_ASSET_SHDW_DRIVE_URL || "";
 export const ASSET_SHDW_DRIVE_ADDRESS =
   process.env.NEXT_PUBLIC_ASSET_SHDW_DRIVE_ADDRESS || "";
 export const DDK_ASSET_SHDW_DRIVE_ADDRESS =
@@ -37,3 +35,5 @@ export const DDK_ASSET_SHDW_DRIVE_ADDRESS =
 
 export const DEVNET_TREE_ADDRESS =
   process.env.NEXT_PUBLIC_DEVNET_TREE_ADDRESS || "";
+
+export const SHDW_DRIVE_BASE_URL = "https://shdw-drive.genesysgo.net/";

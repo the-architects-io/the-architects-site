@@ -1,18 +1,18 @@
 import { AddWalletsResponse } from "@/app/blueprint/types";
+import { jsonFileToJson } from "@/app/blueprint/utils";
 import { BASE_URL } from "@/constants/constants";
 import { client } from "@/graphql/backend-client";
 import { ADD_AIRDROP_RECIPIENTS } from "@/graphql/mutations/add-airdrop-recipients";
-import { jsonFileToJson } from "@/utils/files";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const formData = await req.formData();
-  const recipientsJsonFile = formData.get(
-    "recipientsJsonFile"
-  ) as unknown as File | null;
-  const recipients = formData.get("recipients");
-  const airdropId = formData.get("airdropId");
+  const { airdropId, recipients } = await req.json();
+
+  console.log({
+    airdropId,
+    recipients,
+  });
 
   if (!airdropId) {
     return NextResponse.json(
@@ -21,19 +21,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (recipientsJsonFile && recipients) {
-    throw new Error(
-      "Only recipients or recipientsJsonFile can be provided, not both"
-    );
-  }
-
-  let addresses: string[];
-
-  if (recipientsJsonFile) {
-    addresses = await jsonFileToJson(recipientsJsonFile);
-  } else if (recipients) {
-    addresses = JSON.parse(recipients as string);
-  } else {
+  if (!recipients) {
     return NextResponse.json(
       { error: "No recipients provided" },
       { status: 400 }
@@ -43,14 +31,14 @@ export async function POST(req: NextRequest) {
   try {
     const { data: addedWallets }: { data: AddWalletsResponse } =
       await axios.post(`${BASE_URL}/api/add-wallets`, {
-        addresses,
+        addresses: recipients,
       });
 
     const { existingWalletsCount, insertedWalletsCount, wallets } =
       addedWallets;
 
     // create map where key is address and value is count
-    const addressMap = addresses.reduce((acc: any, address: string) => {
+    const addressMap = recipients.reduce((acc: any, address: string) => {
       if (acc[address]) {
         acc[address] += 1;
       } else {

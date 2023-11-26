@@ -544,8 +544,7 @@ export type CreateAirdropResponse = BaseBlueprintResponse & {
 
 export type AddAirdropRecipientsInput = {
   airdropId: string;
-  recipients?: string[];
-  recipientsJsonFile?: File;
+  recipients: string[] | File;
 };
 
 export type AirdropRecipientsResponse = BaseBlueprintResponse & {

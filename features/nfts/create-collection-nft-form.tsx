@@ -2,8 +2,8 @@ import { UploadAssetsToShadowDriveResponse } from "@/app/api/upload-file-to-shad
 import { createBlueprintClient } from "@/app/blueprint/client";
 import {
   ASSET_SHDW_DRIVE_ADDRESS,
-  ASSET_SHDW_DRIVE_URL,
   BASE_URL,
+  SHDW_DRIVE_BASE_URL,
 } from "@/constants/constants";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
@@ -12,17 +12,18 @@ import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import showToast from "@/features/toasts/show-toast";
 import { getSlug } from "@/utils/formatting";
 import { useWallet } from "@solana/wallet-adapter-react";
-import axios from "axios";
 import { useFormik } from "formik";
 import { useState } from "react";
 
 export default function CreateCollectionNftForm({
+  driveAddress,
   step,
   setStep,
   setSellerFeeBasisPoints,
   setCollectionNftAddress,
   airdropId,
 }: {
+  driveAddress: string;
   isLoading?: boolean;
   setIsLoading?: (isLoading: boolean) => void;
   step?: number;
@@ -55,7 +56,7 @@ export default function CreateCollectionNftForm({
 
       if (!files?.length) return;
 
-      const driveUrl = ASSET_SHDW_DRIVE_URL;
+      const driveUrl = `${SHDW_DRIVE_BASE_URL}/${driveAddress}}`;
 
       const collectionNameSlug = getSlug(collectionName);
 
@@ -66,30 +67,25 @@ export default function CreateCollectionNftForm({
       const { url } = await blueprint.uploadFile({
         file: files[0],
         fileName: `${collectionNameSlug}-collection.png`,
-        driveAddress: ASSET_SHDW_DRIVE_ADDRESS,
+        driveAddress,
       });
 
-      console.log({ url });
-
       setCollectionImageUrl(url);
-
       const basisPoints = sellerFeeBasisPoints * 100;
 
       let uri = "";
 
-      const json = {
-        name: collectionName,
-        symbol,
-        description,
-        seller_fee_basis_points: basisPoints,
-        image: `${driveUrl}/${collectionNameSlug}-collection.png`,
-      };
-
       try {
         const { url } = await blueprint.uploadJson({
-          json,
+          json: {
+            name: collectionName,
+            symbol,
+            description,
+            seller_fee_basis_points: basisPoints,
+            image: `${driveUrl}/${collectionNameSlug}-collection.png`,
+          },
           fileName: `${collectionName.split(" ").join("-")}-collection.json`,
-          driveAddress: ASSET_SHDW_DRIVE_ADDRESS,
+          driveAddress,
         });
 
         uri = url;

@@ -1,4 +1,5 @@
 "use client";
+import { ASSET_SHDW_DRIVE_ADDRESS } from "@/constants/constants";
 import WalletButton from "@/features/UI/buttons/wallet-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Panel } from "@/features/UI/panel";
@@ -17,7 +18,7 @@ import { useEffect, useState } from "react";
 export default function AirdropCreatePage() {
   const { publicKey } = useWallet();
   const router = useRouter();
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(4);
   const [airdropId, setAirdropId] = useState<string | null>(
     "18928e38-a519-4123-96d7-a617f4d781eb"
   );
@@ -59,7 +60,7 @@ export default function AirdropCreatePage() {
             step={step}
             setStep={setStep}
             airdropId={airdropId}
-            drive={drive}
+            driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
             setSellerFeeBasisPoints={setSellerFeeBasisPoints}
             setCollectionNftAddress={setCollectionNftAddress}
           />

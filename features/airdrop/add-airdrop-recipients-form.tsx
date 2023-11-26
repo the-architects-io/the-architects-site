@@ -41,7 +41,7 @@ export default function AddAirdropRecipientsForm({
       const { success, status, message, addedReipientsCount } =
         await blueprint.addAirdropRecipients({
           airdropId,
-          recipientsJsonFile: files[0],
+          recipients: files[0],
         });
 
       if (!success) {

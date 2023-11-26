@@ -1,4 +1,3 @@
-import { UploadAssetsToShadowDriveResponse } from "@/app/api/upload-json-to-shadow-drive/route";
 import {
   AddAirdropRecipientsInput,
   AirdropRecipientsResponse,
@@ -11,6 +10,7 @@ import {
   UploadFileResponse,
   UploadJsonInput,
 } from "@/app/blueprint/types";
+import { jsonFileToJson, jsonToJSONFile } from "@/app/blueprint/utils";
 import { BASE_URL } from "@/constants/constants";
 import axios from "axios";
 
@@ -41,28 +41,37 @@ const addAirdropRecipients = async (
   options: BlueprintClientOptions,
   params: AddAirdropRecipientsInput
 ): Promise<AirdropRecipientsResponse> => {
-  const { recipientsJsonFile, recipients, airdropId } = params;
+  const { recipients: incomingRecipients, airdropId } = params;
 
-  if (!recipientsJsonFile && !recipients) {
+  if (!incomingRecipients) {
     throw new Error("No recipients provided");
   }
 
-  if (recipientsJsonFile && recipients) {
-    throw new Error(
-      "Only recipients or recipientsJsonFile can be provided, not both"
-    );
+  let recipients: string[] = [];
+  debugger;
+
+  const isJsonFile = (file: any) => {
+    try {
+      return file.type === "application/json";
+    } catch (err) {
+      return false;
+    }
+  };
+
+  console.log({ incomingRecipients });
+
+  if (isJsonFile(incomingRecipients)) {
+    const json = await jsonFileToJson(incomingRecipients as File);
+    recipients = json;
+  } else {
+    recipients = incomingRecipients as string[];
   }
 
-  const body = new FormData();
-
-  if (recipientsJsonFile) body.set("recipientsJsonFile", recipientsJsonFile);
-  if (recipients) body.set("recipients", JSON.stringify(recipients));
-  body.set("airdropId", airdropId);
-  body.set("action", BlueprintApiActions.ADD_AIRDROP_RECIPIENTS);
-
-  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, body, {
-    headers: {
-      "Content-Type": "multipart/form-data",
+  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, {
+    action: BlueprintApiActions.ADD_AIRDROP_RECIPIENTS,
+    params: {
+      recipients,
+      airdropId,
     },
   });
 
