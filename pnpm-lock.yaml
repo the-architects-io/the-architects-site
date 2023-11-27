@@ -68,6 +68,15 @@ dependencies:
   '@project-serum/anchor':
     specifier: ^0.26.0
     version: 0.26.0(encoding@0.1.13)
+  '@rpldy/upload-button':
+    specifier: ^1.6.1
+    version: 1.6.1(react-dom@18.2.0)(react@18.2.0)
+  '@rpldy/upload-preview':
+    specifier: ^1.6.1
+    version: 1.6.1(react-dom@18.2.0)(react@18.2.0)
+  '@rpldy/uploady':
+    specifier: ^1.6.1
+    version: 1.6.1(react-dom@18.2.0)(react@18.2.0)
   '@shadow-drive/sdk':
     specifier: ^5.0.0
     version: 5.0.0(@solana/web3.js@1.87.0)(encoding@0.1.13)(react@18.2.0)
@@ -201,7 +210,7 @@ dependencies:
     specifier: 8.4.23
     version: 8.4.23
   rc-progress:
-    specifier: ^3.4.1
+    specifier: ^3.5.1
     version: 3.5.1(react-dom@18.2.0)(react@18.2.0)
   react:
     specifier: 18.2.0
@@ -4599,6 +4608,106 @@ packages:
       invariant: 2.2.4
       nullthrows: 1.1.1
       react-native: 0.72.5(@babel/core@7.23.0)(@babel/preset-env@7.22.20)(encoding@0.1.13)(react@18.2.0)
+    dev: false
+
+  /@rpldy/abort@1.6.1:
+    resolution: {integrity: sha512-zQfvziiYZH8I/8218qwwNdnWNWhyDXyV0gGi2eJCD947OnU2Zb5RsrKuvYnElVhk7ZAp7r5N4IiiJtjTsaWFUw==}
+    dependencies:
+      '@rpldy/raw-uploader': 1.6.1
+      '@rpldy/shared': 1.6.1
+      '@rpldy/simple-state': 1.6.1
+    dev: false
+
+  /@rpldy/life-events@1.6.1:
+    resolution: {integrity: sha512-p4HOYSoOH+riZ23NlqeJq2HC0+hUYlh4XBIUaQnHv4T5cdoxO1iZDxuTnUaQjq/E1VV0FLGYUYIET4SiLoG/0Q==}
+    dependencies:
+      '@rpldy/shared': 1.6.1
+    dev: false
+
+  /@rpldy/raw-uploader@1.6.1:
+    resolution: {integrity: sha512-pQaUn6fMsNQJ3OD6Lsuhm1VAb78QdSUkpqo62kk8qJRJ31H/T9u6oHejLns8TkiOVVK3miA2Ju3s7iq9okGo5g==}
+    dependencies:
+      '@rpldy/life-events': 1.6.1
+      '@rpldy/shared': 1.6.1
+    dev: false
+
+  /@rpldy/sender@1.6.1:
+    resolution: {integrity: sha512-RYT7Z16TYexTirOf9bOo3lHEsuBak5tni75vDxMNGNd1293uxDDJmYWj2LxwLi7aKby3dYSJKs7LcoZ/pN2w3A==}
+    dependencies:
+      '@rpldy/shared': 1.6.1
+    dev: false
+
+  /@rpldy/shared-ui@1.6.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-+mZ/MbijMFxao/F3EWJ3Tmt2u05f7yh4w5xrCzSDfPy8nQj8OIEhygUEVHR6Sy5KHwSSkfVk3QNM78rSJVxcZQ==}
+    peerDependencies:
+      react: '>=16.8'
+      react-dom: '>=16.8'
+    dependencies:
+      '@rpldy/shared': 1.6.1
+      '@rpldy/uploader': 1.6.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /@rpldy/shared@1.6.1:
+    resolution: {integrity: sha512-H6R9eKCf0IC00p6cEF41GzyC3LTH/qGxVRtjg2aKub9GW7FfcyGu8E+hEReBKNq3+SdvSIb0RQ2vPAgsdQWpkw==}
+    dependencies:
+      invariant: 2.2.4
+      just-throttle: 4.2.0
+    dev: false
+
+  /@rpldy/simple-state@1.6.1:
+    resolution: {integrity: sha512-HiX+Qa1QzR11DQGzyAdE1jMKYjrCmF7BIsfw9SQdCmqEo88ftdE2bnwHsqmzteVUD1mTDCmtguj7PbqBu4lFAw==}
+    dependencies:
+      '@rpldy/shared': 1.6.1
+    dev: false
+
+  /@rpldy/upload-button@1.6.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-YSbKcOFyb4J1uroBBNpgXvSKWVHf3DsNIAcDekwGGp7NOv1Ydn5yKBfVqtDr8TbaVJZumbjL2OLcRE9c7Xmuow==}
+    peerDependencies:
+      react: '>=16.8'
+      react-dom: '>=16.8'
+    dependencies:
+      '@rpldy/shared-ui': 1.6.1(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /@rpldy/upload-preview@1.6.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-1VDdqTpH6Bj/soCc6Ii6C7J5ynQ9uL3iYk1gFpX1zp81hp72AHWxSVXMhKVyxBhDHZ13ZWZGu3VtxXgJigVtgQ==}
+    peerDependencies:
+      react: '>=16.8'
+      react-dom: '>=16.8'
+    dependencies:
+      '@rpldy/shared': 1.6.1
+      '@rpldy/shared-ui': 1.6.1(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /@rpldy/uploader@1.6.1:
+    resolution: {integrity: sha512-50tTQOwf1owH39r+NEbOV584ik0v6JK0YTHTmi3rNuSGpxht0FT6e5Jf01BLb9UfF9QBrI+9kIoPXxvdRtWTjw==}
+    dependencies:
+      '@rpldy/abort': 1.6.1
+      '@rpldy/life-events': 1.6.1
+      '@rpldy/raw-uploader': 1.6.1
+      '@rpldy/sender': 1.6.1
+      '@rpldy/shared': 1.6.1
+      '@rpldy/simple-state': 1.6.1
+    dev: false
+
+  /@rpldy/uploady@1.6.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-BcU6wfidTHKh0YYs3NXLw0EyptCXbXn9i2uH8MlyV5bBZsP4b4hSzWRvxo/mcDopwdL3FDybE68nQt14/uQZNg==}
+    peerDependencies:
+      react: '>=16.8'
+      react-dom: '>=16.8'
+    dependencies:
+      '@rpldy/life-events': 1.6.1
+      '@rpldy/shared': 1.6.1
+      '@rpldy/shared-ui': 1.6.1(react-dom@18.2.0)(react@18.2.0)
+      '@rpldy/uploader': 1.6.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /@rushstack/eslint-patch@1.5.1:
@@ -13165,6 +13274,10 @@ packages:
       array.prototype.flat: 1.3.2
       object.assign: 4.1.4
       object.values: 1.1.7
+    dev: false
+
+  /just-throttle@4.2.0:
+    resolution: {integrity: sha512-/iAZv1953JcExpvsywaPKjSzfTiCLqeguUTE6+VmK15mOcwxBx7/FHrVvS4WEErMR03TRazH8kcBSHqMagYIYg==}
     dev: false
 
   /jwt-decode@3.1.2:

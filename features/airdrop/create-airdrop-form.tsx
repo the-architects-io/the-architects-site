@@ -1,12 +1,11 @@
 import { createBlueprintClient } from "@/app/blueprint/client";
-import { AddAirdropResponse, BlueprintApiActions } from "@/app/blueprint/types";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import showToast from "@/features/toasts/show-toast";
 import { useUserData } from "@nhost/nextjs";
-import axios from "axios";
+
 import { useFormik } from "formik";
 import { useEffect } from "react";
 
@@ -26,11 +25,17 @@ export default function CreateAirdropForm({
       startTime: "",
       shouldKickoffManually: false,
     },
-    onSubmit: async ({ name }) => {
+    onSubmit: async ({ name, startTime, ownerId, shouldKickoffManually }) => {
       const blueprint = createBlueprintClient({
         cluster: "devnet",
       });
-      const { success, airdrop } = await blueprint.createAirdrop({ name });
+
+      const { success, airdrop } = await blueprint.createAirdrop({
+        name,
+        startTime,
+        ownerId,
+        shouldKickoffManually,
+      });
 
       if (success && airdrop?.id) {
         setAirdropId(airdrop.id);

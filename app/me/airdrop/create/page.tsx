@@ -3,13 +3,9 @@ import { ASSET_SHDW_DRIVE_ADDRESS } from "@/constants/constants";
 import WalletButton from "@/features/UI/buttons/wallet-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Panel } from "@/features/UI/panel";
-import AddAirdropMetadatasForm from "@/features/airdrop/add-airdrop-metadatas-form";
 import AddAirdropRecipientsForm from "@/features/airdrop/add-airdrop-recipients-form";
-import AddImagesForm from "@/features/airdrop/add-images-form";
 import CreateAirdropForm from "@/features/airdrop/create-airdrop-form";
-import CreateCollectionNftForm from "@/features/nfts/create-collection-nft-form";
-import { Umi } from "@metaplex-foundation/umi/dist/types/Umi";
-import { ShdwDrive } from "@shadow-drive/sdk";
+import CreateCollectionForm from "@/features/nft-collections/create-collection-form";
 
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/navigation";
@@ -18,11 +14,8 @@ import { useEffect, useState } from "react";
 export default function AirdropCreatePage() {
   const { publicKey } = useWallet();
   const router = useRouter();
-  const [step, setStep] = useState(4);
-  const [airdropId, setAirdropId] = useState<string | null>(
-    "18928e38-a519-4123-96d7-a617f4d781eb"
-  );
-  const [drive, setDrive] = useState<ShdwDrive | null>(null);
+  const [step, setStep] = useState(0);
+  const [airdropId, setAirdropId] = useState<string | null>(null);
   const [sellerFeeBasisPoints, setSellerFeeBasisPoints] = useState<
     number | null
   >(null);
@@ -52,30 +45,24 @@ export default function AirdropCreatePage() {
   return (
     <ContentWrapper>
       <Panel className="flex flex-col items-center mb-16">
+        <div>STEP {step + 1} OF 3</div>
         {step === 0 && (
-          <CreateAirdropForm setAirdropId={setAirdropId} setStep={setStep} />
+          <>
+            <CreateCollectionForm
+              step={step}
+              setStep={setStep}
+              driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
+              setSellerFeeBasisPoints={setSellerFeeBasisPoints}
+              setCollectionNftAddress={setCollectionNftAddress}
+            />
+          </>
         )}
         {step === 1 && airdropId && (
-          <CreateCollectionNftForm
-            step={step}
-            setStep={setStep}
-            airdropId={airdropId}
-            driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
-            setSellerFeeBasisPoints={setSellerFeeBasisPoints}
-            setCollectionNftAddress={setCollectionNftAddress}
-          />
+          <>
+            <CreateAirdropForm setAirdropId={setAirdropId} setStep={setStep} />
+          </>
         )}
         {step === 2 && airdropId && (
-          <AddAirdropMetadatasForm
-            step={step}
-            setStep={setStep}
-            airdropId={airdropId}
-          />
-        )}
-        {step === 3 && airdropId && (
-          <AddImagesForm step={step} setStep={setStep} airdropId={airdropId} />
-        )}
-        {step === 4 && airdropId && (
           <AddAirdropRecipientsForm
             step={step}
             setStep={setStep}

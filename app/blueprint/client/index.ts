@@ -12,6 +12,8 @@ import {
   MintNftResponse,
   UploadFileInput,
   UploadFileResponse,
+  UploadFilesInput,
+  UploadFilesResponse,
   UploadJsonInput,
 } from "@/app/blueprint/types";
 import { jsonFileToJson } from "@/app/blueprint/utils";
@@ -197,6 +199,34 @@ const uploadFile = async (
   return data;
 };
 
+const uploadFiles = async (
+  options: BlueprintClientOptions,
+  params: UploadFilesInput
+): Promise<UploadFilesResponse> => {
+  const { files, driveAddress } = params;
+
+  if (!files || !driveAddress) {
+    throw new Error("Missing required parameters");
+  }
+
+  console.log("@@@@@@@@@@@@@@@@@@@@@@@@@");
+  console.log({ files });
+
+  const formData = new FormData();
+  formData.append("driveAddress", driveAddress);
+  formData.append("action", BlueprintApiActions.UPLOAD_FILES);
+  // @ts-ignore
+  formData.append("files", files);
+
+  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return data;
+};
+
 export const createBlueprintClient = (options: BlueprintClientOptions) => {
   return {
     addAirdropRecipients: (params: AddAirdropRecipientsInput) =>
@@ -207,6 +237,7 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
     mintCnft: (params: MintCnftInput) => mintCnft(options, params),
     mintNft: (params: MintNftInput) => mintNft(options, params),
     uploadFile: (params: UploadFileInput) => uploadFile(options, params),
+    uploadFiles: (params: UploadFilesInput) => uploadFiles(options, params),
     uploadJson: (params: UploadJsonInput) => uploadJson(options, params),
   };
 };

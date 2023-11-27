@@ -1,4 +1,5 @@
 import { RpcConfirmTransactionResult } from "@metaplex-foundation/umi";
+import { ShadowFile } from "@shadow-drive/sdk";
 
 export type ErrorResponse = {
   success: boolean;
@@ -529,7 +530,9 @@ export type AddAirdropResponse = {
 export type CreateAirdropInput = {
   name: string;
   collectionNftId?: string;
-  startTimestamp?: number;
+  startTime?: string;
+  ownerId?: string;
+  shouldKickoffManually?: boolean;
 };
 
 export type BaseBlueprintResponse = {
@@ -612,6 +615,15 @@ export type CreateTreeResponse = BaseBlueprintResponse & {
   merkleTreeAddress: string;
 };
 
+export type UploadFilesInput = {
+  files: ShadowFile[];
+  driveAddress: string;
+};
+
+export type UploadFilesResponse = BaseBlueprintResponse & {
+  urls: string[];
+};
+
 export enum BlueprintApiActions {
   ADD_AIRDROP_RECIPIENTS = "ADD_AIRDROP_RECIPIENTS",
   CREATE_AIRDROP = "CREATE_AIRDROP",
@@ -621,5 +633,6 @@ export enum BlueprintApiActions {
   MINT_CNFT = "MINT_CNFT",
   MINT_NFT = "MINT_NFT",
   UPLOAD_FILE = "UPLOAD_FILE",
+  UPLOAD_FILES = "UPLOAD_FILES",
   UPLOAD_JSON = "UPLOAD_JSON",
 }

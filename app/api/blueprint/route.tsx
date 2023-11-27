@@ -17,6 +17,7 @@ const {
   MINT_NFT,
   UPLOAD_JSON,
   UPLOAD_FILE,
+  UPLOAD_FILES,
 } = BlueprintApiActions;
 
 const BlueprintApiActionUrls = {
@@ -29,12 +30,14 @@ const BlueprintApiActionUrls = {
   [MINT_NFT]: `${BASE_URL}/api/mint-nft`,
   [UPLOAD_JSON]: `${BASE_URL}/api/upload-json-to-shadow-drive`,
   [UPLOAD_FILE]: `${BASE_URL}/api/upload-file-to-shadow-drive`,
+  [UPLOAD_FILES]: `${BASE_URL}/api/upload-files-to-shadow-drive`,
 };
 
 export const mapErrorToResponse = (error: any): MappedErrorResponse => {
   const status =
     error?.response?.status || error?.response?.data?.status || 500;
   console.log({
+    error,
     statuses: {
       "error?.response?.status": error?.response?.status,
       "error?.response?.data?.status": error?.response?.data?.status,
@@ -139,7 +142,10 @@ const handleAddAirdropRecipients = async (params: any) => {
   }
 };
 
-const handleUploadFile = async (formData: FormData | undefined) => {
+const handleUploadFormData = async (
+  action: BlueprintApiActions,
+  formData: FormData | undefined
+) => {
   if (!process.env.BLUEPRINT_API_KEY) {
     return NextResponse.json(
       {
@@ -160,11 +166,11 @@ const handleUploadFile = async (formData: FormData | undefined) => {
     );
   }
 
-  formData.set("apiKey", process.env.BLUEPRINT_API_KEY);
+  formData.append("apiKey", process.env.BLUEPRINT_API_KEY);
 
   try {
     const { data, status, statusText } = await axios.post(
-      `${BASE_URL}/api/upload-file-to-shadow-drive`,
+      BlueprintApiActionUrls[action],
       formData,
       {
         headers: {
@@ -298,7 +304,8 @@ export async function POST(req: NextRequest) {
     case BlueprintApiActions.UPLOAD_JSON:
       return handleBlueprintAction(action, params);
     case BlueprintApiActions.UPLOAD_FILE:
-      return handleUploadFile(params);
+    case BlueprintApiActions.UPLOAD_FILES:
+      return handleUploadFormData(action, params);
     case BlueprintApiActions.ADD_AIRDROP_RECIPIENTS:
       return handleAddAirdropRecipients(params);
     case BlueprintApiActions.CREATE_DISENSER:

@@ -5,6 +5,7 @@ export const ADD_AIRDROP = gql`
     insert_airdrops_one(object: $airdrop) {
       name
       id
+      startTime
       collectionNft {
         id
         name

@@ -4,7 +4,7 @@ import { ADD_AIRDROP } from "@/graphql/mutations/add-airdrop";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { name, collectionNftId } = await req.json();
+  const { name, startTime, ownerId, shouldKickoffManually } = await req.json();
 
   if (!name) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
@@ -17,6 +17,9 @@ export async function POST(req: NextRequest) {
         variables: {
           airdrop: {
             name,
+            startTime,
+            ownerId,
+            shouldKickoffManually,
           },
         },
       });
