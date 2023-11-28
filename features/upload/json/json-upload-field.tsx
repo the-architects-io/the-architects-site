@@ -1,7 +1,8 @@
+import { BlueprintApiActions } from "@/app/blueprint/types";
 import UploadButton from "@rpldy/upload-button";
 import { useUploady } from "@rpldy/uploady";
 
-export const MultiJsonUploadField = ({
+export const JsonUploadField = ({
   driveAddress,
   children,
 }: {
@@ -15,7 +16,7 @@ export const MultiJsonUploadField = ({
       <UploadButton
         className="underline border border-gray-600 rounded-lg py-12 px-4 w-full min-h-[38vh] mb-4"
         params={{
-          action: "UPLOAD_FILES",
+          action: BlueprintApiActions.UPLOAD_JSON,
           driveAddress,
         }}
       >

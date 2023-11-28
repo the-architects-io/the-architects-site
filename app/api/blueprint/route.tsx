@@ -28,7 +28,7 @@ const BlueprintApiActionUrls = {
   [DISPENSE_TOKENS]: `${BASE_URL}/api/dispense-tokens`,
   [MINT_CNFT]: `${BASE_URL}/api/mint-cnft`,
   [MINT_NFT]: `${BASE_URL}/api/mint-nft`,
-  [UPLOAD_JSON]: `${BASE_URL}/api/upload-json-to-shadow-drive`,
+  [UPLOAD_JSON]: `${BASE_URL}/api/upload-json-file-to-shadow-drive`,
   [UPLOAD_FILE]: `${BASE_URL}/api/upload-file-to-shadow-drive`,
   [UPLOAD_FILES]: `${BASE_URL}/api/upload-files-to-shadow-drive`,
 };
@@ -168,6 +168,8 @@ const handleUploadFormData = async (
 
   formData.append("apiKey", process.env.BLUEPRINT_API_KEY);
 
+  console.log({ formData });
+
   try {
     const { data, status, statusText } = await axios.post(
       BlueprintApiActionUrls[action],
@@ -179,12 +181,14 @@ const handleUploadFormData = async (
       }
     );
 
+    console.log({ data, status, statusText });
+
     if (data?.errors?.length) {
       return NextResponse.json({
         error: data?.errors[0],
         status: 500,
         statusText: "Error with upload to shadow drive",
-        action: UPLOAD_FILE,
+        action: BlueprintApiActionUrls[action],
       });
     }
 
@@ -192,7 +196,7 @@ const handleUploadFormData = async (
       ...data,
       status: status || 500,
       statusText,
-      action: UPLOAD_FILE,
+      action: BlueprintApiActionUrls[action],
       success: status === 200,
     });
   } catch (rawError: any) {
@@ -258,6 +262,71 @@ const handleDispenseTokens = async (params: any) => {
   }
 };
 
+const handleJsonFileUpload = async (formData: FormData | undefined) => {
+  console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@ handleJsonFileUpload", {
+    formData,
+  });
+  if (!process.env.BLUEPRINT_API_KEY) {
+    return NextResponse.json(
+      {
+        error: "Blueprint API key not configured",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+
+  if (!formData) {
+    return NextResponse.json(
+      {
+        error: "Missing form data",
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+
+  formData.append("apiKey", process.env.BLUEPRINT_API_KEY);
+
+  console.log({ formData });
+
+  try {
+    const { data, status, statusText } = await axios.post(
+      BlueprintApiActionUrls[UPLOAD_JSON],
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    console.log({ data, status, statusText });
+
+    if (data?.errors?.length) {
+      return NextResponse.json({
+        error: data?.errors[0],
+        status: 500,
+        statusText: "Error with upload to shadow drive",
+        action: BlueprintApiActionUrls[UPLOAD_JSON],
+      });
+    }
+
+    return NextResponse.json({
+      ...data,
+      status: status || 500,
+      statusText,
+      action: BlueprintApiActionUrls[UPLOAD_JSON],
+      success: status === 200,
+    });
+  } catch (rawError: any) {
+    let error = mapErrorToResponse(rawError);
+
+    logError(error);
+    return NextResponse.json({ error });
+  }
+};
+
 export async function POST(req: NextRequest) {
   let action, params;
 
@@ -301,11 +370,12 @@ export async function POST(req: NextRequest) {
     case BlueprintApiActions.CREATE_TREE:
     case BlueprintApiActions.MINT_CNFT:
     case BlueprintApiActions.MINT_NFT:
-    case BlueprintApiActions.UPLOAD_JSON:
       return handleBlueprintAction(action, params);
     case BlueprintApiActions.UPLOAD_FILE:
     case BlueprintApiActions.UPLOAD_FILES:
       return handleUploadFormData(action, params);
+    case BlueprintApiActions.UPLOAD_JSON:
+      return handleJsonFileUpload(params);
     case BlueprintApiActions.ADD_AIRDROP_RECIPIENTS:
       return handleAddAirdropRecipients(params);
     case BlueprintApiActions.CREATE_DISENSER:

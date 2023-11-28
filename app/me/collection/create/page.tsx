@@ -6,7 +6,7 @@ import CreateCollectionForm from "@/features/nft-collections/create-collection-f
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { MultiJsonUpload } from "@/features/upload/multi-json/multi-json-upload";
+import { JsonUpload } from "@/features/upload/json/json-upload";
 import { SingleImageUpload } from "@/features/upload/single-image/single-image-upload";
 import { MultiImageUpload } from "@/features/upload/multi-image/multi-image-upload";
 
@@ -56,9 +56,12 @@ export default function CreateCollectionPage() {
           />
         </div>
         <div className="flex flex-col items-center w-full px-8">
-          <MultiJsonUpload driveAddress={ASSET_SHDW_DRIVE_ADDRESS}>
+          <JsonUpload
+            driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
+            fileName="test-collection-metas"
+          >
             Add Collection Metadata JSONs
-          </MultiJsonUpload>
+          </JsonUpload>
           <MultiImageUpload driveAddress={ASSET_SHDW_DRIVE_ADDRESS}>
             Add Collection Images
           </MultiImageUpload>

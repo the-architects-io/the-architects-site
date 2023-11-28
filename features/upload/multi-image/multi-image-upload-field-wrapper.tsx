@@ -18,7 +18,7 @@ export const MultiImageUploadWrapper = ({
           driveAddress,
         },
       }}
-      autoUpload={false}
+      autoUpload={true}
       multiple={true}
     >
       {children}

@@ -8,7 +8,7 @@ export default function DashboardPage() {
       <Panel className="flex flex-col items-center">
         <h1 className="text-3xl mb-4">Dashboard</h1>
         <PrimaryButton>
-          <a href="/me/dispensers">My Dispensers</a>
+          <a href="/me/dispensers">Dispensers</a>
         </PrimaryButton>
       </Panel>
     </ContentWrapper>
