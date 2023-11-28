@@ -1,0 +1,27 @@
+import { BlueprintApiActions } from "@/app/blueprint/types";
+import { BASE_URL } from "@/constants/constants";
+import Uploady from "@rpldy/uploady";
+
+export const MultiJsonUploadWrapper = ({
+  children,
+  driveAddress,
+}: {
+  children: JSX.Element | JSX.Element[];
+  driveAddress: string;
+}) => {
+  return (
+    <Uploady
+      destination={{
+        url: `${BASE_URL}/api/blueprint`,
+        params: {
+          action: BlueprintApiActions.UPLOAD_FILES,
+          driveAddress,
+        },
+      }}
+      autoUpload={true}
+      multiple={true}
+    >
+      {children}
+    </Uploady>
+  );
+};
