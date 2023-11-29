@@ -14,7 +14,7 @@ export const JsonUploadField = ({
   return (
     <>
       <UploadButton
-        className="underline border border-gray-600 rounded-lg py-12 px-4 w-full min-h-[38vh] mb-4"
+        className="underline"
         params={{
           action: BlueprintApiActions.UPLOAD_JSON,
           driveAddress,

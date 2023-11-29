@@ -99,6 +99,7 @@
     "tsparticles": "^2.10.1",
     "tsparticles-engine": "^2.10.1",
     "typescript": "5.0.4",
+    "uuidv4": "^6.2.13",
     "yargs": "^17.7.2"
   },
   "devDependencies": {

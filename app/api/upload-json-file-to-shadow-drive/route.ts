@@ -12,6 +12,13 @@ export type UploadAssetsToShadowDriveResponse = {
   errors: Array<ShadowUploadResponse>;
 };
 
+export type UploadJsonFileToShadowDriveResponse = {
+  url: string;
+  message: string;
+  count?: number;
+  errors?: Array<ShadowUploadResponse>;
+};
+
 export async function POST(req: NextRequest) {
   if (
     !process.env.EXECUTION_WALLET_PRIVATE_KEY ||
@@ -30,12 +37,6 @@ export async function POST(req: NextRequest) {
   const fileName = formData.get("fileName") as string;
   const driveAddress = formData.get("driveAddress") as string;
 
-  console.log("############# upload-json-file-to-shadow-drive", {
-    formDataFile,
-    fileName,
-    driveAddress,
-  });
-
   if (!formDataFile || !fileName || !driveAddress) {
     return NextResponse.json(
       {
@@ -45,11 +46,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // extract JSON from json file
   const json = await formDataFile.text();
-
-  // assuming its an array, count how many objects are in it
-  // if its not an array, make count undefined
   let count: number | undefined;
 
   try {

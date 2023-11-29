@@ -9,6 +9,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const {
   ADD_AIRDROP_RECIPIENTS,
+  CREATE_COLLECTION,
   CREATE_DISENSER,
   CREATE_TREE,
   DISPENSE_TOKENS,
@@ -23,6 +24,7 @@ const {
 const BlueprintApiActionUrls = {
   [ADD_AIRDROP_RECIPIENTS]: `${BASE_URL}/api/add-airdrop-recipients`,
   [CREATE_AIRDROP]: `${BASE_URL}/api/add-airdrop`,
+  [CREATE_COLLECTION]: `${BASE_URL}/api/add-collection`,
   [CREATE_DISENSER]: `${BASE_URL}/api/add-dispenser`,
   [CREATE_TREE]: `${BASE_URL}/api/create-tree`,
   [DISPENSE_TOKENS]: `${BASE_URL}/api/dispense-tokens`,
@@ -367,6 +369,7 @@ export async function POST(req: NextRequest) {
 
   switch (action) {
     case BlueprintApiActions.CREATE_AIRDROP:
+    case BlueprintApiActions.CREATE_COLLECTION:
     case BlueprintApiActions.CREATE_TREE:
     case BlueprintApiActions.MINT_CNFT:
     case BlueprintApiActions.MINT_NFT:

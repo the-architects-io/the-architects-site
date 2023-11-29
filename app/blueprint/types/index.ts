@@ -1,4 +1,6 @@
+import { Community } from "@/features/admin/communities/communities-list-item";
 import { RpcConfirmTransactionResult } from "@metaplex-foundation/umi";
+import { User } from "@nhost/nextjs";
 import { ShadowFile } from "@shadow-drive/sdk";
 
 export type ErrorResponse = {
@@ -624,8 +626,35 @@ export type UploadFilesResponse = BaseBlueprintResponse & {
   urls: string[];
 };
 
+export type CreateCollectionInput = {
+  name?: string;
+  imageUrl?: string;
+  family?: string;
+  nftId?: string;
+  ownerId?: string;
+  communityId?: string;
+  hasBeenMinted?: boolean;
+};
+
+export type Collection = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  owner: User;
+  name?: string;
+  community?: Community;
+  imageUrl?: string;
+  family?: string;
+  hasBeenMinted?: boolean;
+};
+
+export type CreateCollectionResponse = BaseBlueprintResponse & {
+  collection: Collection;
+};
+
 export enum BlueprintApiActions {
   ADD_AIRDROP_RECIPIENTS = "ADD_AIRDROP_RECIPIENTS",
+  CREATE_COLLECTION = "CREATE_COLLECTION",
   CREATE_AIRDROP = "CREATE_AIRDROP",
   CREATE_DISENSER = "CREATE_DISENSER",
   CREATE_TREE = "CREATE_TREE",

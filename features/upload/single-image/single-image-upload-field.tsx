@@ -34,7 +34,7 @@ export const SingleImageUploadField = ({
         }}
         PreviewComponent={({ url }: { url: string }) => (
           <div className="relative border border-gray-600 p-2 rounded-lg mb-2">
-            <Image src={url} alt="Collection Image" width={240} height={240} />
+            <Image src={url} alt="Collection Image" width={500} height={500} />
             <button
               onClick={() => imagePreviewMethodsRef.current?.clear()}
               className="absolute -mt-4 -mr-4 top-0 right-0"

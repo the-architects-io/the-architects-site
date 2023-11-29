@@ -4,6 +4,8 @@ import {
   BlueprintApiActions,
   CreateAirdropInput,
   CreateAirdropResponse,
+  CreateCollectionInput,
+  CreateCollectionResponse,
   CreateTreeInput,
   CreateTreeResponse,
   MintCnftInput,
@@ -22,6 +24,25 @@ import axios from "axios";
 
 export type BlueprintClientOptions = {
   cluster: "devnet" | "testnet" | "mainnet-beta";
+};
+
+const createCollection = async (
+  options: BlueprintClientOptions,
+  params: CreateCollectionInput
+): Promise<CreateCollectionResponse> => {
+  const response = await fetch("/api/blueprint", {
+    method: "POST",
+    body: JSON.stringify({
+      action: BlueprintApiActions.CREATE_COLLECTION,
+      params: { collection: params },
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await response.json();
+  return data;
 };
 
 const createAirdrop = async (
@@ -231,6 +252,8 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
   return {
     addAirdropRecipients: (params: AddAirdropRecipientsInput) =>
       addAirdropRecipients(options, params),
+    createCollection: (params: CreateCollectionInput) =>
+      createCollection(options, params),
     createAirdrop: (params: CreateAirdropInput) =>
       createAirdrop(options, params),
     createTree: (params: CreateTreeInput) => createTree(options, params),

@@ -2,17 +2,12 @@
 
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import UserMenu from "@/features/UI/menus/user-menu";
-import { useAdmin } from "@/hooks/admin";
-import { useDebugMode } from "@/hooks/debug-mode";
-import { Bars3Icon, BugAntIcon, KeyIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon } from "@heroicons/react/24/outline";
 import { useUserData } from "@nhost/nextjs";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Image from "next/image";
 import Link from "next/link";
 
 const NavbarItems = () => {
-  const { isDebugMode, setIsDebugMode } = useDebugMode();
-  const { isAdmin } = useAdmin();
   const user = useUserData();
 
   return (
@@ -48,13 +43,7 @@ const NavbarItems = () => {
               Dispensers
             </Link>
             <Link
-              href="/me/collecton"
-              className="hover:text-stone-200 uppercase text-sm tracking-widest"
-            >
-              Collections
-            </Link>
-            <Link
-              href="/me/collecton"
+              href="/me/collection"
               className="hover:text-stone-200 uppercase text-sm tracking-widest"
             >
               Collections
