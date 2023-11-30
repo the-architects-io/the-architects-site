@@ -636,6 +636,17 @@ export type CreateCollectionInput = {
   hasBeenMinted?: boolean;
 };
 
+export type UnmintedMetadata = {
+  id: string;
+  name: string;
+  collection: Collection;
+  metadata: string;
+  createdAt: string;
+  updatedAt: string;
+  driveAddress: string;
+  collectionIndex: number;
+};
+
 export type Collection = {
   id: string;
   createdAt: string;
@@ -646,9 +657,22 @@ export type Collection = {
   imageUrl?: string;
   family?: string;
   hasBeenMinted?: boolean;
+  isComplete: boolean;
+  symbol?: string;
+  description?: string;
+  unmintedMetadatas: UnmintedMetadata[];
+  nft: Token;
+  creators: Creator[];
 };
 
 export type CreateCollectionResponse = BaseBlueprintResponse & {
+  collection: Collection;
+};
+
+export type Creator = {
+  address: string;
+  share: number;
+  wallet: Wallet;
   collection: Collection;
 };
 

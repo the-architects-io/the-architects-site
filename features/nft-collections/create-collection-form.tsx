@@ -3,7 +3,6 @@ import { SHDW_DRIVE_BASE_URL } from "@/constants/constants";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormTextareaWithLabel } from "@/features/UI/forms/form-textarea-with-label";
-import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import showToast from "@/features/toasts/show-toast";
 import { getSlug } from "@/utils/formatting";
 import { useWallet } from "@solana/wallet-adapter-react";

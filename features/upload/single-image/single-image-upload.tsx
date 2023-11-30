@@ -5,16 +5,19 @@ export const SingleImageUpload = ({
   fileName,
   driveAddress,
   children,
+  setImage,
 }: {
   fileName: string;
   driveAddress: string;
   children?: string | JSX.Element | JSX.Element[];
+  setImage?: (response: any) => void;
 }) => {
   return (
     <SingleImageUploadFieldWrapper
       autoUpload={true}
       fileName={fileName}
       driveAddress={driveAddress}
+      setImage={setImage}
     >
       <SingleImageUploadField driveAddress={driveAddress} fileName={fileName}>
         {!!children ? children : "Add Image"}

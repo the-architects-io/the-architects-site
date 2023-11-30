@@ -7,18 +7,12 @@ export const ADD_COLLECTION = gql`
       owner {
         id
       }
-      nft {
-        creators {
+      creators {
+        id
+        share
+        wallet {
+          address
           id
-          share
-          wallet {
-            address
-            id
-          }
-          token {
-            id
-            mintAddress
-          }
         }
       }
     }

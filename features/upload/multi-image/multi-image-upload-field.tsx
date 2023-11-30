@@ -13,7 +13,7 @@ export const MultiImageUploadField = ({
   return (
     <>
       <UploadButton
-        className="underline border border-gray-600 rounded-lg py-12 px-4 w-full min-h-[38vh] mb-4"
+        className="underline"
         params={{
           action: "UPLOAD_FILES",
           driveAddress,

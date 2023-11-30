@@ -36,4 +36,6 @@ export const DDK_ASSET_SHDW_DRIVE_ADDRESS =
 export const DEVNET_TREE_ADDRESS =
   process.env.NEXT_PUBLIC_DEVNET_TREE_ADDRESS || "";
 
-export const SHDW_DRIVE_BASE_URL = "https://shdw-drive.genesysgo.net/";
+export const SHDW_DRIVE_BASE_URL =
+  process.env.NEXT_PUBLIC_SHDW_DRIVE_BASE_URL ||
+  "https://shdw-drive.genesysgo.net/";
