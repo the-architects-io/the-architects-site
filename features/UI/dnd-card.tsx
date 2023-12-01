@@ -1,4 +1,3 @@
-import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import type { Identifier, XYCoord } from "dnd-core";
 import type { FC } from "react";
 import { useRef } from "react";

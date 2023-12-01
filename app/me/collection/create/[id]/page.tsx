@@ -19,7 +19,7 @@ import { GET_COLLECTION_BY_ID } from "@/graphql/queries/get-collection-by-id";
 import { Collection, Creator } from "@/app/blueprint/types";
 import { useUserData } from "@nhost/nextjs";
 import { isUuid } from "uuidv4";
-import { useFormik } from "formik";
+import { FieldArray, FormikProvider, useFormik } from "formik";
 import { getAbbreviatedAddress, getSlug } from "@/utils/formatting";
 import { createBlueprintClient } from "@/app/blueprint/client";
 import { getShdwDriveUrl } from "@/utils/drive";
@@ -30,6 +30,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { DndProvider } from "react-dnd";
 import { DndCard } from "@/features/UI/dnd-card";
 import Spinner from "@/features/UI/spinner";
+import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 
 export default function CreateCollectionPage({
   params,
@@ -54,7 +55,7 @@ export default function CreateCollectionPage({
       description: "",
       sellerFeeBasisPoints: 0,
       iamge: "",
-      creators: [] as Creator[],
+      creators: [{ address: "", share: 0, sortOrder: 0 }] as Creator[],
     },
     onSubmit: async ({
       collectionName,
@@ -147,10 +148,10 @@ export default function CreateCollectionPage({
         "creators",
         formik.values.creators.map((creator, index) => {
           if (index === dragIndex) {
-            return { ...creator, share: hoverIndex };
+            return { ...creator, sortOrder: hoverIndex };
           }
           if (index === hoverIndex) {
-            return { ...creator, share: dragIndex };
+            return { ...creator, sortOrder: dragIndex };
           }
           return creator;
         })
@@ -159,6 +160,13 @@ export default function CreateCollectionPage({
     [formik]
   );
 
+  const handleAddCreator = useCallback(() => {
+    formik.setFieldValue("creators", [
+      ...formik.values.creators,
+      { address: "", share: 0, sortOrder: formik.values.creators.length },
+    ]);
+  }, [formik]);
+
   useEffect(() => {
     if (!params?.id || !isUuid(params?.id)) {
       router.push("/me/collection");
@@ -166,7 +174,6 @@ export default function CreateCollectionPage({
     }
 
     if (jsonUploadResponse) {
-      console.log("jsonUploadResponse", jsonUploadResponse.count);
       if (isValidCollectionMetadatas(jsonUploadResponse)) {
         setCollectionMetadataStats(
           getCollectionStatsFromCollectionMetadatas(jsonUploadResponse)
@@ -175,7 +182,10 @@ export default function CreateCollectionPage({
     }
 
     if (creators?.length && formik.values.creators.length === 0) {
-      formik.setFieldValue("creators", creators);
+      formik.setFieldValue(
+        "creators",
+        creators.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+      );
     }
   }, [jsonUploadResponse, params?.id, router, creators, formik]);
 
@@ -253,26 +263,90 @@ export default function CreateCollectionPage({
             <div className="text-lg mb-4">Creators</div>
             <>
               <DndProvider backend={HTML5Backend}>
-                {formik.values.creators.map(({ address, share }, index) => (
-                  <DndCard
-                    key={address.toString()}
-                    id={address.toString()}
-                    index={index}
-                    moveCard={moveCard}
-                  >
-                    <div className="flex items-center overflow-hidden space-x-4">
-                      <div className="flex space-x-2">
-                        <div>Address:</div>
-                        <div>{getAbbreviatedAddress(address)}</div>
+                <FormikProvider value={formik}>
+                  <FieldArray
+                    name="creators"
+                    render={(arrayHelpers) => (
+                      <div className="bg-black">
+                        {formik.values.creators
+                          .sort((a, b) => a.sortOrder - b.sortOrder)
+                          .map((creator, index) => (
+                            <DndCard
+                              key={creator.address}
+                              id={creator.address}
+                              index={index}
+                              moveCard={moveCard}
+                            >
+                              <FormInputWithLabel
+                                label="Creator Address"
+                                name={`creators.${index}.address`}
+                                placeholder="Creator Address"
+                                onChange={formik.handleChange}
+                                value={creator.address}
+                              />
+                              <FormInputWithLabel
+                                label="Share"
+                                name={`creators.${index}.share`}
+                                placeholder="Share"
+                                onChange={formik.handleChange}
+                                value={creator.share}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => arrayHelpers.remove(index)} // remove a friend from the list
+                              >
+                                -
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => arrayHelpers.insert(index, "")} // insert an empty string at a position
+                              >
+                                +
+                              </button>
+                            </DndCard>
+                          ))}
                       </div>
-                      <div className="flex space-x-2">
-                        <div>Share:</div>
-                        <div>{share}%</div>
+                    )}
+                  />
+                  {/* {formik.values.creators.map(({ address, share }, index) => (
+                    <DndCard
+                      key={address}
+                      id={address}
+                      index={index}
+                      moveCard={moveCard}
+                    >
+                      <div className="flex items-center overflow-hidden space-x-4">
+                        <div className="flex space-x-2">
+                          <div>Address:</div>
+                          <FormInputWithLabel
+                            label=""
+                            name={`creators.${index}.address`}
+                            placeholder="Creator Address"
+                            onChange={formik.handleChange}
+                            value={address}
+                          />
+                        </div>
+                        <div className="flex space-x-2">
+                          <div>Share:</div>
+                          <div>{share}%</div>
+                        </div>
                       </div>
-                    </div>
-                  </DndCard>
-                ))}
+                    </DndCard>
+                  ))} */}
+                </FormikProvider>
               </DndProvider>
+              <PrimaryButton
+                className="text-gray-100"
+                onClick={handleAddCreator}
+                disabled={
+                  !(
+                    formik.values.creators.every((c) => c.address) &&
+                    formik.values.creators.every((c) => c.share)
+                  )
+                }
+              >
+                Add Creator
+              </PrimaryButton>
             </>
           </div>
           <div className="border border-gray-600 rounded-lg px-4 w-full min-h-[28vh] mb-4 flex flex-col items-center justify-center">

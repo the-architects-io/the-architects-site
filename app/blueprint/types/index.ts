@@ -670,6 +670,7 @@ export type CreateCollectionResponse = BaseBlueprintResponse & {
 };
 
 export type Creator = {
+  sortOrder: number;
   address: string;
   share: number;
   wallet: Wallet;
