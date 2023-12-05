@@ -16,7 +16,7 @@ import {
 } from "@/app/blueprint/utils";
 import { useQuery } from "@apollo/client";
 import { GET_COLLECTION_BY_ID } from "@/graphql/queries/get-collection-by-id";
-import { Collection, Creator } from "@/app/blueprint/types";
+import { Collection, Creator, UploadJsonResponse } from "@/app/blueprint/types";
 import { useUserData } from "@nhost/nextjs";
 import { isUuid } from "uuidv4";
 import { FieldArray, FormikProvider, useFormik } from "formik";
@@ -31,6 +31,10 @@ import { DndProvider } from "react-dnd";
 import { DndCard } from "@/features/UI/dnd-card";
 import Spinner from "@/features/UI/spinner";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
+import { PlusIcon, TrashIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import { CheckBadgeIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { isValidPublicKey } from "@/utils/rpc";
+import axios from "axios";
 
 export default function CreateCollectionPage({
   params,
@@ -41,12 +45,15 @@ export default function CreateCollectionPage({
   const wallet = useWallet();
   const router = useRouter();
   const [collectionId, setCollectionId] = useState<string | null>(params?.id);
-  const [jsonUploadResponse, setJsonUploadResponse] =
-    useState<UploadJsonFileToShadowDriveResponse | null>(null);
+  const [
+    collectionMetadatasJsonUploadResponse,
+    setCollectionMetadatasJsonUploadResponse,
+  ] = useState<UploadJsonResponse | null>(null);
   const [collectionMetadataStats, setCollectionMetadataStats] =
     useState<CollectionStatsFromCollectionMetadatas | null>(null);
   const [collectionImage, setCollectionImage] = useState<File | null>(null);
   const [creators, setCreators] = useState<Creator[] | null>(null);
+  const [jsonBeingUploaded, setJsonBeingUploaded] = useState<any | null>(null);
 
   const formik = useFormik({
     initialValues: {
@@ -55,7 +62,7 @@ export default function CreateCollectionPage({
       description: "",
       sellerFeeBasisPoints: 0,
       iamge: "",
-      creators: [{ address: "", share: 0, sortOrder: 0 }] as Creator[],
+      creators: [{ address: "", share: 0, sortOrder: 0, id: 0 }] as Creator[],
     },
     onSubmit: async ({
       collectionName,
@@ -163,22 +170,35 @@ export default function CreateCollectionPage({
   const handleAddCreator = useCallback(() => {
     formik.setFieldValue("creators", [
       ...formik.values.creators,
-      { address: "", share: 0, sortOrder: formik.values.creators.length },
+      {
+        address: "",
+        share: 0,
+        sortOrder: formik.values.creators.length,
+        id: formik.values.creators.length,
+      },
     ]);
   }, [formik]);
+
+  const handleMetadataJsonUploadComplete = useCallback(
+    async ({ url, success }: UploadJsonResponse) => {
+      if (!success) {
+        showToast({
+          primaryMessage: "Collection Metadata JSON Upload Failed",
+        });
+        return;
+      }
+
+      const { data } = await axios.get(url);
+
+      setCollectionMetadatasJsonUploadResponse(data);
+    },
+    []
+  );
 
   useEffect(() => {
     if (!params?.id || !isUuid(params?.id)) {
       router.push("/me/collection");
       return;
-    }
-
-    if (jsonUploadResponse) {
-      if (isValidCollectionMetadatas(jsonUploadResponse)) {
-        setCollectionMetadataStats(
-          getCollectionStatsFromCollectionMetadatas(jsonUploadResponse)
-        );
-      }
     }
 
     if (creators?.length && formik.values.creators.length === 0) {
@@ -187,7 +207,24 @@ export default function CreateCollectionPage({
         creators.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
       );
     }
-  }, [jsonUploadResponse, params?.id, router, creators, formik]);
+
+    if (jsonBeingUploaded && !collectionMetadataStats) {
+      const collectionMetadataStats =
+        getCollectionStatsFromCollectionMetadatas(jsonBeingUploaded);
+
+      setCollectionMetadataStats(collectionMetadataStats);
+    }
+  }, [
+    collectionMetadataStats,
+    jsonBeingUploaded,
+    params?.id,
+    collectionMetadatasJsonUploadResponse,
+    creators,
+    formik.values.creators.length,
+    formik,
+    handleMetadataJsonUploadComplete,
+    router,
+  ]);
 
   if (loading) {
     return (
@@ -218,13 +255,13 @@ export default function CreateCollectionPage({
     <ContentWrapper>
       <div className="w-full flex">
         <div className="flex flex-col items-center mb-16 w-full md:w-[500px]">
-          {/* <SingleImageUpload
+          <SingleImageUpload
             fileName={`${collectionId}-collection.png}`}
             driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
             setImage={setCollectionImage}
           >
             Add Collection Image
-          </SingleImageUpload> */}
+          </SingleImageUpload>
           <div className="flex flex-col justify-center items-center w-full mb-4 space-y-4">
             <FormInputWithLabel
               label="Collection Name"
@@ -267,85 +304,73 @@ export default function CreateCollectionPage({
                   <FieldArray
                     name="creators"
                     render={(arrayHelpers) => (
-                      <div className="bg-black">
+                      <div className="bg-black w-full">
                         {formik.values.creators
                           .sort((a, b) => a.sortOrder - b.sortOrder)
                           .map((creator, index) => (
                             <DndCard
-                              key={creator.address}
-                              id={creator.address}
+                              className="mb-4"
+                              key={creator.id}
+                              id={creator.id}
                               index={index}
                               moveCard={moveCard}
                             >
-                              <FormInputWithLabel
-                                label="Creator Address"
-                                name={`creators.${index}.address`}
-                                placeholder="Creator Address"
-                                onChange={formik.handleChange}
-                                value={creator.address}
-                              />
-                              <FormInputWithLabel
-                                label="Share"
-                                name={`creators.${index}.share`}
-                                placeholder="Share"
-                                onChange={formik.handleChange}
-                                value={creator.share}
-                              />
-                              <button
-                                type="button"
-                                onClick={() => arrayHelpers.remove(index)} // remove a friend from the list
-                              >
-                                -
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => arrayHelpers.insert(index, "")} // insert an empty string at a position
-                              >
-                                +
-                              </button>
+                              <div className="relative w-full flex">
+                                <div className="flex flex-1 mr-4">
+                                  <FormInputWithLabel
+                                    label="Creator Address"
+                                    name={`creators.${index}.address`}
+                                    placeholder="Creator Address"
+                                    onChange={formik.handleChange}
+                                    value={creator.address}
+                                  />
+                                  {isValidPublicKey(creator.address) ? (
+                                    <CheckBadgeIcon className="h-6 w-6 text-green-500 self-end ml-2 mb-1.5" />
+                                  ) : (
+                                    <XCircleIcon className="h-6 w-6 text-red-500 self-end ml-2 mb-1.5" />
+                                  )}
+                                </div>
+                                <div className="w-24 mr-8">
+                                  <FormInputWithLabel
+                                    label="Share (in %)"
+                                    name={`creators.${index}.share`}
+                                    placeholder="Share"
+                                    type="number"
+                                    min={0}
+                                    max={100}
+                                    onChange={formik.handleChange}
+                                    value={creator.share}
+                                  />
+                                </div>
+                                {formik.values.creators.length > 1 && (
+                                  <button
+                                    className=" absolute -top-2 -right-2.5 cursor-pointer"
+                                    type="button"
+                                    onClick={() => arrayHelpers.remove(index)} // remove a friend from the list
+                                  >
+                                    <XMarkIcon className="h-6 w-6 text-gray-100" />
+                                  </button>
+                                )}
+                              </div>
                             </DndCard>
                           ))}
                       </div>
                     )}
                   />
-                  {/* {formik.values.creators.map(({ address, share }, index) => (
-                    <DndCard
-                      key={address}
-                      id={address}
-                      index={index}
-                      moveCard={moveCard}
-                    >
-                      <div className="flex items-center overflow-hidden space-x-4">
-                        <div className="flex space-x-2">
-                          <div>Address:</div>
-                          <FormInputWithLabel
-                            label=""
-                            name={`creators.${index}.address`}
-                            placeholder="Creator Address"
-                            onChange={formik.handleChange}
-                            value={address}
-                          />
-                        </div>
-                        <div className="flex space-x-2">
-                          <div>Share:</div>
-                          <div>{share}%</div>
-                        </div>
-                      </div>
-                    </DndCard>
-                  ))} */}
                 </FormikProvider>
               </DndProvider>
               <PrimaryButton
-                className="text-gray-100"
+                className="text-gray-100 mt-4"
                 onClick={handleAddCreator}
                 disabled={
                   !(
-                    formik.values.creators.every((c) => c.address) &&
-                    formik.values.creators.every((c) => c.share)
+                    formik.values.creators.every(
+                      (c) => !!c.address && isValidPublicKey(c.address)
+                    ) && formik.values.creators.every((c) => c.share)
                   )
                 }
               >
-                Add Creator
+                <PlusIcon className="h-6 w-6" />
               </PrimaryButton>
             </>
           </div>
@@ -355,18 +380,25 @@ export default function CreateCollectionPage({
                 <p className="text-gray-100 text-lg mb-4">
                   {collectionMetadataStats.count} NFTs
                 </p>
-                <p className="text-gray-100 text-lg mb-4">
-                  {collectionMetadataStats.uniqueTraits} Unique Traits
+                <p className="text-gray-100 text-lg mb-4 text-center">
+                  <div>
+                    {collectionMetadataStats.uniqueTraits.length} unique traits
+                    across collection
+                  </div>
                 </p>
                 <p className="text-gray-100 text-lg mb-4">
-                  {collectionMetadataStats.creators.length} Creators
+                  {collectionMetadataStats.creators.length}{" "}
+                  {collectionMetadataStats.creators.length > 1
+                    ? "creators"
+                    : "creator"}
                 </p>
               </div>
             ) : (
               <JsonUpload
-                setJsonUploadResponse={setJsonUploadResponse}
+                setJsonBeingUploaded={setJsonBeingUploaded}
+                setJsonUploadResponse={handleMetadataJsonUploadComplete}
                 driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
-                fileName="test-collection-metas.json"
+                fileName={`${collectionId}-collection-metadatas.json`}
               >
                 Add Collection Metadata JSONs
               </JsonUpload>

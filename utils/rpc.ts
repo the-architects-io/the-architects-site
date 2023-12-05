@@ -1,4 +1,5 @@
 import { ENV, RPC_ENDPOINT, RPC_ENDPOINT_DEVNET } from "@/constants/constants";
+import { PublicKey } from "@solana/web3.js";
 
 export const getRpcEndpoint = (
   cluster: "devnet" | "mainnet-beta" = "mainnet-beta"
@@ -28,5 +29,14 @@ export const isValidCluster = (cluster: string) => {
       return true;
     default:
       return false;
+  }
+};
+
+export const isValidPublicKey = (key: string) => {
+  try {
+    new PublicKey(key);
+    return true;
+  } catch (err) {
+    return false;
   }
 };

@@ -1,4 +1,4 @@
-import { RPC_ENDPOINT } from "@/constants/constants";
+import { RPC_ENDPOINT, SHDW_DRIVE_BASE_URL } from "@/constants/constants";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { PublicKey } from "@metaplex-foundation/js";
@@ -79,7 +79,16 @@ export async function POST(req: NextRequest) {
     const connection = new Connection(RPC_ENDPOINT, "confirmed");
     const drive = await new ShdwDrive(connection, wallet).init();
 
-    const buffer = Buffer.from(JSON.stringify(json));
+    const buffer = Buffer.from(json);
+
+    const fileToDelete = `${SHDW_DRIVE_BASE_URL}/${driveAddress.toString()}/${fileName}`;
+
+    const { message: deleteMessage } = await drive.deleteFile(
+      new PublicKey(driveAddress),
+      fileToDelete
+    );
+
+    console.log("deleteMessage", deleteMessage);
 
     const { message, finalized_locations, upload_errors } =
       await drive.uploadFile(new PublicKey(driveAddress), {

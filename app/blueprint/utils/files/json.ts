@@ -49,7 +49,7 @@ export type NftMetadata = {
 
 export const isValidCollectionMetadatas = (json: any): boolean => {
   // TODO: Check if this is working, i think it is not
-  const parsedJson = () => {
+  const parseJson = () => {
     try {
       return JSON.parse(json);
     } catch (error) {
@@ -57,13 +57,13 @@ export const isValidCollectionMetadatas = (json: any): boolean => {
     }
   };
 
-  const collectionMetadatas: NftMetadata[] = parsedJson();
+  const collectionMetadatas: NftMetadata[] = parseJson();
 
   if (!Array.isArray(collectionMetadatas)) {
     return false;
   }
 
-  const isValidCollectionMetadata = (collection: any) => {
+  const isValidMetadata = (collection: any) => {
     const {
       name,
       symbol,
@@ -72,11 +72,10 @@ export const isValidCollectionMetadatas = (json: any): boolean => {
       image,
       external_url,
       edition,
-      attributes,
       properties,
     } = collection;
 
-    const { files, category, creators } = properties;
+    const { creators } = properties;
 
     if (
       !name ||
@@ -86,10 +85,7 @@ export const isValidCollectionMetadatas = (json: any): boolean => {
       !image ||
       !external_url ||
       !edition ||
-      !attributes ||
       !properties ||
-      !files ||
-      !category ||
       !creators
     ) {
       return false;
@@ -98,7 +94,7 @@ export const isValidCollectionMetadatas = (json: any): boolean => {
     return true;
   };
 
-  const isValid = collectionMetadatas.every(isValidCollectionMetadata);
+  const isValid = collectionMetadatas.every(isValidMetadata);
 
   return isValid;
 };
@@ -112,15 +108,7 @@ export type CollectionStatsFromCollectionMetadatas = {
 export const getCollectionStatsFromCollectionMetadatas = (
   json: any
 ): CollectionStatsFromCollectionMetadatas => {
-  const collectionMetadatas: {} = () => {
-    try {
-      return JSON.parse(json) as unknown as {} | [];
-    } catch (error) {
-      return json as unknown as {} | [];
-    }
-  };
-
-  if (!Array.isArray(collectionMetadatas)) {
+  if (!Array.isArray(json)) {
     return {
       count: 0,
       uniqueTraits: [],
@@ -129,8 +117,8 @@ export const getCollectionStatsFromCollectionMetadatas = (
   }
 
   return {
-    count: (collectionMetadatas as []).length,
-    creators: (collectionMetadatas as [])
+    count: (json as []).length,
+    creators: (json as [])
       .reduce((acc: any, curr: any) => {
         const { properties } = curr;
         const { creators } = properties;
@@ -144,17 +132,18 @@ export const getCollectionStatsFromCollectionMetadatas = (
       .filter((creatorAddress: any, index: any, array: any) => {
         return array.indexOf(creatorAddress) === index;
       }),
-    uniqueTraits: (collectionMetadatas as [])
-      .reduce((acc: any, curr: any) => {
-        const { attributes } = curr;
-        const traitTypes = attributes.map((attribute: any) => {
-          return attribute.trait_type;
+    uniqueTraits: Array.from(
+      (json as []).reduce((acc, curr) => {
+        const {
+          attributes,
+        }: { attributes: Array<{ trait_type: string; value: string }> } = curr;
+
+        attributes.forEach(({ trait_type, value }) => {
+          acc.add(`${trait_type}:${value}`);
         });
 
-        return [...acc, ...traitTypes];
-      }, [])
-      .filter((traitType: any, index: any, array: any) => {
-        return array.indexOf(traitType) === index;
-      }),
+        return acc;
+      }, new Set<string>())
+    ),
   };
 };

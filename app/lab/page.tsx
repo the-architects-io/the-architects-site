@@ -16,14 +16,7 @@ import {
   REWARD_WALLET_ADDRESS,
 } from "@/constants/constants";
 // import idl from "@/idls/architects_dispensers.json";
-import {
-  Connection,
-  SystemProgram,
-  Transaction,
-  TransactionInstruction,
-  clusterApiUrl,
-  sendAndConfirmTransaction,
-} from "@solana/web3.js";
+import { Connection, clusterApiUrl } from "@solana/web3.js";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import showToast from "@/features/toasts/show-toast";

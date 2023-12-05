@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import type { Identifier, XYCoord } from "dnd-core";
 import type { FC } from "react";
 import { useRef } from "react";
@@ -8,7 +9,7 @@ export const ItemTypes = {
 
 export interface CardProps {
   id: any;
-
+  className?: string;
   index: number;
   moveCard: (dragIndex: number, hoverIndex: number) => void;
   children?: React.ReactNode;
@@ -20,7 +21,13 @@ interface DragItem {
   type: string;
 }
 
-export const DndCard: FC<CardProps> = ({ id, index, moveCard, children }) => {
+export const DndCard: FC<CardProps> = ({
+  id,
+  index,
+  moveCard,
+  children,
+  className,
+}) => {
   const ref = useRef<HTMLDivElement>(null);
   const [{ handlerId }, drop] = useDrop<
     DragItem,
@@ -100,7 +107,10 @@ export const DndCard: FC<CardProps> = ({ id, index, moveCard, children }) => {
       ref={ref}
       style={{ opacity }}
       data-handler-id={handlerId}
-      className="flex w-full border-2 border-gray-200 rounded-lg p-4 my-2"
+      className={classNames([
+        "flex w-full border border-gray-300 rounded-lg p-4 my-2",
+        className,
+      ])}
     >
       {!!children && children}
     </div>

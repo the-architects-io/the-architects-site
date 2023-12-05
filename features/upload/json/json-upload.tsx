@@ -7,11 +7,13 @@ export const JsonUpload = ({
   fileName,
   children,
   setJsonUploadResponse,
+  setJsonBeingUploaded,
 }: {
   driveAddress: string;
   fileName: string;
   children?: string | JSX.Element | JSX.Element[];
   setJsonUploadResponse: (response: any) => void;
+  setJsonBeingUploaded: (json: any) => void;
 }) => {
   return (
     <JsonUploadWrapper
@@ -19,7 +21,10 @@ export const JsonUpload = ({
       fileName={fileName}
       setJsonUploadResponse={setJsonUploadResponse}
     >
-      <JsonUploadField driveAddress={driveAddress}>
+      <JsonUploadField
+        driveAddress={driveAddress}
+        setJsonBeingUploaded={setJsonBeingUploaded}
+      >
         {!!children ? children : "Add JSONs"}
       </JsonUploadField>
     </JsonUploadWrapper>
