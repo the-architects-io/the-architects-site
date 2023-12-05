@@ -26,22 +26,33 @@ export async function POST(req: NextRequest) {
   }
 
   const formData = await req.formData();
-  const formDataFiles = formData.get("files") as unknown as ShadowFile[] | null;
+
+  let formDataFiles: ShadowFile[] = [];
+  let amountOfFiles = 0;
+
+  while (true) {
+    if (formData.get(`file[${amountOfFiles}]`)) {
+      amountOfFiles++;
+    } else {
+      break;
+    }
+  }
+
+  for (let i = 0; i < amountOfFiles; i++) {
+    const file = formData.get(`file[${i}]`) as unknown as File;
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    const shadowFile = {
+      name: file.name,
+      file: fileBuffer,
+    };
+    formDataFiles.push(shadowFile);
+  }
+
   const driveAddress = formData.get("driveAddress") as string;
 
   if (!formDataFiles || !driveAddress) {
     return NextResponse.json(null, { status: 400 });
   }
-
-  console.log({ formDataFiles: JSON.stringify(formDataFiles) });
-
-  // await formDataFiles.map(async (file) => {
-  //   const fileBuffer = Buffer.from(await file.arrayBuffer());
-  //   return {
-  //     name: file.name,
-  //     file: fileBuffer,
-  //   };
-  // });
 
   try {
     const keypair = Keypair.fromSecretKey(
@@ -54,12 +65,18 @@ export async function POST(req: NextRequest) {
     const connection = new Connection(RPC_ENDPOINT, "confirmed");
     const drive = await new ShdwDrive(connection, wallet).init();
 
-    const res = await drive.uploadMultipleFiles(
+    const responses = await drive.uploadMultipleFiles(
       new PublicKey(driveAddress),
       formDataFiles
     );
 
-    return NextResponse.json(res, { status: 200 });
+    return NextResponse.json(
+      {
+        ...responses,
+        count: responses.length,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.log("error", error);
     return NextResponse.json(

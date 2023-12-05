@@ -148,6 +148,7 @@ const handleUploadFormData = async (
   action: BlueprintApiActions,
   formData: FormData | undefined
 ) => {
+  console.log("sanity check");
   if (!process.env.BLUEPRINT_API_KEY) {
     return NextResponse.json(
       {
@@ -157,6 +158,8 @@ const handleUploadFormData = async (
       { status: 500 }
     );
   }
+
+  console.log("sanity check 2");
 
   if (!formData) {
     return NextResponse.json(
@@ -168,9 +171,9 @@ const handleUploadFormData = async (
     );
   }
 
-  formData.append("apiKey", process.env.BLUEPRINT_API_KEY);
+  console.log("sanity check 3");
 
-  console.log({ formData });
+  formData.append("apiKey", process.env.BLUEPRINT_API_KEY);
 
   try {
     const { data, status, statusText } = await axios.post(
@@ -183,8 +186,6 @@ const handleUploadFormData = async (
       }
     );
 
-    console.log({ data, status, statusText });
-
     if (data?.errors?.length) {
       return NextResponse.json({
         error: data?.errors[0],
@@ -196,6 +197,7 @@ const handleUploadFormData = async (
 
     return NextResponse.json({
       ...data,
+      count: data?.count || 0,
       status: status || 500,
       statusText,
       action: BlueprintApiActionUrls[action],

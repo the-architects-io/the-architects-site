@@ -37,6 +37,8 @@ export async function POST(req: NextRequest) {
   const fileName = formData.get("fileName") as string;
   const driveAddress = formData.get("driveAddress") as string;
 
+  console.log({ formDataFile, fileName, driveAddress });
+
   if (!formDataFile || !fileName || !driveAddress) {
     return NextResponse.json(
       {
