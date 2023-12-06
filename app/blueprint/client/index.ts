@@ -12,6 +12,7 @@ import {
   MintCnftResponse,
   MintNftInput,
   MintNftResponse,
+  UpdateCollectionInput,
   UploadFileInput,
   UploadFileResponse,
   UploadFilesInput,
@@ -172,6 +173,25 @@ const mintNft = async (
   return data;
 };
 
+const updateCollection = async (
+  options: BlueprintClientOptions,
+  params: UpdateCollectionInput
+): Promise<CreateCollectionResponse> => {
+  const response = await fetch("/api/blueprint", {
+    method: "POST",
+    body: JSON.stringify({
+      action: BlueprintApiActions.UPDATE_COLLECTION,
+      params,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await response.json();
+  return data;
+};
+
 const uploadJson = async (
   options: BlueprintClientOptions,
   params: UploadJsonInput
@@ -259,6 +279,8 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
     createTree: (params: CreateTreeInput) => createTree(options, params),
     mintCnft: (params: MintCnftInput) => mintCnft(options, params),
     mintNft: (params: MintNftInput) => mintNft(options, params),
+    updateCollection: (params: UpdateCollectionInput) =>
+      updateCollection(options, params),
     uploadFile: (params: UploadFileInput) => uploadFile(options, params),
     uploadFiles: (params: UploadFilesInput) => uploadFiles(options, params),
     uploadJson: (params: UploadJsonInput) => uploadJson(options, params),

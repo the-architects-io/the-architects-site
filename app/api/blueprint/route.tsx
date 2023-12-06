@@ -16,6 +16,7 @@ const {
   CREATE_AIRDROP,
   MINT_CNFT,
   MINT_NFT,
+  UPDATE_COLLECTION,
   UPLOAD_JSON,
   UPLOAD_FILE,
   UPLOAD_FILES,
@@ -30,6 +31,7 @@ const BlueprintApiActionUrls = {
   [DISPENSE_TOKENS]: `${BASE_URL}/api/dispense-tokens`,
   [MINT_CNFT]: `${BASE_URL}/api/mint-cnft`,
   [MINT_NFT]: `${BASE_URL}/api/mint-nft`,
+  [UPDATE_COLLECTION]: `${BASE_URL}/api/update-collection`,
   [UPLOAD_JSON]: `${BASE_URL}/api/upload-json-file-to-shadow-drive`,
   [UPLOAD_FILE]: `${BASE_URL}/api/upload-file-to-shadow-drive`,
   [UPLOAD_FILES]: `${BASE_URL}/api/upload-files-to-shadow-drive`,
@@ -39,7 +41,8 @@ export const mapErrorToResponse = (error: any): MappedErrorResponse => {
   const status =
     error?.response?.status || error?.response?.data?.status || 500;
   console.log({
-    error,
+    // error,
+    error: error.response?.data,
     statuses: {
       "error?.response?.status": error?.response?.status,
       "error?.response?.data?.status": error?.response?.data?.status,
@@ -375,6 +378,7 @@ export async function POST(req: NextRequest) {
     case BlueprintApiActions.CREATE_TREE:
     case BlueprintApiActions.MINT_CNFT:
     case BlueprintApiActions.MINT_NFT:
+    case BlueprintApiActions.UPDATE_COLLECTION:
       return handleBlueprintAction(action, params);
     case BlueprintApiActions.UPLOAD_FILE:
     case BlueprintApiActions.UPLOAD_FILES:

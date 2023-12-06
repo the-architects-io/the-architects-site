@@ -6,6 +6,9 @@ import {
 import { BASE_URL } from "@/constants/constants";
 import Uploady from "@rpldy/uploady";
 
+export type SingleImageUploadResponse = UploadFileResponse &
+  BaseBlueprintResponse;
+
 export const SingleImageUploadFieldWrapper = ({
   children,
   fileName,

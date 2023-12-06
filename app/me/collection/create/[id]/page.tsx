@@ -41,6 +41,8 @@ import { isValidPublicKey } from "@/utils/rpc";
 import axios from "axios";
 import classNames from "classnames";
 import { CreateCollectionFormChecklist } from "@/features/collection/create-collection-form-checklist";
+import { SubmitButton } from "@/features/UI/buttons/submit-button";
+import { SingleImageUploadResponse } from "@/features/upload/single-image/single-image-upload-field-wrapper";
 
 export default function CreateCollectionPage({
   params,
@@ -57,13 +59,15 @@ export default function CreateCollectionPage({
   ] = useState<UploadJsonResponse | null>(null);
   const [collectionMetadataStats, setCollectionMetadataStats] =
     useState<CollectionStatsFromCollectionMetadatas | null>(null);
-  const [collectionImage, setCollectionImage] = useState<File | null>(null);
+  const [collectionImage, setCollectionImage] =
+    useState<SingleImageUploadResponse | null>(null);
   const [creators, setCreators] = useState<Creator[] | null>(null);
   const [jsonBeingUploaded, setJsonBeingUploaded] = useState<any | null>(null);
   const [isJsonMetadataUploadInProgress, setIsJsonMetadataUploadInProgress] =
     useState(false);
   const [collectionImagesUploadCount, setCollectionImagesUploadCount] =
     useState<number | null>(null);
+  const [isSavingCollection, setIsSavingCollection] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -79,66 +83,109 @@ export default function CreateCollectionPage({
       symbol,
       description,
       sellerFeeBasisPoints,
+      creators,
     }) => {
       if (!wallet?.publicKey) return;
-      if (!collectionImage) return;
+      if (
+        !collectionImage ||
+        !collectionId ||
+        !creators ||
+        !collectionMetadataStats ||
+        !collectionMetadatasJsonUploadResponse ||
+        !collectionImagesUploadCount
+      ) {
+        showToast({
+          primaryMessage: "Collection Upload Failed",
+        });
+        return;
+      }
+
+      setIsSavingCollection(true);
 
       const blueprint = createBlueprintClient({
         cluster: "devnet",
       });
 
-      const driveAddress = ASSET_SHDW_DRIVE_ADDRESS;
-      const basisPoints = sellerFeeBasisPoints * 100;
+      const { success } = await blueprint.updateCollection({
+        imageUrl: collectionImage.url,
+        id: collectionId,
+        name: collectionName,
+        symbol,
+        description,
+        sellerFeeBasisPoints,
+        creators,
+        driveAddress: ASSET_SHDW_DRIVE_ADDRESS,
+        isReadyToMint: true,
+      });
 
-      let uri = "";
-
-      try {
-        const { url } = await blueprint.uploadJson({
-          json: {
-            name: collectionName,
-            symbol,
-            description,
-            seller_fee_basis_points: basisPoints,
-            image: `${getShdwDriveUrl(driveAddress)}/${getSlug(
-              collectionName
-            )}-collection.png`,
-          },
-          fileName: `${collectionName.split(" ").join("-")}-collection.json`,
-          driveAddress,
-        });
-
-        uri = url;
-      } catch (error) {
-        console.log({ error });
-      }
-
-      try {
-        console.log({ collectionName, uri, sellerFeeBasisPoints });
-
-        const { success, mintAddress } = await blueprint.mintNft({
-          name: collectionName,
-          uri,
-          sellerFeeBasisPoints: basisPoints,
-          isCollection: true,
-        });
-
-        if (!success) {
-          showToast({
-            primaryMessage: "Collection NFT Mint Failed",
-          });
-          return;
-        }
-
+      if (!success) {
         showToast({
-          primaryMessage: "Collection NFT Minted",
-          link: {
-            title: "View NFT",
-            url: `https://solscan.io/token/${mintAddress}`,
-          },
+          primaryMessage: "Collection saved",
         });
-      } catch (error) {
-        console.log({ error });
+        return;
       }
+
+      showToast({
+        primaryMessage: "Collection saved",
+      });
+
+      setIsSavingCollection(false);
+
+      router.push("/me/collection");
+
+      // ** Move this to mint during airdrop **
+      // const driveAddress = ASSET_SHDW_DRIVE_ADDRESS;
+      // const basisPoints = sellerFeeBasisPoints * 100;
+
+      // let uri = "";
+
+      // try {
+      //   const { url } = await blueprint.uploadJson({
+      //     json: {
+      //       name: collectionName,
+      //       symbol,
+      //       description,
+      //       seller_fee_basis_points: basisPoints,
+      //       image: `${getShdwDriveUrl(driveAddress)}/${getSlug(
+      //         collectionName
+      //       )}-collection.png`,
+      //     },
+      //     fileName: `${collectionName.split(" ").join("-")}-collection.json`,
+      //     driveAddress,
+      //   });
+
+      //   uri = url;
+      // } catch (error) {
+      //   console.log({ error });
+      // }
+
+      // try {
+      //   console.log({ collectionName, uri, sellerFeeBasisPoints });
+
+      //   const { success, mintAddress } = await blueprint.mintNft({
+      //     name: collectionName,
+      //     uri,
+      //     sellerFeeBasisPoints: basisPoints,
+      //     isCollection: true,
+      //   });
+
+      //   if (!success) {
+      //     showToast({
+      //       primaryMessage: "Collection NFT Mint Failed",
+      //     });
+      //     return;
+      //   }
+
+      //   showToast({
+      //     primaryMessage: "Collection NFT Minted",
+      //     link: {
+      //       title: "View NFT",
+      //       url: `https://solscan.io/token/${mintAddress}`,
+      //     },
+      //   });
+      // } catch (error) {
+      //   console.log({ error });
+      // }
     },
   });
 
@@ -213,7 +260,7 @@ export default function CreateCollectionPage({
         });
         return;
       }
-
+      if (!res.count) return;
       setCollectionImagesUploadCount(res.count);
     },
     []
@@ -487,7 +534,8 @@ export default function CreateCollectionPage({
       </div>
       <div className="flex bottom-0 left-0 right-0 fixed w-full justify-center items-center">
         <div className="bg-gray-900 w-full p-8 py-4">
-          <PrimaryButton
+          <SubmitButton
+            isSubmitting={isSavingCollection}
             className="w-full"
             disabled={
               !(
@@ -502,9 +550,10 @@ export default function CreateCollectionPage({
                 !!collectionImagesUploadCount
               )
             }
+            onClick={formik.handleSubmit}
           >
             Save Premint Collection
-          </PrimaryButton>
+          </SubmitButton>
         </div>
       </div>
     </ContentWrapper>

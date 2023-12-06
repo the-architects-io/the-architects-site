@@ -86,11 +86,19 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(json);
 
     if (overwrite) {
-      const { message: deleteMessage } = await drive.deleteFile(
-        new PublicKey(driveAddress),
-        `${SHDW_DRIVE_BASE_URL}/${driveAddress}/${fileName}`
-      );
-      console.log("deleteMessage", deleteMessage);
+      const { keys } = await drive.listObjects(new PublicKey(driveAddress));
+
+      const fileExists = keys.some((key) => key === fileName);
+
+      console.log("fileExists", fileExists);
+
+      if (fileExists) {
+        const { message: deleteMessage } = await drive.deleteFile(
+          new PublicKey(driveAddress),
+          `${SHDW_DRIVE_BASE_URL}/${driveAddress}/${fileName}`
+        );
+        console.log("deleteMessage", deleteMessage);
+      }
     }
 
     const { message, finalized_locations, upload_errors } =

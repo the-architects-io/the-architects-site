@@ -679,6 +679,18 @@ export type Creator = {
   collection: Collection;
 };
 
+export type UpdateCollectionInput = {
+  id: string;
+  name: string;
+  symbol: string;
+  description: string;
+  sellerFeeBasisPoints: number;
+  imageUrl: string;
+  creators: Creator[];
+  driveAddress: string;
+  isReadyToMint: boolean;
+};
+
 export enum BlueprintApiActions {
   ADD_AIRDROP_RECIPIENTS = "ADD_AIRDROP_RECIPIENTS",
   CREATE_COLLECTION = "CREATE_COLLECTION",
@@ -688,6 +700,7 @@ export enum BlueprintApiActions {
   DISPENSE_TOKENS = "DISPENSE_TOKENS",
   MINT_CNFT = "MINT_CNFT",
   MINT_NFT = "MINT_NFT",
+  UPDATE_COLLECTION = "UPDATE_COLLECTION",
   UPLOAD_FILE = "UPLOAD_FILE",
   UPLOAD_FILES = "UPLOAD_FILES",
   UPLOAD_JSON = "UPLOAD_JSON",

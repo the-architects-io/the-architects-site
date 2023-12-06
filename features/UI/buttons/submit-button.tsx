@@ -27,7 +27,7 @@ export const SubmitButton = ({
       }}
       disabled={isSubmitting || disabled}
       className={classNames([
-        "tracking-widest",
+        "tracking-widest flex items-center justify-center",
         isSubmitting
           ? "opacity-50 cursor-not-allowed"
           : "opacity-100 cursor-pointer",

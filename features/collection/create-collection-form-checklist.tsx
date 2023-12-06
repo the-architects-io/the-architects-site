@@ -3,6 +3,7 @@ import {
   CollectionStatsFromCollectionMetadatas,
   creatorsAreValid,
 } from "@/app/blueprint/utils";
+import { SingleImageUploadResponse } from "@/features/upload/single-image/single-image-upload-field-wrapper";
 import { ChevronDoubleLeftIcon } from "@heroicons/react/20/solid";
 import {
   ArrowRightCircleIcon,
@@ -24,7 +25,7 @@ export const CreateCollectionFormChecklist = ({
   collectionMetadatasJsonUploadResponse,
   collectionImagesUploadCount,
 }: {
-  collectionImage: File | null;
+  collectionImage: SingleImageUploadResponse | null;
   creators: Creator[];
   collectionName?: string;
   symbol?: string;

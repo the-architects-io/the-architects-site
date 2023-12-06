@@ -11,17 +11,8 @@ type UpdateDispenserInput = {
 };
 
 export async function POST(req: NextRequest) {
-  const { id, rewardWalletAddress, rewardWalletBump, cooldownInMs, noop } =
+  const { id, rewardWalletAddress, rewardWalletBump, cooldownInMs } =
     await req.json();
-
-  if (noop)
-    return NextResponse.json(
-      {
-        noop: true,
-        endpoint: "update-dispenser",
-      },
-      { status: 200 }
-    );
 
   if (!id) {
     return NextResponse.json(
