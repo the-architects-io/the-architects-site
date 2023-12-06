@@ -37,12 +37,6 @@ const NavbarItems = () => {
         {!!user?.id && (
           <>
             <Link
-              href="/me/dispenser"
-              className="hover:text-stone-200 uppercase text-sm tracking-widest"
-            >
-              Dispensers
-            </Link>
-            <Link
               href="/me/collection"
               className="hover:text-stone-200 uppercase text-sm tracking-widest"
             >
@@ -59,6 +53,12 @@ const NavbarItems = () => {
               className="hover:text-stone-200 uppercase text-sm tracking-widest"
             >
               Mints
+            </Link>
+            <Link
+              href="/me/drive"
+              className="hover:text-stone-200 uppercase text-sm tracking-widest"
+            >
+              Drive
             </Link>
           </>
         )}

@@ -13,13 +13,16 @@ import AdminToolbar from "@/features/admin/tools/admin-toolbar";
 import GoogleAnalytics from "@/features/google-analytics";
 import { GA_TRACKING_ID } from "@/constants/constants";
 import { Analytics } from "@vercel/analytics/react";
+import { Metadata } from "next";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
+const createPageMetadata = (): Metadata => ({
   title: "The Architects",
-  description: "Building Web 3",
-};
+  description: "Closing the loop",
+});
+
+export const metadata: Metadata = createPageMetadata();
 
 export default function RootLayout({
   children,

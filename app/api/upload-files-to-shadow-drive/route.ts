@@ -74,6 +74,8 @@ export async function POST(req: NextRequest) {
       {
         ...responses,
         count: responses.length,
+        successCount: responses.filter((r) => r.status === "Uploaded.").length,
+        failedCount: responses.filter((r) => r.status !== "Uploaded.").length,
       },
       { status: 200 }
     );

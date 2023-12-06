@@ -23,6 +23,7 @@ export const SingleImageUploadFieldWrapper = ({
 }) => {
   return (
     <Uploady
+      accept="image/*"
       destination={{
         url: `${BASE_URL}/api/blueprint`,
         params: {
