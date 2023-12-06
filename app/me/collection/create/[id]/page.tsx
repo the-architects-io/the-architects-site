@@ -8,18 +8,16 @@ import { useCallback, useEffect, useState } from "react";
 import { JsonUpload } from "@/features/upload/json/json-upload";
 import { SingleImageUpload } from "@/features/upload/single-image/single-image-upload";
 import { MultiImageUpload } from "@/features/upload/multi-image/multi-image-upload";
-import { UploadJsonFileToShadowDriveResponse } from "@/app/api/upload-json-file-to-shadow-drive/route";
 import {
   CollectionStatsFromCollectionMetadatas,
+  creatorsAreValid,
   getCollectionStatsFromCollectionMetadatas,
-  isValidCollectionMetadatas,
 } from "@/app/blueprint/utils";
 import { useQuery } from "@apollo/client";
 import { GET_COLLECTION_BY_ID } from "@/graphql/queries/get-collection-by-id";
 import {
   Collection,
   Creator,
-  UploadFileResponse,
   UploadFilesResponse,
   UploadJsonResponse,
 } from "@/app/blueprint/types";
@@ -42,6 +40,7 @@ import { CheckBadgeIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { isValidPublicKey } from "@/utils/rpc";
 import axios from "axios";
 import classNames from "classnames";
+import { CreateCollectionFormChecklist } from "@/features/collection/create-collection-form-checklist";
 
 export default function CreateCollectionPage({
   params,
@@ -220,17 +219,6 @@ export default function CreateCollectionPage({
     []
   );
 
-  const creatorsAreValid = (creators: Creator[]) => {
-    const shareCount = creators.reduce((acc, curr) => acc + curr.share, 0);
-    const sharesEqual100 = shareCount === 100;
-
-    return (
-      creators.every((c) => !!c.address && isValidPublicKey(c.address)) &&
-      creators.every((c) => c.share) &&
-      sharesEqual100
-    );
-  };
-
   useEffect(() => {
     if (!params?.id || !isUuid(params?.id)) {
       router.push("/me/collection");
@@ -298,7 +286,7 @@ export default function CreateCollectionPage({
           >
             Add Collection Image
           </SingleImageUpload>
-          <div className="flex flex-col justify-center items-center w-full mb-4 space-y-4">
+          <div className="flex flex-col justify-center items-center w-full mb-8 space-y-4">
             <FormInputWithLabel
               label="Collection Name"
               name="collectionName"
@@ -330,6 +318,19 @@ export default function CreateCollectionPage({
               onChange={formik.handleChange}
             />
           </div>
+          <CreateCollectionFormChecklist
+            collectionImage={collectionImage}
+            creators={formik.values.creators}
+            collectionName={formik.values.collectionName}
+            symbol={formik.values.symbol}
+            description={formik.values.description}
+            sellerFeeBasisPoints={formik.values.sellerFeeBasisPoints}
+            collectionMetadataStats={collectionMetadataStats}
+            collectionMetadatasJsonUploadResponse={
+              collectionMetadatasJsonUploadResponse
+            }
+            collectionImagesUploadCount={collectionImagesUploadCount}
+          />
         </div>
         <div className="flex flex-col items-center w-full px-8">
           <div
