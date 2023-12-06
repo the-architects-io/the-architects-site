@@ -2,6 +2,7 @@ import { UploadAssetsToShadowDriveResponse } from "@/app/api/mint-nft/route";
 import {
   BaseBlueprintResponse,
   BlueprintApiActions,
+  UploadFilesResponse,
 } from "@/app/blueprint/types";
 import { BASE_URL } from "@/constants/constants";
 import Spinner from "@/features/UI/spinner";
@@ -13,9 +14,11 @@ import { useState } from "react";
 export const MultiImageUpload = ({
   driveAddress,
   children,
+  onUploadComplete,
 }: {
   driveAddress: string;
   children?: string | JSX.Element | JSX.Element[];
+  onUploadComplete?: (response: UploadFilesResponse) => void;
 }) => {
   const [progress, setProgress] = useState(0);
   const [isInProgress, setIsInProgress] = useState(false);
@@ -28,14 +31,15 @@ export const MultiImageUpload = ({
         url: `${BASE_URL}/api/blueprint`,
         params: {
           action: BlueprintApiActions.UPLOAD_FILES,
+          overwrite: true,
           driveAddress,
         },
       }}
       isSuccessfulCall={({ response }: { response: string }) => {
-        const parsedResponse: UploadAssetsToShadowDriveResponse &
-          BaseBlueprintResponse = JSON.parse(response);
+        const parsedResponse: UploadFilesResponse = JSON.parse(response);
         if (parsedResponse.success) {
           setIsSuccessful(true);
+          onUploadComplete?.(parsedResponse);
           return true;
         }
         setIsSuccessful(false);

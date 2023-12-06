@@ -16,11 +16,17 @@ import {
 } from "@/app/blueprint/utils";
 import { useQuery } from "@apollo/client";
 import { GET_COLLECTION_BY_ID } from "@/graphql/queries/get-collection-by-id";
-import { Collection, Creator, UploadJsonResponse } from "@/app/blueprint/types";
+import {
+  Collection,
+  Creator,
+  UploadFileResponse,
+  UploadFilesResponse,
+  UploadJsonResponse,
+} from "@/app/blueprint/types";
 import { useUserData } from "@nhost/nextjs";
 import { isUuid } from "uuidv4";
 import { FieldArray, FormikProvider, useFormik } from "formik";
-import { getAbbreviatedAddress, getSlug } from "@/utils/formatting";
+import { getSlug } from "@/utils/formatting";
 import { createBlueprintClient } from "@/app/blueprint/client";
 import { getShdwDriveUrl } from "@/utils/drive";
 import showToast from "@/features/toasts/show-toast";
@@ -56,6 +62,8 @@ export default function CreateCollectionPage({
   const [jsonBeingUploaded, setJsonBeingUploaded] = useState<any | null>(null);
   const [isJsonMetadataUploadInProgress, setIsJsonMetadataUploadInProgress] =
     useState(false);
+  const [collectionImagesUploadCount, setCollectionImagesUploadCount] =
+    useState<number | null>(null);
 
   const formik = useFormik({
     initialValues: {
@@ -193,6 +201,20 @@ export default function CreateCollectionPage({
       const { data } = await axios.get(url);
 
       setCollectionMetadatasJsonUploadResponse(data);
+    },
+    []
+  );
+
+  const handleCollectionImagesCompleted = useCallback(
+    async (res: UploadFilesResponse) => {
+      if (!res.success) {
+        showToast({
+          primaryMessage: "Collection Images Upload Failed",
+        });
+        return;
+      }
+
+      setCollectionImagesUploadCount(res.count);
     },
     []
   );
@@ -377,27 +399,25 @@ export default function CreateCollectionPage({
             </>
           </div>
           <div className="border border-gray-600 rounded-lg px-4 w-full min-h-[28vh] mb-4 flex flex-col items-center justify-center">
-            {!!collectionMetadataStats && !isJsonMetadataUploadInProgress ? (
+            {!!collectionMetadataStats &&
+            !!collectionMetadatasJsonUploadResponse ? (
               <div className="flex flex-col items-center">
-                <p className="text-gray-100 text-lg mb-4">
-                  {collectionMetadataStats.count} NFTs
+                <div className="text-green-500 flex items-center gap-x-2 mb-4">
+                  <CheckBadgeIcon className="h-5 w-5" />
+                  <div>Token Metadatas Added</div>
+                </div>
+                <p className="text-gray-100 text-lg mb-2">
+                  {collectionMetadataStats.count} token metadatas
                 </p>
-                <p className="text-gray-100 text-lg mb-4 text-center">
+                <p className="text-gray-100 text-lg mb-2 text-center">
                   <div>
                     {collectionMetadataStats.uniqueTraits.length} unique traits
                     across collection
                   </div>
                 </p>
-                <p className="text-gray-100 text-lg mb-4">
-                  {collectionMetadataStats.creators.length}{" "}
-                  {collectionMetadataStats.creators.length > 1
-                    ? "creators"
-                    : "creator"}
-                </p>
               </div>
             ) : (
               <JsonUpload
-                setIsJsonUploadInProgress={setIsJsonMetadataUploadInProgress}
                 setJsonBeingUploaded={setJsonBeingUploaded}
                 setJsonUploadResponse={handleMetadataJsonUploadComplete}
                 driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
@@ -408,9 +428,24 @@ export default function CreateCollectionPage({
             )}
           </div>
           <div className="border border-gray-600 rounded-lg px-4 w-full min-h-[28vh] mb-4 flex flex-col items-center justify-center">
-            <MultiImageUpload driveAddress={ASSET_SHDW_DRIVE_ADDRESS}>
-              Add Collection Images
-            </MultiImageUpload>
+            {!!collectionImagesUploadCount ? (
+              <div className="flex flex-col items-center">
+                <div className="text-green-500 flex items-center gap-x-2 mb-4">
+                  <CheckBadgeIcon className="h-5 w-5" />
+                  <div>Collection Images Added</div>
+                </div>
+                <p className="text-gray-100 text-lg mb-2">
+                  {collectionImagesUploadCount} collection images
+                </p>
+              </div>
+            ) : (
+              <MultiImageUpload
+                driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
+                onUploadComplete={handleCollectionImagesCompleted}
+              >
+                Add Collection Images
+              </MultiImageUpload>
+            )}
           </div>
         </div>
       </div>

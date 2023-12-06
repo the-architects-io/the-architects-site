@@ -48,6 +48,7 @@ export const MultiImageUploadField = ({
         params={{
           action: BlueprintApiActions.UPLOAD_FILES,
           driveAddress,
+          overwrite: true,
         }}
       >
         {!!children ? children : "Add Images"}

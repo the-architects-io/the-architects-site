@@ -30,6 +30,12 @@ export const JsonUploadField = ({
     setBatch(batch);
     console.log("batch add", batch);
     setIsInProgress(true);
+    const reader = new FileReader();
+    reader.readAsText(batch.items[0].file as unknown as Blob);
+    reader.onload = () => {
+      const json = JSON.parse(reader.result as string);
+      setJsonBeingUploaded(json);
+    };
   });
 
   useBatchFinishListener((batch: Batch) => {
@@ -39,10 +45,6 @@ export const JsonUploadField = ({
 
   useEffect(() => {
     if (!batch?.completed) return;
-
-    if (batch?.completed > 0) {
-      setProgress(Math.round((batch.completed / batch.total) * 100));
-    }
   }, [batch?.completed, batch?.total, setProgress]);
 
   return (
@@ -50,6 +52,7 @@ export const JsonUploadField = ({
       params={{
         action: BlueprintApiActions.UPLOAD_JSON,
         driveAddress,
+        overwrite: true,
       }}
     >
       {!!children ? children : "Add JSONs"}

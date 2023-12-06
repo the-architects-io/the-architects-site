@@ -36,6 +36,8 @@ export async function POST(req: NextRequest) {
   const formDataFile = formData.get("file") as unknown as File | null;
   const fileName = formData.get("fileName") as string;
   const driveAddress = formData.get("driveAddress") as string;
+  const overwriteString = formData.get("overwrite") as string;
+  const overwrite = !!overwriteString;
 
   console.log({ formDataFile, fileName, driveAddress });
 
@@ -83,14 +85,13 @@ export async function POST(req: NextRequest) {
 
     const buffer = Buffer.from(json);
 
-    const fileToDelete = `${SHDW_DRIVE_BASE_URL}/${driveAddress}/${fileName}`;
-
-    const { message: deleteMessage } = await drive.deleteFile(
-      new PublicKey(driveAddress),
-      fileToDelete
-    );
-
-    console.log("deleteMessage", deleteMessage);
+    if (overwrite) {
+      const { message: deleteMessage } = await drive.deleteFile(
+        new PublicKey(driveAddress),
+        `${SHDW_DRIVE_BASE_URL}/${driveAddress}/${fileName}`
+      );
+      console.log("deleteMessage", deleteMessage);
+    }
 
     const { message, finalized_locations, upload_errors } =
       await drive.uploadFile(new PublicKey(driveAddress), {

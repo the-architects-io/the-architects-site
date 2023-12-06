@@ -624,6 +624,7 @@ export type UploadFilesInput = {
 
 export type UploadFilesResponse = BaseBlueprintResponse & {
   urls: string[];
+  count: number;
 };
 
 export type CreateCollectionInput = {

@@ -23,13 +23,13 @@ export const SingleImageUploadFieldWrapper = ({
 }) => {
   return (
     <Uploady
-      accept="image/*"
       destination={{
         url: `${BASE_URL}/api/blueprint`,
         params: {
           action: BlueprintApiActions.UPLOAD_FILE,
           fileName,
           driveAddress,
+          overwrite: true,
         },
       }}
       isSuccessfulCall={({ response }: { response: string }) => {

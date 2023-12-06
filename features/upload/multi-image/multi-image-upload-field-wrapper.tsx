@@ -17,6 +17,7 @@ export const MultiImageUploadWrapper = ({
         params: {
           action: BlueprintApiActions.UPLOAD_FILES,
           driveAddress,
+          overwrite: true,
         },
       }}
       autoUpload={true}

@@ -1,4 +1,3 @@
-import { ASSET_SHDW_DRIVE_ADDRESS } from "@/constants/constants";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import UploadButton from "@rpldy/upload-button";
 import UploadPreview, {
@@ -52,6 +51,7 @@ export const SingleImageUploadField = ({
             action: "UPLOAD_FILE",
             driveAddress,
             fileName,
+            overwrite: true,
           }}
         >
           {!!children ? children : "Add Image"}

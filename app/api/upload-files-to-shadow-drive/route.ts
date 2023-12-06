@@ -4,7 +4,11 @@ import { Connection, Keypair } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { PublicKey } from "@metaplex-foundation/js";
-import { RPC_ENDPOINT } from "@/constants/constants";
+import {
+  ASSET_SHDW_DRIVE_ADDRESS,
+  RPC_ENDPOINT,
+  SHDW_DRIVE_BASE_URL,
+} from "@/constants/constants";
 
 export type UploadAssetsToShadowDriveResponse = {
   urls: string[];
@@ -49,6 +53,8 @@ export async function POST(req: NextRequest) {
   }
 
   const driveAddress = formData.get("driveAddress") as string;
+  const overwriteString = formData.get("overwrite") as string;
+  const overwrite = !!overwriteString;
 
   if (!formDataFiles || !driveAddress) {
     return NextResponse.json(null, { status: 400 });
@@ -65,6 +71,15 @@ export async function POST(req: NextRequest) {
     const connection = new Connection(RPC_ENDPOINT, "confirmed");
     const drive = await new ShdwDrive(connection, wallet).init();
 
+    if (overwrite) {
+      for (const file of formDataFiles) {
+        await drive.deleteFile(
+          new PublicKey(driveAddress),
+          `${SHDW_DRIVE_BASE_URL}/${driveAddress}/${file.name}`
+        );
+      }
+    }
+
     const responses = await drive.uploadMultipleFiles(
       new PublicKey(driveAddress),
       formDataFiles
@@ -72,7 +87,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        ...responses,
+        urls: responses.map((r) => r.location),
         count: responses.length,
         successCount: responses.filter((r) => r.status === "Uploaded.").length,
         failedCount: responses.filter((r) => r.status !== "Uploaded.").length,

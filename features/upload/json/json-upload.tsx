@@ -17,22 +17,16 @@ export const JsonUpload = ({
   children,
   setJsonUploadResponse,
   setJsonBeingUploaded,
-  setIsJsonUploadInProgress,
 }: {
   driveAddress: string;
   fileName: string;
   children?: string | JSX.Element | JSX.Element[];
   setJsonUploadResponse: (response: any) => void;
   setJsonBeingUploaded: (json: any) => void;
-  setIsJsonUploadInProgress: (isInProgress: boolean) => void;
 }) => {
   const [progress, setProgress] = useState(0);
   const [isInProgress, setIsInProgress] = useState(false);
   const [isSuccessful, setIsSuccessful] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    setIsJsonUploadInProgress(isInProgress);
-  }, [isInProgress, setIsJsonUploadInProgress]);
 
   return (
     <>
@@ -44,6 +38,7 @@ export const JsonUpload = ({
             action: BlueprintApiActions.UPLOAD_JSON,
             driveAddress,
             fileName,
+            overwrite: true,
           },
         }}
         isSuccessfulCall={({ response }: { response: string }) => {
