@@ -6,9 +6,8 @@ import {
 import { BASE_URL } from "@/constants/constants";
 import Spinner from "@/features/UI/spinner";
 import { JsonUploadField } from "@/features/upload/json/json-upload-field";
-import { JsonUploadWrapper } from "@/features/upload/json/json-upload-field-wrapper";
 import { CheckBadgeIcon } from "@heroicons/react/20/solid";
-import { BellAlertIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import Uploady from "@rpldy/uploady";
 import { useEffect, useState } from "react";
 
@@ -27,8 +26,8 @@ export const JsonUpload = ({
   setJsonBeingUploaded: (json: any) => void;
   setIsJsonUploadInProgress: (isInProgress: boolean) => void;
 }) => {
-  const [isInProgress, setIsInProgress] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isInProgress, setIsInProgress] = useState(false);
   const [isSuccessful, setIsSuccessful] = useState<boolean | null>(null);
 
   useEffect(() => {
