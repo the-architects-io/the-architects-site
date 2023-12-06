@@ -54,6 +54,8 @@ export default function CreateCollectionPage({
   const [collectionImage, setCollectionImage] = useState<File | null>(null);
   const [creators, setCreators] = useState<Creator[] | null>(null);
   const [jsonBeingUploaded, setJsonBeingUploaded] = useState<any | null>(null);
+  const [isJsonMetadataUploadInProgress, setIsJsonMetadataUploadInProgress] =
+    useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -375,7 +377,7 @@ export default function CreateCollectionPage({
             </>
           </div>
           <div className="border border-gray-600 rounded-lg px-4 w-full min-h-[28vh] mb-4 flex flex-col items-center justify-center">
-            {!!collectionMetadataStats ? (
+            {!!collectionMetadataStats && !isJsonMetadataUploadInProgress ? (
               <div className="flex flex-col items-center">
                 <p className="text-gray-100 text-lg mb-4">
                   {collectionMetadataStats.count} NFTs
@@ -395,6 +397,7 @@ export default function CreateCollectionPage({
               </div>
             ) : (
               <JsonUpload
+                setIsJsonUploadInProgress={setIsJsonMetadataUploadInProgress}
                 setJsonBeingUploaded={setJsonBeingUploaded}
                 setJsonUploadResponse={handleMetadataJsonUploadComplete}
                 driveAddress={ASSET_SHDW_DRIVE_ADDRESS}

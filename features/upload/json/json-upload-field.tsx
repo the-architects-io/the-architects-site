@@ -1,39 +1,52 @@
 import { BlueprintApiActions } from "@/app/blueprint/types";
 import UploadButton from "@rpldy/upload-button";
-import { useBatchAddListener, useUploady } from "@rpldy/uploady";
-import { useEffect } from "react";
+import {
+  Batch,
+  useBatchAddListener,
+  useBatchFinalizeListener,
+  useBatchFinishListener,
+  useUploady,
+} from "@rpldy/uploady";
+import { useEffect, useState } from "react";
 
 export const JsonUploadField = ({
   driveAddress,
   children,
   setJsonBeingUploaded,
+  setIsInProgress,
+  setProgress,
 }: {
   driveAddress: string;
   children: string | JSX.Element | JSX.Element[];
   setJsonBeingUploaded: (json: any) => void;
+  setIsInProgress: (isInProgress: boolean) => void;
+  setProgress: (progress: number) => void;
 }) => {
   const uploady = useUploady();
 
-  useBatchAddListener((batch) => {
-    const fileLike = batch.items[0].file;
-    if (fileLike instanceof Blob) {
-      const reader = new FileReader();
-      reader.readAsText(fileLike);
-      reader.onload = () => {
-        try {
-          const fileContentAsJson = JSON.parse(reader.result as string);
-          setJsonBeingUploaded(fileContentAsJson);
-          debugger;
-        } catch (error) {
-          console.error("Error parsing JSON:", error);
-        }
-      };
-    }
+  const [batch, setBatch] = useState<Batch | null>(null);
+
+  useBatchAddListener((batch: Batch) => {
+    setBatch(batch);
+    console.log("batch add", batch);
+    setIsInProgress(true);
   });
+
+  useBatchFinishListener((batch: Batch) => {
+    console.log("batch finish", batch);
+    setIsInProgress(false);
+  });
+
+  useEffect(() => {
+    if (!batch?.completed) return;
+
+    if (batch?.completed > 0) {
+      setProgress(Math.round((batch.completed / batch.total) * 100));
+    }
+  }, [batch?.completed, batch?.total, setProgress]);
 
   return (
     <UploadButton
-      className="underline"
       params={{
         action: BlueprintApiActions.UPLOAD_JSON,
         driveAddress,

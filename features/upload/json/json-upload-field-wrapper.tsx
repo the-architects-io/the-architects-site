@@ -19,7 +19,6 @@ export const JsonUploadWrapper = ({
 }) => {
   return (
     <Uploady
-      accept=".json"
       destination={{
         url: `${BASE_URL}/api/blueprint`,
         params: {

@@ -85,12 +85,12 @@ export async function POST(req: NextRequest) {
 
     const fileToDelete = `${SHDW_DRIVE_BASE_URL}/${driveAddress}/${fileName}`;
 
-    // const { message: deleteMessage } = await drive.deleteFile(
-    //   new PublicKey(driveAddress),
-    //   fileToDelete
-    // );
+    const { message: deleteMessage } = await drive.deleteFile(
+      new PublicKey(driveAddress),
+      fileToDelete
+    );
 
-    // console.log("deleteMessage", deleteMessage);
+    console.log("deleteMessage", deleteMessage);
 
     const { message, finalized_locations, upload_errors } =
       await drive.uploadFile(new PublicKey(driveAddress), {
