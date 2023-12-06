@@ -15,10 +15,12 @@ export const MultiImageUpload = ({
   driveAddress,
   children,
   onUploadComplete,
+  prefix,
 }: {
   driveAddress: string;
   children?: string | JSX.Element | JSX.Element[];
   onUploadComplete?: (response: UploadFilesResponse) => void;
+  prefix?: string;
 }) => {
   const [progress, setProgress] = useState(0);
   const [isInProgress, setIsInProgress] = useState(false);
@@ -32,6 +34,7 @@ export const MultiImageUpload = ({
         params: {
           action: BlueprintApiActions.UPLOAD_FILES,
           overwrite: true,
+          prefix: prefix?.length ? `${prefix}-` : "",
           driveAddress,
         },
       }}
@@ -52,12 +55,11 @@ export const MultiImageUpload = ({
         driveAddress={driveAddress}
         setIsInProgress={setIsInProgress}
         setProgress={setProgress}
+        prefix={prefix}
       >
         {isInProgress ? (
           <div className="flex flex-col w-full h-full justify-center items-center text-lg">
-            {progress > 0 && (
-              <div className="text-lg font-bold">{progress}%</div>
-            )}
+            <div className="text-gray-200 mb-4">Processing</div>
             <Spinner />
           </div>
         ) : (

@@ -13,11 +13,13 @@ export const MultiImageUploadField = ({
   children,
   setIsInProgress,
   setProgress,
+  prefix,
 }: {
   driveAddress: string;
   children: string | JSX.Element | JSX.Element[];
   setIsInProgress: (isInProgress: boolean) => void;
   setProgress: (progress: number) => void;
+  prefix?: string;
 }) => {
   const uploady = useUploady();
 
@@ -49,6 +51,7 @@ export const MultiImageUploadField = ({
           action: BlueprintApiActions.UPLOAD_FILES,
           driveAddress,
           overwrite: true,
+          prefix: prefix?.length ? `${prefix}-` : "",
         }}
       >
         {!!children ? children : "Add Images"}

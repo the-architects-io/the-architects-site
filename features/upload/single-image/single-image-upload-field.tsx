@@ -1,10 +1,21 @@
-import { XCircleIcon } from "@heroicons/react/24/outline";
+import Spinner from "@/features/UI/spinner";
+import { PreviewComponent } from "@/features/upload/single-image/preview-component";
+import {
+  CheckBadgeIcon,
+  XCircleIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/solid";
 import UploadButton from "@rpldy/upload-button";
 import UploadPreview, {
   PreviewItem,
   PreviewMethods,
 } from "@rpldy/upload-preview";
-import Uploady, { useUploady } from "@rpldy/uploady";
+import Uploady, {
+  Batch,
+  useBatchAddListener,
+  useBatchFinishListener,
+  useUploady,
+} from "@rpldy/uploady";
 import Image from "next/image";
 import { useRef, useState } from "react";
 
@@ -12,16 +23,33 @@ export const SingleImageUploadField = ({
   driveAddress,
   fileName,
   children,
+  isInProgress,
+  setIsInProgress,
 }: {
   driveAddress: string;
   fileName: string;
   children: string | JSX.Element | JSX.Element[];
+  isInProgress: boolean;
+  setIsInProgress: (isInProgress: boolean) => void;
 }) => {
   const uploady = useUploady();
 
   const imagePreviewMethodsRef = useRef<PreviewMethods>(null);
   const [selectedCollectionImagePreview, setSelectedCollectionImagePreview] =
     useState<PreviewItem | null>(null);
+
+  const [batch, setBatch] = useState<Batch | null>(null);
+  const [isSuccessful, setIsSuccessful] = useState<boolean | null>(null);
+
+  useBatchAddListener((batch: Batch) => {
+    setBatch(batch);
+    setIsInProgress(true);
+  });
+
+  useBatchFinishListener((batch: Batch) => {
+    setIsInProgress(false);
+    setIsSuccessful(batch.completed === 100);
+  });
 
   return (
     <div className="pb-8 flex flex-col items-center w-full">
@@ -32,15 +60,12 @@ export const SingleImageUploadField = ({
           setSelectedCollectionImagePreview(previews[0]);
         }}
         PreviewComponent={({ url }: { url: string }) => (
-          <div className="relative border border-gray-600 p-2 rounded-lg mb-2">
-            <Image src={url} alt="Collection Image" width={500} height={500} />
-            <button
-              onClick={() => imagePreviewMethodsRef.current?.clear()}
-              className="absolute -mt-4 -mr-4 top-0 right-0"
-            >
-              <XCircleIcon className="h-10 w-10 text-gray-100 bg-black rounded-full" />
-            </button>
-          </div>
+          <PreviewComponent
+            url={url}
+            clearPreview={() => imagePreviewMethodsRef.current?.clear()}
+            isInProgress={isInProgress}
+            isSuccessful={isSuccessful}
+          />
         )}
       />
 

@@ -1,5 +1,8 @@
+import Spinner from "@/features/UI/spinner";
 import { SingleImageUploadField } from "@/features/upload/single-image/single-image-upload-field";
 import { SingleImageUploadFieldWrapper } from "@/features/upload/single-image/single-image-upload-field-wrapper";
+import { CheckBadgeIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
 
 export const SingleImageUpload = ({
   fileName,
@@ -12,6 +15,9 @@ export const SingleImageUpload = ({
   children?: string | JSX.Element | JSX.Element[];
   setImage?: (response: any) => void;
 }) => {
+  const [isInProgress, setIsInProgress] = useState(false);
+  const [isSuccessful, setIsSuccessful] = useState<boolean | null>(null);
+
   return (
     <SingleImageUploadFieldWrapper
       autoUpload={true}
@@ -19,7 +25,12 @@ export const SingleImageUpload = ({
       driveAddress={driveAddress}
       setImage={setImage}
     >
-      <SingleImageUploadField driveAddress={driveAddress} fileName={fileName}>
+      <SingleImageUploadField
+        isInProgress={isInProgress}
+        driveAddress={driveAddress}
+        fileName={fileName}
+        setIsInProgress={setIsInProgress}
+      >
         {!!children ? children : "Add Image"}
       </SingleImageUploadField>
     </SingleImageUploadFieldWrapper>

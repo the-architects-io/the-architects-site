@@ -62,6 +62,7 @@ export const JsonUpload = ({
         >
           {isInProgress ? (
             <div className="flex flex-col w-full h-full justify-center items-center text-lg">
+              <div className="text-gray-200 mb-4">Processing</div>
               <Spinner />
             </div>
           ) : (

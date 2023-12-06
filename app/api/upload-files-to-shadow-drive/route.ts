@@ -42,11 +42,13 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  const prefix = formData.get("prefix") as string;
+
   for (let i = 0; i < amountOfFiles; i++) {
     const file = formData.get(`file[${i}]`) as unknown as File;
     const fileBuffer = Buffer.from(await file.arrayBuffer());
     const shadowFile = {
-      name: file.name,
+      name: prefix?.length ? `${prefix}${file.name}` : file.name,
       file: fileBuffer,
     };
     formDataFiles.push(shadowFile);
@@ -55,6 +57,8 @@ export async function POST(req: NextRequest) {
   const driveAddress = formData.get("driveAddress") as string;
   const overwriteString = formData.get("overwrite") as string;
   const overwrite = !!overwriteString;
+
+  console.log({ overwrite });
 
   if (!formDataFiles || !driveAddress) {
     return NextResponse.json(null, { status: 400 });
@@ -72,11 +76,31 @@ export async function POST(req: NextRequest) {
     const drive = await new ShdwDrive(connection, wallet).init();
 
     if (overwrite) {
-      for (const file of formDataFiles) {
-        await drive.deleteFile(
+      const { keys } = await drive.listObjects(new PublicKey(driveAddress));
+      const fileNames = formDataFiles.map((f) => f.name?.replace(prefix, ""));
+
+      const filesToDelete = keys.filter((key) => {
+        return fileNames.find((name) => {
+          if (prefix?.length) {
+            return name === key.replace(prefix, "");
+          }
+          return name === key;
+        });
+      });
+      console.log({
+        keys,
+        filesToDelete,
+        formDataFiles: formDataFiles.map((f) => f.name),
+        prefix,
+      });
+
+      for (const file of filesToDelete) {
+        const res = await drive.deleteFile(
           new PublicKey(driveAddress),
-          `${SHDW_DRIVE_BASE_URL}/${driveAddress}/${file.name}`
+          `${SHDW_DRIVE_BASE_URL}/${driveAddress}/${file}`
         );
+
+        console.log({ res });
       }
     }
 

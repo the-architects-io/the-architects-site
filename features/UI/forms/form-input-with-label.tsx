@@ -21,7 +21,11 @@ export const FormInputWithLabel = ({
         type={props.type || "text"}
         name={props.name}
         placeholder={props.placeholder}
-        onChange={onChange}
+        onChange={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onChange?.(e);
+        }}
         value={value}
         {...props}
       />

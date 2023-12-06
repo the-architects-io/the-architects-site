@@ -41,6 +41,7 @@ import { PlusIcon, TrashIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { isValidPublicKey } from "@/utils/rpc";
 import axios from "axios";
+import classNames from "classnames";
 
 export default function CreateCollectionPage({
   params,
@@ -219,6 +220,17 @@ export default function CreateCollectionPage({
     []
   );
 
+  const creatorsAreValid = (creators: Creator[]) => {
+    const shareCount = creators.reduce((acc, curr) => acc + curr.share, 0);
+    const sharesEqual100 = shareCount === 100;
+
+    return (
+      creators.every((c) => !!c.address && isValidPublicKey(c.address)) &&
+      creators.every((c) => c.share) &&
+      sharesEqual100
+    );
+  };
+
   useEffect(() => {
     if (!params?.id || !isUuid(params?.id)) {
       router.push("/me/collection");
@@ -277,7 +289,7 @@ export default function CreateCollectionPage({
 
   return (
     <ContentWrapper>
-      <div className="w-full flex">
+      <div className="w-full flex mb-24">
         <div className="flex flex-col items-center mb-16 w-full md:w-[500px]">
           <SingleImageUpload
             fileName={`${collectionId}-collection.png}`}
@@ -320,7 +332,14 @@ export default function CreateCollectionPage({
           </div>
         </div>
         <div className="flex flex-col items-center w-full px-8">
-          <div className="border border-gray-600 rounded-lg px-4 w-full mb-4 flex flex-col items-center justify-center p-8">
+          <div
+            className={classNames([
+              "border rounded-lg px-4 w-full mb-4 flex flex-col items-center justify-center p-8",
+              creatorsAreValid(formik.values.creators)
+                ? "border-green-500 bg-green-500 bg-opacity-10"
+                : "border-gray-600",
+            ])}
+          >
             <div className="text-lg mb-4">Creators</div>
             <>
               <DndProvider backend={HTML5Backend}>
@@ -398,7 +417,15 @@ export default function CreateCollectionPage({
               </PrimaryButton>
             </>
           </div>
-          <div className="border border-gray-600 rounded-lg px-4 w-full min-h-[28vh] mb-4 flex flex-col items-center justify-center">
+          <div
+            className={classNames([
+              "border rounded-lg px-4 w-full mb-4 flex flex-col items-center justify-center p-8 min-h-[28vh]",
+              !!collectionMetadataStats &&
+              !!collectionMetadatasJsonUploadResponse
+                ? "border-green-500 bg-green-500 bg-opacity-10"
+                : "border-gray-600",
+            ])}
+          >
             {!!collectionMetadataStats &&
             !!collectionMetadatasJsonUploadResponse ? (
               <div className="flex flex-col items-center">
@@ -427,7 +454,14 @@ export default function CreateCollectionPage({
               </JsonUpload>
             )}
           </div>
-          <div className="border border-gray-600 rounded-lg px-4 w-full min-h-[28vh] mb-4 flex flex-col items-center justify-center">
+          <div
+            className={classNames([
+              "border rounded-lg px-4 w-full mb-4 flex flex-col items-center justify-center p-8 min-h-[28vh]",
+              !!collectionImagesUploadCount
+                ? "border-green-500 bg-green-500 bg-opacity-10"
+                : "border-gray-600",
+            ])}
+          >
             {!!collectionImagesUploadCount ? (
               <div className="flex flex-col items-center">
                 <div className="text-green-500 flex items-center gap-x-2 mb-4">
@@ -442,11 +476,34 @@ export default function CreateCollectionPage({
               <MultiImageUpload
                 driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
                 onUploadComplete={handleCollectionImagesCompleted}
+                prefix={collectionId || ""}
               >
                 Add Collection Images
               </MultiImageUpload>
             )}
           </div>
+        </div>
+      </div>
+      <div className="flex bottom-0 left-0 right-0 fixed w-full justify-center items-center">
+        <div className="bg-gray-900 w-full p-8 py-4">
+          <PrimaryButton
+            className="w-full"
+            disabled={
+              !(
+                !!formik.values.collectionName &&
+                !!formik.values.symbol &&
+                !!formik.values.description &&
+                !!formik.values.sellerFeeBasisPoints &&
+                !!collectionImage &&
+                creatorsAreValid(formik.values.creators) &&
+                !!collectionMetadataStats &&
+                !!collectionMetadatasJsonUploadResponse &&
+                !!collectionImagesUploadCount
+              )
+            }
+          >
+            Save Premint Collection
+          </PrimaryButton>
         </div>
       </div>
     </ContentWrapper>
