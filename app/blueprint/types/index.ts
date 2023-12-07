@@ -664,6 +664,8 @@ export type Collection = {
   unmintedMetadatas: UnmintedMetadata[];
   nft: Token;
   creators: Creator[];
+  isReadyToMint: boolean;
+  driveAddress: string;
 };
 
 export type CreateCollectionResponse = BaseBlueprintResponse & {
@@ -689,6 +691,38 @@ export type UpdateCollectionInput = {
   creators: Creator[];
   driveAddress: string;
   isReadyToMint: boolean;
+};
+
+export type TokenMetadata = {
+  name: string;
+  symbol: string;
+  description: string;
+  seller_fee_basis_points: number;
+  image: string;
+  animation_url?: string;
+  external_url: string;
+  edition: number;
+  collection: {
+    name: string;
+    family?: string;
+  };
+  attributes: {
+    trait_type: string;
+    value: string;
+  }[];
+  properties: {
+    files: {
+      uri: string;
+      type: string;
+      cdn?: string;
+    }[];
+    category: string;
+    creators: {
+      address: string;
+      share: number;
+    }[];
+  };
+  index?: number; // sort order in original metadata JSON file
 };
 
 export enum BlueprintApiActions {

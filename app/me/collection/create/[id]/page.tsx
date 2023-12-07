@@ -327,7 +327,7 @@ export default function CreateCollectionPage({
       <div className="w-full flex mb-24">
         <div className="flex flex-col items-center mb-16 w-full md:w-[500px]">
           <SingleImageUpload
-            fileName={`${collectionId}-collection.png}`}
+            fileName={`${collectionId}-collection.png`}
             driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
             setImage={setCollectionImage}
           >

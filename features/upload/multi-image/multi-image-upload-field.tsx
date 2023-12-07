@@ -47,6 +47,7 @@ export const MultiImageUploadField = ({
     <>
       <UploadButton
         grouped={true}
+        maxGroupSize={10000}
         params={{
           action: BlueprintApiActions.UPLOAD_FILES,
           driveAddress,

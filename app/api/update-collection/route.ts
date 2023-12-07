@@ -26,6 +26,8 @@ export async function POST(req: NextRequest) {
 
   // todo: NEED TO BE ABLE TO CREATE NEW DRIVE FOR COLLECTION
 
+  console.log({ creators });
+
   if (creators.length > 1) {
     let addedCreators;
     try {

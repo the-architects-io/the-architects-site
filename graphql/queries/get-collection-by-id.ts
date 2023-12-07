@@ -4,32 +4,26 @@ export const GET_COLLECTION_BY_ID = gql`
   query GET_COLLECTION_BY_ID($id: uuid!) {
     collections_by_pk(id: $id) {
       id
+      creators {
+        id
+        wallet {
+          address
+        }
+      }
       createdAt
-      updatedAt
+      family
+      driveAddress
+      description
+      hasBeenMinted
+      imageUrl
+      isReadyToMint
+      name
       owner {
         id
       }
-      name
-      community {
-        id
-      }
-      imageUrl
-      family
-      hasBeenMinted
+      sellerFeeBasisPoints
       symbol
-      description
-      isComplete
-      unmintedMetadatas {
-        id
-      }
-      nft {
-        id
-      }
-      creators {
-        id
-
-        share
-      }
+      updatedAt
     }
   }
 `;
