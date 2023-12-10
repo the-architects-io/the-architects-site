@@ -57,7 +57,7 @@ export const CollectionPreview = ({
                 >
                   <div className="flex flex-col items-center justify-center flex-shrink-0 p-4">
                     <Image
-                      src={`${SHDW_DRIVE_BASE_URL}/${collection.driveAddress}/${collection.id}-${token.index}.png`}
+                      src={`${SHDW_DRIVE_BASE_URL}/${collection.driveAddress}/${token.index}.png`}
                       alt="token image"
                       className="w-40 h-40 rounded-lg"
                       width={160}

@@ -44,14 +44,23 @@ export async function POST(req: NextRequest) {
 
   const prefix = formData.get("prefix") as string;
 
-  for (let i = 0; i < amountOfFiles; i++) {
-    const file = formData.get(`file[${i}]`) as unknown as File;
-    const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const shadowFile = {
-      name: prefix?.length ? `${prefix}${file.name}` : file.name,
-      file: fileBuffer,
-    };
-    formDataFiles.push(shadowFile);
+  const singleFile = formData.get("file") as unknown as File | null;
+
+  if (singleFile) {
+    formDataFiles.push({
+      name: prefix?.length ? `${prefix}${singleFile.name}` : singleFile.name,
+      file: Buffer.from(await singleFile.arrayBuffer()),
+    });
+  } else {
+    for (let i = 0; i < amountOfFiles; i++) {
+      const file = formData.get(`file[${i}]`) as unknown as File;
+      const fileBuffer = Buffer.from(await file.arrayBuffer());
+      const shadowFile = {
+        name: prefix?.length ? `${prefix}${file.name}` : file.name,
+        file: fileBuffer,
+      };
+      formDataFiles.push(shadowFile);
+    }
   }
 
   const driveAddress = formData.get("driveAddress") as string;
