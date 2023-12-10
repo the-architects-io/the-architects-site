@@ -101,7 +101,8 @@ export default function CreateCollectionPage({
         !creators ||
         !collectionMetadataStats ||
         !collectionMetadatasJsonUploadResponse ||
-        !collectionImagesUploadCount
+        !collectionImagesUploadCount ||
+        !collectionDriveAddress
       ) {
         showToast({
           primaryMessage: "Collection Upload Failed",
@@ -123,7 +124,7 @@ export default function CreateCollectionPage({
         description,
         sellerFeeBasisPoints,
         creators,
-        driveAddress: ASSET_SHDW_DRIVE_ADDRESS,
+        driveAddress: collectionDriveAddress,
         isReadyToMint: true,
       });
 

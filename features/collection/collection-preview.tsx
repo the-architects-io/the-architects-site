@@ -19,9 +19,9 @@ export const CollectionPreview = ({
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [tokensPerPage, setTokensPerPage] = useState<number>(20);
 
-  const createPrevieTokens = useCallback(async () => {
+  const createPreviewTokens = useCallback(async () => {
     const { data } = await axios.get(
-      `${SHDW_DRIVE_BASE_URL}/${collection.driveAddress}/${collection.id}-collection-metadatas.json`
+      `${SHDW_DRIVE_BASE_URL}/${collection.driveAddress}/collection-metadatas.json`
     );
 
     const collectionTokens: TokenMetadata[] = data;
@@ -31,13 +31,13 @@ export const CollectionPreview = ({
         index,
       }))
     );
-  }, [collection.driveAddress, collection.id]);
+  }, [collection.driveAddress]);
 
   useEffect(() => {
     if (!collection) return;
 
-    createPrevieTokens();
-  }, [collection, createPrevieTokens]);
+    createPreviewTokens();
+  }, [collection, createPreviewTokens]);
 
   return (
     <div className="w-full h-full">
