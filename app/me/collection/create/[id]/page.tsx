@@ -425,7 +425,7 @@ export default function CreateCollectionPage({
         <div className="flex flex-col items-center mb-16 w-full md:w-[500px]">
           {!!collectionDriveAddress ? (
             <SingleImageUpload
-              fileName={`${collectionId}-collection.png`}
+              fileName={`collection.png`}
               driveAddress={collectionDriveAddress}
               setImage={setCollectionImage}
             >
@@ -640,7 +640,6 @@ export default function CreateCollectionPage({
                   <MultiImageUpload
                     driveAddress={collectionDriveAddress}
                     onUploadComplete={handleCollectionImagesCompleted}
-                    prefix={collectionId || ""}
                   >
                     Add Collection Images
                   </MultiImageUpload>

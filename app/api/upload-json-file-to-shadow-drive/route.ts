@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
 
     const buffer = Buffer.from(json);
 
+    let editedFileUrl;
     if (overwrite) {
       const { keys } = await drive.listObjects(new PublicKey(driveAddress));
 
@@ -93,11 +94,15 @@ export async function POST(req: NextRequest) {
       console.log("fileExists", fileExists);
 
       if (fileExists) {
-        const { message: deleteMessage } = await drive.deleteFile(
+        const { finalized_location } = await drive.editFile(
           new PublicKey(driveAddress),
-          `${SHDW_DRIVE_BASE_URL}/${driveAddress}/${fileName}`
+          `${SHDW_DRIVE_BASE_URL}/${driveAddress}/${fileName}`,
+          {
+            name: fileName,
+            file: buffer,
+          }
         );
-        console.log("deleteMessage", deleteMessage);
+        editedFileUrl = finalized_location;
       }
     }
 
@@ -121,7 +126,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        url: finalized_locations[0],
+        url: editedFileUrl || finalized_locations[0],
         message,
         count,
       },
