@@ -10,10 +10,13 @@ import { NextResponse, type NextRequest } from "next/server";
 const {
   ADD_AIRDROP_RECIPIENTS,
   CREATE_COLLECTION,
+  CREATE_DRIVE,
   CREATE_DISENSER,
   CREATE_TREE,
   DISPENSE_TOKENS,
   CREATE_AIRDROP,
+  GET_DRIVE,
+  GET_DRIVES,
   MINT_CNFT,
   MINT_NFT,
   UPDATE_COLLECTION,
@@ -26,9 +29,12 @@ const BlueprintApiActionUrls = {
   [ADD_AIRDROP_RECIPIENTS]: `${BASE_URL}/api/add-airdrop-recipients`,
   [CREATE_AIRDROP]: `${BASE_URL}/api/add-airdrop`,
   [CREATE_COLLECTION]: `${BASE_URL}/api/add-collection`,
+  [CREATE_DRIVE]: `${BASE_URL}/api/create-drive`,
   [CREATE_DISENSER]: `${BASE_URL}/api/add-dispenser`,
   [CREATE_TREE]: `${BASE_URL}/api/create-tree`,
   [DISPENSE_TOKENS]: `${BASE_URL}/api/dispense-tokens`,
+  [GET_DRIVE]: `${BASE_URL}/api/get-drive`,
+  [GET_DRIVES]: `${BASE_URL}/api/get-drives`,
   [MINT_CNFT]: `${BASE_URL}/api/mint-cnft`,
   [MINT_NFT]: `${BASE_URL}/api/mint-nft`,
   [UPDATE_COLLECTION]: `${BASE_URL}/api/update-collection`,
@@ -375,7 +381,10 @@ export async function POST(req: NextRequest) {
   switch (action) {
     case BlueprintApiActions.CREATE_AIRDROP:
     case BlueprintApiActions.CREATE_COLLECTION:
+    case BlueprintApiActions.CREATE_DRIVE:
     case BlueprintApiActions.CREATE_TREE:
+    case BlueprintApiActions.GET_DRIVE:
+    case BlueprintApiActions.GET_DRIVES:
     case BlueprintApiActions.MINT_CNFT:
     case BlueprintApiActions.MINT_NFT:
     case BlueprintApiActions.UPDATE_COLLECTION:

@@ -1,7 +1,7 @@
 import { Community } from "@/features/admin/communities/communities-list-item";
 import { RpcConfirmTransactionResult } from "@metaplex-foundation/umi";
 import { User } from "@nhost/nextjs";
-import { ShadowFile } from "@shadow-drive/sdk";
+import { ShadowFile, StorageAccount } from "@shadow-drive/sdk";
 
 export type ErrorResponse = {
   success: boolean;
@@ -181,6 +181,7 @@ export type NoopResponse = {
 export type Wallet = {
   address: string;
   id: string;
+  user?: User;
 };
 
 export enum TokenClaimPayoutStrategies {
@@ -725,13 +726,77 @@ export type TokenMetadata = {
   index?: number; // sort order in original metadata JSON file
 };
 
+export type CreateDriveInput = {
+  name: string;
+  sizeInKb: number;
+  ownerAddress: string;
+};
+
+export type CreateDriveResponse = BaseBlueprintResponse & {
+  address: string;
+  transaction: string;
+};
+
+export type GetDriveInput = {
+  address: string;
+  ownerAddress: string;
+};
+
+export type GetDrivesInput = {
+  ownerAddress: string;
+};
+
+export type DriveAccount = {
+  address: string;
+  name: string;
+  immutable: boolean;
+  toBeDeleted: boolean;
+  deleteRequestEpoch: number;
+  storage: string;
+  owner1: string;
+  accountCounterSeed: number;
+  creationTime: number;
+  createdAtString: string;
+  creationEpoch: number;
+  lastFeeEpoch: number;
+};
+
+export type Drive = {
+  account: DriveAccount;
+  address: string;
+  files: string[];
+  storage: {
+    total: string;
+    used: string;
+    free: string;
+    percentUsed: number;
+    percentFree: number;
+    bytes: {
+      total: number;
+      used: number;
+      free: number;
+    };
+  };
+};
+
+export type GetDriveResponse = BaseBlueprintResponse & {
+  drive: Drive;
+};
+
+export type GetDrivesResponse = BaseBlueprintResponse & {
+  drives: DriveAccount[];
+};
+
 export enum BlueprintApiActions {
   ADD_AIRDROP_RECIPIENTS = "ADD_AIRDROP_RECIPIENTS",
-  CREATE_COLLECTION = "CREATE_COLLECTION",
   CREATE_AIRDROP = "CREATE_AIRDROP",
+  CREATE_COLLECTION = "CREATE_COLLECTION",
+  CREATE_DRIVE = "CREATE_DRIVE",
   CREATE_DISENSER = "CREATE_DISENSER",
   CREATE_TREE = "CREATE_TREE",
   DISPENSE_TOKENS = "DISPENSE_TOKENS",
+  GET_DRIVE = "GET_DRIVE",
+  GET_DRIVES = "GET_DRIVES",
   MINT_CNFT = "MINT_CNFT",
   MINT_NFT = "MINT_NFT",
   UPDATE_COLLECTION = "UPDATE_COLLECTION",

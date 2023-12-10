@@ -74,7 +74,7 @@ export default function DrivePage() {
                   <div className="flex flex-col flex-1 h-full space-x-4 p-4">
                     <div className="flex flex-col items-center justify-center overflow-x-hidden ">
                       <Link
-                        href={`${BASE_URL}/drive/${publicKey?.toString()}`}
+                        href={`${BASE_URL}/me/drive/${publicKey?.toString()}`}
                         className="text-center hover:text-sky-200"
                       >
                         <FolderIcon className="w-16 h-16 mb-3 mt-2 mx-auto" />
@@ -101,7 +101,7 @@ export default function DrivePage() {
         )}
       </ContentWrapper>
       <div className="absolute bottom-6 right-6">
-        <Link href={`${BASE_URL}/drive/create`}>
+        <Link href={`${BASE_URL}/me/drive/create`}>
           <PlusCircleIcon className="w-16 h-16 text-sky-200 hover:text-sky-300 cursor-pointer" />
         </Link>
       </div>

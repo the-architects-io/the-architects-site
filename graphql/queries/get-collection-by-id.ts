@@ -6,8 +6,15 @@ export const GET_COLLECTION_BY_ID = gql`
       id
       creators {
         id
+        share
+        sortOrder
         wallet {
+          id
           address
+          user {
+            id
+            displayName
+          }
         }
       }
       createdAt

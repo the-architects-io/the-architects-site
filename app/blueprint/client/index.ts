@@ -6,8 +6,14 @@ import {
   CreateAirdropResponse,
   CreateCollectionInput,
   CreateCollectionResponse,
+  CreateDriveInput,
+  CreateDriveResponse,
   CreateTreeInput,
   CreateTreeResponse,
+  GetDriveInput,
+  GetDriveResponse,
+  GetDrivesInput,
+  GetDrivesResponse,
   MintCnftInput,
   MintCnftResponse,
   MintNftInput,
@@ -106,6 +112,18 @@ const addAirdropRecipients = async (
   return data;
 };
 
+const createDrive = async (
+  options: BlueprintClientOptions,
+  params: CreateDriveInput
+): Promise<CreateDriveResponse> => {
+  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, {
+    action: BlueprintApiActions.CREATE_DRIVE,
+    params,
+  });
+
+  return data;
+};
+
 const createTree = async (
   options: BlueprintClientOptions,
   params: CreateTreeInput
@@ -122,6 +140,38 @@ const createTree = async (
   });
 
   const data = await response.json();
+  return data;
+};
+
+const getDrive = async (
+  options: BlueprintClientOptions,
+  params: GetDriveInput
+): Promise<GetDriveResponse> => {
+  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, {
+    action: BlueprintApiActions.GET_DRIVE,
+    params,
+  });
+
+  return data;
+};
+
+const getDrives = async (
+  options: BlueprintClientOptions,
+  params: GetDrivesInput
+): Promise<GetDrivesResponse> => {
+  const { ownerAddress } = params;
+
+  if (!ownerAddress) {
+    throw new Error("Missing required parameters");
+  }
+
+  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, {
+    action: BlueprintApiActions.GET_DRIVES,
+    params: {
+      ownerAddress,
+    },
+  });
+
   return data;
 };
 
@@ -276,7 +326,10 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
       createCollection(options, params),
     createAirdrop: (params: CreateAirdropInput) =>
       createAirdrop(options, params),
+    createDrive: (params: CreateDriveInput) => createDrive(options, params),
     createTree: (params: CreateTreeInput) => createTree(options, params),
+    getDrive: (params: GetDriveInput) => getDrive(options, params),
+    getDrives: (params: GetDrivesInput) => getDrives(options, params),
     mintCnft: (params: MintCnftInput) => mintCnft(options, params),
     mintNft: (params: MintNftInput) => mintNft(options, params),
     updateCollection: (params: UpdateCollectionInput) =>

@@ -1,4 +1,4 @@
-"user client";
+"use client";
 import DriveTest from "@/features/drive/drive-test";
 
 export default function DriveTestPage() {

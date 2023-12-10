@@ -67,7 +67,7 @@ export default function DriveInstancePage({
   return (
     <ContentWrapper className="flex flex-col items-center pt-32 w-full">
       <div className="-mt-8 mb-8 ml-10 self-start uppercase">
-        <Link href={`${BASE_URL}/drive`} className="flex items-center">
+        <Link href={`${BASE_URL}/me/drive`} className="flex items-center">
           <ArrowLeft className="mr-2 h-6 w-6" />
           <div>Back to drives</div>
         </Link>

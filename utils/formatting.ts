@@ -5,6 +5,7 @@ export const getAbbreviatedAddress = (
   address: string | PublicKey,
   identifierLength: number = 4
 ) => {
+  if (!address) return "";
   // check if it's a solana public key
   if (typeof address !== "string") {
     address = address.toString();
@@ -35,4 +36,41 @@ export const getSlug = (string: string) => {
 
 export const makeNumberArray = (amountOfItems: number) => {
   return Array.from({ length: amountOfItems }, (_, index) => index + 1);
+};
+
+export const convertBytesToKilobytes = (bytes: number) => {
+  return bytes / 1024;
+};
+
+export const convertBytesToMegabytes = (bytes: number) => {
+  return convertBytesToKilobytes(bytes) / 1024;
+};
+
+export const convertBytesToGigabytes = (bytes: number) => {
+  return convertBytesToMegabytes(bytes) / 1024;
+};
+
+export const convertBytesToTerabytes = (bytes: number) => {
+  return convertBytesToGigabytes(bytes) / 1024;
+};
+
+export const convertBytesToPetabytes = (bytes: number) => {
+  return convertBytesToTerabytes(bytes) / 1024;
+};
+
+export const getBestFittingStorageSizeString = (storageInBytes: number) => {
+  const storageInKb = storageInBytes / 1024;
+  const storageInMb = storageInKb / 1024;
+  const storageInGb = storageInMb / 1024;
+  const storageInTb = storageInGb / 1024;
+
+  return storageInTb > 1
+    ? `${storageInTb.toFixed(2)}TB`
+    : storageInGb > 1
+    ? `${storageInGb.toFixed(2)}GB`
+    : storageInMb > 1
+    ? `${storageInMb.toFixed(2)}MB`
+    : storageInKb > 1
+    ? `${storageInKb.toFixed(2)}KB`
+    : `${storageInBytes}B`;
 };

@@ -1,5 +1,8 @@
 "use client";
-import { ASSET_SHDW_DRIVE_ADDRESS } from "@/constants/constants";
+import {
+  ASSET_SHDW_DRIVE_ADDRESS,
+  EXECUTION_WALLET_ADDRESS,
+} from "@/constants/constants";
 import WalletButton from "@/features/UI/buttons/wallet-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -37,12 +40,14 @@ import Spinner from "@/features/UI/spinner";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { PlusIcon, TrashIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { isValidPublicKey } from "@/utils/rpc";
+import { getRpcEndpoint, isValidPublicKey } from "@/utils/rpc";
 import axios from "axios";
 import classNames from "classnames";
 import { CreateCollectionFormChecklist } from "@/features/collection/create-collection-form-checklist";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { SingleImageUploadResponse } from "@/features/upload/single-image/single-image-upload-field-wrapper";
+import { Connection } from "@solana/web3.js";
+import { ShdwDrive } from "@shadow-drive/sdk";
 
 export default function CreateCollectionPage({
   params,
@@ -68,6 +73,10 @@ export default function CreateCollectionPage({
   const [collectionImagesUploadCount, setCollectionImagesUploadCount] =
     useState<number | null>(null);
   const [isSavingCollection, setIsSavingCollection] = useState(false);
+  const [drive, setDrive] = useState<ShdwDrive | null>(null);
+  const [collectionDriveAddress, setCollectionDriveAddress] = useState<
+    string | null
+  >(null);
 
   const formik = useFormik({
     initialValues: {
@@ -120,7 +129,7 @@ export default function CreateCollectionPage({
 
       if (!success) {
         showToast({
-          primaryMessage: "Collection saved",
+          primaryMessage: "Saving collection failed",
         });
         return;
       }
@@ -266,6 +275,35 @@ export default function CreateCollectionPage({
     []
   );
 
+  const createShdwDriveClient = useCallback(async () => {
+    const connection = new Connection(getRpcEndpoint(), "confirmed");
+    const drive = await new ShdwDrive(connection, wallet).init();
+    return drive;
+  }, [wallet]);
+
+  const getOrCreateDrive = useCallback(
+    async (collectionId: string) => {
+      if (!drive) {
+        await setDrive(await createShdwDriveClient());
+      }
+
+      const collectionDriveAddress = await drive?.getStorageAccounts();
+      if (!collectionDriveAddress) {
+        const blueprint = createBlueprintClient({
+          cluster: "devnet",
+        });
+
+        const { address, success } = await blueprint.createDrive({
+          name: collectionId,
+          sizeInKb: 1000,
+          ownerAddress: EXECUTION_WALLET_ADDRESS,
+        });
+        setCollectionDriveAddress(address);
+      }
+    },
+    [drive, createShdwDriveClient]
+  );
+
   useEffect(() => {
     if (!params?.id || !isUuid(params?.id)) {
       router.push("/me/collection");
@@ -285,6 +323,10 @@ export default function CreateCollectionPage({
 
       setCollectionMetadataStats(collectionMetadataStats);
     }
+
+    if (!collectionDriveAddress && collectionId) {
+      getOrCreateDrive(collectionId);
+    }
   }, [
     collectionMetadataStats,
     jsonBeingUploaded,
@@ -295,6 +337,9 @@ export default function CreateCollectionPage({
     formik,
     handleMetadataJsonUploadComplete,
     router,
+    collectionDriveAddress,
+    collectionId,
+    getOrCreateDrive,
   ]);
 
   if (loading) {
@@ -355,7 +400,12 @@ export default function CreateCollectionPage({
               min={0}
               max={100}
               placeholder="Seller Fee Basis Points"
-              onChange={formik.handleChange}
+              onChange={(e) => {
+                formik.handleChange(e);
+                if (Number(e.target.value) > 100) {
+                  formik.setFieldValue("sellerFeeBasisPoints", 100);
+                }
+              }}
               value={formik.values.sellerFeeBasisPoints}
             />
             <FormTextareaWithLabel
@@ -484,12 +534,12 @@ export default function CreateCollectionPage({
                 <p className="text-gray-100 text-lg mb-2">
                   {collectionMetadataStats.count} token metadatas
                 </p>
-                <p className="text-gray-100 text-lg mb-2 text-center">
+                <div className="text-gray-100 text-lg mb-2 text-center">
                   <div>
                     {collectionMetadataStats.uniqueTraits.length} unique traits
                     across collection
                   </div>
-                </p>
+                </div>
               </div>
             ) : (
               <JsonUpload
@@ -547,7 +597,8 @@ export default function CreateCollectionPage({
                 creatorsAreValid(formik.values.creators) &&
                 !!collectionMetadataStats &&
                 !!collectionMetadatasJsonUploadResponse &&
-                !!collectionImagesUploadCount
+                !!collectionImagesUploadCount &&
+                collectionImagesUploadCount === collectionMetadataStats.count
               )
             }
             onClick={formik.handleSubmit}

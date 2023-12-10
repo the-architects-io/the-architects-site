@@ -12,7 +12,7 @@ export const formatDate = (date: string) =>
 export const formatTime = (date: string) =>
   dayjs(dayjs(date).toString()).format("h:mm A");
 // export const fromNow = (date: string) => dayjs(date).fromNow();
-export const formatDateTime = (date: string) =>
+export const formatDateTime = (date: string | number) =>
   dayjs(dayjs(date).toString()).format("M/DD/YY @ h:mm a");
 export const diff = (date: string) => dayjs(date).diff(dayjs());
 export const diffInHours = (date: string | number) =>
@@ -39,3 +39,7 @@ export const convertSecondsToDaysAndHoursAndMinutesString = (
 };
 
 export const formatDateTimeToUnix = (date: number) => dayjs.unix(date);
+export const formatUnixToDateTime = (date: number) =>
+  dayjs.unix(date).format("M/DD/YY @ h:mm a");
+export const getDateTimeFromShdwDriveCreationTime = (creationTime: number) =>
+  formatDateTime(String(new Date(creationTime * 1000)));
