@@ -49,7 +49,7 @@ const BlueprintApiActionUrls = {
   [UPLOAD_FILES]: `${BASE_URL}/api/upload-files-to-shadow-drive`,
 };
 
-export const mapErrorToResponse = (error: any): MappedErrorResponse => {
+const mapErrorToResponse = (error: any): MappedErrorResponse => {
   const status =
     error?.response?.status || error?.response?.data?.status || 500;
   console.log({
@@ -200,6 +200,8 @@ const handleUploadFormData = async (
       }
     );
 
+    console.log({ data });
+
     if (data?.errors?.length) {
       return NextResponse.json({
         error: data?.errors[0],
@@ -219,6 +221,9 @@ const handleUploadFormData = async (
     });
   } catch (rawError: any) {
     let error = mapErrorToResponse(rawError);
+
+    console.log({ rawError });
+    console.log(rawError?.response);
 
     logError(error);
     return NextResponse.json({ error });

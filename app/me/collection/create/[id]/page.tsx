@@ -21,15 +21,14 @@ import { GET_COLLECTION_BY_ID } from "@/graphql/queries/get-collection-by-id";
 import {
   Collection,
   Creator,
+  Drive,
   UploadFilesResponse,
   UploadJsonResponse,
 } from "@/app/blueprint/types";
 import { useUserData } from "@nhost/nextjs";
 import { isUuid } from "uuidv4";
 import { FieldArray, FormikProvider, useFormik } from "formik";
-import { getSlug } from "@/utils/formatting";
 import { createBlueprintClient } from "@/app/blueprint/client";
-import { getShdwDriveUrl } from "@/utils/drive";
 import showToast from "@/features/toasts/show-toast";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormTextareaWithLabel } from "@/features/UI/forms/form-textarea-with-label";
@@ -68,15 +67,16 @@ export default function CreateCollectionPage({
     useState<SingleImageUploadResponse | null>(null);
   const [creators, setCreators] = useState<Creator[] | null>(null);
   const [jsonBeingUploaded, setJsonBeingUploaded] = useState<any | null>(null);
-  const [isJsonMetadataUploadInProgress, setIsJsonMetadataUploadInProgress] =
-    useState(false);
   const [collectionImagesUploadCount, setCollectionImagesUploadCount] =
     useState<number | null>(null);
   const [isSavingCollection, setIsSavingCollection] = useState(false);
-  const [drive, setDrive] = useState<ShdwDrive | null>(null);
   const [collectionDriveAddress, setCollectionDriveAddress] = useState<
     string | null
   >(null);
+  const [isCreatingCollectionDrive, setIsCreatingCollectionDrive] =
+    useState(false);
+  const [isFetchingDrive, setIsFetchingDrive] = useState(false);
+  const [collectionDrive, setCollectionDrive] = useState<Drive | null>(null);
 
   const formik = useFormik({
     initialValues: {
@@ -94,7 +94,7 @@ export default function CreateCollectionPage({
       sellerFeeBasisPoints,
       creators,
     }) => {
-      if (!wallet?.publicKey) return;
+      if (!wallet?.publicKey || !collectionDrive) return;
       if (
         !collectionImage ||
         !collectionId ||
@@ -128,6 +128,22 @@ export default function CreateCollectionPage({
       });
 
       if (!success) {
+        showToast({
+          primaryMessage: "Saving collection failed",
+        });
+        return;
+      }
+
+      const fresSpaceInKb = collectionDrive.storage.bytes.free / 1024;
+      const amountInKb = fresSpaceInKb - 500 * 1024;
+
+      const { success: success2 } = await blueprint.reduceStorage({
+        address: ASSET_SHDW_DRIVE_ADDRESS,
+        amountInKb,
+        ownerAddress: EXECUTION_WALLET_ADDRESS,
+      });
+
+      if (!success2) {
         showToast({
           primaryMessage: "Saving collection failed",
         });
@@ -275,33 +291,62 @@ export default function CreateCollectionPage({
     []
   );
 
-  const createShdwDriveClient = useCallback(async () => {
-    const connection = new Connection(getRpcEndpoint(), "confirmed");
-    const drive = await new ShdwDrive(connection, wallet).init();
-    return drive;
-  }, [wallet]);
-
   const getOrCreateDrive = useCallback(
     async (collectionId: string) => {
-      if (!drive) {
-        await setDrive(await createShdwDriveClient());
-      }
+      if (isCreatingCollectionDrive) return;
+      const blueprint = createBlueprintClient({
+        cluster: "devnet",
+      });
 
-      const collectionDriveAddress = await drive?.getStorageAccounts();
-      if (!collectionDriveAddress) {
-        const blueprint = createBlueprintClient({
-          cluster: "devnet",
-        });
+      const { success, drives } = await blueprint.getDrives({
+        ownerAddress: EXECUTION_WALLET_ADDRESS,
+      });
 
+      const collectionDriveAddress = drives.find(
+        (d) => d.name === collectionId
+      )?.address;
+
+      if (collectionDriveAddress) {
+        setCollectionDriveAddress(collectionDriveAddress);
+      } else {
+        setIsCreatingCollectionDrive(true);
         const { address, success } = await blueprint.createDrive({
           name: collectionId,
-          sizeInKb: 1000,
+          sizeInKb: 10 * 1024 * 1024, // 10 GB
           ownerAddress: EXECUTION_WALLET_ADDRESS,
         });
+
         setCollectionDriveAddress(address);
+        setIsCreatingCollectionDrive(false);
       }
     },
-    [drive, createShdwDriveClient]
+    [isCreatingCollectionDrive]
+  );
+
+  const getCollectionDrive = useCallback(
+    async (collectionDriveAddress: string) => {
+      if (isFetchingDrive) return;
+      setIsFetchingDrive(true);
+      const blueprint = createBlueprintClient({
+        cluster: "devnet",
+      });
+
+      const { success, drive } = await blueprint.getDrive({
+        address: collectionDriveAddress,
+        ownerAddress: EXECUTION_WALLET_ADDRESS,
+      });
+
+      if (!success) {
+        showToast({
+          primaryMessage: "Collection Drive Fetch Failed",
+        });
+        setIsFetchingDrive(false);
+        return;
+      }
+
+      setCollectionDrive(drive);
+    },
+    [isFetchingDrive]
   );
 
   useEffect(() => {
@@ -324,8 +369,12 @@ export default function CreateCollectionPage({
       setCollectionMetadataStats(collectionMetadataStats);
     }
 
-    if (!collectionDriveAddress && collectionId) {
+    if (!collectionDriveAddress && collectionId && !isCreatingCollectionDrive) {
       getOrCreateDrive(collectionId);
+    }
+
+    if (collectionDriveAddress && !isFetchingDrive) {
+      getCollectionDrive(collectionDriveAddress);
     }
   }, [
     collectionMetadataStats,
@@ -340,6 +389,9 @@ export default function CreateCollectionPage({
     collectionDriveAddress,
     collectionId,
     getOrCreateDrive,
+    isCreatingCollectionDrive,
+    isFetchingDrive,
+    getCollectionDrive,
   ]);
 
   if (loading) {
@@ -371,13 +423,19 @@ export default function CreateCollectionPage({
     <ContentWrapper>
       <div className="w-full flex mb-24">
         <div className="flex flex-col items-center mb-16 w-full md:w-[500px]">
-          <SingleImageUpload
-            fileName={`${collectionId}-collection.png`}
-            driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
-            setImage={setCollectionImage}
-          >
-            Add Collection Image
-          </SingleImageUpload>
+          {!!collectionDriveAddress ? (
+            <SingleImageUpload
+              fileName={`${collectionId}-collection.png`}
+              driveAddress={collectionDriveAddress}
+              setImage={setCollectionImage}
+            >
+              Add Collection Image
+            </SingleImageUpload>
+          ) : (
+            <div className="border border-gray-600 rounded-lg p-4 py-8 w-full mb-4 flex justify-center items-center">
+              <Spinner />
+            </div>
+          )}
           <div className="flex flex-col justify-center items-center w-full mb-8 space-y-4">
             <FormInputWithLabel
               label="Collection Name"
@@ -542,14 +600,20 @@ export default function CreateCollectionPage({
                 </div>
               </div>
             ) : (
-              <JsonUpload
-                setJsonBeingUploaded={setJsonBeingUploaded}
-                setJsonUploadResponse={handleMetadataJsonUploadComplete}
-                driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
-                fileName={`${collectionId}-collection-metadatas.json`}
-              >
-                Add Collection Metadata JSONs
-              </JsonUpload>
+              <>
+                {!!collectionDriveAddress ? (
+                  <JsonUpload
+                    setJsonBeingUploaded={setJsonBeingUploaded}
+                    setJsonUploadResponse={handleMetadataJsonUploadComplete}
+                    driveAddress={collectionDriveAddress}
+                    fileName={`${collectionId}-collection-metadatas.json`}
+                  >
+                    Add Collection Metadata JSONs
+                  </JsonUpload>
+                ) : (
+                  <Spinner />
+                )}
+              </>
             )}
           </div>
           <div
@@ -571,13 +635,19 @@ export default function CreateCollectionPage({
                 </p>
               </div>
             ) : (
-              <MultiImageUpload
-                driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
-                onUploadComplete={handleCollectionImagesCompleted}
-                prefix={collectionId || ""}
-              >
-                Add Collection Images
-              </MultiImageUpload>
+              <>
+                {!!collectionDriveAddress ? (
+                  <MultiImageUpload
+                    driveAddress={collectionDriveAddress}
+                    onUploadComplete={handleCollectionImagesCompleted}
+                    prefix={collectionId || ""}
+                  >
+                    Add Collection Images
+                  </MultiImageUpload>
+                ) : (
+                  <Spinner />
+                )}
+              </>
             )}
           </div>
         </div>

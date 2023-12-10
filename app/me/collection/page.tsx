@@ -65,12 +65,14 @@ export default function CollectionsPage() {
                         className="flex flex-col items-center space-y-4 mb-4 p-4 border border-gray-600 rounded-lg cursor-pointer"
                         href={`/me/collection/${collection.id}`}
                       >
-                        <Image
-                          src={`${SHDW_DRIVE_BASE_URL}/${ASSET_SHDW_DRIVE_ADDRESS}/${collection.id}-collection.png`}
-                          width={200}
-                          height={200}
-                          alt="Collection image"
-                        />
+                        {!!collection.imageUrl && (
+                          <Image
+                            src={collection.imageUrl}
+                            width={200}
+                            height={200}
+                            alt="Collection image"
+                          />
+                        )}
                         <div className="text-xl">{collection.name}</div>
                         <div className="text-sm">({collection.symbol})</div>
                       </Link>

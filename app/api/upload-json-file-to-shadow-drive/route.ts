@@ -107,6 +107,8 @@ export async function POST(req: NextRequest) {
         file: buffer,
       });
 
+    console.log({ message, finalized_locations, upload_errors });
+
     if (upload_errors.length > 0) {
       return NextResponse.json(
         {

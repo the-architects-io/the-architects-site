@@ -1,4 +1,5 @@
 "use client";
+import { ASSET_SHDW_DRIVE_ADDRESS } from "@/constants/constants";
 import CreateCollectionNftForm from "@/features/nfts/create-collection-nft-form";
 import { Umi } from "@metaplex-foundation/umi";
 import { ShdwDrive } from "@shadow-drive/sdk";
@@ -31,8 +32,7 @@ export default function Page() {
           setSellerFeeBasisPoints={setSellerFeeBasisPoints}
           setIsLoading={setIsLoading}
           isLoading={isLoading}
-          umi={umi}
-          drive={drive}
+          driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
         />
       )}
     </div>

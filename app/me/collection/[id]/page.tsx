@@ -71,7 +71,7 @@ export default function CollectionDetailsPage({ params }: { params: any }) {
                 Creators
               </div>
               <div className="w-full">
-                {collection?.creators
+                {[...collection?.creators]
                   ?.sort((a, b) => a.sortOrder - b.sortOrder)
                   .map((creator) => (
                     <div

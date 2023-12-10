@@ -37,6 +37,13 @@ export async function POST(req: NextRequest) {
 
   const file = Buffer.from(await formDataFile.arrayBuffer());
 
+  console.log({
+    formDataFile,
+    fileName,
+    driveAddress,
+    file,
+  });
+
   try {
     const keypair = Keypair.fromSecretKey(
       bs58.decode(process.env.EXECUTION_WALLET_PRIVATE_KEY)
@@ -53,6 +60,8 @@ export async function POST(req: NextRequest) {
         name: getSlug(fileName),
         file,
       });
+
+    console.log({ upload_errors, finalized_locations, message });
 
     return NextResponse.json(
       {
