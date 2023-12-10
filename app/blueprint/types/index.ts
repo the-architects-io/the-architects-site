@@ -764,6 +764,7 @@ export type DriveAccount = {
 export type Drive = {
   account: DriveAccount;
   address: string;
+  name: string;
   files: string[];
   storage: {
     total: string;
@@ -787,6 +788,36 @@ export type GetDrivesResponse = BaseBlueprintResponse & {
   drives: DriveAccount[];
 };
 
+export type IncreaseStorageInput = {
+  address: string;
+  amountInKb: number;
+  ownerAddress: string;
+};
+
+export type IncreaseStorageResponse = BaseBlueprintResponse & {
+  message: string;
+  transaction: string;
+};
+
+export type ReduceStorageInput = {
+  address: string;
+  amountInKb: number;
+  ownerAddress: string;
+};
+
+export type ReduceStorageResponse = BaseBlueprintResponse & {
+  message: string;
+  transaction: string;
+};
+
+export type DeleteDriveInput = {
+  address: string;
+};
+
+export type DeleteDriveResponse = BaseBlueprintResponse & {
+  transaction: string;
+};
+
 export enum BlueprintApiActions {
   ADD_AIRDROP_RECIPIENTS = "ADD_AIRDROP_RECIPIENTS",
   CREATE_AIRDROP = "CREATE_AIRDROP",
@@ -794,11 +825,14 @@ export enum BlueprintApiActions {
   CREATE_DRIVE = "CREATE_DRIVE",
   CREATE_DISENSER = "CREATE_DISENSER",
   CREATE_TREE = "CREATE_TREE",
+  DELETE_DRIVE = "DELETE_DRIVE",
   DISPENSE_TOKENS = "DISPENSE_TOKENS",
   GET_DRIVE = "GET_DRIVE",
   GET_DRIVES = "GET_DRIVES",
+  INCREASE_STORAGE = "INCREASE_STORAGE",
   MINT_CNFT = "MINT_CNFT",
   MINT_NFT = "MINT_NFT",
+  REDUCE_STORAGE = "REDUCE_STORAGE",
   UPDATE_COLLECTION = "UPDATE_COLLECTION",
   UPLOAD_FILE = "UPLOAD_FILE",
   UPLOAD_FILES = "UPLOAD_FILES",

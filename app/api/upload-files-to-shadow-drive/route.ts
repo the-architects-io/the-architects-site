@@ -94,6 +94,7 @@ export async function POST(req: NextRequest) {
         prefix,
       });
 
+      // TODO: use editFile instead of deleteFile
       for (const file of filesToDelete) {
         const res = await drive.deleteFile(
           new PublicKey(driveAddress),

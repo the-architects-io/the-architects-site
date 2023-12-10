@@ -10,15 +10,18 @@ import { NextResponse, type NextRequest } from "next/server";
 const {
   ADD_AIRDROP_RECIPIENTS,
   CREATE_COLLECTION,
+  CREATE_AIRDROP,
   CREATE_DRIVE,
   CREATE_DISENSER,
   CREATE_TREE,
+  DELETE_DRIVE,
   DISPENSE_TOKENS,
-  CREATE_AIRDROP,
   GET_DRIVE,
   GET_DRIVES,
+  INCREASE_STORAGE,
   MINT_CNFT,
   MINT_NFT,
+  REDUCE_STORAGE,
   UPDATE_COLLECTION,
   UPLOAD_JSON,
   UPLOAD_FILE,
@@ -32,11 +35,14 @@ const BlueprintApiActionUrls = {
   [CREATE_DRIVE]: `${BASE_URL}/api/create-drive`,
   [CREATE_DISENSER]: `${BASE_URL}/api/add-dispenser`,
   [CREATE_TREE]: `${BASE_URL}/api/create-tree`,
+  [DELETE_DRIVE]: `${BASE_URL}/api/delete-drive`,
   [DISPENSE_TOKENS]: `${BASE_URL}/api/dispense-tokens`,
   [GET_DRIVE]: `${BASE_URL}/api/get-drive`,
   [GET_DRIVES]: `${BASE_URL}/api/get-drives`,
+  [INCREASE_STORAGE]: `${BASE_URL}/api/increase-storage`,
   [MINT_CNFT]: `${BASE_URL}/api/mint-cnft`,
   [MINT_NFT]: `${BASE_URL}/api/mint-nft`,
+  [REDUCE_STORAGE]: `${BASE_URL}/api/reduce-storage`,
   [UPDATE_COLLECTION]: `${BASE_URL}/api/update-collection`,
   [UPLOAD_JSON]: `${BASE_URL}/api/upload-json-file-to-shadow-drive`,
   [UPLOAD_FILE]: `${BASE_URL}/api/upload-file-to-shadow-drive`,
@@ -124,7 +130,6 @@ const handleAddAirdropRecipients = async (params: any) => {
   }
 
   try {
-    console.log("!!!!!!!!!");
     const { data, status, statusText } = await axios.post(
       BlueprintApiActionUrls[ADD_AIRDROP_RECIPIENTS],
       {
@@ -383,10 +388,13 @@ export async function POST(req: NextRequest) {
     case BlueprintApiActions.CREATE_COLLECTION:
     case BlueprintApiActions.CREATE_DRIVE:
     case BlueprintApiActions.CREATE_TREE:
+    case BlueprintApiActions.DELETE_DRIVE:
     case BlueprintApiActions.GET_DRIVE:
     case BlueprintApiActions.GET_DRIVES:
+    case BlueprintApiActions.INCREASE_STORAGE:
     case BlueprintApiActions.MINT_CNFT:
     case BlueprintApiActions.MINT_NFT:
+    case BlueprintApiActions.REDUCE_STORAGE:
     case BlueprintApiActions.UPDATE_COLLECTION:
       return handleBlueprintAction(action, params);
     case BlueprintApiActions.UPLOAD_FILE:

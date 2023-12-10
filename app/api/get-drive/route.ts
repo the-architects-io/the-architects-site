@@ -81,6 +81,7 @@ export async function POST(req: NextRequest) {
           ])?.[0],
           files: keys,
           address,
+          name: account.identifier,
           storage: {
             total: getBestFittingStorageSizeString(reservedBytes),
             used: getBestFittingStorageSizeString(currentUsage),

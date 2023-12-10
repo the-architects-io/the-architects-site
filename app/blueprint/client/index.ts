@@ -10,14 +10,18 @@ import {
   CreateDriveResponse,
   CreateTreeInput,
   CreateTreeResponse,
+  DeleteDriveInput,
   GetDriveInput,
   GetDriveResponse,
   GetDrivesInput,
   GetDrivesResponse,
+  IncreaseStorageInput,
+  IncreaseStorageResponse,
   MintCnftInput,
   MintCnftResponse,
   MintNftInput,
   MintNftResponse,
+  ReduceStorageInput,
   UpdateCollectionInput,
   UploadFileInput,
   UploadFileResponse,
@@ -143,6 +147,18 @@ const createTree = async (
   return data;
 };
 
+const deleteDrive = async (
+  options: BlueprintClientOptions,
+  params: DeleteDriveInput
+): Promise<CreateDriveResponse> => {
+  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, {
+    action: BlueprintApiActions.DELETE_DRIVE,
+    params,
+  });
+
+  return data;
+};
+
 const getDrive = async (
   options: BlueprintClientOptions,
   params: GetDriveInput
@@ -170,6 +186,18 @@ const getDrives = async (
     params: {
       ownerAddress,
     },
+  });
+
+  return data;
+};
+
+const increaseStorage = async (
+  options: BlueprintClientOptions,
+  params: IncreaseStorageInput
+): Promise<IncreaseStorageResponse> => {
+  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, {
+    action: BlueprintApiActions.INCREASE_STORAGE,
+    params,
   });
 
   return data;
@@ -220,6 +248,18 @@ const mintNft = async (
   });
 
   const data = await response.json();
+  return data;
+};
+
+const reduceStorage = async (
+  options: BlueprintClientOptions,
+  params: ReduceStorageInput
+): Promise<IncreaseStorageResponse> => {
+  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, {
+    action: BlueprintApiActions.REDUCE_STORAGE,
+    params,
+  });
+
   return data;
 };
 
@@ -328,10 +368,15 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
       createAirdrop(options, params),
     createDrive: (params: CreateDriveInput) => createDrive(options, params),
     createTree: (params: CreateTreeInput) => createTree(options, params),
+    deleteDrive: (params: DeleteDriveInput) => deleteDrive(options, params),
     getDrive: (params: GetDriveInput) => getDrive(options, params),
     getDrives: (params: GetDrivesInput) => getDrives(options, params),
+    increaseStorage: (params: IncreaseStorageInput) =>
+      increaseStorage(options, params),
     mintCnft: (params: MintCnftInput) => mintCnft(options, params),
     mintNft: (params: MintNftInput) => mintNft(options, params),
+    reduceStorage: (params: ReduceStorageInput) =>
+      reduceStorage(options, params),
     updateCollection: (params: UpdateCollectionInput) =>
       updateCollection(options, params),
     uploadFile: (params: UploadFileInput) => uploadFile(options, params),
