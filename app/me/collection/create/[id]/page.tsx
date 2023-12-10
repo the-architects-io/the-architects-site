@@ -607,7 +607,7 @@ export default function CreateCollectionPage({
                     setJsonBeingUploaded={setJsonBeingUploaded}
                     setJsonUploadResponse={handleMetadataJsonUploadComplete}
                     driveAddress={collectionDriveAddress}
-                    fileName={`${collectionId}-collection-metadatas.json`}
+                    fileName="collection-metadatas.json"
                   >
                     Add Collection Metadata JSONs
                   </JsonUpload>
