@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
   }
 
   const url = formData.get("url") as string;
+  const prefix = formData.get("prefix") as string;
 
   if (url.length) {
     console.log(`fetching ${url}`);
@@ -59,28 +60,24 @@ export async function POST(req: NextRequest) {
     });
 
     amountOfFiles += 1;
-  }
-
-  console.log({ amountOfFiles });
-
-  const prefix = formData.get("prefix") as string;
-
-  const singleFile = formData.get("file") as unknown as File | null;
-
-  if (singleFile) {
-    formDataFiles.push({
-      name: prefix?.length ? `${prefix}${singleFile.name}` : singleFile.name,
-      file: Buffer.from(await singleFile.arrayBuffer()),
-    });
   } else {
-    for (let i = 0; i < amountOfFiles; i++) {
-      const file = formData.get(`file[${i}]`) as unknown as File;
-      const fileBuffer = Buffer.from(await file.arrayBuffer());
-      const shadowFile = {
-        name: prefix?.length ? `${prefix}${file.name}` : file.name,
-        file: fileBuffer,
-      };
-      formDataFiles.push(shadowFile);
+    const singleFile = formData.get("file") as unknown as File | null;
+
+    if (singleFile) {
+      formDataFiles.push({
+        name: prefix?.length ? `${prefix}${singleFile.name}` : singleFile.name,
+        file: Buffer.from(await singleFile.arrayBuffer()),
+      });
+    } else {
+      for (let i = 0; i < amountOfFiles; i++) {
+        const file = formData.get(`file[${i}]`) as unknown as File;
+        const fileBuffer = Buffer.from(await file.arrayBuffer());
+        const shadowFile = {
+          name: prefix?.length ? `${prefix}${file.name}` : file.name,
+          file: fileBuffer,
+        };
+        formDataFiles.push(shadowFile);
+      }
     }
   }
 
@@ -88,7 +85,7 @@ export async function POST(req: NextRequest) {
   const overwriteString = formData.get("overwrite") as string;
   const overwrite = !!overwriteString;
 
-  console.log({ overwrite });
+  console.log({ overwrite, amountOfFiles });
 
   if (!formDataFiles || !driveAddress) {
     return NextResponse.json(null, { status: 400 });
