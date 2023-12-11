@@ -46,6 +46,17 @@ export async function POST(req: NextRequest) {
 
   console.log({ amountOfFiles });
 
+  const url = formData.get("url") as string;
+
+  if (url.length) {
+    const file = await fetch(url);
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    formDataFiles.push({
+      name: url.split("/").pop(),
+      file: fileBuffer,
+    });
+  }
+
   const prefix = formData.get("prefix") as string;
 
   const singleFile = formData.get("file") as unknown as File | null;
