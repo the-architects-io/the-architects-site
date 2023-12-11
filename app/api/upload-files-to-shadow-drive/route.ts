@@ -44,18 +44,24 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  console.log({ amountOfFiles });
-
   const url = formData.get("url") as string;
 
   if (url.length) {
+    console.log(`fetching ${url}`);
     const file = await fetch(url);
+    console.log("converting to buffer");
     const fileBuffer = Buffer.from(await file.arrayBuffer());
+    const name = url.split("/").pop();
+    console.log({ name });
     formDataFiles.push({
-      name: url.split("/").pop(),
+      name,
       file: fileBuffer,
     });
+
+    amountOfFiles += 1;
   }
+
+  console.log({ amountOfFiles });
 
   const prefix = formData.get("prefix") as string;
 
