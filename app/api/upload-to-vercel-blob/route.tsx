@@ -6,6 +6,7 @@ import fs from "fs";
 import { User } from "@nhost/nextjs";
 import { client } from "@/graphql/backend-client";
 import { GET_USER_BY_ID } from "@/graphql/queries/get-user-by-id";
+import { del } from "@vercel/blob";
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
@@ -41,22 +42,22 @@ export async function POST(request: Request): Promise<NextResponse> {
           throw new Error("Client payload not found");
         }
 
-        const { userId, ownerAddress, driveAddress } =
-          JSON.parse(clientPayload);
+        // const { userId, ownerAddress, driveAddress } =
+        //   JSON.parse(clientPayload);
 
-        const { users_by_pk: users }: { users_by_pk: User[] } =
-          await client.request({
-            document: GET_USER_BY_ID,
-            variables: {
-              id: userId,
-            },
-          });
+        // const { users_by_pk: users }: { users_by_pk: User[] } =
+        //   await client.request({
+        //     document: GET_USER_BY_ID,
+        //     variables: {
+        //       id: userId,
+        //     },
+        //   });
 
-        console.log({ users });
+        // console.log({ users });
 
-        if (!users?.[0]?.id) {
-          throw new Error("User not found");
-        }
+        // if (!users?.[0]?.id) {
+        //   throw new Error("User not found");
+        // }
 
         return {
           allowedContentTypes: [
@@ -112,8 +113,16 @@ export async function POST(request: Request): Promise<NextResponse> {
               },
             ],
           });
+
+          await del(pathname);
+
+          if (!success) {
+            throw new Error("Could not upload file");
+          }
+
+          console.log({ success, urls, count });
         } catch (error) {
-          throw new Error("Could not update user");
+          throw new Error("Could not upload file");
         }
       },
     });
