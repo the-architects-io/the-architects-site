@@ -64,7 +64,7 @@ export const CollectionPreview = ({
                       height={160}
                     />
                   </div>
-                  <div className="flex p-4">
+                  <div className="flex flex-1 p-4">
                     <div className="text-2xl">
                       <div className="mb-2">{token.name}</div>
                       <p className="text-sm">

@@ -29,6 +29,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  console.log(`~~~~~~~~~~~~~~~`);
+
   const formData = await req.formData();
 
   let formDataFiles: ShadowFile[] = [];
@@ -41,6 +43,8 @@ export async function POST(req: NextRequest) {
       break;
     }
   }
+
+  console.log({ amountOfFiles });
 
   const prefix = formData.get("prefix") as string;
 

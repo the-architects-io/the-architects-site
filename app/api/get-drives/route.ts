@@ -26,10 +26,6 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const umi = await createUmi(getRpcEndpoint())
-      .use(mplToolbox())
-      .use(mplTokenMetadata());
-
     const privateKeyMap = new Map();
 
     privateKeyMap.set(
