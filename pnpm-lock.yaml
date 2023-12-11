@@ -68,6 +68,9 @@ dependencies:
   '@project-serum/anchor':
     specifier: ^0.26.0
     version: 0.26.0(encoding@0.1.13)
+  '@rpldy/chunked-uploady':
+    specifier: ^1.6.1
+    version: 1.6.1(react-dom@18.2.0)(react@18.2.0)
   '@rpldy/upload-button':
     specifier: ^1.6.1
     version: 1.6.1(react-dom@18.2.0)(react@18.2.0)
@@ -5409,6 +5412,30 @@ packages:
       '@rpldy/raw-uploader': 1.6.1
       '@rpldy/shared': 1.6.1
       '@rpldy/simple-state': 1.6.1
+    dev: false
+
+  /@rpldy/chunked-sender@1.6.1:
+    resolution: {integrity: sha512-XG3t+lVLr9ov2SmbFFlU01jScVy14ivQjHljcmC572rO3nbefpl+o7zBkJJ/Cd+PMC3B+arAAh/TcMpvLOOF/Q==}
+    dependencies:
+      '@rpldy/sender': 1.6.1
+      '@rpldy/shared': 1.6.1
+      '@rpldy/simple-state': 1.6.1
+    dev: false
+
+  /@rpldy/chunked-uploady@1.6.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-LldpJksoLBjq5V6IepIQGfRuHq0X9bD22VMxUVeNvmj6f3ULqFuM+1/WNlmk3pgtqLwVlW4iAVyowPjJIeGShg==}
+    peerDependencies:
+      react: '>=16.8'
+    dependencies:
+      '@rpldy/chunked-sender': 1.6.1
+      '@rpldy/sender': 1.6.1
+      '@rpldy/shared': 1.6.1
+      '@rpldy/shared-ui': 1.6.1(react-dom@18.2.0)(react@18.2.0)
+      '@rpldy/uploader': 1.6.1
+      '@rpldy/uploady': 1.6.1(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
+    transitivePeerDependencies:
+      - react-dom
     dev: false
 
   /@rpldy/life-events@1.6.1:
