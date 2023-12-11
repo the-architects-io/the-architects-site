@@ -33,6 +33,8 @@ export default function StreamUploadPage() {
       const newBlob = await upload(file?.name, file, {
         access: "public",
         handleUploadUrl: `/api/upload-to-vercel-blob`,
+        // @ts-ignore
+        // addRandomSuffix: false,
         clientPayload: JSON.stringify({
           ownerAddress: EXECUTION_WALLET_ADDRESS,
           driveAddress: "6EAWakDFnyKDW4cezXvBZBYyStFdV8UzKfNcgkbd7QMi",

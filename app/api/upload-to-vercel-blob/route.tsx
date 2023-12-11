@@ -96,6 +96,12 @@ export async function POST(request: Request): Promise<NextResponse> {
             contentDisposition,
           });
 
+          const formData = new FormData();
+
+          formData.append("url", url);
+          formData.append("driveAddress", driveAddress);
+          formData.append("ownerAddress", ownerAddress);
+
           const res = await fetch(
             `${BASE_URL}/api/upload-files-to-shadow-drive`,
             {
@@ -103,11 +109,6 @@ export async function POST(request: Request): Promise<NextResponse> {
               headers: {
                 "Content-Type": "multipart/form-data",
               },
-              body: JSON.stringify({
-                driveAddress,
-                url,
-                ownerAddress,
-              }),
             }
           );
 
