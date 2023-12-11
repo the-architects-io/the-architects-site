@@ -150,7 +150,7 @@ export default function DriveTestPage() {
                       : "border-gray-400",
                   ])}
                 >
-                  {drive.name} - {drive.createdAtString}
+                  {drive.name} - {drive.createdAtString} - {drive.address}
                 </div>
               </div>
             ))}

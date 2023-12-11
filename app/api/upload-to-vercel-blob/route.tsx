@@ -7,6 +7,7 @@ import { User } from "@nhost/nextjs";
 import { client } from "@/graphql/backend-client";
 import { GET_USER_BY_ID } from "@/graphql/queries/get-user-by-id";
 import { del } from "@vercel/blob";
+import { BASE_URL } from "@/constants/constants";
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
@@ -32,18 +33,14 @@ export async function POST(request: Request): Promise<NextResponse> {
         // ⚠️ Authenticate and authorize users before generating the token.
         // Otherwise, you're allowing anonymous uploads.
 
-        const blueprint = createBlueprintClient({
-          cluster: "devnet",
-        });
-
         console.log({ pathname, clientPayload });
 
         if (!clientPayload) {
           throw new Error("Client payload not found");
         }
 
-        // const { userId, ownerAddress, driveAddress } =
-        //   JSON.parse(clientPayload);
+        const { userId, ownerAddress, driveAddress } =
+          JSON.parse(clientPayload);
 
         // const { users_by_pk: users }: { users_by_pk: User[] } =
         //   await client.request({
@@ -71,8 +68,9 @@ export async function POST(request: Request): Promise<NextResponse> {
             // optional, sent to your server on upload completion
             // you could pass a user id from auth, or a value from clientPayload
             message: "Upload to vercel blob completed -- tokenPayload",
-            pathname,
-            // userId: users[0].id,
+            userId,
+            driveAddress,
+            ownerAddress,
           }),
         };
       },
@@ -83,7 +81,11 @@ export async function POST(request: Request): Promise<NextResponse> {
 
         try {
           // Run any logic after the file upload completed
-          // const { userId } = JSON.parse(tokenPayload);
+          if (!tokenPayload) {
+            throw new Error("Token payload not found");
+          }
+          const { userId, driveAddress, ownerAddress } =
+            JSON.parse(tokenPayload);
           // await db.update({ avatar: blob.url, userId });
           const { url, pathname, contentType, contentDisposition } = blob;
 
@@ -94,33 +96,22 @@ export async function POST(request: Request): Promise<NextResponse> {
             contentDisposition,
           });
 
-          const file = await axios.get(url, {
-            responseType: "arraybuffer",
-          });
-
-          console.log({ file });
-
-          const blueprint = createBlueprintClient({
-            cluster: "devnet",
-          });
-
-          const { success, urls, count } = await blueprint.uploadFiles({
-            driveAddress: "6EAWakDFnyKDW4cezXvBZBYyStFdV8UzKfNcgkbd7QMi",
-            files: [
-              {
-                file: Buffer.from(file.data),
-                name: pathname,
+          const res = await fetch(
+            `${BASE_URL}/api/upload-files-to-shadow-drive`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
               },
-            ],
-          });
+              body: JSON.stringify({
+                driveAddress: driveAddress,
+                url,
+                ownerAddress,
+              }),
+            }
+          );
 
           await del(pathname);
-
-          if (!success) {
-            throw new Error("Could not upload file");
-          }
-
-          console.log({ success, urls, count });
         } catch (error) {
           throw new Error("Could not upload file");
         }
