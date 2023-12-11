@@ -106,13 +106,11 @@ export async function POST(request: Request): Promise<NextResponse> {
             `${BASE_URL}/api/upload-files-to-shadow-drive`,
             {
               method: "POST",
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
+              body: formData,
             }
           );
 
-          await del(pathname);
+          await del(url);
         } catch (error) {
           throw new Error("Could not upload file");
         }
