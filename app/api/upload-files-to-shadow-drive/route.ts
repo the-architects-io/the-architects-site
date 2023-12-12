@@ -29,8 +29,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  console.log(`~~~~~~~~~~~~~~~`);
-
   const formData = await req.formData();
 
   let formDataFiles: ShadowFile[] = [];

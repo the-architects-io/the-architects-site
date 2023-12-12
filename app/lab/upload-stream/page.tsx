@@ -26,42 +26,28 @@ export default function StreamUploadPage() {
       file: File | null;
     },
 
-    onSubmit: async ({ file }) => {
-      if (!file?.name || !user?.id) {
-        return;
-      }
-      const newBlob = await upload(file?.name, file, {
-        access: "public",
-        handleUploadUrl: `/api/upload-to-vercel-blob`,
-        // @ts-ignore
-        // addRandomSuffix: false,
-        clientPayload: JSON.stringify({
-          ownerAddress: EXECUTION_WALLET_ADDRESS,
-          driveAddress: "6EAWakDFnyKDW4cezXvBZBYyStFdV8UzKfNcgkbd7QMi",
-          userId: user?.id,
-        }),
-      });
-
-      setBlob(newBlob);
-    },
+    onSubmit: async ({ file }) => {},
   });
   return (
     <ContentWrapper className="flex flex-col items-center">
-      {/* <ChunkedUploady
+      <ChunkedUploady
         multiple
         destination={{
-          url: `${BASE_URL}/api/upload-stream`,
+          url: `http://164.90.244.66/api/upload`,
           params: {
             ownerAddress: EXECUTION_WALLET_ADDRESS,
             driveAddress: "6EAWakDFnyKDW4cezXvBZBYyStFdV8UzKfNcgkbd7QMi",
+            collectionId: "1234567890",
+            shouldUnzip: true,
           },
         }}
-        // 20MB
-        chunkSize={20 * 1024 * 1024}
+        autoUpload={true}
+        chunkSize={5 * 1024 * 1024}
+        chunked
       >
         <UploadButton />
-      </ChunkedUploady> */}
-      <FormWrapper onSubmit={formik.handleSubmit} className="flex flex-col">
+      </ChunkedUploady>
+      {/* <FormWrapper onSubmit={formik.handleSubmit} className="flex flex-col">
         <label htmlFor="ownerAddress">Owner Address</label>
         <input
           id="ownerAddress"
@@ -93,7 +79,7 @@ export default function StreamUploadPage() {
         >
           Submit
         </SubmitButton>
-      </FormWrapper>
+      </FormWrapper> */}
     </ContentWrapper>
   );
 }
