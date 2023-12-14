@@ -3,6 +3,8 @@ import { BASE_URL, EXECUTION_WALLET_ADDRESS } from "@/constants/constants";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
+import UploadStream from "@/features/upload/upload-stream/upload-stream";
+
 import { useUserData } from "@nhost/nextjs";
 import ChunkedUploady from "@rpldy/chunked-uploady";
 import UploadButton from "@rpldy/upload-button";
@@ -30,7 +32,9 @@ export default function StreamUploadPage() {
   });
   return (
     <ContentWrapper className="flex flex-col items-center">
-      <ChunkedUploady
+      <div className="text-2xl">Upload Single File</div>
+      <UploadStream />
+      {/* <ChunkedUploady
         multiple
         destination={{
           url: `http://164.90.244.66/api/upload`,
@@ -38,7 +42,7 @@ export default function StreamUploadPage() {
             ownerAddress: EXECUTION_WALLET_ADDRESS,
             driveAddress: "6EAWakDFnyKDW4cezXvBZBYyStFdV8UzKfNcgkbd7QMi",
             collectionId: "1234567890",
-            shouldUnzip: true,
+            shouldUnzip: false,
           },
         }}
         autoUpload={true}
@@ -46,7 +50,7 @@ export default function StreamUploadPage() {
         chunked
       >
         <UploadButton />
-      </ChunkedUploady>
+      </ChunkedUploady> */}
       {/* <FormWrapper onSubmit={formik.handleSubmit} className="flex flex-col">
         <label htmlFor="ownerAddress">Owner Address</label>
         <input
