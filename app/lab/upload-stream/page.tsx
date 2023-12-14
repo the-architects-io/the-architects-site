@@ -1,17 +1,13 @@
 "use client";
-import { BASE_URL, EXECUTION_WALLET_ADDRESS } from "@/constants/constants";
-import { SubmitButton } from "@/features/UI/buttons/submit-button";
+import { EXECUTION_WALLET_ADDRESS } from "@/constants/constants";
+
 import { ContentWrapper } from "@/features/UI/content-wrapper";
-import { FormWrapper } from "@/features/UI/forms/form-wrapper";
-import UploadStream from "@/features/upload/upload-stream/upload-stream";
+import ShadowUpload from "@/features/upload/shadow-upload/shadow-upload";
 
 import { useUserData } from "@nhost/nextjs";
-import ChunkedUploady from "@rpldy/chunked-uploady";
-import UploadButton from "@rpldy/upload-button";
 import { PutBlobResult } from "@vercel/blob";
-import { upload } from "@vercel/blob/client";
 import { useFormik } from "formik";
-import { use, useState } from "react";
+import { useState } from "react";
 
 export default function StreamUploadPage() {
   const [blob, setBlob] = useState<PutBlobResult | null>(null);
@@ -32,8 +28,15 @@ export default function StreamUploadPage() {
   });
   return (
     <ContentWrapper className="flex flex-col items-center">
-      <div className="text-2xl">Upload Single File</div>
-      <UploadStream />
+      {!!user?.id && (
+        <ShadowUpload
+          ownerAddress={EXECUTION_WALLET_ADDRESS}
+          driveAddress="5DB4MmQBHdZRet8a789ezNbDeFSpQUMuFG5fxuLGXRhD"
+          collectionId="1234567890"
+          shouldUnzip={false}
+          userId={user?.id}
+        />
+      )}
       {/* <ChunkedUploady
         multiple
         destination={{

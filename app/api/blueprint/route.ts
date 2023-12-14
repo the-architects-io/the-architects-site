@@ -14,6 +14,7 @@ const {
   CREATE_DRIVE,
   CREATE_DISENSER,
   CREATE_TREE,
+  CREATE_UPLOAD_JOB,
   DELETE_DRIVE,
   DISPENSE_TOKENS,
   GET_DRIVE,
@@ -35,6 +36,7 @@ const BlueprintApiActionUrls = {
   [CREATE_DRIVE]: `${BASE_URL}/api/create-drive`,
   [CREATE_DISENSER]: `${BASE_URL}/api/add-dispenser`,
   [CREATE_TREE]: `${BASE_URL}/api/create-tree`,
+  [CREATE_UPLOAD_JOB]: `${BASE_URL}/api/add-upload-job`,
   [DELETE_DRIVE]: `${BASE_URL}/api/delete-drive`,
   [DISPENSE_TOKENS]: `${BASE_URL}/api/dispense-tokens`,
   [GET_DRIVE]: `${BASE_URL}/api/get-drive`,
@@ -393,6 +395,7 @@ export async function POST(req: NextRequest) {
     case BlueprintApiActions.CREATE_COLLECTION:
     case BlueprintApiActions.CREATE_DRIVE:
     case BlueprintApiActions.CREATE_TREE:
+    case BlueprintApiActions.CREATE_UPLOAD_JOB:
     case BlueprintApiActions.DELETE_DRIVE:
     case BlueprintApiActions.GET_DRIVE:
     case BlueprintApiActions.GET_DRIVES:

@@ -10,6 +10,7 @@ import {
   CreateDriveResponse,
   CreateTreeInput,
   CreateTreeResponse,
+  CreateUploadJobInput,
   DeleteDriveInput,
   GetDriveInput,
   GetDriveResponse,
@@ -136,6 +137,25 @@ const createTree = async (
     method: "POST",
     body: JSON.stringify({
       action: BlueprintApiActions.CREATE_TREE,
+      params,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await response.json();
+  return data;
+};
+
+const createUploadJob = async (
+  options: BlueprintClientOptions,
+  params: CreateUploadJobInput
+) => {
+  const response = await fetch("/api/blueprint", {
+    method: "POST",
+    body: JSON.stringify({
+      action: BlueprintApiActions.CREATE_UPLOAD_JOB,
       params,
     }),
     headers: {
@@ -368,6 +388,8 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
       createAirdrop(options, params),
     createDrive: (params: CreateDriveInput) => createDrive(options, params),
     createTree: (params: CreateTreeInput) => createTree(options, params),
+    createUploadJob: (params: CreateUploadJobInput) =>
+      createUploadJob(options, params),
     deleteDrive: (params: DeleteDriveInput) => deleteDrive(options, params),
     getDrive: (params: GetDriveInput) => getDrive(options, params),
     getDrives: (params: GetDrivesInput) => getDrives(options, params),

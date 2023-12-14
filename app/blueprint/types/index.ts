@@ -818,6 +818,38 @@ export type DeleteDriveResponse = BaseBlueprintResponse & {
   transaction: string;
 };
 
+export type CreateUploadJobInput = {
+  driveAddress: string;
+  sizeInBytes: number;
+  userId: string;
+};
+
+export type CreateUploadJobResponse = BaseBlueprintResponse & {
+  job: UploadJob;
+};
+
+export enum UploadJobStatus {
+  IN_PROGRESS = "IN_PROGRESS",
+  ERROR = "ERROR",
+  COMPLETE = "COMPLETE",
+}
+
+export const StatusUUIDs = {
+  [UploadJobStatus.IN_PROGRESS]: "534090fe-488a-42fc-9573-84a65ff9fc57",
+  [UploadJobStatus.ERROR]: "03b962a7-2a48-4efc-9d42-9d827728ab71",
+  [UploadJobStatus.COMPLETE]: "39353545-336d-4fce-a039-cc4fc203a8a9",
+};
+
+export type UploadJob = {
+  id: string;
+  status: UploadJobStatus;
+  isComplete: boolean;
+  user: User;
+  sizeInBytes: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export enum BlueprintApiActions {
   ADD_AIRDROP_RECIPIENTS = "ADD_AIRDROP_RECIPIENTS",
   CREATE_AIRDROP = "CREATE_AIRDROP",
@@ -825,6 +857,7 @@ export enum BlueprintApiActions {
   CREATE_DRIVE = "CREATE_DRIVE",
   CREATE_DISENSER = "CREATE_DISENSER",
   CREATE_TREE = "CREATE_TREE",
+  CREATE_UPLOAD_JOB = "CREATE_UPLOAD_JOB",
   DELETE_DRIVE = "DELETE_DRIVE",
   DISPENSE_TOKENS = "DISPENSE_TOKENS",
   GET_DRIVE = "GET_DRIVE",
