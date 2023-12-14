@@ -87,7 +87,6 @@ const addAirdropRecipients = async (
   }
 
   let recipients: string[] = [];
-  debugger;
 
   const isJsonFile = (file: any) => {
     try {

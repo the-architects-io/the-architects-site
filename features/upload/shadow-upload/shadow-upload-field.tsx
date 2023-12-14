@@ -8,16 +8,18 @@ import {
   useRequestPreSend,
   useUploady,
 } from "@rpldy/uploady";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid"; // Ensure you have 'uuid' installed
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
 export const ShadowUploadField = ({
   children,
+  setUploadJobId,
   params,
 }: {
   children?: string | JSX.Element | JSX.Element[];
+  setUploadJobId: (id: string) => void;
   params: {
     ownerAddress: string;
     driveAddress: string;
@@ -28,56 +30,7 @@ export const ShadowUploadField = ({
 }) => {
   const uploady = useUploady();
   const fileUploadIdsRef = useRef<any>({}); // Store uploadIds for each file
-
-  useMemo(
-    () => ({
-      [UPLOADER_EVENTS.REQUEST_PRE_SEND]: ({
-        items,
-        options,
-      }: {
-        items: BatchItem[];
-        options: CreateOptions;
-      }) => {
-        return new Promise(async (resolve, reject) => {
-          const blueprint = createBlueprintClient({
-            cluster: "devnet",
-          });
-
-          const sizeInBytes = items.reduce((acc, item) => {
-            return acc + item.file.size;
-          }, 0);
-
-          if (!params.userId) {
-            return reject("No userId, cannot create job.");
-          }
-
-          const { success, job } = await blueprint.createUploadJob({
-            driveAddress: params.driveAddress,
-            sizeInBytes,
-            userId: params.userId,
-          });
-
-          if (!success) {
-            return reject("Failed to create upload job");
-          }
-
-          console.log("job", job);
-
-          return resolve({
-            options: {
-              ...options, // Maintain existing options configuration
-              params: {
-                ...params, // Maintain existing params
-                ...options.params, // Preserve existing params
-                uploadJobId: job.id,
-              },
-            },
-          });
-        });
-      },
-    }),
-    [params]
-  );
+  const jobIdRef = useRef<string | null>(null);
 
   useRequestPreSend(async ({ items, options }) => {
     const blueprint = createBlueprintClient({
@@ -103,6 +56,8 @@ export const ShadowUploadField = ({
     }
 
     console.log("job", job);
+    jobIdRef.current = job.id;
+    setUploadJobId(job.id);
 
     return {
       options: {
@@ -116,6 +71,60 @@ export const ShadowUploadField = ({
     };
   });
 
+  // useMemo(
+  //   () => ({
+  //     [UPLOADER_EVENTS.REQUEST_PRE_SEND]: ({
+  //       items,
+  //       options,
+  //     }: {
+  //       items: BatchItem[];
+  //       options: CreateOptions;
+  //     }) => {
+  //       return new Promise(async (resolve, reject) => {
+  //         const blueprint = createBlueprintClient({
+  //           cluster: "devnet",
+  //         });
+
+  //         const sizeInBytes = items.reduce((acc, item) => {
+  //           return acc + item.file.size;
+  //         }, 0);
+
+  //         if (!params.userId) {
+  //           return reject("No userId, cannot create job.");
+  //         }
+
+  //         const { success, job } = await blueprint.createUploadJob({
+  //           driveAddress: params.driveAddress,
+  //           sizeInBytes,
+  //           userId: params.userId,
+  //         });
+
+  //         debugger;
+
+  //         setUploadJobId(job.id);
+
+  //         if (!success) {
+  //           return reject("Failed to create upload job");
+  //         }
+
+  //         console.log("job", job);
+
+  //         return resolve({
+  //           options: {
+  //             ...options, // Maintain existing options configuration
+  //             params: {
+  //               ...params, // Maintain existing params
+  //               ...options.params, // Preserve existing params
+  //               uploadJobId: job.id,
+  //             },
+  //           },
+  //         });
+  //       });
+  //     },
+  //   }),
+  //   [params, setUploadJobId]
+  // );
+
   useChunkStartListener(({ item, chunk, sendOptions }) => {
     const chunkIndex = chunk.index;
     const fileId = item.id;
@@ -127,6 +136,7 @@ export const ShadowUploadField = ({
     const uploadId = fileUploadIdsRef.current[fileId];
 
     const totalChunks = Math.ceil(item.file.size / CHUNK_SIZE);
+
     return {
       sendOptions: {
         ...sendOptions, // Maintain existing sendOptions configuration
@@ -136,6 +146,7 @@ export const ShadowUploadField = ({
           chunkIndex,
           uploadId,
           totalChunks,
+          uploadJobId: jobIdRef.current,
         },
       },
     };

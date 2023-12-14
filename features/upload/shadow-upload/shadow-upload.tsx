@@ -7,6 +7,7 @@ const ShadowUpload = (params: {
   collectionId: string;
   shouldUnzip: boolean;
   userId: string;
+  setUploadJobId: (id: string) => void;
 }) => {
   return (
     <ChunkedUploady
@@ -18,7 +19,16 @@ const ShadowUpload = (params: {
       chunkSize={5 * 1024 * 1024}
       chunked
     >
-      <ShadowUploadField params={params} />
+      <ShadowUploadField
+        params={{
+          ownerAddress: params.ownerAddress,
+          driveAddress: params.driveAddress,
+          collectionId: params.collectionId,
+          shouldUnzip: params.shouldUnzip,
+          userId: params.userId,
+        }}
+        setUploadJobId={params.setUploadJobId}
+      />
     </ChunkedUploady>
   );
 };
