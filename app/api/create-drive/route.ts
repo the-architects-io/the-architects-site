@@ -1,10 +1,6 @@
 import { RPC_ENDPOINT } from "@/constants/constants";
-import { getRpcEndpoint } from "@/utils/rpc";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
-import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
-import { mplToolbox } from "@metaplex-foundation/mpl-toolbox";
-import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { ShdwDrive } from "@shadow-drive/sdk";
 import { Connection, Keypair } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
@@ -26,6 +22,7 @@ export async function POST(req: NextRequest) {
     process.env.NEXT_PUBLIC_EXECUTION_WALLET_ADDRESS,
     bs58.decode(process.env.EXECUTION_WALLET_PRIVATE_KEY)
   );
+
   const key = privateKeyMap.get(ownerAddress);
 
   const keypair = Keypair.fromSecretKey(key);

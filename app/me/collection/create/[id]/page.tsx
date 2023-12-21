@@ -45,8 +45,6 @@ import classNames from "classnames";
 import { CreateCollectionFormChecklist } from "@/features/collection/create-collection-form-checklist";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { SingleImageUploadResponse } from "@/features/upload/single-image/single-image-upload-field-wrapper";
-import { Connection } from "@solana/web3.js";
-import { ShdwDrive } from "@shadow-drive/sdk";
 
 export default function CreateCollectionPage({
   params,

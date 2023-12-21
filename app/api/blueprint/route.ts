@@ -74,298 +74,58 @@ const mapErrorToResponse = (error: any): MappedErrorResponse => {
   };
 };
 
-const handleBlueprintAction = async (
+async function makeBlueprintApiRequest(
   action: BlueprintApiActions,
-  params: any
-) => {
-  try {
-    const { data, status, statusText } = await axios.post(
-      BlueprintApiActionUrls[action],
-      {
-        ...params,
-        apiKey: process.env.BLUEPRINT_API_KEY,
-      }
-    );
-
+  data: any,
+  isFormData: boolean = false
+) {
+  const apiKey = process.env.BLUEPRINT_API_KEY;
+  if (!apiKey) {
     return NextResponse.json(
-      {
-        status: status || 500,
-        statusText,
-        success: status === 200,
-        action,
-        params,
-        ...data,
-      },
-      {
-        status: status || 500,
-      }
-    );
-  } catch (rawError: any) {
-    let { error, status } = mapErrorToResponse(rawError);
-
-    logError({ error, status });
-    return NextResponse.json({ error }, { status });
-  }
-};
-
-const handleAddAirdropRecipients = async (params: any) => {
-  const { airdropId, recipients } = params;
-
-  if (!airdropId || !recipients) {
-    return NextResponse.json(
-      {
-        error: "Missing required params",
-        status: 500,
-      },
+      { error: "Blueprint API key not configured", status: 500 },
       { status: 500 }
     );
   }
 
-  if (!process.env.BLUEPRINT_API_KEY) {
-    return NextResponse.json(
-      {
-        error: "Blueprint API key not configured",
-        status: 500,
-      },
-      { status: 500 }
-    );
-  }
+  const url = BlueprintApiActionUrls[action];
 
   try {
-    const { data, status, statusText } = await axios.post(
-      BlueprintApiActionUrls[ADD_AIRDROP_RECIPIENTS],
-      {
-        ...params,
-        apiKey: process.env.BLUEPRINT_API_KEY,
-      }
-    );
-
-    return NextResponse.json(
-      {
-        ...data,
-        status: status || 500,
-        statusText,
-        action: UPLOAD_FILE,
-        success: status === 200,
-      },
-      {
-        status: status || 500,
-      }
-    );
-  } catch (rawError: any) {
-    let { error, status } = mapErrorToResponse(rawError);
-
-    logError({ error, status });
-    return NextResponse.json({ error }, { status });
-  }
-};
-
-const handleUploadFormData = async (
-  action: BlueprintApiActions,
-  formData: FormData | undefined
-) => {
-  console.log("sanity check");
-  if (!process.env.BLUEPRINT_API_KEY) {
-    return NextResponse.json(
-      {
-        error: "Blueprint API key not configured",
-        status: 500,
-      },
-      { status: 500 }
-    );
-  }
-
-  console.log("sanity check 2");
-
-  if (!formData) {
-    return NextResponse.json(
-      {
-        error: "Missing form data",
-        status: 500,
-      },
-      { status: 500 }
-    );
-  }
-
-  console.log("sanity check 3");
-
-  formData.append("apiKey", process.env.BLUEPRINT_API_KEY);
-
-  try {
-    const { data, status, statusText } = await axios.post(
-      BlueprintApiActionUrls[action],
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    console.log({ data });
-
-    if (data?.errors?.length) {
-      return NextResponse.json({
-        error: data?.errors[0],
-        status: 500,
-        statusText: "Error with upload to shadow drive",
-        action: BlueprintApiActionUrls[action],
-      });
+    let headers = {};
+    if (isFormData) {
+      data.append("apiKey", apiKey);
+      // No need to explicitly set 'Content-Type' as axios/browser will handle it
+    } else {
+      data.apiKey = apiKey;
+      headers = { "Content-Type": "application/json" };
     }
 
-    return NextResponse.json({
-      ...data,
-      count: data?.count || 0,
-      status: status || 500,
-      statusText,
-      action: BlueprintApiActionUrls[action],
-      success: status === 200,
-    });
-  } catch (rawError: any) {
-    let error = mapErrorToResponse(rawError);
+    const response = await axios.post(url, data, { headers });
 
-    console.log({ rawError });
-    console.log(rawError?.response);
-
-    logError(error);
-    return NextResponse.json({ error });
-  }
-};
-
-const handleCreateDispenser = async (params: any) => {
-  try {
-    const { data, status, statusText } = await axios.post(
-      BlueprintApiActionUrls[CREATE_DISENSER],
-      {
-        ...params,
-        apiKey: process.env.BLUEPRINT_API_KEY,
-      }
-    );
-
-    return NextResponse.json({
-      ...data,
-      status: data?.status || 500,
-      statusText: data?.status !== 200 ? data?.statusText : statusText,
-      action: CREATE_DISENSER,
-      params,
-    });
-  } catch (rawError: any) {
-    let error = mapErrorToResponse(rawError);
-
-    logError(error);
-    return NextResponse.json({ error });
-  }
-};
-
-const handleDispenseTokens = async (params: any) => {
-  try {
-    const { data, status, statusText } = await axios.post(
-      BlueprintApiActionUrls[DISPENSE_TOKENS],
-      {
-        ...params,
-        apiKey: process.env.BLUEPRINT_API_KEY,
-      }
-    );
+    // Additional check for file upload related errors
+    if (isFormData && response.data?.errors?.length) {
+      // Handle file-specific errors here
+      return NextResponse.json({ ...response.data, status: 500 });
+    }
 
     return NextResponse.json(
       {
-        status: status || 500,
-        statusText,
-        action: DISPENSE_TOKENS,
-        params,
-        ...data,
+        ...response.data,
+        status: response.status,
+        action: action,
+        success: response.status === 200,
       },
       {
-        status: status || 500,
+        status: response.status,
       }
     );
   } catch (rawError: any) {
-    let { error, status } = mapErrorToResponse(rawError);
-
+    const { error, status } = mapErrorToResponse(rawError);
     logError({ error, status });
     return NextResponse.json({ error }, { status });
   }
-};
-
-const handleJsonFileUpload = async (formData: FormData | undefined) => {
-  console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@ handleJsonFileUpload", {
-    formData,
-  });
-  if (!process.env.BLUEPRINT_API_KEY) {
-    return NextResponse.json(
-      {
-        error: "Blueprint API key not configured",
-        status: 500,
-      },
-      { status: 500 }
-    );
-  }
-
-  if (!formData) {
-    return NextResponse.json(
-      {
-        error: "Missing form data",
-        status: 500,
-      },
-      { status: 500 }
-    );
-  }
-
-  formData.append("apiKey", process.env.BLUEPRINT_API_KEY);
-
-  console.log({ formData });
-
-  try {
-    const { data, status, statusText } = await axios.post(
-      BlueprintApiActionUrls[UPLOAD_JSON],
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    console.log({ data, status, statusText });
-
-    if (data?.errors?.length) {
-      return NextResponse.json({
-        error: data?.errors[0],
-        status: 500,
-        statusText: "Error with upload to shadow drive",
-        action: BlueprintApiActionUrls[UPLOAD_JSON],
-      });
-    }
-
-    return NextResponse.json({
-      ...data,
-      status: status || 500,
-      statusText,
-      action: BlueprintApiActionUrls[UPLOAD_JSON],
-      success: status === 200,
-    });
-  } catch (rawError: any) {
-    let error = mapErrorToResponse(rawError);
-
-    logError(error);
-    return NextResponse.json({ error });
-  }
-};
+}
 
 export async function POST(req: NextRequest) {
-  let action, params;
-
-  console.log({ headers: req.headers.get("content-type") });
-
-  if (req.headers.get("content-type") === "application/json") {
-    const json = await req.json();
-    action = json.action;
-    params = json.params;
-  } else {
-    params = await req.formData();
-    action = params.get("action");
-  }
-
   if (!process.env.API_ACCESS_HOST_LIST) {
     return NextResponse.json(
       {
@@ -390,36 +150,20 @@ export async function POST(req: NextRequest) {
   //   );
   // }
 
-  switch (action) {
-    case BlueprintApiActions.CREATE_AIRDROP:
-    case BlueprintApiActions.CREATE_COLLECTION:
-    case BlueprintApiActions.CREATE_DRIVE:
-    case BlueprintApiActions.CREATE_TREE:
-    case BlueprintApiActions.CREATE_UPLOAD_JOB:
-    case BlueprintApiActions.DELETE_DRIVE:
-    case BlueprintApiActions.GET_DRIVE:
-    case BlueprintApiActions.GET_DRIVES:
-    case BlueprintApiActions.INCREASE_STORAGE:
-    case BlueprintApiActions.MINT_CNFT:
-    case BlueprintApiActions.MINT_NFT:
-    case BlueprintApiActions.REDUCE_STORAGE:
-    case BlueprintApiActions.UPDATE_COLLECTION:
-      return handleBlueprintAction(action, params);
-    case BlueprintApiActions.UPLOAD_FILE:
-    case BlueprintApiActions.UPLOAD_FILES:
-      return handleUploadFormData(action, params);
-    case BlueprintApiActions.UPLOAD_JSON:
-      return handleJsonFileUpload(params);
-    case BlueprintApiActions.ADD_AIRDROP_RECIPIENTS:
-      return handleAddAirdropRecipients(params);
-    case BlueprintApiActions.CREATE_DISENSER:
-      return handleCreateDispenser(params);
-    case BlueprintApiActions.DISPENSE_TOKENS:
-      return handleDispenseTokens(params);
-    default:
-      return NextResponse.json({
-        error: "Invalid action",
-        status: 500,
-      });
+  // Extract action and parameters from request
+  let action, params;
+  if (req.headers.get("content-type") === "application/json") {
+    const json = await req.json();
+    action = json.action;
+    params = json.params;
+  } else {
+    params = await req.formData();
+    action = params.get("action");
   }
+
+  // Determine if the request data is FormData
+  const isFormData = req.headers.get("content-type") !== "application/json";
+
+  // Make API request based on action
+  return makeBlueprintApiRequest(action, params, isFormData);
 }

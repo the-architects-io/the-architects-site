@@ -22,7 +22,7 @@ export const ShadowUploadField = ({
   setUploadJobId: (id: string) => void;
   params: {
     ownerAddress: string;
-    driveAddress: string;
+    driveAddress?: string;
     collectionId: string;
     shouldUnzip: boolean;
     userId: string;

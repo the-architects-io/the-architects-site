@@ -1,7 +1,7 @@
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { Panel } from "@/features/UI/panel";
 import showToast from "@/features/toasts/show-toast";
-import ShadowUpload from "@/utils/shadow-upload";
+import ShadowUpload from "@/features/shadow-upload";
 import { PublicKey } from "@metaplex-foundation/js";
 import { ShdwDrive } from "@shadow-drive/sdk";
 

@@ -3,7 +3,7 @@ import { ShadowUploadField } from "@/features/upload/shadow-upload/shadow-upload
 
 const ShadowUpload = (params: {
   ownerAddress: string;
-  driveAddress: string;
+  driveAddress?: string;
   collectionId: string;
   shouldUnzip: boolean;
   userId: string;

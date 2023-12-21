@@ -43,7 +43,6 @@ export default function StreamUploadPage() {
         <div className="mb-8">
           <ShadowUpload
             ownerAddress={EXECUTION_WALLET_ADDRESS}
-            driveAddress="5DB4MmQBHdZRet8a789ezNbDeFSpQUMuFG5fxuLGXRhD"
             collectionId="1234567890"
             shouldUnzip={false}
             userId={user?.id}

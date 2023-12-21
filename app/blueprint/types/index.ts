@@ -823,7 +823,7 @@ export type DeleteDriveResponse = BaseBlueprintResponse & {
 };
 
 export type CreateUploadJobInput = {
-  driveAddress: string;
+  driveAddress?: string;
   sizeInBytes: number;
   userId: string;
 };
