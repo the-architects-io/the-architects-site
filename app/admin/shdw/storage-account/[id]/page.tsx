@@ -5,7 +5,7 @@ import { Panel } from "@/features/UI/panel";
 import showToast from "@/features/toasts/show-toast";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { getRpcEndpoint } from "@/utils/rpc";
-import ShadowUpload from "@/features/shadow-upload";
+import ShadowUpload from "@/features/basic-shadow-upload";
 import { ClipboardIcon, EyeIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { PublicKey } from "@metaplex-foundation/js";
 import { ShdwDrive, StorageAccountV2 } from "@shadow-drive/sdk";

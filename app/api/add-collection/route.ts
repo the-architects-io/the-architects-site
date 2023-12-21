@@ -4,7 +4,11 @@ import { Collection } from "@metaplex-foundation/mpl-token-metadata";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { collection } = await req.json();
+  const collection = await req.json();
+
+  if (collection.apiKey) {
+    delete collection.apiKey;
+  }
 
   const {
     insert_collections_one,

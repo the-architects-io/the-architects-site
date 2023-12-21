@@ -2,9 +2,7 @@ import { createBlueprintClient } from "@/app/blueprint/client";
 import { useChunkStartListener } from "@rpldy/chunked-uploady";
 import UploadButton from "@rpldy/upload-button";
 import {
-  BatchItem,
-  CreateOptions,
-  UPLOADER_EVENTS,
+  useBatchFinalizeListener,
   useRequestPreSend,
   useUploady,
 } from "@rpldy/uploady";
@@ -16,10 +14,12 @@ const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 export const ShadowUploadField = ({
   children,
   setUploadJobId,
+  onUploadComplete,
   params,
 }: {
   children?: string | JSX.Element | JSX.Element[];
   setUploadJobId: (id: string) => void;
+  onUploadComplete?: (response: any) => void;
   params: {
     ownerAddress: string;
     driveAddress?: string;
@@ -71,60 +71,6 @@ export const ShadowUploadField = ({
     };
   });
 
-  // useMemo(
-  //   () => ({
-  //     [UPLOADER_EVENTS.REQUEST_PRE_SEND]: ({
-  //       items,
-  //       options,
-  //     }: {
-  //       items: BatchItem[];
-  //       options: CreateOptions;
-  //     }) => {
-  //       return new Promise(async (resolve, reject) => {
-  //         const blueprint = createBlueprintClient({
-  //           cluster: "devnet",
-  //         });
-
-  //         const sizeInBytes = items.reduce((acc, item) => {
-  //           return acc + item.file.size;
-  //         }, 0);
-
-  //         if (!params.userId) {
-  //           return reject("No userId, cannot create job.");
-  //         }
-
-  //         const { success, job } = await blueprint.createUploadJob({
-  //           driveAddress: params.driveAddress,
-  //           sizeInBytes,
-  //           userId: params.userId,
-  //         });
-
-  //         debugger;
-
-  //         setUploadJobId(job.id);
-
-  //         if (!success) {
-  //           return reject("Failed to create upload job");
-  //         }
-
-  //         console.log("job", job);
-
-  //         return resolve({
-  //           options: {
-  //             ...options, // Maintain existing options configuration
-  //             params: {
-  //               ...params, // Maintain existing params
-  //               ...options.params, // Preserve existing params
-  //               uploadJobId: job.id,
-  //             },
-  //           },
-  //         });
-  //       });
-  //     },
-  //   }),
-  //   [params, setUploadJobId]
-  // );
-
   useChunkStartListener(({ item, chunk, sendOptions }) => {
     const chunkIndex = chunk.index;
     const fileId = item.id;
@@ -152,5 +98,13 @@ export const ShadowUploadField = ({
     };
   });
 
-  return <UploadButton>{!!children ? children : "Upload"}</UploadButton>;
+  useBatchFinalizeListener((batch) => {
+    onUploadComplete?.(batch);
+  });
+
+  return (
+    <UploadButton className="underline">
+      {!!children ? children : "Upload"}
+    </UploadButton>
+  );
 };

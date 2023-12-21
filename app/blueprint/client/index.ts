@@ -96,7 +96,6 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
         options,
         true
       ),
-
     createCollection: (params: CreateCollectionInput) =>
       makeApiRequest<CreateCollectionResponse, CreateCollectionInput>(
         BlueprintApiActions.CREATE_COLLECTION,

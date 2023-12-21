@@ -7,7 +7,7 @@ import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import showToast from "@/features/toasts/show-toast";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { getRpcEndpoint } from "@/utils/rpc";
-import ShadowUpload from "@/features/shadow-upload";
+import ShadowUpload from "@/features/basic-shadow-upload";
 import { PublicKey } from "@metaplex-foundation/js";
 import { ShdwDrive, StorageAccountV2 } from "@shadow-drive/sdk";
 import { useWallet } from "@solana/wallet-adapter-react";

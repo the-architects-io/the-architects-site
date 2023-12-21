@@ -690,7 +690,6 @@ export type UpdateCollectionInput = {
   sellerFeeBasisPoints: number;
   imageUrl: string;
   creators: Creator[];
-  driveAddress: string;
   isReadyToMint: boolean;
 };
 

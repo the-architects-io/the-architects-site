@@ -47,6 +47,7 @@ export default function StreamUploadPage() {
             shouldUnzip={false}
             userId={user?.id}
             setUploadJobId={setUploadJobId}
+            onUploadComplete={() => {}}
           />
         </div>
       )}
