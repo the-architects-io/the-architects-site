@@ -56,7 +56,9 @@ export default function CollectionsPage() {
           />
           {!!readyToMintCollections.length && (
             <div className="max-w-3xl mx-auto">
-              <div className="text-2xl mb-4 mt-8">Mint Ready Collections</div>
+              <div className="text-2xl mb-4 mt-16 text-center">
+                Mint Ready Collections
+              </div>
               <div className="flex flex-wrap">
                 {readyToMintCollections.map((collection) => {
                   return (
