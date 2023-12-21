@@ -11,6 +11,7 @@ export const GET_UPLOAD_JOB_BY_ID = gql`
       percentComplete
       sizeInBytes
       updatedAt
+      statusText
       status {
         id
         name

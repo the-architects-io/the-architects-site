@@ -41,7 +41,7 @@ export const ShadowUploadField = ({
       return acc + item.file.size;
     }, 0);
 
-    if (!params.userId) {
+    if (!params.userId || !items?.[0].file) {
       throw new Error("No userId, cannot create job.");
     }
 

@@ -1,19 +1,16 @@
 "use client";
-import { UploadJob } from "@/app/blueprint/types";
 import { EXECUTION_WALLET_ADDRESS } from "@/constants/constants";
-
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import ShadowUpload from "@/features/upload/shadow-upload/shadow-upload";
 import { GET_UPLOAD_JOB_BY_ID } from "@/graphql/queries/get-upload-job-by-id";
 import { useQuery } from "@apollo/client";
-
+import { CheckCircleIcon } from "@heroicons/react/24/solid";
+import { Line } from "rc-progress";
 import { useUserData } from "@nhost/nextjs";
-import { PutBlobResult } from "@vercel/blob";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 
 export default function StreamUploadPage() {
-  const [blob, setBlob] = useState<PutBlobResult | null>(null);
   const [uploadJobId, setUploadJobId] = useState<string | undefined>(undefined);
 
   const { loading, error, data } = useQuery(GET_UPLOAD_JOB_BY_ID, {
@@ -21,7 +18,7 @@ export default function StreamUploadPage() {
       id: uploadJobId,
     },
     skip: !uploadJobId,
-    pollInterval: 1000,
+    pollInterval: 500,
   });
 
   const user = useUserData();
@@ -43,17 +40,50 @@ export default function StreamUploadPage() {
   return (
     <ContentWrapper className="flex flex-col items-center">
       {!!user?.id && (
-        <ShadowUpload
-          ownerAddress={EXECUTION_WALLET_ADDRESS}
-          driveAddress="5DB4MmQBHdZRet8a789ezNbDeFSpQUMuFG5fxuLGXRhD"
-          collectionId="1234567890"
-          shouldUnzip={false}
-          userId={user?.id}
-          setUploadJobId={setUploadJobId}
-        />
+        <div className="mb-8">
+          <ShadowUpload
+            ownerAddress={EXECUTION_WALLET_ADDRESS}
+            driveAddress="5DB4MmQBHdZRet8a789ezNbDeFSpQUMuFG5fxuLGXRhD"
+            collectionId="1234567890"
+            shouldUnzip={false}
+            userId={user?.id}
+            setUploadJobId={setUploadJobId}
+          />
+        </div>
       )}
       {!!data?.uploadJobs_by_pk && (
-        <>{JSON.stringify(data.uploadJobs_by_pk, null, 2)}</>
+        <div className="my-8 w-full">
+          {data.uploadJobs_by_pk.percentComplete < 100 ? (
+            <>
+              <div className="text-8xl mb-8 flex flex-col items-center justify-center w-full h-48">
+                <div className="flex justify-center items-end mb-4">
+                  {data.uploadJobs_by_pk.percentComplete}
+                  <span className="text-3xl ml-3 mb-2">%</span>
+                </div>
+                <div className="w-full max-w-md mb-8">
+                  <Line
+                    percent={data.uploadJobs_by_pk.percentComplete}
+                    trailWidth={1}
+                    strokeWidth={3}
+                    strokeColor="#10B981"
+                  />
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="text-8xl mb-4 flex justify-center items-end w-full">
+              <span className="text-green-500 ml-3 mb-2">
+                <CheckCircleIcon className="w-48 h-48" />
+              </span>
+            </div>
+          )}
+          <div className="text-3xl text-center mb-6">
+            {data.uploadJobs_by_pk.statusText || "Uploading..."}
+          </div>
+          <div className="text-xl mb-4 flex justify-center">
+            {(data.uploadJobs_by_pk.sizeInBytes / 1000000).toFixed(2)} MB
+          </div>
+        </div>
       )}
     </ContentWrapper>
   );

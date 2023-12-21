@@ -55,7 +55,7 @@ export default function CollectionsPage() {
             onSuccess={(collection) => handleRedirect(collection)}
           />
           {!!readyToMintCollections.length && (
-            <>
+            <div className="max-w-3xl mx-auto">
               <div className="text-2xl mb-4 mt-8">Mint Ready Collections</div>
               <div className="flex flex-wrap">
                 {readyToMintCollections.map((collection) => {
@@ -80,7 +80,7 @@ export default function CollectionsPage() {
                   );
                 })}
               </div>
-            </>
+            </div>
           )}
         </div>
       </ContentWrapper>
