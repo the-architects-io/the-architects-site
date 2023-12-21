@@ -11,7 +11,9 @@ import {
   CreateTreeInput,
   CreateTreeResponse,
   CreateUploadJobInput,
+  CreateUploadJobResponse,
   DeleteDriveInput,
+  DeleteDriveResponse,
   GetDriveInput,
   GetDriveResponse,
   GetDrivesInput,
@@ -23,12 +25,15 @@ import {
   MintNftInput,
   MintNftResponse,
   ReduceStorageInput,
+  ReduceStorageResponse,
   UpdateCollectionInput,
+  UpdateCollectionResponse,
   UploadFileInput,
   UploadFileResponse,
   UploadFilesInput,
   UploadFilesResponse,
   UploadJsonInput,
+  UploadJsonResponse,
 } from "@/app/blueprint/types";
 import { jsonFileToJson } from "@/app/blueprint/utils";
 import { BASE_URL } from "@/constants/constants";
@@ -38,370 +43,161 @@ export type BlueprintClientOptions = {
   cluster: "devnet" | "testnet" | "mainnet-beta";
 };
 
-const createCollection = async (
-  options: BlueprintClientOptions,
-  params: CreateCollectionInput
-): Promise<CreateCollectionResponse> => {
-  const response = await fetch("/api/blueprint", {
-    method: "POST",
-    body: JSON.stringify({
-      action: BlueprintApiActions.CREATE_COLLECTION,
-      params: { collection: params },
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const data = await response.json();
-  return data;
-};
-
-const createAirdrop = async (
-  options: BlueprintClientOptions,
-  params: CreateAirdropInput
-): Promise<CreateAirdropResponse> => {
-  const response = await fetch("/api/blueprint", {
-    method: "POST",
-    body: JSON.stringify({
-      action: BlueprintApiActions.CREATE_AIRDROP,
-      params,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const data = await response.json();
-  return data;
-};
-
-const addAirdropRecipients = async (
-  options: BlueprintClientOptions,
-  params: AddAirdropRecipientsInput
-): Promise<AirdropRecipientsResponse> => {
-  const { recipients: incomingRecipients, airdropId } = params;
-
-  if (!incomingRecipients) {
-    throw new Error("No recipients provided");
-  }
-
-  let recipients: string[] = [];
-
-  const isJsonFile = (file: any) => {
-    try {
-      return file.type === "application/json";
-    } catch (err) {
-      return false;
+const getFormData = async (params: Record<string, any>) => {
+  const formData = new FormData();
+  for (const key in params) {
+    if (params[key] instanceof File) {
+      const file = params[key] as File;
+      if (file.type === "application/json") {
+        const json = await jsonFileToJson(file);
+        formData.append(key, JSON.stringify(json));
+      } else {
+        formData.append(key, file);
+      }
+    } else {
+      formData.append(key, params[key]);
     }
-  };
+  }
+  return formData;
+};
 
-  console.log({ incomingRecipients });
+async function makeApiRequest<TResponse, TParams extends Record<string, any>>(
+  action: BlueprintApiActions,
+  params: TParams,
+  options: BlueprintClientOptions,
+  isFormData: boolean = false
+): Promise<TResponse> {
+  const url = `${BASE_URL}/api/blueprint`;
 
-  if (isJsonFile(incomingRecipients)) {
-    const json = await jsonFileToJson(incomingRecipients as File);
-    recipients = json;
+  let body: FormData | string;
+  let headers = {};
+
+  if (isFormData) {
+    const formData = await getFormData(params);
+    if (!formData) throw new Error("Failed to create form data");
+
+    body = formData;
+    headers = { "Content-Type": "multipart/form-data" };
   } else {
-    recipients = incomingRecipients as string[];
+    body = JSON.stringify({ action, params, cluster: options.cluster });
+    headers = { "Content-Type": "application/json" };
   }
 
-  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, {
-    action: BlueprintApiActions.ADD_AIRDROP_RECIPIENTS,
-    params: {
-      recipients,
-      airdropId,
-    },
-  });
-
-  return data;
-};
-
-const createDrive = async (
-  options: BlueprintClientOptions,
-  params: CreateDriveInput
-): Promise<CreateDriveResponse> => {
-  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, {
-    action: BlueprintApiActions.CREATE_DRIVE,
-    params,
-  });
-
-  return data;
-};
-
-const createTree = async (
-  options: BlueprintClientOptions,
-  params: CreateTreeInput
-): Promise<CreateTreeResponse> => {
-  const response = await fetch("/api/blueprint", {
-    method: "POST",
-    body: JSON.stringify({
-      action: BlueprintApiActions.CREATE_TREE,
-      params,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const data = await response.json();
-  return data;
-};
-
-const createUploadJob = async (
-  options: BlueprintClientOptions,
-  params: CreateUploadJobInput
-) => {
-  const response = await fetch("/api/blueprint", {
-    method: "POST",
-    body: JSON.stringify({
-      action: BlueprintApiActions.CREATE_UPLOAD_JOB,
-      params,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const data = await response.json();
-  return data;
-};
-
-const deleteDrive = async (
-  options: BlueprintClientOptions,
-  params: DeleteDriveInput
-): Promise<CreateDriveResponse> => {
-  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, {
-    action: BlueprintApiActions.DELETE_DRIVE,
-    params,
-  });
-
-  return data;
-};
-
-const getDrive = async (
-  options: BlueprintClientOptions,
-  params: GetDriveInput
-): Promise<GetDriveResponse> => {
-  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, {
-    action: BlueprintApiActions.GET_DRIVE,
-    params,
-  });
-
-  return data;
-};
-
-const getDrives = async (
-  options: BlueprintClientOptions,
-  params: GetDrivesInput
-): Promise<GetDrivesResponse> => {
-  const { ownerAddress } = params;
-
-  if (!ownerAddress) {
-    throw new Error("Missing required parameters");
-  }
-
-  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, {
-    action: BlueprintApiActions.GET_DRIVES,
-    params: {
-      ownerAddress,
-    },
-  });
-
-  return data;
-};
-
-const increaseStorage = async (
-  options: BlueprintClientOptions,
-  params: IncreaseStorageInput
-): Promise<IncreaseStorageResponse> => {
-  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, {
-    action: BlueprintApiActions.INCREASE_STORAGE,
-    params,
-  });
-
-  return data;
-};
-
-const mintCnft = async (
-  options: BlueprintClientOptions,
-  params: MintCnftInput
-): Promise<MintCnftResponse> => {
-  const { cluster } = options;
-
-  const response = await fetch("/api/blueprint", {
-    method: "POST",
-    body: JSON.stringify({
-      action: BlueprintApiActions.MINT_CNFT,
-      params: {
-        ...params,
-        cluster,
-      },
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const data = await response.json();
-  return data;
-};
-
-const mintNft = async (
-  options: BlueprintClientOptions,
-  params: MintNftInput
-): Promise<MintNftResponse> => {
-  const { cluster } = options;
-
-  const response = await fetch("/api/blueprint", {
-    method: "POST",
-    body: JSON.stringify({
-      action: BlueprintApiActions.MINT_NFT,
-      params: {
-        ...params,
-        cluster,
-      },
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const data = await response.json();
-  return data;
-};
-
-const reduceStorage = async (
-  options: BlueprintClientOptions,
-  params: ReduceStorageInput
-): Promise<IncreaseStorageResponse> => {
-  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, {
-    action: BlueprintApiActions.REDUCE_STORAGE,
-    params,
-  });
-
-  return data;
-};
-
-const updateCollection = async (
-  options: BlueprintClientOptions,
-  params: UpdateCollectionInput
-): Promise<CreateCollectionResponse> => {
-  const response = await fetch("/api/blueprint", {
-    method: "POST",
-    body: JSON.stringify({
-      action: BlueprintApiActions.UPDATE_COLLECTION,
-      params,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const data = await response.json();
-  return data;
-};
-
-const uploadJson = async (
-  options: BlueprintClientOptions,
-  params: UploadJsonInput
-): Promise<UploadFileResponse> => {
-  const { json, fileName } = params;
-
-  const response = await fetch("/api/blueprint", {
-    method: "POST",
-    body: JSON.stringify({
-      action: BlueprintApiActions.UPLOAD_JSON,
-      params,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const data = await response.json();
-  return data;
-};
-
-const uploadFile = async (
-  options: BlueprintClientOptions,
-  params: UploadFileInput
-): Promise<UploadFileResponse> => {
-  const { cluster } = options;
-  const { file, fileName, driveAddress } = params;
-
-  if (!file || !fileName || !driveAddress) {
-    throw new Error("Missing required parameters");
-  }
-
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("fileName", fileName);
-  formData.append("driveAddress", driveAddress);
-  formData.append("cluster", cluster);
-  formData.append("action", BlueprintApiActions.UPLOAD_FILE);
-
-  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-
-  return data;
-};
-
-const uploadFiles = async (
-  options: BlueprintClientOptions,
-  params: UploadFilesInput
-): Promise<UploadFilesResponse> => {
-  const { files, driveAddress } = params;
-
-  if (!files || !driveAddress) {
-    throw new Error("Missing required parameters");
-  }
-
-  console.log("@@@@@@@@@@@@@@@@@@@@@@@@@");
-  console.log({ files });
-
-  const formData = new FormData();
-  formData.append("driveAddress", driveAddress);
-  formData.append("action", BlueprintApiActions.UPLOAD_FILES);
-  // @ts-ignore
-  formData.append("files", files);
-
-  const { data } = await axios.post(`${BASE_URL}/api/blueprint`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-
-  return data;
-};
+  const response = await axios.post(url, body, { headers });
+  return response.data;
+}
 
 export const createBlueprintClient = (options: BlueprintClientOptions) => {
   return {
     addAirdropRecipients: (params: AddAirdropRecipientsInput) =>
-      addAirdropRecipients(options, params),
+      makeApiRequest<AirdropRecipientsResponse, AddAirdropRecipientsInput>(
+        BlueprintApiActions.ADD_AIRDROP_RECIPIENTS,
+        params,
+        options,
+        true
+      ),
+
     createCollection: (params: CreateCollectionInput) =>
-      createCollection(options, params),
+      makeApiRequest<CreateCollectionResponse, CreateCollectionInput>(
+        BlueprintApiActions.CREATE_COLLECTION,
+        params,
+        options
+      ),
     createAirdrop: (params: CreateAirdropInput) =>
-      createAirdrop(options, params),
-    createDrive: (params: CreateDriveInput) => createDrive(options, params),
-    createTree: (params: CreateTreeInput) => createTree(options, params),
+      makeApiRequest<CreateAirdropResponse, CreateAirdropInput>(
+        BlueprintApiActions.CREATE_AIRDROP,
+        params,
+        options
+      ),
+    createDrive: (params: CreateDriveInput) =>
+      makeApiRequest<CreateDriveResponse, CreateDriveInput>(
+        BlueprintApiActions.CREATE_DRIVE,
+        params,
+        options
+      ),
+    createTree: (params: CreateTreeInput) =>
+      makeApiRequest<CreateTreeResponse, CreateTreeInput>(
+        BlueprintApiActions.CREATE_TREE,
+        params,
+        options
+      ),
+
     createUploadJob: (params: CreateUploadJobInput) =>
-      createUploadJob(options, params),
-    deleteDrive: (params: DeleteDriveInput) => deleteDrive(options, params),
-    getDrive: (params: GetDriveInput) => getDrive(options, params),
-    getDrives: (params: GetDrivesInput) => getDrives(options, params),
+      makeApiRequest<CreateUploadJobResponse, CreateUploadJobInput>(
+        BlueprintApiActions.CREATE_UPLOAD_JOB,
+        params,
+        options
+      ),
+    deleteDrive: (params: DeleteDriveInput) =>
+      makeApiRequest<DeleteDriveResponse, DeleteDriveInput>(
+        BlueprintApiActions.DELETE_DRIVE,
+        params,
+        options
+      ),
+
+    getDrive: (params: GetDriveInput) =>
+      makeApiRequest<GetDriveResponse, GetDriveInput>(
+        BlueprintApiActions.GET_DRIVE,
+        params,
+        options
+      ),
+    getDrives: (params: GetDrivesInput) =>
+      makeApiRequest<GetDrivesResponse, GetDrivesInput>(
+        BlueprintApiActions.GET_DRIVES,
+        params,
+        options
+      ),
     increaseStorage: (params: IncreaseStorageInput) =>
-      increaseStorage(options, params),
-    mintCnft: (params: MintCnftInput) => mintCnft(options, params),
-    mintNft: (params: MintNftInput) => mintNft(options, params),
+      makeApiRequest<IncreaseStorageResponse, IncreaseStorageInput>(
+        BlueprintApiActions.INCREASE_STORAGE,
+        params,
+        options
+      ),
+    mintCnft: (params: MintCnftInput) =>
+      makeApiRequest<MintCnftResponse, MintCnftInput>(
+        BlueprintApiActions.MINT_CNFT,
+        params,
+        options
+      ),
+    mintNft: (params: MintNftInput) =>
+      makeApiRequest<MintNftResponse, MintNftInput>(
+        BlueprintApiActions.MINT_NFT,
+        params,
+        options
+      ),
     reduceStorage: (params: ReduceStorageInput) =>
-      reduceStorage(options, params),
+      makeApiRequest<ReduceStorageResponse, ReduceStorageInput>(
+        BlueprintApiActions.REDUCE_STORAGE,
+        params,
+        options
+      ),
     updateCollection: (params: UpdateCollectionInput) =>
-      updateCollection(options, params),
-    uploadFile: (params: UploadFileInput) => uploadFile(options, params),
-    uploadFiles: (params: UploadFilesInput) => uploadFiles(options, params),
-    uploadJson: (params: UploadJsonInput) => uploadJson(options, params),
+      makeApiRequest<UpdateCollectionResponse, UpdateCollectionInput>(
+        BlueprintApiActions.UPDATE_COLLECTION,
+        params,
+        options
+      ),
+    uploadFile: (params: UploadFileInput) =>
+      makeApiRequest<UploadFileResponse, UploadFileInput>(
+        BlueprintApiActions.UPLOAD_FILE,
+        params,
+        options,
+        true
+      ),
+
+    uploadFiles: (params: UploadFilesInput) =>
+      makeApiRequest<UploadFilesResponse, UploadFilesInput>(
+        BlueprintApiActions.UPLOAD_FILES,
+        params,
+        options,
+        true
+      ),
+    uploadJson: (params: UploadJsonInput) =>
+      makeApiRequest<UploadJsonResponse, UploadJsonInput>(
+        BlueprintApiActions.UPLOAD_JSON,
+        params,
+        options,
+        true
+      ),
   };
 };

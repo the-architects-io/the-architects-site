@@ -694,6 +694,10 @@ export type UpdateCollectionInput = {
   isReadyToMint: boolean;
 };
 
+export type UpdateCollectionResponse = BaseBlueprintResponse & {
+  collection: Collection;
+};
+
 export type TokenMetadata = {
   name: string;
   symbol: string;

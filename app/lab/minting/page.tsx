@@ -89,8 +89,6 @@ export default function Page() {
     console.log("treeConfig", treeConfig);
     console.log("sortedRpcAssetList", sortedRpcAssetList);
 
-    debugger;
-
     const [assetId, bump] = await findLeafAssetIdPda(umi, {
       merkleTree: publicKey(merkleTreeAddress),
       leafIndex: 0,

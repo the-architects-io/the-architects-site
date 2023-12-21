@@ -64,6 +64,7 @@ export default function DriveTestPage() {
     const { success, drives } = await blueprint.getDrives({
       ownerAddress: EXECUTION_WALLET_ADDRESS,
     });
+
     if (!success) {
       showToast({ primaryMessage: "Error fetching drives" });
       return;
