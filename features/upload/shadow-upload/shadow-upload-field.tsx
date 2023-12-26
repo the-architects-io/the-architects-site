@@ -1,4 +1,9 @@
 import { createBlueprintClient } from "@/app/blueprint/client";
+import { inspectZipFile } from "@/app/blueprint/utils/files/zip";
+import Spinner from "@/features/UI/spinner";
+import { UploadStatus } from "@/features/upload/shadow-upload/upload-status";
+import { GET_UPLOAD_JOB_BY_ID } from "@/graphql/queries/get-upload-job-by-id";
+import { useQuery } from "@apollo/client";
 import { useChunkStartListener } from "@rpldy/chunked-uploady";
 import UploadButton from "@rpldy/upload-button";
 import {
@@ -31,8 +36,23 @@ export const ShadowUploadField = ({
   const uploady = useUploady();
   const fileUploadIdsRef = useRef<any>({}); // Store uploadIds for each file
   const jobIdRef = useRef<string | null>(null);
+  const [isComplete, setIsComplete] = useState(false);
+  const [isInProgress, setIsInProgress] = useState(false);
+
+  const { loading, error, data } = useQuery(GET_UPLOAD_JOB_BY_ID, {
+    variables: {
+      id: jobIdRef.current,
+    },
+    skip: !jobIdRef.current,
+    pollInterval: isComplete ? 0 : 500,
+  });
 
   useRequestPreSend(async ({ items, options }) => {
+    // if zip file, inspect it
+    if (items?.[0].file.type === "application/zip") {
+      inspectZipFile(items[0].file as File);
+    }
+    setIsInProgress(true);
     const blueprint = createBlueprintClient({
       cluster: "devnet",
     });
@@ -99,12 +119,26 @@ export const ShadowUploadField = ({
   });
 
   useBatchFinalizeListener((batch) => {
-    onUploadComplete?.(batch);
+    onUploadComplete?.(data.uploadJobs_by_pk);
+    setTimeout(() => {
+      setIsComplete(true);
+      setIsInProgress(false);
+    }, 1000);
   });
 
   return (
-    <UploadButton className="underline">
-      {!!children ? children : "Upload"}
-    </UploadButton>
+    <>
+      {isInProgress && (
+        <div className="w-full flex justify-center mb-4">
+          <Spinner />
+        </div>
+      )}
+      {!!data?.uploadJobs_by_pk && <UploadStatus job={data.uploadJobs_by_pk} />}
+      {!isComplete && !isInProgress && (
+        <UploadButton className="underline">
+          {!!children ? children : "Upload"}
+        </UploadButton>
+      )}
+    </>
   );
 };

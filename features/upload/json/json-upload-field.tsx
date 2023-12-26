@@ -3,7 +3,6 @@ import UploadButton from "@rpldy/upload-button";
 import {
   Batch,
   useBatchAddListener,
-  useBatchFinalizeListener,
   useBatchFinishListener,
   useUploady,
 } from "@rpldy/uploady";

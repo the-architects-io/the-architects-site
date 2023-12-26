@@ -688,7 +688,7 @@ export type UpdateCollectionInput = {
   symbol: string;
   description: string;
   sellerFeeBasisPoints: number;
-  imageUrl: string;
+  imageUrl?: string;
   creators: Creator[];
   isReadyToMint: boolean;
 };
@@ -844,13 +844,23 @@ export const StatusUUIDs = {
 };
 
 export type UploadJob = {
-  id: string;
-  status: UploadJobStatus;
-  isComplete: boolean;
-  user: User;
-  sizeInBytes: number;
   createdAt: string;
+  driveAddress: string;
+  id: string;
+  isComplete: boolean;
+  log: string;
+  percentComplete: number;
+  sizeInBytes: number;
   updatedAt: string;
+  statusText: string;
+  fileCount: number;
+  status: {
+    id: string;
+    name: string;
+  };
+  user: {
+    id: string;
+  };
 };
 
 export enum BlueprintApiActions {

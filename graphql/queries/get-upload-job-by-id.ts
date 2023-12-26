@@ -12,6 +12,7 @@ export const GET_UPLOAD_JOB_BY_ID = gql`
       sizeInBytes
       updatedAt
       statusText
+      fileCount
       status {
         id
         name

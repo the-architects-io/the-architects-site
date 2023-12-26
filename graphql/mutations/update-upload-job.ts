@@ -5,6 +5,7 @@ export const UPDATE_UPLOAD_JOB = gql`
     update_uploadJobs_by_pk(pk_columns: { id: $id }, _set: $job) {
       id
       percentComplete
+      fileCount
       status {
         id
         name

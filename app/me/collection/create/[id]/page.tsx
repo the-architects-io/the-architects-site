@@ -1,4 +1,5 @@
 "use client";
+import JSZip from "jszip";
 import {
   ASSET_SHDW_DRIVE_ADDRESS,
   EXECUTION_WALLET_ADDRESS,
@@ -23,6 +24,7 @@ import {
   Creator,
   Drive,
   UploadFilesResponse,
+  UploadJob,
   UploadJsonResponse,
 } from "@/app/blueprint/types";
 import { useUserData } from "@nhost/nextjs";
@@ -257,19 +259,10 @@ export default function CreateCollectionPage({
     []
   );
 
-  const handleCollectionImagesCompleted = useCallback(
-    async (res: UploadFilesResponse) => {
-      if (!res.success) {
-        showToast({
-          primaryMessage: "Collection Images Upload Failed",
-        });
-        return;
-      }
-      if (!res.count) return;
-      setCollectionImagesUploadCount(res.count);
-    },
-    []
-  );
+  const handleCollectionImagesCompleted = async (res: UploadJob) => {
+    console.log({ res });
+    setCollectionImagesUploadCount(res.fileCount);
+  };
 
   useEffect(() => {
     if (!params?.id || !isUuid(params?.id)) {
@@ -342,6 +335,21 @@ export default function CreateCollectionPage({
           >
             Add Collection Image
           </SingleImageUpload>
+          <CreateCollectionFormChecklist
+            collectionImage={collectionImage}
+            creators={formik.values.creators}
+            collectionName={formik.values.collectionName}
+            symbol={formik.values.symbol}
+            description={formik.values.description}
+            sellerFeeBasisPoints={formik.values.sellerFeeBasisPoints}
+            collectionMetadataStats={collectionMetadataStats}
+            collectionMetadatasJsonUploadResponse={
+              collectionMetadatasJsonUploadResponse
+            }
+            collectionImagesUploadCount={collectionImagesUploadCount}
+          />
+        </div>
+        <div className="flex flex-col items-center w-full px-8">
           <div className="flex flex-col justify-center items-center w-full mb-8 space-y-4">
             <FormInputWithLabel
               label="Collection Name"
@@ -379,21 +387,6 @@ export default function CreateCollectionPage({
               onChange={formik.handleChange}
             />
           </div>
-          <CreateCollectionFormChecklist
-            collectionImage={collectionImage}
-            creators={formik.values.creators}
-            collectionName={formik.values.collectionName}
-            symbol={formik.values.symbol}
-            description={formik.values.description}
-            sellerFeeBasisPoints={formik.values.sellerFeeBasisPoints}
-            collectionMetadataStats={collectionMetadataStats}
-            collectionMetadatasJsonUploadResponse={
-              collectionMetadatasJsonUploadResponse
-            }
-            collectionImagesUploadCount={collectionImagesUploadCount}
-          />
-        </div>
-        <div className="flex flex-col items-center w-full px-8">
           <div
             className={classNames([
               "border rounded-lg px-4 w-full mb-4 flex flex-col items-center justify-center p-8",
@@ -479,45 +472,7 @@ export default function CreateCollectionPage({
               </PrimaryButton>
             </>
           </div>
-          <div
-            className={classNames([
-              "border rounded-lg px-4 w-full mb-4 flex flex-col items-center justify-center p-8 min-h-[28vh]",
-              !!collectionMetadataStats &&
-              !!collectionMetadatasJsonUploadResponse
-                ? "border-green-500 bg-green-500 bg-opacity-10"
-                : "border-gray-600",
-            ])}
-          >
-            {!!collectionMetadataStats &&
-            !!collectionMetadatasJsonUploadResponse ? (
-              <div className="flex flex-col items-center">
-                <div className="text-green-500 flex items-center gap-x-2 mb-4">
-                  <CheckBadgeIcon className="h-5 w-5" />
-                  <div>Token Metadatas Added</div>
-                </div>
-                <p className="text-gray-100 text-lg mb-2">
-                  {collectionMetadataStats.count} token metadatas
-                </p>
-                <div className="text-gray-100 text-lg mb-2 text-center">
-                  <div>
-                    {collectionMetadataStats.uniqueTraits.length} unique traits
-                    across collection
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <>
-                <JsonUpload
-                  setJsonBeingUploaded={setJsonBeingUploaded}
-                  setJsonUploadResponse={handleMetadataJsonUploadComplete}
-                  driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
-                  fileName={`${collectionId}-collection-metadatas.json`}
-                >
-                  Add Collection Metadata JSONs
-                </JsonUpload>
-              </>
-            )}
-          </div>
+
           <div
             className={classNames([
               "border rounded-lg px-4 w-full mb-4 flex flex-col items-center justify-center p-8 min-h-[28vh]",
@@ -585,7 +540,7 @@ export default function CreateCollectionPage({
             }
             onClick={formik.handleSubmit}
           >
-            Save Premint Collection
+            Next - Add Assets
           </SubmitButton>
         </div>
       </div>
