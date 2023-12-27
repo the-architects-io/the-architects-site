@@ -1,17 +1,12 @@
 "use client";
 import { Collection } from "@/app/blueprint/types";
 import { CreateCollectionButton } from "@/app/blueprint/ui/create-collection-button";
-import {
-  ASSET_SHDW_DRIVE_ADDRESS,
-  SHDW_DRIVE_BASE_URL,
-} from "@/constants/constants";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
-import SharedHead from "@/features/UI/head";
+import { CollectionList } from "@/features/collection/collection-list";
+import { CollectionListItem } from "@/features/collection/collection-list-item";
 import { GET_COLLECTIONS_BY_OWNER_ID } from "@/graphql/queries/get-collections-by-owner-id";
 import { useQuery } from "@apollo/client";
 import { useUserData } from "@nhost/nextjs";
-import { Metadata } from "next";
-import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -27,6 +22,8 @@ export default function CollectionsPage() {
   };
 
   const [collections, setCollections] = useState<Collection[]>([]);
+  const [inProgressCollection, setInProgressCollection] =
+    useState<Collection | null>(null);
   const [readyToMintCollections, setReadyToMintCollections] = useState<
     Collection[]
   >([]);
@@ -42,6 +39,9 @@ export default function CollectionsPage() {
       setReadyToMintCollections(
         collections.filter((collection) => collection.isReadyToMint)
       );
+      setInProgressCollection(
+        collections.filter((collection) => !collection.isReadyToMint)?.[0]
+      );
     },
   });
 
@@ -50,38 +50,35 @@ export default function CollectionsPage() {
       <ContentWrapper>
         <div className="flex flex-col items-center">
           <h1 className="text-3xl pb-8">My Collections</h1>
-          <CreateCollectionButton
-            name="Test Collection"
-            onSuccess={(collection) => handleRedirect(collection)}
-          />
+          {!!inProgressCollection ? (
+            <div className="max-w-3xl mx-auto">
+              <div className="text-2xl mb-4 mt-16 text-center">
+                Collection in Progress
+              </div>
+              <CollectionListItem
+                collection={inProgressCollection}
+                url={
+                  inProgressCollection.creators?.length
+                    ? `/me/collection/create/${inProgressCollection.id}/upload-assets`
+                    : `/me/collection/create/${inProgressCollection.id}`
+                }
+              />
+            </div>
+          ) : (
+            <CreateCollectionButton
+              name={`new-collection-${user?.id}`}
+              onSuccess={(collection) => handleRedirect(collection)}
+            />
+          )}
           {!!readyToMintCollections.length && (
             <div className="max-w-3xl mx-auto">
               <div className="text-2xl mb-4 mt-16 text-center">
                 Mint Ready Collections
               </div>
-              <div className="flex flex-wrap">
-                {readyToMintCollections.map((collection) => {
-                  return (
-                    <div className="m-2" key={collection.id}>
-                      <Link
-                        className="flex flex-col items-center space-y-4 mb-4 p-4 border border-gray-600 rounded-lg cursor-pointer"
-                        href={`/me/collection/${collection.id}`}
-                      >
-                        {!!collection.imageUrl && (
-                          <Image
-                            src={collection.imageUrl}
-                            width={200}
-                            height={200}
-                            alt="Collection image"
-                          />
-                        )}
-                        <div className="text-xl">{collection.name}</div>
-                        <div className="text-sm">({collection.symbol})</div>
-                      </Link>
-                    </div>
-                  );
-                })}
-              </div>
+              <CollectionList
+                collections={readyToMintCollections}
+                linkBaseUrl="/me/collection"
+              />
             </div>
           )}
         </div>

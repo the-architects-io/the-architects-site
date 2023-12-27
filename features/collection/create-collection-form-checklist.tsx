@@ -21,9 +21,6 @@ export const CreateCollectionFormChecklist = ({
   symbol,
   description,
   sellerFeeBasisPoints,
-  collectionMetadataStats,
-  collectionMetadatasJsonUploadResponse,
-  collectionImagesUploadCount,
 }: {
   collectionImage: SingleImageUploadResponse | null;
   creators: Creator[];
@@ -31,9 +28,6 @@ export const CreateCollectionFormChecklist = ({
   symbol?: string;
   description?: string;
   sellerFeeBasisPoints?: number;
-  collectionMetadataStats: CollectionStatsFromCollectionMetadatas | null;
-  collectionMetadatasJsonUploadResponse: UploadJsonResponse | null;
-  collectionImagesUploadCount: number | null;
 }) => {
   return (
     <div className="flex flex-col border border-gray-600 rounded-lg p-4 w-full space-y-4 py-6">
@@ -90,7 +84,7 @@ export const CreateCollectionFormChecklist = ({
           </li>
         </ul>
       </div>
-      <div className="flex flex-col">
+      {/* <div className="flex flex-col">
         <div className="flex space-x-3 items-center mb-3">
           <div>
             {!!collectionMetadataStats &&
@@ -142,7 +136,7 @@ export const CreateCollectionFormChecklist = ({
             Learn more
           </a>
         </li>
-      </ul>
+      </ul> */}
     </div>
   );
 };

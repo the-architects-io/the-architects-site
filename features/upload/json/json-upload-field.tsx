@@ -48,6 +48,7 @@ export const JsonUploadField = ({
 
   return (
     <UploadButton
+      autoUpload={false}
       params={{
         action: BlueprintApiActions.UPLOAD_JSON,
         driveAddress,

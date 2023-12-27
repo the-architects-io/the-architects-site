@@ -1,26 +1,39 @@
+"use client";
 import { createBlueprintClient } from "@/app/blueprint/client";
-import { Creator, UploadJsonResponse } from "@/app/blueprint/types";
+import {
+  Creator,
+  UploadFilesResponse,
+  UploadJsonResponse,
+} from "@/app/blueprint/types";
 import { CollectionStatsFromCollectionMetadatas } from "@/app/blueprint/utils";
-import { ASSET_SHDW_DRIVE_ADDRESS } from "@/constants/constants";
+import {
+  ASSET_SHDW_DRIVE_ADDRESS,
+  EXECUTION_WALLET_ADDRESS,
+} from "@/constants/constants";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import showToast from "@/features/toasts/show-toast";
 import { JsonUpload } from "@/features/upload/json/json-upload";
+import { JsonUploadMetadataValidation } from "@/features/upload/json/json-upload-metadata-validation";
+import ShadowUpload from "@/features/upload/shadow-upload/shadow-upload";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { useUserData } from "@nhost/nextjs";
 
 import { useWallet } from "@solana/wallet-adapter-react";
 import axios from "axios";
 import classNames from "classnames";
 import { useFormik } from "formik";
-import { useRouter } from "next/router";
-import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { useCallback, useEffect, useState } from "react";
 
 export default function CollectionCreationUploadAssetsPage({
   params,
 }: {
   params: { id: string };
 }) {
-  const [collectionId, setCollectionId] = useState<string | null>(params?.id);
+  const user = useUserData();
+  const router = useRouter();
   const [isSavingCollection, setIsSavingCollection] = useState(false);
   const [collectionMetadataStats, setCollectionMetadataStats] =
     useState<CollectionStatsFromCollectionMetadatas | null>(null);
@@ -29,8 +42,10 @@ export default function CollectionCreationUploadAssetsPage({
     setCollectionMetadatasJsonUploadResponse,
   ] = useState<UploadJsonResponse | null>(null);
   const [jsonBeingUploaded, setJsonBeingUploaded] = useState<any | null>(null);
+  const [collectionImagesUploadCount, setCollectionImagesUploadCount] =
+    useState<number>(0);
+  const [uploadJobId, setUploadJobId] = useState<string | null>(null);
 
-  const router = useRouter();
   const wallet = useWallet();
   const formik = useFormik({
     initialValues: {
@@ -41,15 +56,8 @@ export default function CollectionCreationUploadAssetsPage({
       iamge: "",
       creators: [{ address: "", share: 0, sortOrder: 0, id: 0 }] as Creator[],
     },
-    onSubmit: async ({
-      collectionName,
-      symbol,
-      description,
-      sellerFeeBasisPoints,
-      creators,
-    }) => {
-      if (!wallet?.publicKey) return;
-      if (!collectionId || !creators) {
+    onSubmit: async ({}) => {
+      if (!wallet?.publicKey) {
         showToast({
           primaryMessage: "Collection Upload Failed",
         });
@@ -63,12 +71,7 @@ export default function CollectionCreationUploadAssetsPage({
       });
 
       const { success } = await blueprint.updateCollection({
-        id: collectionId,
-        name: collectionName,
-        symbol,
-        description,
-        sellerFeeBasisPoints,
-        creators,
+        id: params.id,
         isReadyToMint: true,
       });
 
@@ -84,8 +87,6 @@ export default function CollectionCreationUploadAssetsPage({
       });
 
       setIsSavingCollection(false);
-
-      router.push("/me/collection");
 
       // ** Move this to mint during airdrop **
       // const driveAddress = ASSET_SHDW_DRIVE_ADDRESS;
@@ -159,51 +160,114 @@ export default function CollectionCreationUploadAssetsPage({
     []
   );
 
+  const handleCollectionImagesCompleted = useCallback(
+    async (res: UploadFilesResponse) => {
+      if (!res.success) {
+        showToast({
+          primaryMessage: "Collection Images Upload Failed",
+        });
+        return;
+      }
+      if (!res.count) return;
+      setCollectionImagesUploadCount(res.count);
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (!params.id) {
+      router.push("/me/collection");
+    }
+  }, [params.id, router]);
+
   return (
     <ContentWrapper>
-      <FormWrapper>
-        <div className="flex flex-col justify-center items-center w-full mb-8 space-y-4">
-          <div
-            className={classNames([
-              "border rounded-lg px-4 w-full mb-4 flex flex-col items-center justify-center p-8 min-h-[28vh]",
-              !!collectionMetadataStats &&
-              !!collectionMetadatasJsonUploadResponse
-                ? "border-green-500 bg-green-500 bg-opacity-10"
-                : "border-gray-600",
-            ])}
-          >
-            {!!collectionMetadataStats &&
-            !!collectionMetadatasJsonUploadResponse ? (
-              <div className="flex flex-col items-center">
-                <div className="text-green-500 flex items-center gap-x-2 mb-4">
-                  <CheckBadgeIcon className="h-5 w-5" />
-                  <div>Token Metadatas Added</div>
-                </div>
-                <p className="text-gray-100 text-lg mb-2">
-                  {collectionMetadataStats.count} token metadatas
-                </p>
-                <div className="text-gray-100 text-lg mb-2 text-center">
-                  <div>
-                    {collectionMetadataStats.uniqueTraits.length} unique traits
-                    across collection
-                  </div>
+      <div className="flex flex-col justify-center items-center w-full mb-8 space-y-4">
+        <div
+          className={classNames([
+            "border rounded-lg px-4 w-full mb-4 flex flex-col items-center justify-center p-8 min-h-[28vh]",
+            !!collectionMetadataStats && !!collectionMetadatasJsonUploadResponse
+              ? "border-green-500 bg-green-500 bg-opacity-10"
+              : "border-gray-600",
+          ])}
+        >
+          {!!collectionMetadataStats &&
+          !!collectionMetadatasJsonUploadResponse ? (
+            <div className="flex flex-col items-center">
+              <div className="text-green-500 flex items-center gap-x-2 mb-4">
+                <CheckBadgeIcon className="h-5 w-5" />
+                <div>Token Metadatas Added</div>
+              </div>
+              <p className="text-gray-100 text-lg mb-2">
+                {collectionMetadataStats.count} token metadatas
+              </p>
+              <div className="text-gray-100 text-lg mb-2 text-center">
+                <div>
+                  {collectionMetadataStats.uniqueTraits.length} unique traits
+                  across collection
                 </div>
               </div>
-            ) : (
-              <>
+            </div>
+          ) : (
+            <div>
+              {!!jsonBeingUploaded ? (
+                <div className="mt-4">
+                  <JsonUploadMetadataValidation
+                    json={jsonBeingUploaded}
+                    setJsonBeingUploaded={setJsonBeingUploaded}
+                  />
+                </div>
+              ) : (
                 <JsonUpload
                   setJsonBeingUploaded={setJsonBeingUploaded}
                   setJsonUploadResponse={handleMetadataJsonUploadComplete}
                   driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
-                  fileName={`${collectionId}-collection-metadatas.json`}
+                  fileName={`${params.id}-collection-metadatas.json`}
                 >
                   Add Collection Metadata JSONs
                 </JsonUpload>
-              </>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
-      </FormWrapper>
+        <div
+          className={classNames([
+            "border rounded-lg px-4 w-full mb-4 flex flex-col items-center justify-center p-8 min-h-[28vh]",
+            !!collectionImagesUploadCount
+              ? "border-green-500 bg-green-500 bg-opacity-10"
+              : "border-gray-600",
+          ])}
+        >
+          {!!collectionImagesUploadCount ? (
+            <div className="flex flex-col items-center">
+              <div className="text-green-500 flex items-center gap-x-2 mb-4">
+                <CheckBadgeIcon className="h-5 w-5" />
+                <div>Collection Images Added</div>
+              </div>
+              <p className="text-gray-100 text-lg mb-2">
+                {collectionImagesUploadCount} collection images
+              </p>
+            </div>
+          ) : (
+            <>
+              {!!user?.id && !!params?.id && (
+                <ShadowUpload
+                  ownerAddress={EXECUTION_WALLET_ADDRESS}
+                  onUploadComplete={handleCollectionImagesCompleted}
+                  collectionId={params.id}
+                  shouldUnzip={true}
+                  userId={user?.id}
+                  setUploadJobId={setUploadJobId}
+                  // only zip files
+                  accept=".zip"
+                >
+                  Add Collection Images Zip File
+                </ShadowUpload>
+              )}
+            </>
+          )}
+        </div>
+      </div>
     </ContentWrapper>
   );
 }

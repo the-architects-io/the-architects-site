@@ -1,5 +1,5 @@
 "use client";
-import JSZip from "jszip";
+
 import {
   ASSET_SHDW_DRIVE_ADDRESS,
   EXECUTION_WALLET_ADDRESS,
@@ -9,9 +9,7 @@ import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { JsonUpload } from "@/features/upload/json/json-upload";
 import { SingleImageUpload } from "@/features/upload/single-image/single-image-upload";
-import { MultiImageUpload } from "@/features/upload/multi-image/multi-image-upload";
 import {
   CollectionStatsFromCollectionMetadatas,
   creatorsAreValid,
@@ -68,14 +66,8 @@ export default function CreateCollectionPage({
     useState<SingleImageUploadResponse | null>(null);
   const [creators, setCreators] = useState<Creator[] | null>(null);
   const [jsonBeingUploaded, setJsonBeingUploaded] = useState<any | null>(null);
-  const [collectionImagesUploadCount, setCollectionImagesUploadCount] =
-    useState<number | null>(null);
+
   const [isSavingCollection, setIsSavingCollection] = useState(false);
-  const [isCreatingCollectionDrive, setIsCreatingCollectionDrive] =
-    useState(false);
-  const [isFetchingDrive, setIsFetchingDrive] = useState(false);
-  const [collectionDrive, setCollectionDrive] = useState<Drive | null>(null);
-  const [uploadJobId, setUploadJobId] = useState<string | undefined>(undefined);
 
   const formik = useFormik({
     initialValues: {
@@ -93,14 +85,11 @@ export default function CreateCollectionPage({
       sellerFeeBasisPoints,
       creators,
     }) => {
-      if (!wallet?.publicKey || !collectionDrive) return;
       if (
+        !wallet?.publicKey ||
         !collectionImage ||
         !collectionId ||
-        !creators ||
-        !collectionMetadataStats ||
-        !collectionMetadatasJsonUploadResponse ||
-        !collectionImagesUploadCount
+        !creators
       ) {
         showToast({
           primaryMessage: "Collection Upload Failed",
@@ -122,7 +111,7 @@ export default function CreateCollectionPage({
         description,
         sellerFeeBasisPoints,
         creators,
-        isReadyToMint: true,
+        isReadyToMint: false,
       });
 
       if (!success) {
@@ -133,66 +122,12 @@ export default function CreateCollectionPage({
       }
 
       showToast({
-        primaryMessage: "Collection saved",
+        primaryMessage: "Collection details saved",
       });
 
       setIsSavingCollection(false);
 
-      router.push("/me/collection");
-
-      // ** Move this to mint during airdrop **
-      // const driveAddress = ASSET_SHDW_DRIVE_ADDRESS;
-      // const basisPoints = sellerFeeBasisPoints * 100;
-
-      // let uri = "";
-
-      // try {
-      //   const { url } = await blueprint.uploadJson({
-      //     json: {
-      //       name: collectionName,
-      //       symbol,
-      //       description,
-      //       seller_fee_basis_points: basisPoints,
-      //       image: `${getShdwDriveUrl(driveAddress)}/${getSlug(
-      //         collectionName
-      //       )}-collection.png`,
-      //     },
-      //     fileName: `${collectionName.split(" ").join("-")}-collection.json`,
-      //     driveAddress,
-      //   });
-
-      //   uri = url;
-      // } catch (error) {
-      //   console.log({ error });
-      // }
-
-      // try {
-      //   console.log({ collectionName, uri, sellerFeeBasisPoints });
-
-      //   const { success, mintAddress } = await blueprint.mintNft({
-      //     name: collectionName,
-      //     uri,
-      //     sellerFeeBasisPoints: basisPoints,
-      //     isCollection: true,
-      //   });
-
-      //   if (!success) {
-      //     showToast({
-      //       primaryMessage: "Collection NFT Mint Failed",
-      //     });
-      //     return;
-      //   }
-
-      //   showToast({
-      //     primaryMessage: "Collection NFT Minted",
-      //     link: {
-      //       title: "View NFT",
-      //       url: `https://solscan.io/token/${mintAddress}`,
-      //     },
-      //   });
-      // } catch (error) {
-      //   console.log({ error });
-      // }
+      router.push(`/me/collection/create/${collectionId}/upload-assets`);
     },
   });
 
@@ -259,11 +194,6 @@ export default function CreateCollectionPage({
     []
   );
 
-  const handleCollectionImagesCompleted = async (res: UploadJob) => {
-    console.log({ res });
-    setCollectionImagesUploadCount(res.fileCount);
-  };
-
   useEffect(() => {
     if (!params?.id || !isUuid(params?.id)) {
       router.push("/me/collection");
@@ -294,9 +224,6 @@ export default function CreateCollectionPage({
     handleMetadataJsonUploadComplete,
     router,
     collectionId,
-    isCreatingCollectionDrive,
-    isFetchingDrive,
-    setCollectionDrive,
   ]);
 
   if (loading) {
@@ -342,11 +269,6 @@ export default function CreateCollectionPage({
             symbol={formik.values.symbol}
             description={formik.values.description}
             sellerFeeBasisPoints={formik.values.sellerFeeBasisPoints}
-            collectionMetadataStats={collectionMetadataStats}
-            collectionMetadatasJsonUploadResponse={
-              collectionMetadatasJsonUploadResponse
-            }
-            collectionImagesUploadCount={collectionImagesUploadCount}
           />
         </div>
         <div className="flex flex-col items-center w-full px-8">
@@ -444,7 +366,7 @@ export default function CreateCollectionPage({
                                   <button
                                     className=" absolute -top-2 -right-2.5 cursor-pointer"
                                     type="button"
-                                    onClick={() => arrayHelpers.remove(index)} // remove a friend from the list
+                                    onClick={() => arrayHelpers.remove(index)}
                                   >
                                     <XMarkIcon className="h-6 w-6 text-gray-100" />
                                   </button>
@@ -472,51 +394,6 @@ export default function CreateCollectionPage({
               </PrimaryButton>
             </>
           </div>
-
-          <div
-            className={classNames([
-              "border rounded-lg px-4 w-full mb-4 flex flex-col items-center justify-center p-8 min-h-[28vh]",
-              !!collectionImagesUploadCount
-                ? "border-green-500 bg-green-500 bg-opacity-10"
-                : "border-gray-600",
-            ])}
-          >
-            {!!collectionImagesUploadCount ? (
-              <div className="flex flex-col items-center">
-                <div className="text-green-500 flex items-center gap-x-2 mb-4">
-                  <CheckBadgeIcon className="h-5 w-5" />
-                  <div>Collection Images Added</div>
-                </div>
-                <p className="text-gray-100 text-lg mb-2">
-                  {collectionImagesUploadCount} collection images
-                </p>
-              </div>
-            ) : (
-              <>
-                {!!user?.id && !!collectionId && (
-                  <ShadowUpload
-                    ownerAddress={EXECUTION_WALLET_ADDRESS}
-                    onUploadComplete={handleCollectionImagesCompleted}
-                    collectionId={collectionId}
-                    shouldUnzip={true}
-                    userId={user?.id}
-                    setUploadJobId={setUploadJobId}
-                    // only zip files
-                    accept=".zip"
-                  >
-                    Add Collection Images Zip File
-                  </ShadowUpload>
-                )}
-              </>
-
-              // <MultiImageUpload
-              //   driveAddress={collectionDriveAddress}
-              //   onUploadComplete={handleCollectionImagesCompleted}
-              // >
-              //   Add Collection Images
-              // </MultiImageUpload>
-            )}
-          </div>
         </div>
       </div>
       <div className="flex bottom-0 left-0 right-0 fixed w-full justify-center items-center">
@@ -531,11 +408,7 @@ export default function CreateCollectionPage({
                 !!formik.values.description &&
                 !!formik.values.sellerFeeBasisPoints &&
                 !!collectionImage &&
-                creatorsAreValid(formik.values.creators) &&
-                !!collectionMetadataStats &&
-                !!collectionMetadatasJsonUploadResponse &&
-                !!collectionImagesUploadCount &&
-                collectionImagesUploadCount === collectionMetadataStats.count
+                creatorsAreValid(formik.values.creators)
               )
             }
             onClick={formik.handleSubmit}

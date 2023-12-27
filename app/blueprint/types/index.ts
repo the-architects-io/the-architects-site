@@ -684,13 +684,13 @@ export type Creator = {
 
 export type UpdateCollectionInput = {
   id: string;
-  name: string;
-  symbol: string;
-  description: string;
-  sellerFeeBasisPoints: number;
+  name?: string;
+  symbol?: string;
+  description?: string;
+  sellerFeeBasisPoints?: number;
   imageUrl?: string;
-  creators: Creator[];
-  isReadyToMint: boolean;
+  creators?: Creator[];
+  isReadyToMint?: boolean;
 };
 
 export type UpdateCollectionResponse = BaseBlueprintResponse & {
@@ -705,8 +705,8 @@ export type TokenMetadata = {
   image: string;
   animation_url?: string;
   external_url: string;
-  edition: number;
-  collection: {
+  edition?: number;
+  collection?: {
     name: string;
     family?: string;
   };
@@ -714,7 +714,7 @@ export type TokenMetadata = {
     trait_type: string;
     value: string;
   }[];
-  properties: {
+  properties?: {
     files: {
       uri: string;
       type: string;

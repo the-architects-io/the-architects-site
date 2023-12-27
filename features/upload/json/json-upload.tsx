@@ -9,7 +9,7 @@ import { JsonUploadField } from "@/features/upload/json/json-upload-field";
 import { CheckBadgeIcon } from "@heroicons/react/20/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Uploady from "@rpldy/uploady";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export const JsonUpload = ({
   driveAddress,
@@ -52,7 +52,7 @@ export const JsonUpload = ({
           setIsSuccessful(false);
           return false;
         }}
-        autoUpload={true}
+        autoUpload={false}
       >
         <JsonUploadField
           setProgress={setProgress}

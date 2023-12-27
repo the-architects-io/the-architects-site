@@ -1,3 +1,4 @@
+import { CloseButton } from "@/features/UI/buttons/close-button";
 import Spinner from "@/features/UI/spinner";
 import {
   CheckBadgeIcon,
@@ -36,12 +37,7 @@ export const PreviewComponent = ({
               <div className="absolute bottom-4 left-6 bg-black rounded-full">
                 <CheckBadgeIcon className="w-12 h-12 text-green-500" />
               </div>
-              <button
-                onClick={clearPreview}
-                className="absolute -mt-4 -mr-4 top-0 right-0"
-              >
-                <XCircleIcon className="h-10 w-10 text-gray-100 bg-black rounded-full" />
-              </button>
+              <CloseButton onClick={clearPreview} />
             </>
           )}
         </>
