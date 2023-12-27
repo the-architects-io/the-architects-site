@@ -884,3 +884,23 @@ export enum BlueprintApiActions {
   UPLOAD_FILES = "UPLOAD_FILES",
   UPLOAD_JSON = "UPLOAD_JSON",
 }
+
+export type CollectionMetadataStats = {
+  totalMetadatasCount: number;
+  totalMetadatasSize: number;
+};
+
+export type CollectionFileStats = {
+  files: File[];
+  totalUncompressedSize: number;
+  fileNamesAreValid: boolean;
+};
+
+export type CollectionStatsFromCollectionMetadatas = {
+  count: number;
+  uniqueTraits: string[];
+  creators: string[];
+  validCount?: number;
+};
+
+export type ValidationIssue = { text: string; index: number };

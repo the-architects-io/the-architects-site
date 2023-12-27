@@ -1,5 +1,6 @@
 import ChunkedUploady from "@rpldy/chunked-uploady";
 import { ShadowUploadField } from "@/features/upload/shadow-upload/shadow-upload-field";
+import { CollectionFileStats } from "@/app/blueprint/types";
 
 const ShadowUpload = (params: {
   ownerAddress: string;
@@ -7,7 +8,11 @@ const ShadowUpload = (params: {
   collectionId: string;
   shouldUnzip: boolean;
   userId: string;
+  fileStats: CollectionFileStats | null;
+  fileBeingUploaded: File | null;
+  setFileBeingUploaded: (file: File) => void;
   setUploadJobId: (id: string) => void;
+  setFileStats: (stats: CollectionFileStats) => void;
   onUploadComplete?: (response: any) => void;
   children?: string | JSX.Element | JSX.Element[];
   accept?: string;
@@ -19,7 +24,7 @@ const ShadowUpload = (params: {
       destination={{
         url: `http://164.90.244.66/api/upload`,
       }}
-      autoUpload={true}
+      autoUpload={false}
       chunkSize={5 * 1024 * 1024}
       chunked
     >
@@ -31,6 +36,10 @@ const ShadowUpload = (params: {
           shouldUnzip: params.shouldUnzip,
           userId: params.userId,
         }}
+        fileBeingUploaded={params.fileBeingUploaded}
+        setFileBeingUploaded={params.setFileBeingUploaded}
+        fileStats={params.fileStats}
+        setFileStats={params.setFileStats}
         setUploadJobId={params.setUploadJobId}
         onUploadComplete={params.onUploadComplete}
       >

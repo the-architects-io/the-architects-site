@@ -1,3 +1,4 @@
+import { CollectionStatsFromCollectionMetadatas } from "@/app/blueprint/types";
 import { ShadowFile } from "@shadow-drive/sdk";
 import { NextRequest } from "next/server";
 
@@ -97,12 +98,6 @@ export const isValidCollectionMetadatas = (json: any): boolean => {
   const isValid = collectionMetadatas.every(isValidMetadata);
 
   return isValid;
-};
-
-export type CollectionStatsFromCollectionMetadatas = {
-  count: number;
-  uniqueTraits: string[];
-  creators: string[];
 };
 
 export const getCollectionStatsFromCollectionMetadatas = (

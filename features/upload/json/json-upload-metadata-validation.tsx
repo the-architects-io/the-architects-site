@@ -1,22 +1,25 @@
-import { TokenMetadata } from "@/app/blueprint/types";
 import {
   CollectionStatsFromCollectionMetadatas,
-  getCollectionStatsFromCollectionMetadatas,
-} from "@/app/blueprint/utils";
+  TokenMetadata,
+  ValidationIssue,
+} from "@/app/blueprint/types";
+import { getCollectionStatsFromCollectionMetadatas } from "@/app/blueprint/utils";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import Spinner from "@/features/UI/spinner";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { XCircleIcon } from "@heroicons/react/24/solid";
 import { useCallback, useEffect, useState } from "react";
 
-export type ValidationIssue = { text: string; index: number };
-
 export const JsonUploadMetadataValidation = ({
   json,
   setJsonBeingUploaded,
+  setMetadataStas,
 }: {
   json: any;
   setJsonBeingUploaded: (json: any) => void;
+  setMetadataStas: (
+    stats: CollectionStatsFromCollectionMetadatas | null
+  ) => void;
 }) => {
   const [isJsonValid, setIsJsonValid] = useState<boolean | null>(null);
   const [validationIssues, setValidationIssues] = useState<ValidationIssue[]>(
@@ -107,7 +110,33 @@ export const JsonUploadMetadataValidation = ({
     if (!json) return;
 
     setIsJsonValid(validateJson(json));
-  }, [json, setIsJsonValid, validateJson]);
+    setMetadataStas({
+      uniqueTraits: collectionStats?.uniqueTraits || [],
+      creators: collectionStats?.creators || [],
+      count: json.length,
+      validCount:
+        (json?.filter &&
+          json?.filter((tokenMetadata: TokenMetadata, i: number) => {
+            return validateTokenMetadata(tokenMetadata, i);
+          })?.length) ||
+        0,
+    });
+  }, [
+    collectionStats?.creators,
+    collectionStats?.uniqueTraits,
+    json,
+    setIsJsonValid,
+    setMetadataStas,
+    validateJson,
+    validateTokenMetadata,
+  ]);
+
+  const handleClearFile = () => {
+    setIsJsonValid(null);
+    setValidationIssues([]);
+    setJsonBeingUploaded(null);
+    setMetadataStas(null);
+  };
 
   return (
     <div className="flex w=full justify-center space-y-5">
@@ -118,26 +147,33 @@ export const JsonUploadMetadataValidation = ({
         </div>
       )}
       {isJsonValid === false && (
-        <>
+        <div className="flex flex-col items-center space-x-2">
           <div className="flex items-center space-x-2">
             <XCircleIcon className="h-6 w-6 text-red-500" />
-            <div className="mb-4">Invalid JSON</div>
+            <div>Invalid JSON</div>
           </div>
-          <div className="flex flex-col space-y-2">
-            <div className="mb-2 italic">Validation Issues:</div>
-            <div className="flex flex-col space-y-2">
-              {validationIssues.map((issue) => {
-                return (
-                  <div key={issue.index}>
-                    <div className="text-gray-100 text-sm">
-                      {issue.index + 1}: {issue.text}
+          {!!validationIssues.length && (
+            <div className="flex flex-col space-y-2 mt-4">
+              <div className="mb-2 italic">Validation Issues:</div>
+              <div className="flex flex-col space-y-2">
+                {validationIssues.map((issue) => {
+                  return (
+                    <div key={issue.index}>
+                      <div className="text-gray-100">
+                        {issue.index + 1}: {issue.text}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
+          )}
+          <div className="mt-4">
+            <SecondaryButton onClick={handleClearFile}>
+              Clear JSON
+            </SecondaryButton>
           </div>
-        </>
+        </div>
       )}
       {isJsonValid === true && (
         <div className="flex flex-col items-center space-x-2">
@@ -161,13 +197,7 @@ export const JsonUploadMetadataValidation = ({
                   </div>
                 </div>
               </div>
-              <SecondaryButton
-                onClick={() => {
-                  setIsJsonValid(null);
-                  setValidationIssues([]);
-                  setJsonBeingUploaded(null);
-                }}
-              >
+              <SecondaryButton onClick={handleClearFile}>
                 Clear JSON
               </SecondaryButton>
             </div>
