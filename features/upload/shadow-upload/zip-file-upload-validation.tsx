@@ -3,6 +3,7 @@ import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import Spinner from "@/features/UI/spinner";
 import { getBestFittingStorageSizeString } from "@/utils/formatting";
 import { CheckBadgeIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import { UploadyContextType } from "@rpldy/uploady";
 import { useEffect, useState } from "react";
 
 export const ZipFileUploadValidation = ({
@@ -11,12 +12,14 @@ export const ZipFileUploadValidation = ({
   setFileBeingUploaded,
   isFileValid,
   setIsFileValid,
+  uploadyInstance,
 }: {
   fileStats: CollectionFileStats | null;
   setFileStats: (stats: CollectionFileStats | null) => void;
   setFileBeingUploaded: (file: File | null) => void;
   isFileValid: boolean | null;
   setIsFileValid: (isValid: boolean) => void;
+  uploadyInstance: UploadyContextType | null;
 }) => {
   const [validationIssues, setValidationIssues] = useState<ValidationIssue[]>(
     []
@@ -27,6 +30,7 @@ export const ZipFileUploadValidation = ({
     setValidationIssues([]);
     setFileBeingUploaded(null);
     setFileStats(null);
+    uploadyInstance?.clearPending();
   };
 
   useEffect(() => {

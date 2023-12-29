@@ -8,6 +8,7 @@ import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import Spinner from "@/features/UI/spinner";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { XCircleIcon } from "@heroicons/react/24/solid";
+import { UploadyContextType } from "@rpldy/uploady";
 import { useCallback, useEffect, useState } from "react";
 
 export const JsonUploadMetadataValidation = ({
@@ -16,6 +17,7 @@ export const JsonUploadMetadataValidation = ({
   setIsMetadataValid,
   setJsonBeingUploaded,
   setMetadataStas,
+  uploadyInstance,
 }: {
   json: any;
   isMetadataValid: boolean | null;
@@ -24,6 +26,7 @@ export const JsonUploadMetadataValidation = ({
   setMetadataStas: (
     stats: CollectionStatsFromCollectionMetadatas | null
   ) => void;
+  uploadyInstance: UploadyContextType | null;
 }) => {
   const [validationIssues, setValidationIssues] = useState<ValidationIssue[]>(
     []
@@ -139,6 +142,7 @@ export const JsonUploadMetadataValidation = ({
     setValidationIssues([]);
     setJsonBeingUploaded(null);
     setMetadataStas(null);
+    uploadyInstance?.clearPending();
   };
 
   return (

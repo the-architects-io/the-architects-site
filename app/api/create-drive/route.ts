@@ -38,10 +38,8 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(
     {
       success: true,
-      data: {
-        address: shdw_bucket,
-        transaction: tx,
-      },
+      address: shdw_bucket,
+      transaction: tx,
     },
     { status: 200 }
   );

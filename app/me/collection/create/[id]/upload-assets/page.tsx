@@ -6,6 +6,7 @@ import {
   CollectionFileStats,
   CollectionStatsFromCollectionMetadatas,
   Creator,
+  StatusUUIDs,
   UploadFilesResponse,
   UploadJob,
   UploadJobStatus,
@@ -86,7 +87,6 @@ export default function CollectionCreationUploadAssetsPage({
       id: collection?.uploadJob?.id || uploadJob?.id,
     },
     skip: !collection?.uploadJob?.id && !uploadJob?.id,
-    pollInterval: 500,
     onCompleted: ({ uploadJobs_by_pk }) => {
       setUploadJob(uploadJobs_by_pk);
     },
@@ -204,7 +204,7 @@ export default function CollectionCreationUploadAssetsPage({
     let sizeInKb = sizeInBytes ? sizeInBytes / 1000 : 0;
     sizeInKb += 1000; // add 1MB to sizeInKb for overhead
 
-    let driveAddress = "Fr7aiy6QAH9N9gCsyc8jqTWLxL1o9Y7ghVMEQuakWp8q";
+    let driveAddress;
 
     const { job } = await blueprint.createUploadJob({
       statusText: "Creating SHDW drive...",
@@ -218,44 +218,51 @@ export default function CollectionCreationUploadAssetsPage({
       uploadJobId: job.id,
     });
 
-    // try {
-    //   const { address } = await blueprint.createDrive({
-    //     name: params.id,
-    //     sizeInKb,
-    //     ownerAddress: EXECUTION_WALLET_ADDRESS,
-    //   });
-    //   driveAddress = address;
-    // } catch (error) {
-    //   console.log({ error });
-    //   showToast({
-    //     primaryMessage: "Failed to create drive",
-    //   });
-    //   throw new Error("Failed to create drive");
-    // }
-
-    console.log({
-      zipFileUploadyInstance,
-      jsonUploadyInstance,
-      jsonBeingUploaded,
-      zipFileBeingUploaded,
-    });
-
-    if (!zipFileBeingUploaded || !jsonBeingUploaded) {
-      throw new Error("Missing files");
+    try {
+      const { address } = await blueprint.createDrive({
+        name: params.id,
+        sizeInKb,
+        ownerAddress: EXECUTION_WALLET_ADDRESS,
+      });
+      driveAddress = address;
+    } catch (error) {
+      console.log({ error });
+      showToast({
+        primaryMessage: "Failed to create drive",
+      });
+      blueprint.updateUploadJob({
+        id: job.id,
+        statusId: StatusUUIDs.ERROR,
+        statusText: "Failed to create drive.",
+      });
+      throw new Error("Failed to create drive");
     }
 
-    // jsonUploadyInstance.processPending({
-    //   params: {
-    //     driveAddress,
-    //     uploadJobId: job.id,
-    //     action: BlueprintApiActions.UPLOAD_JSON,
-    //     fileName: `${params.id}-collection-metadatas.json`,
-    //     overwrite: true,
-    //     userId: user?.id,
-    //     uploadId: shadowFileUploadId,
-    //     collectionId: params.id,
-    //   },
-    // });
+    console.log({
+      driveAddress,
+    });
+
+    if (!zipFileBeingUploaded || !jsonBeingUploaded || !driveAddress) {
+      blueprint.updateUploadJob({
+        id: job.id,
+        statusId: StatusUUIDs.ERROR,
+        statusText: "An unexpected error occurred.",
+      });
+      throw new Error("Missing files or drive address");
+    }
+
+    jsonUploadyInstance.processPending({
+      params: {
+        driveAddress,
+        uploadJobId: job.id,
+        action: BlueprintApiActions.UPLOAD_JSON,
+        fileName: `${params.id}-collection-metadatas.json`,
+        overwrite: true,
+        userId: user?.id,
+        uploadId: shadowFileUploadId,
+        collectionId: params.id,
+      },
+    });
 
     const exisitingOptions = zipFileUploadyInstance.getOptions();
 
@@ -306,7 +313,12 @@ export default function CollectionCreationUploadAssetsPage({
     <ContentWrapper>
       {!!uploadJob ? (
         <div className="pt-16">
-          <UploadStatus job={uploadJob} setJob={setUploadJob} />
+          <UploadStatus
+            jobId={uploadJob.id}
+            setJob={setUploadJob}
+            jsonUploadyInstance={jsonUploadyInstance}
+            zipFileUploadyInstance={zipFileUploadyInstance}
+          />
         </div>
       ) : (
         <>
@@ -349,6 +361,7 @@ export default function CollectionCreationUploadAssetsPage({
                     {!!jsonBeingUploaded ? (
                       <div className="mt-4">
                         <JsonUploadMetadataValidation
+                          uploadyInstance={jsonUploadyInstance}
                           json={jsonBeingUploaded}
                           isMetadataValid={isMetadataValid}
                           setIsMetadataValid={setIsMetadataValid}
@@ -383,6 +396,7 @@ export default function CollectionCreationUploadAssetsPage({
               >
                 {!!fileStats?.files?.length && !!zipFileBeingUploaded ? (
                   <ZipFileUploadValidation
+                    uploadyInstance={zipFileUploadyInstance}
                     fileStats={fileStats}
                     setFileStats={setFileStats}
                     setFileBeingUploaded={setZipFileBeingUploaded}
@@ -424,7 +438,11 @@ export default function CollectionCreationUploadAssetsPage({
                 isSubmitting={false}
                 className="w-full"
                 onClick={handleUploadClick}
-                disabled={!isMetadataValid || !isZipFileValid}
+                disabled={
+                  !isMetadataValid ||
+                  !isZipFileValid ||
+                  fileStats?.files.length !== collectionMetadataStats?.count
+                }
               >
                 Upload Assets
               </SubmitButton>
