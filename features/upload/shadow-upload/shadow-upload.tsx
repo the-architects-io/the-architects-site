@@ -1,22 +1,35 @@
-import ChunkedUploady from "@rpldy/chunked-uploady";
+import ChunkedUploady, { UploadyContextType } from "@rpldy/chunked-uploady";
 import { ShadowUploadField } from "@/features/upload/shadow-upload/shadow-upload-field";
-import { CollectionFileStats } from "@/app/blueprint/types";
+import { CollectionFileStats, UploadJob } from "@/app/blueprint/types";
+import { getChunkedEnhancer } from "@rpldy/chunked-sender";
 
-const ShadowUpload = (params: {
+type ShadowUploadProps = {
   ownerAddress: string;
   driveAddress?: string;
   collectionId: string;
   shouldUnzip: boolean;
   userId: string;
+  uploadyInstance: UploadyContextType | null;
+  isFileValid: boolean | null;
+  setUploadyInstance: (instance: UploadyContextType) => void;
   fileStats: CollectionFileStats | null;
   fileBeingUploaded: File | null;
   setFileBeingUploaded: (file: File) => void;
-  setUploadJobId: (id: string) => void;
+  setUploadJob: (job: UploadJob) => void;
   setFileStats: (stats: CollectionFileStats) => void;
   onUploadComplete?: (response: any) => void;
   children?: string | JSX.Element | JSX.Element[];
   accept?: string;
-}) => {
+  setShadowFileUploadId: (id: string) => void;
+  uploadJob: UploadJob | null;
+};
+
+const chunkedEnhancer = getChunkedEnhancer({
+  chunkSize: 5 * 1024 * 1024,
+  chunked: true,
+});
+
+const ShadowUpload = (params: ShadowUploadProps) => {
   return (
     <ChunkedUploady
       multiple
@@ -27,8 +40,14 @@ const ShadowUpload = (params: {
       autoUpload={false}
       chunkSize={5 * 1024 * 1024}
       chunked
+      enhancer={chunkedEnhancer}
     >
       <ShadowUploadField
+        uploadJob={params.uploadJob}
+        setShadowFileUploadId={params.setShadowFileUploadId}
+        isFileValid={params.isFileValid}
+        uploadyInstance={params.uploadyInstance}
+        setUploadyInstance={params.setUploadyInstance}
         params={{
           ownerAddress: params.ownerAddress,
           driveAddress: params.driveAddress,
@@ -40,7 +59,7 @@ const ShadowUpload = (params: {
         setFileBeingUploaded={params.setFileBeingUploaded}
         fileStats={params.fileStats}
         setFileStats={params.setFileStats}
-        setUploadJobId={params.setUploadJobId}
+        setUploadJob={params.setUploadJob}
         onUploadComplete={params.onUploadComplete}
       >
         {params.children}

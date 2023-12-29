@@ -4,15 +4,17 @@ export const UPDATE_UPLOAD_JOB = gql`
   mutation UPDATE_UPLOAD_JOB($id: uuid!, $job: uploadJobs_set_input!) {
     update_uploadJobs_by_pk(pk_columns: { id: $id }, _set: $job) {
       id
+      isComplete
+      log
       percentComplete
-      fileCount
+      sizeInBytes
       status {
         id
         name
       }
-      isComplete
-      log
+      statusText
       driveAddress
+      fileCount
     }
   }
 `;

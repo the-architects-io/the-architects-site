@@ -1,15 +1,23 @@
 import { createBlueprintClient } from "@/app/blueprint/client";
-import { CollectionFileStats } from "@/app/blueprint/types";
+import { CollectionFileStats, UploadJob } from "@/app/blueprint/types";
 import { inspectZipFile } from "@/app/blueprint/utils/files/zip";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
 import { UploadStatus } from "@/features/upload/shadow-upload/upload-status";
 import { GET_UPLOAD_JOB_BY_ID } from "@/graphql/queries/get-upload-job-by-id";
 import { useQuery } from "@apollo/client";
+import {
+  CHUNK_EVENTS,
+  ChunkStartEventData,
+  createChunkedSender,
+} from "@rpldy/chunked-sender";
 import { useChunkStartListener } from "@rpldy/chunked-uploady";
 import UploadButton from "@rpldy/upload-button";
 import {
+  Batch,
+  CreateOptions,
   UPLOADER_EVENTS,
+  UploadyContextType,
   useBatchFinalizeListener,
   useRequestPreSend,
   useUploady,
@@ -22,20 +30,30 @@ const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 export const ShadowUploadField = ({
   children,
   setFileBeingUploaded,
-  setUploadJobId,
+  setUploadJob,
   fileStats,
   fileBeingUploaded,
+  isFileValid,
+  uploadyInstance,
+  setUploadyInstance,
   setFileStats,
   onUploadComplete,
+  setShadowFileUploadId,
+  uploadJob,
   params,
 }: {
   children?: string | JSX.Element | JSX.Element[];
   setFileBeingUploaded: (file: File) => void;
-  setUploadJobId: (id: string) => void;
+  setUploadJob: (job: UploadJob) => void;
   fileStats: CollectionFileStats | null;
+  isFileValid: boolean | null;
+  uploadyInstance: UploadyContextType | null;
+  setUploadyInstance: (instance: UploadyContextType) => void;
   fileBeingUploaded: File | null;
   setFileStats: (stats: CollectionFileStats) => void;
   onUploadComplete?: (response: any) => void;
+  setShadowFileUploadId: (id: string) => void;
+  uploadJob: UploadJob | null;
   params: {
     ownerAddress: string;
     driveAddress?: string;
@@ -46,92 +64,67 @@ export const ShadowUploadField = ({
 }) => {
   const uploady = useUploady();
   const fileUploadIdsRef = useRef<any>({}); // Store uploadIds for each file
-  const jobIdRef = useRef<string | null>(null);
   const [isComplete, setIsComplete] = useState(false);
   const [isInProgress, setIsInProgress] = useState(false);
-  const [isEnabled, setIsEnabled] = useState(false);
 
   const { loading, error, data } = useQuery(GET_UPLOAD_JOB_BY_ID, {
     variables: {
-      id: jobIdRef.current,
+      id: uploadJob?.id,
     },
-    skip: !jobIdRef.current,
+    skip: !uploadJob?.id,
     pollInterval: isComplete ? 0 : 500,
   });
 
-  useRequestPreSend(async ({ items, options }) => {
-    if (!isEnabled) {
-      return {
-        abort: true,
-        cancel: true,
-      };
-    }
-    debugger;
-    setIsInProgress(true);
-    const blueprint = createBlueprintClient({
-      cluster: "devnet",
-    });
+  // useRequestPreSend(async ({ items, options }) => {
+  //   debugger;
+  //   if (!isFileValid) {
+  //     showToast({
+  //       primaryMessage: "Invalid file",
+  //     });
 
-    const sizeInBytes = items.reduce((acc, item) => {
-      return acc + item.file.size;
-    }, 0);
+  //     return {
+  //       abort: true,
+  //       cancel: true,
+  //     };
+  //   }
+  //   setIsInProgress(true);
+  //   const blueprint = createBlueprintClient({
+  //     cluster: "devnet",
+  //   });
 
-    if (!params.userId || !items?.[0].file) {
-      throw new Error("No userId, cannot create job.");
-    }
+  //   const sizeInBytes = items.reduce((acc, item) => {
+  //     return acc + item.file.size;
+  //   }, 0);
 
-    const { success, job } = await blueprint.createUploadJob({
-      driveAddress: params.driveAddress,
-      sizeInBytes,
-      userId: params.userId,
-    });
+  //   if (!params.userId || !items?.[0].file || !uploadJobId) {
+  //     throw new Error("Missing data, cannot create job.");
+  //   }
 
-    if (!success) {
-      throw new Error("Failed to create upload job");
-    }
+  //   const { success, job } = await blueprint.updateUploadJob({
+  //     id: uploadJobId,
+  //     job: {
+  //       percentComplete: 0,
+  //       statusText: "Uploading assets to server...",
+  //       sizeInBytes,
+  //     },
+  //   });
 
-    console.log("job", job);
-    jobIdRef.current = job.id;
-    setUploadJobId(job.id);
+  //   if (!success) {
+  //     throw new Error("Failed to update upload job");
+  //   }
 
-    return {
-      options: {
-        ...options, // Maintain existing options configuration
-        params: {
-          ...params, // Maintain existing params
-          ...options.params, // Preserve existing params
-          uploadJobId: job.id,
-        },
-      },
-    };
-  });
-
-  useChunkStartListener(({ item, chunk, sendOptions }) => {
-    const chunkIndex = chunk.index;
-    const fileId = item.id;
-
-    if (!fileUploadIdsRef.current[fileId]) {
-      fileUploadIdsRef.current[fileId] = uuidv4(); // Generate a unique uploadId for each file
-    }
-
-    const uploadId = fileUploadIdsRef.current[fileId];
-
-    const totalChunks = Math.ceil(item.file.size / CHUNK_SIZE);
-
-    return {
-      sendOptions: {
-        ...sendOptions, // Maintain existing sendOptions configuration
-        params: {
-          ...params, // Maintain existing params
-          ...sendOptions.params, // Preserve existing params
-          chunkIndex,
-          uploadId,
-          totalChunks,
-          uploadJobId: jobIdRef.current,
-        },
-      },
-    };
-  });
+  //   return {
+  //     options: {
+  //       ...options, // Maintain existing options configuration
+  //       params: {
+  //         ...params, // Maintain existing params
+  //         ...options.params, // Preserve existing params
+  //         uploadJobId: job.id,
+  //         driveAddress: params.driveAddress,
+  //       },
+  //     },
+  //   };
+  // });
 
   useBatchFinalizeListener((batch) => {
     onUploadComplete?.(data.uploadJobs_by_pk);
@@ -159,15 +152,117 @@ export const ShadowUploadField = ({
   );
 
   useEffect(() => {
+    if (!uploadyInstance) {
+      setUploadyInstance(uploady);
+    }
+
     uploady.on(UPLOADER_EVENTS.BATCH_ADD, (batch) => {
       const file = batch.items[0].file;
       handleFileAdd(file);
     });
 
+    uploady.on(
+      UPLOADER_EVENTS.BATCH_START,
+      async ({ items }: Batch, options: CreateOptions) => {
+        const uploadJobId: string = options.params?.uploadJobId as string;
+        console.log("BATCH_START", { items, options, uploadJobId });
+        const fileId = items[0].id;
+
+        const totalChunks = Math.ceil(items[0].file.size / CHUNK_SIZE);
+
+        if (!fileUploadIdsRef.current[fileId]) {
+          fileUploadIdsRef.current[fileId] = uuidv4(); // Generate a unique uploadId for each file
+        }
+
+        setIsInProgress(true);
+        const blueprint = createBlueprintClient({
+          cluster: "devnet",
+        });
+        const sizeInBytes = items.reduce((acc, item) => {
+          return acc + item.file.size;
+        }, 0);
+        if (!params.userId || !items?.[0].file || !uploadJobId) {
+          console.error("Missing data, cannot create job.");
+          return;
+        }
+
+        // need to debounce
+        const { success, job } = await blueprint.updateUploadJob({
+          id: uploadJobId,
+          percentComplete: 0,
+          statusText: "Uploading assets to server...",
+          sizeInBytes,
+        });
+
+        console.log("BATCH_START job", {
+          success,
+          job,
+          uploadId: fileUploadIdsRef.current[items[0].id],
+        });
+
+        if (!success) {
+          throw new Error("Failed to update upload job");
+        }
+        return {
+          options: {
+            ...options, // Maintain existing options configuration
+            params: {
+              ...params, // Maintain existing params
+              ...options.params, // Preserve existing params,
+              uploadId: fileUploadIdsRef.current[items[0].id],
+              totalChunks,
+              chunkIndex: 0,
+            },
+          },
+        };
+      }
+    );
+
+    uploady.on(
+      CHUNK_EVENTS.CHUNK_START,
+      ({ sendOptions, item, chunk }: ChunkStartEventData) => {
+        console.log({ sendOptions, item, chunk });
+
+        const chunkIndex = chunk.index;
+        const fileId = item.id;
+
+        if (!fileUploadIdsRef.current[fileId]) {
+          fileUploadIdsRef.current[fileId] = uuidv4(); // Generate a unique uploadId for each file
+        }
+
+        const uploadId = fileUploadIdsRef.current[fileId];
+        setShadowFileUploadId(uploadId);
+
+        const totalChunks = Math.ceil(item.file.size / CHUNK_SIZE);
+
+        return {
+          sendOptions: {
+            ...sendOptions, // Maintain existing sendOptions configuration
+            params: {
+              ...params, // Maintain existing params
+              ...sendOptions.params, // Preserve existing params
+              chunkIndex,
+              uploadId,
+              totalChunks,
+            },
+          },
+        };
+      }
+    );
+
     return () => {
       uploady.off(UPLOADER_EVENTS.BATCH_ADD);
     };
-  }, [handleFileAdd, uploady]);
+  }, [
+    handleFileAdd,
+    isFileValid,
+    params,
+    setShadowFileUploadId,
+    setUploadyInstance,
+    uploadJob,
+    uploady,
+    uploadyInstance,
+  ]);
 
   return (
     <>

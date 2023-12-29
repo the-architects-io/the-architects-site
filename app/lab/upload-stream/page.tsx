@@ -41,14 +41,14 @@ export default function StreamUploadPage() {
     <ContentWrapper className="flex flex-col items-center">
       {!!user?.id && (
         <div className="mb-8">
-          <ShadowUpload
+          {/* <ShadowUpload
             ownerAddress={EXECUTION_WALLET_ADDRESS}
             collectionId="1234567890"
             shouldUnzip={false}
             userId={user?.id}
             setUploadJobId={setUploadJobId}
             onUploadComplete={() => {}}
-          />
+          /> */}
         </div>
       )}
       {!!data?.uploadJobs_by_pk && (

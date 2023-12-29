@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
     creators,
     driveAddress,
     isReadyToMint,
+    uploadJobId,
   } = await req.json();
 
   if (!id) {
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
   console.log({ creators });
 
   let addedCreators;
-  if (creators.length) {
+  if (creators?.length) {
     try {
       console.log("@@@@@@@ adding creators");
 
@@ -103,6 +104,7 @@ export async function POST(req: NextRequest) {
           ...(sellerFeeBasisPoints && { sellerFeeBasisPoints }),
           ...(isReadyToMint && { isReadyToMint }),
           ...(driveAddress && { driveAddress }),
+          ...(uploadJobId && { uploadJobId }),
         },
       }
     );

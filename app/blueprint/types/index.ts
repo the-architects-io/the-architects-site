@@ -667,6 +667,7 @@ export type Collection = {
   creators: Creator[];
   isReadyToMint: boolean;
   driveAddress: string;
+  uploadJob: UploadJob;
 };
 
 export type CreateCollectionResponse = BaseBlueprintResponse & {
@@ -691,6 +692,7 @@ export type UpdateCollectionInput = {
   imageUrl?: string;
   creators?: Creator[];
   isReadyToMint?: boolean;
+  uploadJobId?: string;
 };
 
 export type UpdateCollectionResponse = BaseBlueprintResponse & {
@@ -823,8 +825,13 @@ export type DeleteDriveResponse = BaseBlueprintResponse & {
 
 export type CreateUploadJobInput = {
   driveAddress?: string;
-  sizeInBytes: number;
+  sizeInBytes?: number;
   userId: string;
+  statusText?: string;
+  statusId?: string;
+  isComplete?: boolean;
+  log?: string;
+  percentComplete?: number;
 };
 
 export type CreateUploadJobResponse = BaseBlueprintResponse & {
@@ -880,6 +887,7 @@ export enum BlueprintApiActions {
   MINT_NFT = "MINT_NFT",
   REDUCE_STORAGE = "REDUCE_STORAGE",
   UPDATE_COLLECTION = "UPDATE_COLLECTION",
+  UPDATE_UPLOAD_JOB = "UPDATE_UPLOAD_JOB",
   UPLOAD_FILE = "UPLOAD_FILE",
   UPLOAD_FILES = "UPLOAD_FILES",
   UPLOAD_JSON = "UPLOAD_JSON",
@@ -901,6 +909,20 @@ export type CollectionStatsFromCollectionMetadatas = {
   uniqueTraits: string[];
   creators: string[];
   validCount?: number;
+};
+
+export type UpdateUploadJobResponse = BaseBlueprintResponse & {
+  job: UploadJob;
+};
+
+export type UpdateUploadJobInput = {
+  id: string;
+  isComplete?: boolean;
+  log?: string;
+  percentComplete?: number;
+  sizeInBytes?: number;
+  statusText?: string;
+  statusId?: string;
 };
 
 export type ValidationIssue = { text: string; index: number };

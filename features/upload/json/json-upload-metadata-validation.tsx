@@ -12,16 +12,19 @@ import { useCallback, useEffect, useState } from "react";
 
 export const JsonUploadMetadataValidation = ({
   json,
+  isMetadataValid,
+  setIsMetadataValid,
   setJsonBeingUploaded,
   setMetadataStas,
 }: {
   json: any;
+  isMetadataValid: boolean | null;
+  setIsMetadataValid: (isValid: boolean | null) => void;
   setJsonBeingUploaded: (json: any) => void;
   setMetadataStas: (
     stats: CollectionStatsFromCollectionMetadatas | null
   ) => void;
 }) => {
-  const [isJsonValid, setIsJsonValid] = useState<boolean | null>(null);
   const [validationIssues, setValidationIssues] = useState<ValidationIssue[]>(
     []
   );
@@ -109,7 +112,7 @@ export const JsonUploadMetadataValidation = ({
   useEffect(() => {
     if (!json) return;
 
-    setIsJsonValid(validateJson(json));
+    setIsMetadataValid(validateJson(json));
     setMetadataStas({
       uniqueTraits: collectionStats?.uniqueTraits || [],
       creators: collectionStats?.creators || [],
@@ -125,14 +128,14 @@ export const JsonUploadMetadataValidation = ({
     collectionStats?.creators,
     collectionStats?.uniqueTraits,
     json,
-    setIsJsonValid,
+    setIsMetadataValid,
     setMetadataStas,
     validateJson,
     validateTokenMetadata,
   ]);
 
   const handleClearFile = () => {
-    setIsJsonValid(null);
+    setIsMetadataValid(null);
     setValidationIssues([]);
     setJsonBeingUploaded(null);
     setMetadataStas(null);
@@ -140,13 +143,13 @@ export const JsonUploadMetadataValidation = ({
 
   return (
     <div className="flex w=full justify-center space-y-5">
-      {isJsonValid === null && (
+      {isMetadataValid === null && (
         <div className="flex items-center space-x-2">
           <Spinner />
           <div>Validating...</div>
         </div>
       )}
-      {isJsonValid === false && (
+      {isMetadataValid === false && (
         <div className="flex flex-col items-center space-x-2">
           <div className="flex items-center space-x-2">
             <XCircleIcon className="h-6 w-6 text-red-500" />
@@ -175,7 +178,7 @@ export const JsonUploadMetadataValidation = ({
           </div>
         </div>
       )}
-      {isJsonValid === true && (
+      {isMetadataValid === true && (
         <div className="flex flex-col items-center space-x-2">
           <div className="flex items-center space-x-2">
             <CheckBadgeIcon className="h-6 w-6 text-green-500" />

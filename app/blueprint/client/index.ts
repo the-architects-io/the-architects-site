@@ -28,6 +28,8 @@ import {
   ReduceStorageResponse,
   UpdateCollectionInput,
   UpdateCollectionResponse,
+  UpdateUploadJobInput,
+  UpdateUploadJobResponse,
   UploadFileInput,
   UploadFileResponse,
   UploadFilesInput,
@@ -68,7 +70,6 @@ async function makeApiRequest<TResponse, TParams extends Record<string, any>>(
   isFormData: boolean = false
 ): Promise<TResponse> {
   const url = `${BASE_URL}/api/blueprint`;
-
   let body: FormData | string;
   let headers = {};
 
@@ -176,6 +177,12 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
         params,
         options
       ),
+    updateUploadJob: (params: UpdateUploadJobInput) =>
+      makeApiRequest<UpdateUploadJobResponse, UpdateUploadJobInput>(
+        BlueprintApiActions.UPDATE_UPLOAD_JOB,
+        params,
+        options
+      ),
     uploadFile: (params: UploadFileInput) =>
       makeApiRequest<UploadFileResponse, UploadFileInput>(
         BlueprintApiActions.UPLOAD_FILE,
@@ -183,7 +190,6 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
         options,
         true
       ),
-
     uploadFiles: (params: UploadFilesInput) =>
       makeApiRequest<UploadFilesResponse, UploadFilesInput>(
         BlueprintApiActions.UPLOAD_FILES,

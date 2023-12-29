@@ -8,21 +8,29 @@ import Spinner from "@/features/UI/spinner";
 import { JsonUploadField } from "@/features/upload/json/json-upload-field";
 import { CheckBadgeIcon } from "@heroicons/react/20/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import Uploady from "@rpldy/uploady";
+import Uploady, { UploadyContextType } from "@rpldy/uploady";
 import { useState } from "react";
 
 export const JsonUpload = ({
   driveAddress,
   fileName,
   children,
+  uploadyInstance,
+  isFileValid,
+  setUploadyInstance,
   setJsonUploadResponse,
   setJsonBeingUploaded,
+  setJsonFileBeingUploaded,
 }: {
   driveAddress: string;
   fileName: string;
   children?: string | JSX.Element | JSX.Element[];
+  uploadyInstance: UploadyContextType | null;
+  isFileValid: boolean | null;
+  setUploadyInstance: (instance: UploadyContextType) => void;
   setJsonUploadResponse: (response: any) => void;
   setJsonBeingUploaded: (json: any) => void;
+  setJsonFileBeingUploaded: (file: File) => void;
 }) => {
   const [progress, setProgress] = useState(0);
   const [isInProgress, setIsInProgress] = useState(false);
@@ -55,10 +63,14 @@ export const JsonUpload = ({
         autoUpload={false}
       >
         <JsonUploadField
+          isFileValid={isFileValid}
+          uploadyInstance={uploadyInstance}
+          setUploadyInstance={setUploadyInstance}
           setProgress={setProgress}
           setIsInProgress={setIsInProgress}
           driveAddress={driveAddress}
           setJsonBeingUploaded={setJsonBeingUploaded}
+          setJsonFileBeingUploaded={setJsonFileBeingUploaded}
         >
           {isInProgress ? (
             <div className="flex flex-col w-full h-full justify-center items-center text-lg">

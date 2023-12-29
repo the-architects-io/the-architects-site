@@ -9,18 +9,21 @@ export const ZipFileUploadValidation = ({
   fileStats,
   setFileStats,
   setFileBeingUploaded,
+  isFileValid,
+  setIsFileValid,
 }: {
   fileStats: CollectionFileStats | null;
   setFileStats: (stats: CollectionFileStats | null) => void;
   setFileBeingUploaded: (file: File | null) => void;
+  isFileValid: boolean | null;
+  setIsFileValid: (isValid: boolean) => void;
 }) => {
-  const [isFileValid, setisFileValid] = useState<boolean | null>(null);
   const [validationIssues, setValidationIssues] = useState<ValidationIssue[]>(
     []
   );
 
   const handleClearZipFile = () => {
-    setisFileValid(null);
+    setIsFileValid(false);
     setValidationIssues([]);
     setFileBeingUploaded(null);
     setFileStats(null);
@@ -32,7 +35,7 @@ export const ZipFileUploadValidation = ({
     console.log("fileStats", fileStats);
 
     if (fileStats.files.length === 0) {
-      setisFileValid(false);
+      setIsFileValid(false);
       setValidationIssues([
         {
           text: "Zip file is empty",
@@ -43,7 +46,7 @@ export const ZipFileUploadValidation = ({
     }
 
     if (!fileStats.fileNamesAreValid) {
-      setisFileValid(false);
+      setIsFileValid(false);
       setValidationIssues([
         {
           text: "Invalid filenames",
@@ -53,8 +56,8 @@ export const ZipFileUploadValidation = ({
       return;
     }
 
-    setisFileValid(true);
-  }, [fileStats]);
+    setIsFileValid(true);
+  }, [fileStats, setIsFileValid]);
 
   return (
     <div className="flex w=full justify-center space-y-5">

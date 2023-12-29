@@ -11,7 +11,6 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { SingleImageUpload } from "@/features/upload/single-image/single-image-upload";
 import {
-  CollectionStatsFromCollectionMetadatas,
   creatorsAreValid,
   getCollectionStatsFromCollectionMetadatas,
 } from "@/app/blueprint/utils";
@@ -19,6 +18,7 @@ import { useQuery } from "@apollo/client";
 import { GET_COLLECTION_BY_ID } from "@/graphql/queries/get-collection-by-id";
 import {
   Collection,
+  CollectionStatsFromCollectionMetadatas,
   Creator,
   Drive,
   UploadFilesResponse,

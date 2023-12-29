@@ -68,6 +68,9 @@ dependencies:
   '@project-serum/anchor':
     specifier: ^0.26.0
     version: 0.26.0(encoding@0.1.13)
+  '@rpldy/chunked-sender':
+    specifier: ^1.7.1
+    version: 1.7.1
   '@rpldy/chunked-uploady':
     specifier: ^1.6.1
     version: 1.6.1(react-dom@18.2.0)(react@18.2.0)
@@ -5456,6 +5459,14 @@ packages:
       '@rpldy/simple-state': 1.6.1
     dev: false
 
+  /@rpldy/chunked-sender@1.7.1:
+    resolution: {integrity: sha512-w3xX5TOM2Ba4yIkMu4w3bbyHx6fFHK9rosUndf4quzk+GSd4J0MEjE96NYSZUikfJ0oyZj0MUR3LM2D9gwJ1nw==}
+    dependencies:
+      '@rpldy/sender': 1.7.1
+      '@rpldy/shared': 1.7.1
+      '@rpldy/simple-state': 1.7.1
+    dev: false
+
   /@rpldy/chunked-uploady@1.6.1(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-LldpJksoLBjq5V6IepIQGfRuHq0X9bD22VMxUVeNvmj6f3ULqFuM+1/WNlmk3pgtqLwVlW4iAVyowPjJIeGShg==}
     peerDependencies:
@@ -5491,6 +5502,12 @@ packages:
       '@rpldy/shared': 1.6.1
     dev: false
 
+  /@rpldy/sender@1.7.1:
+    resolution: {integrity: sha512-Ct/5eRvUxw6qlb+p1ybvQZOMp3z6/J9cK8qGeWaDPoEn9OQawSqvd2wCEog7x2cDIrCUfxGmKXmDxi4q3Wo0OA==}
+    dependencies:
+      '@rpldy/shared': 1.7.1
+    dev: false
+
   /@rpldy/shared-ui@1.6.1(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-+mZ/MbijMFxao/F3EWJ3Tmt2u05f7yh4w5xrCzSDfPy8nQj8OIEhygUEVHR6Sy5KHwSSkfVk3QNM78rSJVxcZQ==}
     peerDependencies:
@@ -5510,10 +5527,23 @@ packages:
       just-throttle: 4.2.0
     dev: false
 
+  /@rpldy/shared@1.7.1:
+    resolution: {integrity: sha512-AgqM+tnSHjm7JeiXgHl925Jvk4X3Hr2C7MhE7cbLiLAjRbf1dqMs5M2HEmQktWKSIB2tpdM7PGR79Pw9RPUivg==}
+    dependencies:
+      invariant: 2.2.4
+      just-throttle: 4.2.0
+    dev: false
+
   /@rpldy/simple-state@1.6.1:
     resolution: {integrity: sha512-HiX+Qa1QzR11DQGzyAdE1jMKYjrCmF7BIsfw9SQdCmqEo88ftdE2bnwHsqmzteVUD1mTDCmtguj7PbqBu4lFAw==}
     dependencies:
       '@rpldy/shared': 1.6.1
+    dev: false
+
+  /@rpldy/simple-state@1.7.1:
+    resolution: {integrity: sha512-NP/OrBNs+pTcj+zpCBrlreHyzYWzkZr/btpK+jZJml6zImzWHE/uoum6M4iadSp9r7SkMnz3E8kPlOR2nP6cbw==}
+    dependencies:
+      '@rpldy/shared': 1.7.1
     dev: false
 
   /@rpldy/upload-button@1.6.1(react-dom@18.2.0)(react@18.2.0):
