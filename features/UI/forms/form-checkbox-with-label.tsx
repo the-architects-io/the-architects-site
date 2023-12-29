@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { FormikHandlers } from "formik";
 
 interface Props {
@@ -5,6 +6,7 @@ interface Props {
   onChange: FormikHandlers["handleChange"];
   value: boolean;
   name: string;
+  className?: string;
 }
 
 export const FormCheckboxWithLabel = ({
@@ -12,10 +14,11 @@ export const FormCheckboxWithLabel = ({
   onChange,
   value,
   name,
+  className,
   ...props
 }: Props) => {
   return (
-    <label htmlFor={name} className="flex space-x-4">
+    <label htmlFor={name} className={classNames(["flex space-x-4", className])}>
       <input
         type="checkbox"
         name={name}

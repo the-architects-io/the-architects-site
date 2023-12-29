@@ -32,6 +32,7 @@ export default function CollectionsPage() {
     variables: {
       id: user?.id,
     },
+    fetchPolicy: "no-cache",
     skip: !user?.id,
     onCompleted: ({ collections }: { collections: Collection[] }) => {
       console.log({ collections });
@@ -64,6 +65,7 @@ export default function CollectionsPage() {
                 Collection in Progress
               </div>
               <CollectionListItem
+                shouldShowStats={true}
                 collection={inProgressCollection}
                 url={
                   inProgressCollection.creators?.length

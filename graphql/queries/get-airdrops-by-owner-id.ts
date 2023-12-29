@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
-export const GET_AIRDROP_BY_ID = gql`
-  query GET_AIRDROP_BY_ID($id: uuid!) {
-    airdrops_by_pk(id: $id) {
+export const GET_AIRDROPS_BY_OWNER_ID = gql`
+  query GET_AIRDROPS_BY_OWNER_ID($id: uuid!) {
+    airdrops(where: { ownerId: { _eq: $id } }) {
       id
       name
       collectionNft {
@@ -20,14 +20,6 @@ export const GET_AIRDROP_BY_ID = gql`
       }
       isReadyToDrop
       startTime
-      recipients {
-        id
-        wallet {
-          id
-          address
-        }
-        amount
-      }
       recipients_aggregate {
         aggregate {
           count

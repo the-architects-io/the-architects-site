@@ -1,4 +1,5 @@
 import { createBlueprintClient } from "@/app/blueprint/client";
+import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
@@ -7,57 +8,70 @@ import showToast from "@/features/toasts/show-toast";
 import { useUserData } from "@nhost/nextjs";
 
 import { useFormik } from "formik";
-import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function CreateAirdropForm({
-  setAirdropId,
-  setStep,
+  airdropId,
 }: {
-  setAirdropId: (id: string) => void;
-  setStep: (step: number) => void;
+  airdropId: string;
 }) {
+  const router = useRouter();
   const user = useUserData();
+  const [files, setFiles] = useState<FileList | null>(null);
 
   const formik = useFormik({
     initialValues: {
       name: "",
-      ownerId: user?.id,
       startTime: "",
       shouldKickoffManually: false,
     },
-    onSubmit: async ({ name, startTime, ownerId, shouldKickoffManually }) => {
+    onSubmit: async ({ name, startTime, shouldKickoffManually }) => {
+      if (!files?.length) {
+        showToast({ primaryMessage: "No recipients file selected" });
+        return;
+      }
       const blueprint = createBlueprintClient({
         cluster: "devnet",
       });
 
-      const { success, airdrop } = await blueprint.createAirdrop({
-        name,
-        startTime,
-        ownerId,
-        shouldKickoffManually,
-      });
+      const { success: updateAirdropSuccess, airdrop } =
+        await blueprint.updateAirdrop({
+          id: airdropId,
+          name,
+          startTime,
+          shouldKickoffManually,
+          isReadyToDrop: true,
+        });
 
-      if (success && airdrop?.id) {
-        setAirdropId(airdrop.id);
-        setStep(1);
-      } else {
+      const recipients = await files[0].text();
+
+      const { success: addRecipientsSuccess, addedReipientsCount } =
+        await blueprint.addAirdropRecipients({
+          airdropId,
+          recipients,
+        });
+
+      if (!updateAirdropSuccess || !addRecipientsSuccess) {
         showToast({
           primaryMessage: "Error creating airdrop",
         });
+        return;
       }
+
+      showToast({
+        primaryMessage: "Airdrop created",
+        secondaryMessage: `${addedReipientsCount} recipients added`,
+      });
+
+      router.push(`/me/airdrop/${airdrop.id}`);
     },
   });
 
-  useEffect(() => {
-    if (user?.id) {
-      formik.setFieldValue("ownerId", user?.id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  useEffect(() => {}, [files]);
 
   return (
     <FormWrapper onSubmit={formik.handleSubmit}>
-      <h1 className="text-2xl mb-4 text-center w-full">Add Airdrop Info</h1>
       <FormInputWithLabel
         name="name"
         label="Name"
@@ -67,6 +81,7 @@ export default function CreateAirdropForm({
         value={formik.values.name}
       />
       <FormCheckboxWithLabel
+        className="pb-2"
         label="Start airdrop manually"
         name="shouldKickoffManually"
         value={formik.values.shouldKickoffManually}
@@ -85,8 +100,21 @@ export default function CreateAirdropForm({
           value={formik.values.startTime}
         />
       )}
+      <div className="flex items-center">
+        <div className="w-1/2">Add recipients JSON</div>
+        <div className="py-4 mx-auto w-1/2 flex justify-end">
+          <input
+            className="block"
+            multiple
+            type="file"
+            accept=".json"
+            onChange={(e) => setFiles(e.target.files)}
+          />
+        </div>
+      </div>
       <div className="flex w-full justify-center">
         <SubmitButton
+          disabled={!formik.values.name || !files?.length}
           isSubmitting={formik.isSubmitting}
           onClick={formik.submitForm}
         />

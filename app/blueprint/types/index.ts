@@ -507,11 +507,24 @@ export type Airdrop = {
   owner: {
     id: string;
   };
+  collection: {
+    id: string;
+    name: string;
+    imageUrl: string;
+    symbol: string;
+  };
   recipients?: Recipient[];
   collectionNft?: {
     id: string;
     name: string;
     mintAddress: string;
+    imageUrl: string;
+  };
+  isReadyToDrop: boolean;
+  recipients_aggregate?: {
+    aggregate: {
+      count: number;
+    };
   };
 };
 
@@ -531,10 +544,11 @@ export type AddAirdropResponse = {
 };
 
 export type CreateAirdropInput = {
-  name: string;
+  collectionId: string;
+  ownerId: string;
+  name?: string;
   collectionNftId?: string;
   startTime?: string;
-  ownerId?: string;
   shouldKickoffManually?: boolean;
 };
 
@@ -552,7 +566,7 @@ export type CreateAirdropResponse = BaseBlueprintResponse & {
 
 export type AddAirdropRecipientsInput = {
   airdropId: string;
-  recipients: string[] | File;
+  recipients: string;
 };
 
 export type AirdropRecipientsResponse = BaseBlueprintResponse & {
@@ -887,6 +901,7 @@ export enum BlueprintApiActions {
   MINT_CNFT = "MINT_CNFT",
   MINT_NFT = "MINT_NFT",
   REDUCE_STORAGE = "REDUCE_STORAGE",
+  UPDATE_AIRDROP = "UPDATE_AIRDROP",
   UPDATE_COLLECTION = "UPDATE_COLLECTION",
   UPDATE_UPLOAD_JOB = "UPDATE_UPLOAD_JOB",
   UPLOAD_FILE = "UPLOAD_FILE",
@@ -927,3 +942,18 @@ export type UpdateUploadJobInput = {
 };
 
 export type ValidationIssue = { text: string; index: number };
+
+export type UpdateAirdropInput = {
+  id: string;
+  name?: string;
+  collectionId?: string;
+  collectionNftId?: string;
+  startTime?: string;
+  shouldKickoffManually?: boolean;
+  imageUrl?: string;
+  isReadyToDrop?: boolean;
+};
+
+export type UpdateAirdropRespone = BaseBlueprintResponse & {
+  airdrop: Airdrop;
+};

@@ -41,7 +41,7 @@ export default function AirdropDetailsPage({ params }: { params: any }) {
         <div className="text-2xl font-semibold mb-4">{airdrop?.name}</div>
         <div className="text-lg mb-4">
           <span className="font-semibold">Number of recipients: </span>
-          {airdrop?.recipients?.length}
+          {airdrop?.recipients_aggregate?.aggregate?.count}
         </div>
         <div className="text-lg mb-4">
           {!!airdrop?.recipients?.length && (

@@ -26,6 +26,8 @@ import {
   MintNftResponse,
   ReduceStorageInput,
   ReduceStorageResponse,
+  UpdateAirdropInput,
+  UpdateAirdropRespone,
   UpdateCollectionInput,
   UpdateCollectionResponse,
   UpdateUploadJobInput,
@@ -73,6 +75,13 @@ async function makeApiRequest<TResponse, TParams extends Record<string, any>>(
   let body: FormData | string;
   let headers = {};
 
+  console.log({
+    action,
+    params,
+    options,
+    isFormData,
+  });
+
   if (isFormData) {
     const formData = await getFormData(params);
     if (!formData) throw new Error("Failed to create form data");
@@ -84,8 +93,13 @@ async function makeApiRequest<TResponse, TParams extends Record<string, any>>(
     headers = { "Content-Type": "application/json" };
   }
 
-  const response = await axios.post(url, body, { headers });
-  return response.data;
+  try {
+    const response = await axios.post(url, body, { headers });
+    return response.data;
+  } catch (error) {
+    console.log({ error });
+    throw error;
+  }
 }
 
 export const createBlueprintClient = (options: BlueprintClientOptions) => {
@@ -94,8 +108,7 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
       makeApiRequest<AirdropRecipientsResponse, AddAirdropRecipientsInput>(
         BlueprintApiActions.ADD_AIRDROP_RECIPIENTS,
         params,
-        options,
-        true
+        options
       ),
     createCollection: (params: CreateCollectionInput) =>
       makeApiRequest<CreateCollectionResponse, CreateCollectionInput>(
@@ -174,6 +187,12 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
     updateCollection: (params: UpdateCollectionInput) =>
       makeApiRequest<UpdateCollectionResponse, UpdateCollectionInput>(
         BlueprintApiActions.UPDATE_COLLECTION,
+        params,
+        options
+      ),
+    updateAirdrop: (params: UpdateAirdropInput) =>
+      makeApiRequest<UpdateAirdropRespone, UpdateAirdropInput>(
+        BlueprintApiActions.UPDATE_AIRDROP,
         params,
         options
       ),

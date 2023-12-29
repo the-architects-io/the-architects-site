@@ -7,11 +7,13 @@ import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
+  console.log("add-airdrop-recipients");
   const { airdropId, recipients } = await req.json();
 
+  const parsedRecipients = JSON.parse(recipients);
   console.log({
     airdropId,
-    recipients,
+    parsedRecipients,
   });
 
   if (!airdropId) {
@@ -21,9 +23,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (!recipients) {
+  if (!parsedRecipients) {
     return NextResponse.json(
-      { error: "No recipients provided" },
+      { error: "No parsedRecipients provided" },
       { status: 400 }
     );
   }
@@ -31,14 +33,14 @@ export async function POST(req: NextRequest) {
   try {
     const { data: addedWallets }: { data: AddWalletsResponse } =
       await axios.post(`${BASE_URL}/api/add-wallets`, {
-        addresses: recipients,
+        addresses: parsedRecipients,
       });
 
     const { existingWalletsCount, insertedWalletsCount, wallets } =
       addedWallets;
 
     // create map where key is address and value is count
-    const addressMap = recipients.reduce((acc: any, address: string) => {
+    const addressMap = parsedRecipients.reduce((acc: any, address: string) => {
       if (acc[address]) {
         acc[address] += 1;
       } else {

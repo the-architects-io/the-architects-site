@@ -23,6 +23,7 @@ const {
   MINT_CNFT,
   MINT_NFT,
   REDUCE_STORAGE,
+  UPDATE_AIRDROP,
   UPDATE_COLLECTION,
   UPDATE_UPLOAD_JOB,
   UPLOAD_JSON,
@@ -46,6 +47,7 @@ const BlueprintApiActionUrls = {
   [MINT_CNFT]: `${BASE_URL}/api/mint-cnft`,
   [MINT_NFT]: `${BASE_URL}/api/mint-nft`,
   [REDUCE_STORAGE]: `${BASE_URL}/api/reduce-storage`,
+  [UPDATE_AIRDROP]: `${BASE_URL}/api/update-airdrop`,
   [UPDATE_COLLECTION]: `${BASE_URL}/api/update-collection`,
   [UPDATE_UPLOAD_JOB]: `${BASE_URL}/api/update-upload-job`,
   [UPLOAD_JSON]: `${BASE_URL}/api/upload-json-file-to-shadow-drive`,
@@ -56,14 +58,17 @@ const BlueprintApiActionUrls = {
 const mapErrorToResponse = (error: any): MappedErrorResponse => {
   const status =
     error?.response?.status || error?.response?.data?.status || 500;
+  // console.log({
+  //   // error,
+  //   error: error.response?.data,
+  //   statuses: {
+  //     "error?.response?.status": error?.response?.status,
+  //     "error?.response?.data?.status": error?.response?.data?.status,
+  //     status: status,
+  //   },
+  // });
   console.log({
-    // error,
-    error: error.response?.data,
-    statuses: {
-      "error?.response?.status": error?.response?.status,
-      "error?.response?.data?.status": error?.response?.data?.status,
-      status: status,
-    },
+    fullError: error,
   });
   const statusText =
     error?.response?.data?.statusText || "Internal Server Error";
@@ -165,6 +170,13 @@ export async function POST(req: NextRequest) {
 
   // Determine if the request data is FormData
   const isFormData = req.headers.get("content-type") !== "application/json";
+
+  console.log({
+    action,
+    params,
+    isFormData,
+    contentType: req.headers.get("content-type"),
+  });
 
   // Make API request based on action
   return makeBlueprintApiRequest(action, params, isFormData);
