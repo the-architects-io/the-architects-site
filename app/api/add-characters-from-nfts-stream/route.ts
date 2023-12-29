@@ -1,4 +1,3 @@
-import { isAsset } from "@/app/api/add-tokens/route";
 import {
   AddCharactersResponse,
   AddTraitInstancesResponse,
@@ -13,11 +12,18 @@ import { client } from "@/graphql/backend-client";
 import { ADD_CHARACTERS } from "@/graphql/mutations/add-characters";
 import { ADD_TRAIT_INSTANCES } from "@/graphql/mutations/add-trait-instances";
 import { ADD_TRAITS } from "@/graphql/mutations/add-traits";
+import { Mint } from "@metaplex-foundation/js";
 // import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import { DigitalAsset } from "@metaplex-foundation/mpl-token-metadata";
 import { NextRequest } from "next/server";
 
 const CHUNK_SIZE = 10;
+
+const isAsset = (
+  entity: DigitalAsset | Mint | Token
+): entity is DigitalAsset => {
+  return "mint" in entity && entity.mint ? true : false;
+};
 
 // Breaks up the array into smaller chunks
 function chunkArray(array: any[], chunkSize: number) {

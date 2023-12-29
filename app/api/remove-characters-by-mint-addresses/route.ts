@@ -11,27 +11,31 @@ type RemoveCharactersResponse = {
 };
 
 export async function POST(req: NextRequest) {
-  const { mintAddresses, noop } = await req.json();
+  const { mintAddresses } = await req.json();
 
-  if (noop)
-    return {
-      noop: true,
-      endpoint: "remove-characters-by-mint-addresses",
-    };
+  try {
+    const {
+      delete_characters: deletedCharacters,
+    }: { delete_characters: RemoveCharactersResponse } = await client.request({
+      document: REMOVE_CHARACTERS_BY_MINT_ADDRESSES,
+      variables: {
+        mintAddresses,
+      },
+    });
 
-  const {
-    delete_characters: deletedCharacters,
-  }: { delete_characters: RemoveCharactersResponse } = await client.request({
-    document: REMOVE_CHARACTERS_BY_MINT_ADDRESSES,
-    variables: {
-      mintAddresses,
-    },
-  });
-
-  return NextResponse.json(
-    {
-      deletedCharacters,
-    },
-    { status: 200 }
-  );
+    return NextResponse.json(
+      {
+        deletedCharacters,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      {
+        error,
+      },
+      { status: 500 }
+    );
+  }
 }

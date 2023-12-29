@@ -4,25 +4,29 @@ import { Token } from "@metaplex-foundation/js";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { mintAddresses, noop } = await req.json();
+  const { mintAddresses } = await req.json();
 
-  if (noop)
-    return {
-      noop: true,
-      endpoint: "get-token-metadata-from-helius",
-    };
+  try {
+    const { tokens }: { tokens: Token[] } = await client.request({
+      document: GET_TOKENS_BY_MINT_ADDRESSES,
+      variables: {
+        mintAddresses,
+      },
+    });
 
-  const { tokens }: { tokens: Token[] } = await client.request({
-    document: GET_TOKENS_BY_MINT_ADDRESSES,
-    variables: {
-      mintAddresses,
-    },
-  });
-
-  return NextResponse.json(
-    {
-      tokens,
-    },
-    { status: 200 }
-  );
+    return NextResponse.json(
+      {
+        tokens,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      {
+        error,
+      },
+      { status: 500 }
+    );
+  }
 }

@@ -1,4 +1,3 @@
-import { nftStorageUploader } from "@metaplex-foundation/umi-uploader-nft-storage";
 import { RPC_ENDPOINT, RPC_ENDPOINT_DEVNET } from "@/constants/constants";
 import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
 import { mplToolbox } from "@metaplex-foundation/mpl-toolbox";
@@ -16,16 +15,7 @@ export function getUmiClient(
   }
 
   if (!umiClient) {
-    umiClient = createUmi(endpoint)
-      .use(
-        nftStorageUploader({
-          token: process.env.NFT_STORAGE_API_KEY || "",
-          // gatewayHost: "https://cf-ipfs.com",
-          gatewayHost: "https://dweb.link",
-        })
-      )
-      .use(mplToolbox())
-      .use(mplTokenMetadata());
+    umiClient = createUmi(endpoint).use(mplToolbox()).use(mplTokenMetadata());
   }
   return umiClient;
 }

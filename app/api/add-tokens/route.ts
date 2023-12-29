@@ -41,7 +41,7 @@ type ModeledToken = {
   decimals: number;
 };
 
-export const isAsset = (
+const isAsset = (
   entity: DigitalAsset | Mint | Token
 ): entity is DigitalAsset => {
   return "mint" in entity && entity.mint ? true : false;
