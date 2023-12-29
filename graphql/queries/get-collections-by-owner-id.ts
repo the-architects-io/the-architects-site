@@ -27,6 +27,19 @@ export const GET_COLLECTIONS_BY_OWNER_ID = gql`
       sellerFeeBasisPoints
       symbol
       updatedAt
+      uploadJob {
+        id
+        status {
+          id
+          name
+        }
+        sizeInBytes
+        driveAddress
+        percentComplete
+        log
+        statusText
+        fileCount
+      }
     }
   }
 `;

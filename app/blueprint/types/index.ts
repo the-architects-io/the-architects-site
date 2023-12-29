@@ -693,6 +693,7 @@ export type UpdateCollectionInput = {
   creators?: Creator[];
   isReadyToMint?: boolean;
   uploadJobId?: string;
+  driveAddress?: string;
 };
 
 export type UpdateCollectionResponse = BaseBlueprintResponse & {

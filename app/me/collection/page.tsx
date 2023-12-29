@@ -1,5 +1,5 @@
 "use client";
-import { Collection } from "@/app/blueprint/types";
+import { Collection, UploadJobStatus } from "@/app/blueprint/types";
 import { CreateCollectionButton } from "@/app/blueprint/ui/create-collection-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { CollectionList } from "@/features/collection/collection-list";
@@ -37,10 +37,18 @@ export default function CollectionsPage() {
       console.log({ collections });
       setCollections(collections);
       setReadyToMintCollections(
-        collections.filter((collection) => collection.isReadyToMint)
+        collections.filter(
+          (collection) =>
+            collection.isReadyToMint ||
+            collection?.uploadJob?.status?.name === UploadJobStatus.COMPLETE
+        )
       );
       setInProgressCollection(
-        collections.filter((collection) => !collection.isReadyToMint)?.[0]
+        collections.filter(
+          (collection) =>
+            !collection.isReadyToMint &&
+            collection?.uploadJob?.status?.name !== UploadJobStatus.COMPLETE
+        )?.[0]
       );
     },
   });

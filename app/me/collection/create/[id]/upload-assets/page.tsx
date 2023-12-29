@@ -74,6 +74,7 @@ export default function CollectionCreationUploadAssetsPage({
     useState<UploadyContextType | null>(null);
   const [zipFileUploadyInstance, setZipFileUploadyInstance] =
     useState<UploadyContextType | null>(null);
+  const [driveAddress, setDriveAddress] = useState<string | null>(null);
 
   const wallet = useWallet();
   const blueprint = createBlueprintClient({
@@ -204,8 +205,6 @@ export default function CollectionCreationUploadAssetsPage({
     let sizeInKb = sizeInBytes ? sizeInBytes / 1000 : 0;
     sizeInKb += 1000; // add 1MB to sizeInKb for overhead
 
-    let driveAddress;
-
     const { job } = await blueprint.createUploadJob({
       statusText: "Creating SHDW drive...",
       userId: user?.id,
@@ -224,7 +223,7 @@ export default function CollectionCreationUploadAssetsPage({
         sizeInKb,
         ownerAddress: EXECUTION_WALLET_ADDRESS,
       });
-      driveAddress = address;
+      setDriveAddress(address);
     } catch (error) {
       console.log({ error });
       showToast({
@@ -293,13 +292,14 @@ export default function CollectionCreationUploadAssetsPage({
   }, [params.id, router]);
 
   useEffect(() => {
-    if (uploadJob) {
+    if (uploadJob && driveAddress) {
       blueprint.updateCollection({
         id: params.id,
         uploadJobId: uploadJob.id,
+        driveAddress,
       });
     }
-  }, [uploadJob, blueprint, params.id]);
+  }, [uploadJob, blueprint, params.id, driveAddress]);
 
   if (loading) {
     return (
