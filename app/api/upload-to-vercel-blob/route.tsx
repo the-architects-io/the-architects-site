@@ -1,11 +1,5 @@
-import { createBlueprintClient } from "@/app/blueprint/client";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
-import axios from "axios";
 import { NextResponse } from "next/server";
-import fs from "fs";
-import { User } from "@nhost/nextjs";
-import { client } from "@/graphql/backend-client";
-import { GET_USER_BY_ID } from "@/graphql/queries/get-user-by-id";
 import { del } from "@vercel/blob";
 import { BASE_URL } from "@/constants/constants";
 

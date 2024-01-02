@@ -5,7 +5,6 @@ import { BASE_URL } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import Spinner from "@/features/UI/spinner";
-import { AirdropList } from "@/features/airdrop/airdrop-list";
 import { AirdropListItem } from "@/features/airdrop/airdrop-list-item";
 import { CollectionListItem } from "@/features/collection/collection-list-item";
 import showToast from "@/features/toasts/show-toast";
@@ -102,7 +101,7 @@ export default function AirdropPage() {
       cluster: "devnet",
     });
 
-    const { success, airdrop } = await blueprint.createAirdrop({
+    const { success, airdrop } = await blueprint.airdrops.createAirdrop({
       collectionId: collection.id,
       ownerId: user?.id,
     });

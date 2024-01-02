@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
   const overwriteString = formData.get("overwrite") as string;
   const overwrite = !!overwriteString;
 
-  console.log({ formDataFile, fileName, driveAddress });
+  console.log("sanitycheck", { formDataFile, fileName, driveAddress });
 
   if (!formDataFile || !fileName || !driveAddress) {
     return NextResponse.json(

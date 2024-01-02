@@ -1,14 +1,11 @@
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
-import { ShadowUploadResponse, ShdwDrive } from "@shadow-drive/sdk";
+import { ShadowUploadResponse } from "@shadow-drive/sdk";
 import { Connection, Keypair, TransactionSignature } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 import {
-  KeypairSigner,
   RpcConfirmTransactionResult,
-  Umi,
   generateSigner,
   keypairIdentity,
-  percentAmount,
 } from "@metaplex-foundation/umi";
 import {
   createNft,
@@ -18,7 +15,6 @@ import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { mplToolbox } from "@metaplex-foundation/mpl-toolbox";
 import { dasApi } from "@metaplex-foundation/digital-asset-standard-api";
 import { getRpcEndpoint, isValidCluster } from "@/utils/rpc";
-import { PublicKey } from "@metaplex-foundation/js";
 
 export type UploadAssetsToShadowDriveResponse = {
   urls: string[];
@@ -35,6 +31,24 @@ export async function POST(req: NextRequest) {
     creatorAddress,
     cluster,
   } = await req.json();
+
+  console.log({
+    name,
+    uri,
+    sellerFeeBasisPoints,
+    isCollection,
+    creatorAddress,
+    cluster,
+  });
+
+  if (!cluster) {
+    return NextResponse.json(
+      {
+        error: "Missing cluster",
+      },
+      { status: 500 }
+    );
+  }
 
   if (
     !process.env.EXECUTION_WALLET_PRIVATE_KEY ||

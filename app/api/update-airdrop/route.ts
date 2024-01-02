@@ -62,8 +62,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.error("sanity check");
-
     return NextResponse.json(
       {
         message: "Airdrop updated",

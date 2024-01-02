@@ -13,10 +13,37 @@ export const GET_AIRDROP_BY_ID = gql`
       }
       collection {
         id
+        createdAt
+        updatedAt
+        owner {
+          id
+        }
         name
         imageUrl
-        description
+        family
+        hasBeenMinted
+        sellerFeeBasisPoints
+        isReadyToMint
         symbol
+        description
+        creators {
+          id
+          wallet {
+            id
+            address
+          }
+          share
+        }
+        isReadyToMint
+        driveAddress
+        uploadJob {
+          id
+          status {
+            id
+            name
+          }
+          statusText
+        }
       }
       isReadyToDrop
       startTime

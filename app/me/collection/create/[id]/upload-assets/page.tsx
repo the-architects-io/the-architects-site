@@ -5,18 +5,15 @@ import {
   Collection,
   CollectionFileStats,
   CollectionStatsFromCollectionMetadatas,
-  Creator,
   StatusUUIDs,
   UploadFilesResponse,
   UploadJob,
-  UploadJobStatus,
   UploadJsonResponse,
 } from "@/app/blueprint/types";
 import {
   ASSET_SHDW_DRIVE_ADDRESS,
   EXECUTION_WALLET_ADDRESS,
 } from "@/constants/constants";
-import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import Spinner from "@/features/UI/spinner";
@@ -32,14 +29,13 @@ import { GET_UPLOAD_JOB_BY_ID } from "@/graphql/queries/get-upload-job-by-id";
 import { useQuery } from "@apollo/client";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { useUserData } from "@nhost/nextjs";
-import { CHUNK_EVENTS, ChunkStartEventData } from "@rpldy/chunked-sender";
-import { BatchItem, UploadyContextType } from "@rpldy/uploady";
+import { UploadyContextType } from "@rpldy/uploady";
 import { useWallet } from "@solana/wallet-adapter-react";
 import axios from "axios";
 import classNames from "classnames";
 import { useRouter } from "next/navigation";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function CollectionCreationUploadAssetsPage({
   params,
@@ -112,60 +108,6 @@ export default function CollectionCreationUploadAssetsPage({
     },
   });
 
-  // ** Move this to mint during airdrop **
-  // const driveAddress = ASSET_SHDW_DRIVE_ADDRESS;
-  // const basisPoints = sellerFeeBasisPoints * 100;
-
-  // let uri = "";
-
-  // try {
-  //   const { url } = await blueprint.uploadJson({
-  //     json: {
-  //       name: collectionName,
-  //       symbol,
-  //       description,
-  //       seller_fee_basis_points: basisPoints,
-  //       image: `${getShdwDriveUrl(driveAddress)}/${getSlug(
-  //         collectionName
-  //       )}-collection.png`,
-  //     },
-  //     fileName: `${collectionName.split(" ").join("-")}-collection.json`,
-  //     driveAddress,
-  //   });
-
-  //   uri = url;
-  // } catch (error) {
-  //   console.log({ error });
-  // }
-
-  // try {
-  //   console.log({ collectionName, uri, sellerFeeBasisPoints });
-
-  //   const { success, mintAddress } = await blueprint.mintNft({
-  //     name: collectionName,
-  //     uri,
-  //     sellerFeeBasisPoints: basisPoints,
-  //     isCollection: true,
-  //   });
-
-  //   if (!success) {
-  //     showToast({
-  //       primaryMessage: "Collection NFT Mint Failed",
-  //     });
-  //     return;
-  //   }
-
-  //   showToast({
-  //     primaryMessage: "Collection NFT Minted",
-  //     link: {
-  //       title: "View NFT",
-  //       url: `https://solscan.io/token/${mintAddress}`,
-  //     },
-  //   });
-  // } catch (error) {
-  //   console.log({ error });
-  // }
-
   const handleMetadataJsonUploadComplete = useCallback(
     async ({ url, success }: UploadJsonResponse) => {
       if (!success) {
@@ -205,20 +147,20 @@ export default function CollectionCreationUploadAssetsPage({
     let sizeInKb = sizeInBytes ? sizeInBytes / 1000 : 0;
     sizeInKb += 1000; // add 1MB to sizeInKb for overhead
 
-    const { job } = await blueprint.createUploadJob({
+    const { job } = await blueprint.jobs.createUploadJob({
       statusText: "Creating SHDW drive...",
       userId: user?.id,
     });
 
     setUploadJob(job);
 
-    await blueprint.updateCollection({
+    await blueprint.collections.updateCollection({
       id: params.id,
       uploadJobId: job.id,
     });
 
     try {
-      const { address } = await blueprint.createDrive({
+      const { address } = await blueprint.drive.createDrive({
         name: params.id,
         sizeInKb,
         ownerAddress: EXECUTION_WALLET_ADDRESS,
@@ -229,7 +171,7 @@ export default function CollectionCreationUploadAssetsPage({
       showToast({
         primaryMessage: "Failed to create drive",
       });
-      blueprint.updateUploadJob({
+      blueprint.jobs.updateUploadJob({
         id: job.id,
         statusId: StatusUUIDs.ERROR,
         statusText: "Failed to create drive.",
@@ -242,7 +184,7 @@ export default function CollectionCreationUploadAssetsPage({
     });
 
     if (!zipFileBeingUploaded || !jsonBeingUploaded || !driveAddress) {
-      blueprint.updateUploadJob({
+      blueprint.jobs.updateUploadJob({
         id: job.id,
         statusId: StatusUUIDs.ERROR,
         statusText: "An unexpected error occurred.",
@@ -293,7 +235,7 @@ export default function CollectionCreationUploadAssetsPage({
 
   useEffect(() => {
     if (uploadJob && driveAddress) {
-      blueprint.updateCollection({
+      blueprint.collections.updateCollection({
         id: params.id,
         uploadJobId: uploadJob.id,
         driveAddress,

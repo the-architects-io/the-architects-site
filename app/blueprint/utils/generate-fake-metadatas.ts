@@ -4,48 +4,44 @@ export const generateFakeMetadatas = (amountToGenerate = 20) => {
   }
 
   function generateFakeNft(nftNumber: number) {
-    const backgrounds = ["stone tiles", "metal", "wood", "brick", "abstract"];
-    const rocks = ["diamond", "ruby", "emerald", "sapphire", "crystal"];
-    const labels = [
-      "pet rock",
-      "pet stone",
-      "pet pebble",
-      "pet boulder",
-      "pet gem",
-    ];
-    const details = [
+    const backgrounds = ["red", "blue", "green", "yellow", "purple"];
+    const adjectives = [
       "sparkly",
       "shiny",
       "smooth",
-      "rough",
-      "glittery",
-      "dull",
-      "polished",
-      "matte",
-      "glossy",
-      "iridescent",
+      "obtuse",
+      "delinquent",
+      "prickly",
+      "silly",
+      "sassy",
+      "salty",
+      "sour",
+      "sweet",
+      "sour",
+      "salty",
+      "smokey",
+      "balmy",
     ];
-
     return {
       name: `NFT #${nftNumber}`,
-      symbol: "Add symbol",
-      description: "Add description",
-      seller_fee_basis_points: 1000,
+      symbol: "WLY",
+      description: "WARLY LOVES YOU",
+      seller_fee_basis_points: 4200,
       image: `${nftNumber}.png`,
       external_url: "https://the-architects.io/",
       edition: nftNumber,
       collection: {
-        name: "Pet Rocks",
-        family: "Pet Rock Universe",
+        name: "Warly Loves You",
+        family: "Warly Loves You",
       },
       attributes: [
         {
           trait_type: "backgrounds",
           value: generateRandomElement(backgrounds),
         },
-        { trait_type: "rocks", value: generateRandomElement(rocks) },
-        { trait_type: "labels", value: generateRandomElement(labels) },
-        { trait_type: "details", value: generateRandomElement(details) },
+        { trait_type: "adjective", value: generateRandomElement(adjectives) },
+        // { trait_type: "labels", value: generateRandomElement(labels) },
+        // { trait_type: "details", value: generateRandomElement(details) },
       ],
       properties: {
         files: [
@@ -57,7 +53,7 @@ export const generateFakeMetadatas = (amountToGenerate = 20) => {
         category: "image",
         creators: [
           {
-            address: "4ionNE2Tc7nB8w6CVLQx2FioNTjbaa5JxYJ7nbDkwxdt",
+            address: "44Cv2k5kFRzGQwBLEBc6aHHTwTvEReyeh4PHMH1cBgAe",
             share: 100,
           },
         ],

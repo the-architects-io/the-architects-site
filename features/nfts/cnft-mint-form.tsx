@@ -13,15 +13,6 @@ import { Panel } from "@/features/UI/panel";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
 import { makeNumberArray } from "@/utils/formatting";
-import {
-  CreateCompressedNftInput,
-  Nft,
-  PublicKey,
-} from "@metaplex-foundation/js";
-import {
-  MerkleTree,
-  mintToCollectionV1,
-} from "@metaplex-foundation/mpl-bubblegum";
 import { Umi, isPublicKey, publicKey } from "@metaplex-foundation/umi";
 import { useWallet } from "@solana/wallet-adapter-react";
 import axios from "axios";
@@ -98,7 +89,7 @@ export default function CnftMintForm({
 
       try {
         const { success, collectionAddress, signature } =
-          await blueprint.mintCnft({
+          await blueprint.tokens.mintCnft({
             merkleTreeAddress,
             collectionNftAddress,
             creatorAddress,

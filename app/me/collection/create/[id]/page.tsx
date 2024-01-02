@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  ASSET_SHDW_DRIVE_ADDRESS,
-  EXECUTION_WALLET_ADDRESS,
-} from "@/constants/constants";
+import { ASSET_SHDW_DRIVE_ADDRESS } from "@/constants/constants";
 import WalletButton from "@/features/UI/buttons/wallet-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -20,9 +17,6 @@ import {
   Collection,
   CollectionStatsFromCollectionMetadatas,
   Creator,
-  Drive,
-  UploadFilesResponse,
-  UploadJob,
   UploadJsonResponse,
 } from "@/app/blueprint/types";
 import { useUserData } from "@nhost/nextjs";
@@ -45,7 +39,6 @@ import classNames from "classnames";
 import { CreateCollectionFormChecklist } from "@/features/collection/create-collection-form-checklist";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { SingleImageUploadResponse } from "@/features/upload/single-image/single-image-upload-field-wrapper";
-import ShadowUpload from "@/features/upload/shadow-upload/shadow-upload";
 
 export default function CreateCollectionPage({
   params,
@@ -103,7 +96,7 @@ export default function CreateCollectionPage({
         cluster: "devnet",
       });
 
-      const { success } = await blueprint.updateCollection({
+      const { success } = await blueprint.collections.updateCollection({
         imageUrl: collectionImage.url,
         id: collectionId,
         name: collectionName,
@@ -256,7 +249,7 @@ export default function CreateCollectionPage({
       <div className="w-full flex mb-24">
         <div className="flex flex-col items-center mb-16 w-full md:w-[500px]">
           <SingleImageUpload
-            fileName={`collection.png`}
+            fileName={`${collectionId}-collection.png`}
             driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
             setImage={setCollectionImage}
           >

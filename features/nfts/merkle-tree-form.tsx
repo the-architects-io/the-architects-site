@@ -90,7 +90,7 @@ export default function MerkleTreeForm({
     });
 
     try {
-      const { success, merkleTreeAddress } = await blueprint.createTree({
+      const { success, merkleTreeAddress } = await blueprint.tokens.createTree({
         maxDepth: selectedMaxDepth,
         maxBufferSize: selectedMaxBufferSize,
       });

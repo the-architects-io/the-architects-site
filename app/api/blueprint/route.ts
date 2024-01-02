@@ -14,6 +14,7 @@ const {
   CREATE_DRIVE,
   CREATE_DISENSER,
   CREATE_TREE,
+  CREATE_JOB,
   CREATE_UPLOAD_JOB,
   DELETE_DRIVE,
   DISPENSE_TOKENS,
@@ -24,6 +25,7 @@ const {
   MINT_NFT,
   REDUCE_STORAGE,
   UPDATE_AIRDROP,
+  UPDATE_JOB,
   UPDATE_COLLECTION,
   UPDATE_UPLOAD_JOB,
   UPLOAD_JSON,
@@ -38,6 +40,7 @@ const BlueprintApiActionUrls = {
   [CREATE_DRIVE]: `${BASE_URL}/api/create-drive`,
   [CREATE_DISENSER]: `${BASE_URL}/api/add-dispenser`,
   [CREATE_TREE]: `${BASE_URL}/api/create-tree`,
+  [CREATE_JOB]: `${BASE_URL}/api/create-job`,
   [CREATE_UPLOAD_JOB]: `${BASE_URL}/api/add-upload-job`,
   [DELETE_DRIVE]: `${BASE_URL}/api/delete-drive`,
   [DISPENSE_TOKENS]: `${BASE_URL}/api/dispense-tokens`,
@@ -47,6 +50,7 @@ const BlueprintApiActionUrls = {
   [MINT_CNFT]: `${BASE_URL}/api/mint-cnft`,
   [MINT_NFT]: `${BASE_URL}/api/mint-nft`,
   [REDUCE_STORAGE]: `${BASE_URL}/api/reduce-storage`,
+  [UPDATE_JOB]: `${BASE_URL}/api/update-job`,
   [UPDATE_AIRDROP]: `${BASE_URL}/api/update-airdrop`,
   [UPDATE_COLLECTION]: `${BASE_URL}/api/update-collection`,
   [UPDATE_UPLOAD_JOB]: `${BASE_URL}/api/update-upload-job`,
@@ -68,7 +72,8 @@ const mapErrorToResponse = (error: any): MappedErrorResponse => {
   //   },
   // });
   console.log({
-    fullError: error,
+    cause: JSON.stringify(error?.cause),
+    // fullError: error,
   });
   const statusText =
     error?.response?.data?.statusText || "Internal Server Error";

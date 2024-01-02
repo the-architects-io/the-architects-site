@@ -23,11 +23,12 @@ export const CreateCollectionButton = ({
     setIsLoading(true);
     const blueprint = createBlueprintClient({ cluster });
 
-    const { collection, success } = await blueprint.createCollection({
-      name,
-      hasBeenMinted: false,
-      ownerId: !!user?.id ? user?.id : ownerId,
-    });
+    const { collection, success } =
+      await blueprint.collections.createCollection({
+        name,
+        hasBeenMinted: false,
+        ownerId: !!user?.id ? user?.id : ownerId,
+      });
 
     if (success) {
       onSuccess && onSuccess(collection);

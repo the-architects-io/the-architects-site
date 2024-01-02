@@ -1,5 +1,4 @@
 import { createBlueprintClient } from "@/app/blueprint/client";
-import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
@@ -36,7 +35,7 @@ export default function CreateAirdropForm({
       });
 
       const { success: updateAirdropSuccess, airdrop } =
-        await blueprint.updateAirdrop({
+        await blueprint.airdrops.updateAirdrop({
           id: airdropId,
           name,
           startTime,
@@ -47,7 +46,7 @@ export default function CreateAirdropForm({
       const recipients = await files[0].text();
 
       const { success: addRecipientsSuccess, addedReipientsCount } =
-        await blueprint.addAirdropRecipients({
+        await blueprint.airdrops.addAirdropRecipients({
           airdropId,
           recipients,
         });

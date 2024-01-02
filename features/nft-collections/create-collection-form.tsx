@@ -53,7 +53,7 @@ export default function CreateCollectionForm({
         cluster: "devnet",
       });
 
-      const { url } = await blueprint.uploadFile({
+      const { url } = await blueprint.upload.uploadFile({
         file: image,
         fileName: `${collectionNameSlug}-collection.png`,
         driveAddress,
@@ -64,15 +64,17 @@ export default function CreateCollectionForm({
 
       let uri = "";
 
+      const jsonFile = new File(
+        [JSON.stringify({ name: collectionName, symbol, description })],
+        `${collectionName.split(" ").join("-")}-collection.json`,
+        {
+          type: "application/json",
+        }
+      );
+
       try {
-        const { url } = await blueprint.uploadJson({
-          json: {
-            name: collectionName,
-            symbol,
-            description,
-            seller_fee_basis_points: basisPoints,
-            image: `${driveUrl}/${collectionNameSlug}-collection.png`,
-          },
+        const { url } = await blueprint.upload.uploadJson({
+          file: jsonFile,
           fileName: `${collectionName.split(" ").join("-")}-collection.json`,
           driveAddress,
         });
@@ -85,7 +87,7 @@ export default function CreateCollectionForm({
       try {
         console.log({ collectionName, uri, sellerFeeBasisPoints });
 
-        const { success, mintAddress } = await blueprint.mintNft({
+        const { success, mintAddress } = await blueprint.tokens.mintNft({
           name: collectionName,
           uri,
           sellerFeeBasisPoints: basisPoints,

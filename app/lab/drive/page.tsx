@@ -31,7 +31,7 @@ export default function DriveTestPage() {
     },
     onSubmit: async (values) => {
       const blueprint = createBlueprintClient({ cluster: "devnet" });
-      const { address } = await blueprint.createDrive({
+      const { address } = await blueprint.drive.createDrive({
         name: values.name,
         sizeInKb: values.sizeInKb,
         ownerAddress: EXECUTION_WALLET_ADDRESS,
@@ -45,7 +45,7 @@ export default function DriveTestPage() {
     setSelectedDrive(null);
     setIsFetchingDrive(true);
     const blueprint = createBlueprintClient({ cluster: "devnet" });
-    const { success, drive } = await blueprint.getDrive({
+    const { success, drive } = await blueprint.drive.getDrive({
       address: selectedDriveAddress,
       ownerAddress: EXECUTION_WALLET_ADDRESS,
     });
@@ -61,7 +61,7 @@ export default function DriveTestPage() {
   const getDrives = async () => {
     setIsFetchingDrives(true);
     const blueprint = createBlueprintClient({ cluster: "devnet" });
-    const { success, drives } = await blueprint.getDrives({
+    const { success, drives } = await blueprint.drive.getDrives({
       ownerAddress: EXECUTION_WALLET_ADDRESS,
     });
 
@@ -81,7 +81,7 @@ export default function DriveTestPage() {
   const handleIncreaseStorage = async (address: string) => {
     setIsIncreasingStorage(true);
     const blueprint = createBlueprintClient({ cluster: "devnet" });
-    const { success } = await blueprint.increaseStorage({
+    const { success } = await blueprint.drive.increaseStorage({
       amountInKb: 100,
       address,
       ownerAddress: EXECUTION_WALLET_ADDRESS,
@@ -98,7 +98,7 @@ export default function DriveTestPage() {
   const handleReduceStorage = async (address: string) => {
     setIsReducingStorage(true);
     const blueprint = createBlueprintClient({ cluster: "devnet" });
-    const { success } = await blueprint.reduceStorage({
+    const { success } = await blueprint.drive.reduceStorage({
       amountInKb: 100,
       address,
       ownerAddress: EXECUTION_WALLET_ADDRESS,

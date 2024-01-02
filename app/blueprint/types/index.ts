@@ -507,12 +507,7 @@ export type Airdrop = {
   owner: {
     id: string;
   };
-  collection: {
-    id: string;
-    name: string;
-    imageUrl: string;
-    symbol: string;
-  };
+  collection: Collection;
   recipients?: Recipient[];
   collectionNft?: {
     id: string;
@@ -598,7 +593,7 @@ export type MintNftResponse = BaseBlueprintResponse & {
 };
 
 export type UploadJsonInput = {
-  json: any;
+  file: File | Blob;
   fileName: string;
   driveAddress: string;
 };
@@ -673,7 +668,6 @@ export type Collection = {
   imageUrl?: string;
   family?: string;
   hasBeenMinted?: boolean;
-  isComplete: boolean;
   symbol?: string;
   description?: string;
   unmintedMetadatas: UnmintedMetadata[];
@@ -682,6 +676,7 @@ export type Collection = {
   isReadyToMint: boolean;
   driveAddress: string;
   uploadJob: UploadJob;
+  sellerFeeBasisPoints: number;
 };
 
 export type CreateCollectionResponse = BaseBlueprintResponse & {
@@ -865,6 +860,14 @@ export const StatusUUIDs = {
   [UploadJobStatus.COMPLETE]: "39353545-336d-4fce-a039-cc4fc203a8a9",
 };
 
+export enum JobType {
+  AIRDROP = "AIRDROP",
+}
+
+export const JobTypeUUIDs = {
+  [JobType.AIRDROP]: "46f35399-cfd3-4db7-ad22-12c06347d5f5",
+};
+
 export type UploadJob = {
   createdAt: string;
   driveAddress: string;
@@ -892,6 +895,7 @@ export enum BlueprintApiActions {
   CREATE_DRIVE = "CREATE_DRIVE",
   CREATE_DISENSER = "CREATE_DISENSER",
   CREATE_TREE = "CREATE_TREE",
+  CREATE_JOB = "CREATE_JOB",
   CREATE_UPLOAD_JOB = "CREATE_UPLOAD_JOB",
   DELETE_DRIVE = "DELETE_DRIVE",
   DISPENSE_TOKENS = "DISPENSE_TOKENS",
@@ -903,6 +907,7 @@ export enum BlueprintApiActions {
   REDUCE_STORAGE = "REDUCE_STORAGE",
   UPDATE_AIRDROP = "UPDATE_AIRDROP",
   UPDATE_COLLECTION = "UPDATE_COLLECTION",
+  UPDATE_JOB = "UPDATE_JOB",
   UPDATE_UPLOAD_JOB = "UPDATE_UPLOAD_JOB",
   UPLOAD_FILE = "UPLOAD_FILE",
   UPLOAD_FILES = "UPLOAD_FILES",
@@ -941,6 +946,18 @@ export type UpdateUploadJobInput = {
   statusId?: string;
 };
 
+export type UpdateJobResponse = BaseBlueprintResponse & {
+  job: UploadJob;
+};
+
+export type UpdateJobInput = {
+  id: string;
+  jobTypeId?: string;
+  percentComplete?: number;
+  statusText?: string;
+  statusId?: string;
+};
+
 export type ValidationIssue = { text: string; index: number };
 
 export type UpdateAirdropInput = {
@@ -956,4 +973,31 @@ export type UpdateAirdropInput = {
 
 export type UpdateAirdropRespone = BaseBlueprintResponse & {
   airdrop: Airdrop;
+};
+
+export type CreateJobInput = {
+  userId: string;
+  percentComplete?: number;
+  jobTypeId?: string;
+  statusText?: string;
+  statusId?: string;
+};
+
+export type CreateJobResponse = BaseBlueprintResponse & {
+  job: UploadJob;
+};
+
+export type Job = {
+  id: string;
+  status: {
+    id: string;
+    name: string;
+  };
+  statusText?: string;
+  user: User;
+  percentComplete?: number;
+  jobType: {
+    id: string;
+    name: string;
+  };
 };

@@ -1,10 +1,7 @@
+import { createBlueprintClient } from "@/app/blueprint/client";
 import { Collection, TokenMetadata } from "@/app/blueprint/types";
-import {
-  ASSET_SHDW_DRIVE_ADDRESS,
-  SHDW_DRIVE_BASE_URL,
-} from "@/constants/constants";
+import { SHDW_DRIVE_BASE_URL } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
-import axios from "axios";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
@@ -23,11 +20,13 @@ export const CollectionPreview = ({
   const [tokensPerPage, setTokensPerPage] = useState<number>(20);
 
   const createPreviewTokens = useCallback(async () => {
-    const { data } = await axios.get(
-      `${SHDW_DRIVE_BASE_URL}/${ASSET_SHDW_DRIVE_ADDRESS}/${collection.id}-collection-metadatas.json`
-    );
+    const blueprint = createBlueprintClient({
+      cluster: "devnet",
+    });
 
-    const collectionTokens: TokenMetadata[] = data;
+    const collectionTokens =
+      await blueprint.collections.getPremintCollectionMetadata(collection.id);
+
     setCollectionTokens(
       collectionTokens.map((token, index) => ({
         ...token,

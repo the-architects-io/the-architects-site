@@ -31,18 +31,17 @@ export async function POST(req: NextRequest) {
   const fileName = formData.get("fileName") as string;
   const driveAddress = formData.get("driveAddress") as string;
 
+  console.log({
+    formDataFile,
+    fileName,
+    driveAddress,
+  });
+
   if (!formDataFile || !fileName || !driveAddress) {
     return NextResponse.json(null, { status: 400 });
   }
 
   const file = Buffer.from(await formDataFile.arrayBuffer());
-
-  console.log({
-    formDataFile,
-    fileName,
-    driveAddress,
-    file,
-  });
 
   try {
     const keypair = Keypair.fromSecretKey(
@@ -72,7 +71,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.log("error", error);
+    console.log("upload-file-to-shadow-drive error", error);
     return NextResponse.json(
       {
         error: JSON.stringify(error),

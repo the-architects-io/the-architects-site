@@ -187,7 +187,7 @@ export const ShadowUploadField = ({
         }
 
         // need to debounce
-        const { success, job } = await blueprint.updateUploadJob({
+        const { success, job } = await blueprint.jobs.updateUploadJob({
           id: uploadJobId,
           percentComplete: 0,
           statusText: "Uploading assets to server...",
