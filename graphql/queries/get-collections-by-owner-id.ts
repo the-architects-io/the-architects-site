@@ -9,6 +9,13 @@ export const GET_COLLECTIONS_BY_OWNER_ID = gql`
         name
         imageUrl
       }
+      collectionNftAddress
+      merkleTree {
+        id
+        address
+        maxDepth
+        maxBufferSize
+      }
       id
       family
       driveAddress

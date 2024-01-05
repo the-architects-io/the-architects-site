@@ -102,7 +102,7 @@ export default function CreateCollectionPage({
         name: collectionName,
         symbol,
         description,
-        sellerFeeBasisPoints,
+        sellerFeeBasisPoints: sellerFeeBasisPoints * 100,
         creators,
         isReadyToMint: false,
       });

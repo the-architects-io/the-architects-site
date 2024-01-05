@@ -621,10 +621,12 @@ export type MintCnftResponse = BaseBlueprintResponse & {
 export type CreateTreeInput = {
   maxDepth: number;
   maxBufferSize: number;
+  collectionId?: string;
 };
 
 export type CreateTreeResponse = BaseBlueprintResponse & {
   merkleTreeAddress: string;
+  id: string;
 };
 
 export type UploadFilesInput = {
@@ -660,6 +662,7 @@ export type UnmintedMetadata = {
 
 export type Collection = {
   id: string;
+  collectionNftAddress?: string;
   createdAt: string;
   updatedAt: string;
   owner: User;
@@ -703,6 +706,9 @@ export type UpdateCollectionInput = {
   isReadyToMint?: boolean;
   uploadJobId?: string;
   driveAddress?: string;
+  merkleTreeId?: string;
+  collectionNftAddress?: string;
+  nftId?: string;
 };
 
 export type UpdateCollectionResponse = BaseBlueprintResponse & {
@@ -1000,4 +1006,11 @@ export type Job = {
     id: string;
     name: string;
   };
+};
+
+export type MerkleTree = {
+  id: string;
+  address: string;
+  maxDepth: number;
+  maxBufferSize: number;
 };

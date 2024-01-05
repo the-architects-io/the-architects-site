@@ -1,5 +1,11 @@
 import { createBlueprintClient } from "@/app/blueprint/client";
-import { Airdrop, Job, JobTypeUUIDs, StatusUUIDs } from "@/app/blueprint/types";
+import {
+  Airdrop,
+  Job,
+  JobTypeUUIDs,
+  Recipient,
+  StatusUUIDs,
+} from "@/app/blueprint/types";
 import {
   ASSET_SHDW_DRIVE_ADDRESS,
   SHDW_DRIVE_BASE_URL,
@@ -117,7 +123,7 @@ export const ExecuteAirdrop = ({ airdrop }: { airdrop: Airdrop }) => {
           description,
           seller_fee_basis_points: sellerFeeBasisPoints,
           // image: `${SHDW_DRIVE_BASE_URL}/${driveAddress}/${id}-collection.json`,
-          image: `${SHDW_DRIVE_BASE_URL}/${ASSET_SHDW_DRIVE_ADDRESS}/collection.png`,
+          image: `${SHDW_DRIVE_BASE_URL}/${ASSET_SHDW_DRIVE_ADDRESS}/${id}-collection.png`,
         }),
       ],
       {
@@ -142,6 +148,8 @@ export const ExecuteAirdrop = ({ airdrop }: { airdrop: Airdrop }) => {
       statusText: "Minting collection NFT",
     });
 
+    let collectionNftMintAddress;
+
     try {
       const { success, mintAddress } = await blueprint.tokens.mintNft({
         name,
@@ -149,10 +157,77 @@ export const ExecuteAirdrop = ({ airdrop }: { airdrop: Airdrop }) => {
         sellerFeeBasisPoints,
         isCollection: true,
       });
+      collectionNftMintAddress = mintAddress;
     } catch (error) {
       console.log({ error });
     }
-  }, [airdrop, blueprint, user]);
+
+    const mintAddress = "7fncGmTWTdDC9EvUC2K9JdWJj6fcaD4gvyXVwsLLxw1u";
+
+    await blueprint.jobs.updateJob({
+      id: job.id,
+      statusText: "Creating merkle tree",
+    });
+
+    const maxDepth = 14;
+    const maxBufferSize = 64;
+    // const maxDepth = 3;
+    // const maxBufferSize = 8;
+
+    let treeId;
+
+    try {
+      // const { success, merkleTreeAddress, id } =
+      //   await blueprint.tokens.createTree({
+      //     maxBufferSize,
+      //     maxDepth,
+      //     collectionId: airdrop.collection.id,
+      //   });
+
+      // treeId = id;
+
+      // console.log({ merkleTreeAddress });
+
+      if (!success) throw new Error("Error creating Merkle Tree");
+    } catch (error) {
+      console.log({ error });
+    }
+
+    try {
+      const { success } = await blueprint.collections.updateCollection({
+        id,
+        collectionNftAddress: collectionNftMintAddress,
+        merkleTreeId: treeId,
+      });
+    } catch (error) {
+      console.log({ error });
+    }
+
+    try {
+      const { data } = await axios.post(
+        `http://164.90.244.66/api/airdrop-cnfts`,
+        {
+          airdropId: airdrop.id,
+          jobId: job.id,
+          cluster: "devnet",
+        }
+      );
+
+      const {
+        airdrops_by_pk,
+        airdrop_recipients,
+      }: { airdrops_by_pk: Airdrop; airdrop_recipients: Recipient[] } = data;
+    } catch (error) {
+      console.log({ error });
+    }
+  }, [
+    airdrop.collection,
+    airdrop.id,
+    blueprint.collections,
+    blueprint.jobs,
+    blueprint.upload,
+    user,
+  ]);
 
   const handleExecuteAirdrop = () => {
     setIsDisabled(true);

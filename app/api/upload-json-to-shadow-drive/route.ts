@@ -13,10 +13,10 @@ export type UploadAssetsToShadowDriveResponse = {
 };
 
 export async function POST(req: NextRequest) {
-  const { json, fileName, driveAddress }: UploadJsonInput = await req.json();
+  const { file, fileName, driveAddress }: UploadJsonInput = await req.json();
 
   console.log({
-    json,
+    file,
     fileName,
     driveAddress,
   });
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     !process.env.EXECUTION_WALLET_PRIVATE_KEY ||
     !driveAddress ||
     !fileName ||
-    !json
+    !file
   ) {
     return NextResponse.json(
       {
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (!json) {
+  if (!file) {
     return NextResponse.json(null, { status: 400 });
   }
 
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     const connection = new Connection(RPC_ENDPOINT, "confirmed");
     const drive = await new ShdwDrive(connection, wallet).init();
 
-    const buffer = Buffer.from(JSON.stringify({ ...json }));
+    const buffer = Buffer.from(JSON.stringify({ ...file }));
 
     const { message, finalized_locations, upload_errors } =
       await drive.uploadFile(new PublicKey(driveAddress), {

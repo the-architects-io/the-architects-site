@@ -18,6 +18,8 @@ export async function POST(req: NextRequest) {
     driveAddress,
     isReadyToMint,
     uploadJobId,
+    merkleTreeAddress,
+    collectionNftAddress,
   } = await req.json();
 
   if (!id) {
@@ -105,6 +107,8 @@ export async function POST(req: NextRequest) {
           ...(isReadyToMint && { isReadyToMint }),
           ...(driveAddress && { driveAddress }),
           ...(uploadJobId && { uploadJobId }),
+          ...(collectionNftAddress && { collectionNftAddress }),
+          ...(merkleTreeAddress && { merkleTreeAddress }),
         },
       }
     );

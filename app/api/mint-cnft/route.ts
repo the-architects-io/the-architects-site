@@ -2,7 +2,6 @@ import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { TransactionSignature } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 import {
-  RpcConfirmTransactionResult,
   createSignerFromKeypair,
   keypairIdentity,
   publicKey,

@@ -52,7 +52,7 @@ const isMint = (entity: DigitalAsset | Mint): entity is Mint => {
 };
 
 export async function POST(req: NextRequest) {
-  const { mintAddresses, noop } = await req.json();
+  const { mintAddresses, noop, cluster } = await req.json();
 
   if (noop)
     return NextResponse.json(

@@ -2,12 +2,12 @@ import { gql } from "@apollo/client";
 
 export const ADD_ITEM = gql`
   mutation ADD_ITEM(
-    $imageUrl: String = ""
+    $imageUrl: String!
     $isConsumable: Boolean!
     $isCraftable: Boolean!
     $itemCategoryId: uuid!
     $name: String!
-    $description: String = ""
+    $description: String!
   ) {
     insert_items_one(
       object: {

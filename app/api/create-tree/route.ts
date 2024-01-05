@@ -1,14 +1,21 @@
+import { MerkleTree } from "@/app/blueprint/types";
+import { client } from "@/graphql/backend-client";
+import { ADD_MERKLE_TREE } from "@/graphql/mutations/add-merkle-tree";
+import { UPDATE_COLLECTION } from "@/graphql/mutations/update-collection";
 import { getRpcEndpoint } from "@/utils/rpc";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { createTree } from "@metaplex-foundation/mpl-bubblegum";
-import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
+import {
+  Collection,
+  mplTokenMetadata,
+} from "@metaplex-foundation/mpl-token-metadata";
 import { mplToolbox } from "@metaplex-foundation/mpl-toolbox";
 import { generateSigner, keypairIdentity } from "@metaplex-foundation/umi";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { maxDepth, maxBufferSize } = await req.json();
+  const { maxDepth, maxBufferSize, collectionId, cluster } = await req.json();
 
   if (
     !maxDepth ||
@@ -23,7 +30,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing config" }, { status: 400 });
   }
 
-  const umi = await createUmi(getRpcEndpoint())
+  const umi = await createUmi(getRpcEndpoint(cluster))
     .use(mplToolbox())
     .use(mplTokenMetadata());
 
@@ -40,12 +47,37 @@ export async function POST(req: NextRequest) {
     maxBufferSize: Number(maxBufferSize),
   });
 
+  const merkleTreeAddress = merkleTree.publicKey.toString();
+
+  const { insert_merkle_trees_one }: { insert_merkle_trees_one: MerkleTree } =
+    await client.request(ADD_MERKLE_TREE, {
+      tree: {
+        address: merkleTreeAddress,
+        maxDepth: Number(maxDepth),
+        maxBufferSize: Number(maxBufferSize),
+      },
+    });
+
+  if (collectionId) {
+    const {
+      update_collections_by_pk,
+    }: { update_collections_by_pk: Collection } = await client.request(
+      UPDATE_COLLECTION,
+      {
+        id: collectionId,
+        collection: {
+          merkleTreeId: insert_merkle_trees_one.id,
+        },
+      }
+    );
+  }
+
   await builder.sendAndConfirm(umi);
 
   return NextResponse.json(
     {
       success: true,
-      merkleTreeAddress: merkleTree.publicKey.toString(),
+      merkleTreeAddress,
     },
     { status: 200 }
   );
