@@ -8,6 +8,7 @@ import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import { Panel } from "@/features/UI/panel";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
+import { useCluster } from "@/hooks/cluster";
 import {
   MerkleTree,
   createTree,
@@ -65,6 +66,8 @@ export default function MerkleTreeForm({
   isLoading: boolean;
   localOrRemote?: "local" | "remote";
 }) {
+  const { cluster } = useCluster();
+
   const formik = useFormik({
     initialValues: {
       merkleTreeAddress: DEVNET_TREE_ADDRESS,
@@ -86,7 +89,7 @@ export default function MerkleTreeForm({
     setIsLoading(true);
 
     const blueprint = createBlueprintClient({
-      cluster: "devnet",
+      cluster,
     });
 
     try {

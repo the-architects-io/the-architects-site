@@ -1,4 +1,5 @@
 import { MerkleTree } from "@/app/blueprint/types";
+import { getMaxCapacityFromMaxBufferSizeAndMaxDepth } from "@/app/blueprint/utils/merkle-trees";
 import { client } from "@/graphql/backend-client";
 import { ADD_MERKLE_TREE } from "@/graphql/mutations/add-merkle-tree";
 import { UPDATE_COLLECTION } from "@/graphql/mutations/update-collection";
@@ -15,7 +16,8 @@ import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { maxDepth, maxBufferSize, collectionId, cluster } = await req.json();
+  const { maxDepth, maxBufferSize, collectionId, cluster, userId } =
+    await req.json();
 
   if (
     !maxDepth ||
@@ -49,12 +51,24 @@ export async function POST(req: NextRequest) {
 
   const merkleTreeAddress = merkleTree.publicKey.toString();
 
+  const tree = {
+    address: merkleTreeAddress,
+    maxDepth: Number(maxDepth),
+    maxBufferSize: Number(maxBufferSize),
+    cluster,
+  };
+
+  console.log("tree", tree);
+
   const { insert_merkle_trees_one }: { insert_merkle_trees_one: MerkleTree } =
     await client.request(ADD_MERKLE_TREE, {
       tree: {
-        address: merkleTreeAddress,
-        maxDepth: Number(maxDepth),
-        maxBufferSize: Number(maxBufferSize),
+        ...tree,
+        ...(userId && { userId }),
+        maxCapacity: getMaxCapacityFromMaxBufferSizeAndMaxDepth(
+          Number(maxBufferSize),
+          Number(maxDepth)
+        ),
       },
     });
 

@@ -14,6 +14,7 @@ import GoogleAnalytics from "@/features/google-analytics";
 import { GA_TRACKING_ID } from "@/constants/constants";
 import { Analytics } from "@vercel/analytics/react";
 import { Metadata } from "next";
+import { ClusterProvider } from "@/hooks/cluster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,22 +33,24 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={classNames([inter.className, "relative"])}>
-        <ContextProvider>
-          <DebugModeProvider>
-            <SidebarProvider>
-              <AdminProvider>
-                {children}
-                <Navbar />
-                <GoogleAnalytics GA_TRACKING_ID={GA_TRACKING_ID as string} />
-                <Analytics />
+        <ClusterProvider>
+          <ContextProvider>
+            <DebugModeProvider>
+              <SidebarProvider>
+                <AdminProvider>
+                  {children}
+                  <Navbar />
+                  <GoogleAnalytics GA_TRACKING_ID={GA_TRACKING_ID as string} />
+                  <Analytics />
 
-                <Toaster />
-                {/* <Sidebar /> */}
-                <AdminToolbar />
-              </AdminProvider>
-            </SidebarProvider>
-          </DebugModeProvider>
-        </ContextProvider>
+                  <Toaster />
+                  {/* <Sidebar /> */}
+                  <AdminToolbar />
+                </AdminProvider>
+              </SidebarProvider>
+            </DebugModeProvider>
+          </ContextProvider>
+        </ClusterProvider>
       </body>
     </html>
   );

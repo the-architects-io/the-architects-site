@@ -26,6 +26,7 @@ import { ZipFileUploadValidation } from "@/features/upload/shadow-upload/zip-fil
 import { UploadStatus } from "@/features/upload/status/upload-status";
 import { GET_COLLECTION_BY_ID } from "@/graphql/queries/get-collection-by-id";
 import { GET_UPLOAD_JOB_BY_ID } from "@/graphql/queries/get-upload-job-by-id";
+import { useCluster } from "@/hooks/cluster";
 import { useQuery } from "@apollo/client";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { useUserData } from "@nhost/nextjs";
@@ -44,6 +45,7 @@ export default function CollectionCreationUploadAssetsPage({
 }) {
   const user = useUserData();
   const router = useRouter();
+  const { cluster } = useCluster();
 
   const [shadowFileUploadId, setShadowFileUploadId] = useState<string | null>(
     null
@@ -74,7 +76,7 @@ export default function CollectionCreationUploadAssetsPage({
 
   const wallet = useWallet();
   const blueprint = createBlueprintClient({
-    cluster: "devnet",
+    cluster,
   });
 
   const [collection, setCollection] = useState<Collection | null>(null);

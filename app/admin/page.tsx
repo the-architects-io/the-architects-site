@@ -19,12 +19,12 @@ const Admin: NextPage = () => {
 
   const tabs: ITab[] = [
     {
-      name: "Jobs",
-      value: "jobs",
-    },
-    {
       name: "Tools",
       value: "tools",
+    },
+    {
+      name: "Jobs",
+      value: "jobs",
     },
   ];
 

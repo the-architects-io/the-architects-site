@@ -9,6 +9,7 @@ import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
+import { useCluster } from "@/hooks/cluster";
 import classNames from "classnames";
 import { useFormik } from "formik";
 import { useCallback, useEffect, useState } from "react";
@@ -23,6 +24,7 @@ export default function DriveTestPage() {
   >(null);
   const [isIncreasingStorage, setIsIncreasingStorage] = useState(false);
   const [isReducingStorage, setIsReducingStorage] = useState(false);
+  const { cluster } = useCluster();
 
   const formik = useFormik({
     initialValues: {
@@ -30,7 +32,7 @@ export default function DriveTestPage() {
       sizeInKb: 0,
     },
     onSubmit: async (values) => {
-      const blueprint = createBlueprintClient({ cluster: "devnet" });
+      const blueprint = createBlueprintClient({ cluster });
       const { address } = await blueprint.drive.createDrive({
         name: values.name,
         sizeInKb: values.sizeInKb,
@@ -44,7 +46,7 @@ export default function DriveTestPage() {
     if (!selectedDriveAddress) return;
     setSelectedDrive(null);
     setIsFetchingDrive(true);
-    const blueprint = createBlueprintClient({ cluster: "devnet" });
+    const blueprint = createBlueprintClient({ cluster });
     const { success, drive } = await blueprint.drive.getDrive({
       address: selectedDriveAddress,
       ownerAddress: EXECUTION_WALLET_ADDRESS,
@@ -60,7 +62,7 @@ export default function DriveTestPage() {
 
   const getDrives = async () => {
     setIsFetchingDrives(true);
-    const blueprint = createBlueprintClient({ cluster: "devnet" });
+    const blueprint = createBlueprintClient({ cluster });
     const { success, drives } = await blueprint.drive.getDrives({
       ownerAddress: EXECUTION_WALLET_ADDRESS,
     });
@@ -80,7 +82,7 @@ export default function DriveTestPage() {
 
   const handleIncreaseStorage = async (address: string) => {
     setIsIncreasingStorage(true);
-    const blueprint = createBlueprintClient({ cluster: "devnet" });
+    const blueprint = createBlueprintClient({ cluster });
     const { success } = await blueprint.drive.increaseStorage({
       amountInKb: 100,
       address,
@@ -97,7 +99,7 @@ export default function DriveTestPage() {
 
   const handleReduceStorage = async (address: string) => {
     setIsReducingStorage(true);
-    const blueprint = createBlueprintClient({ cluster: "devnet" });
+    const blueprint = createBlueprintClient({ cluster });
     const { success } = await blueprint.drive.reduceStorage({
       amountInKb: 100,
       address,

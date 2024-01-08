@@ -39,6 +39,7 @@ import classNames from "classnames";
 import { CreateCollectionFormChecklist } from "@/features/collection/create-collection-form-checklist";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { SingleImageUploadResponse } from "@/features/upload/single-image/single-image-upload-field-wrapper";
+import { useCluster } from "@/hooks/cluster";
 
 export default function CreateCollectionPage({
   params,
@@ -59,7 +60,7 @@ export default function CreateCollectionPage({
     useState<SingleImageUploadResponse | null>(null);
   const [creators, setCreators] = useState<Creator[] | null>(null);
   const [jsonBeingUploaded, setJsonBeingUploaded] = useState<any | null>(null);
-
+  const { cluster } = useCluster();
   const [isSavingCollection, setIsSavingCollection] = useState(false);
 
   const formik = useFormik({
@@ -93,7 +94,7 @@ export default function CreateCollectionPage({
       setIsSavingCollection(true);
 
       const blueprint = createBlueprintClient({
-        cluster: "devnet",
+        cluster,
       });
 
       const { success } = await blueprint.collections.updateCollection({

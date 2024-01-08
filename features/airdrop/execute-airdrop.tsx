@@ -13,6 +13,7 @@ import {
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { GET_JOB_BY_ID } from "@/graphql/queries/get-job-by-id";
+import { useCluster } from "@/hooks/cluster";
 import { useQuery } from "@apollo/client";
 import { useUserData } from "@nhost/nextjs";
 import axios from "axios";
@@ -24,8 +25,9 @@ export const ExecuteAirdrop = ({ airdrop }: { airdrop: Airdrop }) => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [jobId, setJobId] = useState<string>("");
   const [shouldPoll, setShouldPoll] = useState<boolean>(false);
+  const { cluster } = useCluster();
 
-  const blueprint = createBlueprintClient({ cluster: "devnet" });
+  const blueprint = createBlueprintClient({ cluster });
 
   const {
     loading,
@@ -209,7 +211,7 @@ export const ExecuteAirdrop = ({ airdrop }: { airdrop: Airdrop }) => {
         {
           airdropId: airdrop.id,
           jobId: job.id,
-          cluster: "devnet",
+          cluster,
         }
       );
 
@@ -225,7 +227,9 @@ export const ExecuteAirdrop = ({ airdrop }: { airdrop: Airdrop }) => {
     airdrop.id,
     blueprint.collections,
     blueprint.jobs,
+    blueprint.tokens,
     blueprint.upload,
+    cluster,
     user,
   ]);
 

@@ -51,7 +51,7 @@ import { BASE_URL } from "@/constants/constants";
 import axios from "axios";
 
 export type BlueprintClientOptions = {
-  cluster: "devnet" | "testnet" | "mainnet-beta";
+  cluster: "devnet" | "mainnet-beta";
 };
 
 const getFormData = async (params: Record<string, any>) => {

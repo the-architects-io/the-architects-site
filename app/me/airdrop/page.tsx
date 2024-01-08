@@ -10,6 +10,7 @@ import { CollectionListItem } from "@/features/collection/collection-list-item";
 import showToast from "@/features/toasts/show-toast";
 import { GET_AIRDROPS_BY_OWNER_ID } from "@/graphql/queries/get-airdrops-by-owner-id";
 import { GET_COLLECTIONS_BY_OWNER_ID } from "@/graphql/queries/get-collections-by-owner-id";
+import { useCluster } from "@/hooks/cluster";
 import { useQuery } from "@apollo/client";
 import { useUserData } from "@nhost/nextjs";
 import Link from "next/link";
@@ -19,6 +20,7 @@ import { useEffect, useState } from "react";
 export default function AirdropPage() {
   const router = useRouter();
   const user = useUserData();
+  const { cluster } = useCluster();
 
   const [airdropsInProgress, setAirdropsInProgress] = useState<Airdrop[]>([]);
   const [readyToDropAirdrops, setReadyToDropAirdrops] = useState<Airdrop[]>([]);
@@ -98,7 +100,7 @@ export default function AirdropPage() {
     if (!collection?.id || !user?.id) return;
     setIsLoading(true);
     const blueprint = createBlueprintClient({
-      cluster: "devnet",
+      cluster,
     });
 
     const { success, airdrop } = await blueprint.airdrops.createAirdrop({

@@ -5,6 +5,7 @@ import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
 import { UploadStatus } from "@/features/upload/shadow-upload/upload-status";
 import { GET_UPLOAD_JOB_BY_ID } from "@/graphql/queries/get-upload-job-by-id";
+import { useCluster } from "@/hooks/cluster";
 import { useQuery } from "@apollo/client";
 import {
   CHUNK_EVENTS,
@@ -66,6 +67,7 @@ export const ShadowUploadField = ({
   const fileUploadIdsRef = useRef<any>({}); // Store uploadIds for each file
   const [isComplete, setIsComplete] = useState(false);
   const [isInProgress, setIsInProgress] = useState(false);
+  const { cluster } = useCluster();
 
   const { loading, error, data } = useQuery(GET_UPLOAD_JOB_BY_ID, {
     variables: {
@@ -176,7 +178,7 @@ export const ShadowUploadField = ({
 
         setIsInProgress(true);
         const blueprint = createBlueprintClient({
-          cluster: "devnet",
+          cluster,
         });
         const sizeInBytes = items.reduce((acc, item) => {
           return acc + item.file.size;

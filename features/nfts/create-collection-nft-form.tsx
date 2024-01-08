@@ -10,6 +10,7 @@ import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormTextareaWithLabel } from "@/features/UI/forms/form-textarea-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import showToast from "@/features/toasts/show-toast";
+import { useCluster } from "@/hooks/cluster";
 import { getSlug } from "@/utils/formatting";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useFormik } from "formik";
@@ -37,6 +38,7 @@ export default function CreateCollectionNftForm({
   const [collectionImageUrl, setCollectionImageUrl] = useState<string | null>(
     null
   );
+  const { cluster } = useCluster();
 
   const formik = useFormik({
     initialValues: {
@@ -61,7 +63,7 @@ export default function CreateCollectionNftForm({
       const collectionNameSlug = getSlug(collectionName);
 
       const blueprint = createBlueprintClient({
-        cluster: "devnet",
+        cluster,
       });
 
       const { url } = await blueprint.upload.uploadFile({

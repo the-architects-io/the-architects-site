@@ -1,6 +1,7 @@
 "use client";
 
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
+import ClusterMenu from "@/features/UI/menus/cluster-menu";
 import UserMenu from "@/features/UI/menus/user-menu";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { useUserData } from "@nhost/nextjs";
@@ -64,7 +65,10 @@ const NavbarItems = () => {
         )}
       </div>
       {!!user?.id ? (
-        <UserMenu />
+        <div className="space-x-2 flex">
+          <ClusterMenu />
+          <UserMenu />
+        </div>
       ) : (
         <Link href="/login">
           <PrimaryButton>Login</PrimaryButton>

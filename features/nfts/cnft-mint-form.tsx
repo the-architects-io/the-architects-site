@@ -12,6 +12,7 @@ import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import { Panel } from "@/features/UI/panel";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
+import { useCluster } from "@/hooks/cluster";
 import { makeNumberArray } from "@/utils/formatting";
 import { Umi, isPublicKey, publicKey } from "@metaplex-foundation/umi";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -48,6 +49,7 @@ export default function CnftMintForm({
     []
   );
   const [failedRecipients, setFailedRecipients] = useState<string[]>([]);
+  const { cluster } = useCluster();
 
   const formik = useFormik({
     initialValues: {
@@ -76,7 +78,7 @@ export default function CnftMintForm({
     const nftIds = makeNumberArray(5000);
 
     const blueprint = createBlueprintClient({
-      cluster: "devnet",
+      cluster,
     });
 
     for (let i = 0; i < nftIds.length; i++) {

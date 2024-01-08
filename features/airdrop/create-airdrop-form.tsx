@@ -4,6 +4,7 @@ import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-la
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import showToast from "@/features/toasts/show-toast";
+import { useCluster } from "@/hooks/cluster";
 import { useUserData } from "@nhost/nextjs";
 
 import { useFormik } from "formik";
@@ -18,6 +19,7 @@ export default function CreateAirdropForm({
   const router = useRouter();
   const user = useUserData();
   const [files, setFiles] = useState<FileList | null>(null);
+  const { cluster } = useCluster();
 
   const formik = useFormik({
     initialValues: {
@@ -31,7 +33,7 @@ export default function CreateAirdropForm({
         return;
       }
       const blueprint = createBlueprintClient({
-        cluster: "devnet",
+        cluster,
       });
 
       const { success: updateAirdropSuccess, airdrop } =

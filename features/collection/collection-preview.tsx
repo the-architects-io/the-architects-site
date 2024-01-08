@@ -2,6 +2,7 @@ import { createBlueprintClient } from "@/app/blueprint/client";
 import { Collection, TokenMetadata } from "@/app/blueprint/types";
 import { SHDW_DRIVE_BASE_URL } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
+import { useCluster } from "@/hooks/cluster";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
@@ -18,10 +19,11 @@ export const CollectionPreview = ({
   const [collectionTokens, setCollectionTokens] = useState<TokenMetadata[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [tokensPerPage, setTokensPerPage] = useState<number>(20);
+  const { cluster } = useCluster();
 
   const createPreviewTokens = useCallback(async () => {
     const blueprint = createBlueprintClient({
-      cluster: "devnet",
+      cluster,
     });
 
     const collectionTokens =
@@ -33,7 +35,7 @@ export const CollectionPreview = ({
         index,
       }))
     );
-  }, [collection.id]);
+  }, [collection.id, cluster]);
 
   useEffect(() => {
     if (!collection) return;

@@ -4,6 +4,7 @@ import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormTextareaWithLabel } from "@/features/UI/forms/form-textarea-with-label";
 import showToast from "@/features/toasts/show-toast";
+import { useCluster } from "@/hooks/cluster";
 import { getSlug } from "@/utils/formatting";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useFormik } from "formik";
@@ -27,6 +28,7 @@ export default function CreateCollectionForm({
   const [collectionImageUrl, setCollectionImageUrl] = useState<string | null>(
     null
   );
+  const { cluster } = useCluster();
 
   const formik = useFormik({
     initialValues: {
@@ -50,7 +52,7 @@ export default function CreateCollectionForm({
       const collectionNameSlug = getSlug(collectionName);
 
       const blueprint = createBlueprintClient({
-        cluster: "devnet",
+        cluster,
       });
 
       const { url } = await blueprint.upload.uploadFile({

@@ -19,7 +19,8 @@ export const getAbbreviatedAddress = (
   )}`;
 };
 
-export const formatNumberWithCommas = (num: number) => {
+export const formatNumberWithCommas = (num: number | string) => {
+  if (typeof num === "string") num = parseFloat(num);
   if (!num) return "0";
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
