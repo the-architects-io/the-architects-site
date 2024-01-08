@@ -9,6 +9,7 @@ import {
 import {
   ASSET_SHDW_DRIVE_ADDRESS,
   SHDW_DRIVE_BASE_URL,
+  SYSTEM_USER_ID,
 } from "@/constants/constants";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
@@ -164,8 +165,6 @@ export const ExecuteAirdrop = ({ airdrop }: { airdrop: Airdrop }) => {
       console.log({ error });
     }
 
-    const mintAddress = "7fncGmTWTdDC9EvUC2K9JdWJj6fcaD4gvyXVwsLLxw1u";
-
     await blueprint.jobs.updateJob({
       id: job.id,
       statusText: "Creating merkle tree",
@@ -179,16 +178,17 @@ export const ExecuteAirdrop = ({ airdrop }: { airdrop: Airdrop }) => {
     let treeId;
 
     try {
-      // const { success, merkleTreeAddress, id } =
-      //   await blueprint.tokens.createTree({
-      //     maxBufferSize,
-      //     maxDepth,
-      //     collectionId: airdrop.collection.id,
-      //   });
+      const { success, merkleTreeAddress, id } =
+        await blueprint.tokens.createTree({
+          maxBufferSize,
+          maxDepth,
+          collectionId: airdrop.collection.id,
+          userId: SYSTEM_USER_ID,
+        });
 
-      // treeId = id;
+      treeId = id;
 
-      // console.log({ merkleTreeAddress });
+      console.log({ merkleTreeAddress });
 
       if (!success) throw new Error("Error creating Merkle Tree");
     } catch (error) {

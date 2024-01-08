@@ -1,6 +1,9 @@
 import { Collection, UploadJobStatus } from "@/app/blueprint/types";
 import { UploadStatus } from "@/features/upload/shadow-upload/upload-status";
-import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import {
+  CheckBadgeIcon,
+  InformationCircleIcon,
+} from "@heroicons/react/24/outline";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -52,10 +55,23 @@ export const CollectionListItem = ({
               {collection.creators?.length ? (
                 <>
                   <CheckBadgeIcon className="h-6 w-6 mr-1" />
-                  <div className="">Details complete</div>
+                  <div className="">Details added</div>
                 </>
               ) : (
                 <div className="text-yellow-500">Details in progress</div>
+              )}
+            </div>
+            <div className="flex justify-center items-center text-green-500 flex-wrap">
+              {collection.creators?.length ? (
+                <>
+                  <CheckBadgeIcon className="h-6 w-6 mr-1" />
+                  <div className="">Creators added</div>
+                </>
+              ) : (
+                <>
+                  <InformationCircleIcon className="h-6 w-6 mr-1" />
+                  <div className="text-yellow-500">Creators missing</div>
+                </>
               )}
             </div>
             <div className="flex justify-center items-center text-green-500 flex-wrap">
@@ -72,12 +88,14 @@ export const CollectionListItem = ({
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center text-yellow-500">
                   <div className="flex mb-2">
-                    <div className="text-yellow-500">Metadata missing</div>
+                    <InformationCircleIcon className="h-6 w-6 mr-1" />
+                    <div>Metadata missing</div>
                   </div>
                   <div className="flex">
-                    <div className="text-yellow-500">Assets missing</div>
+                    <InformationCircleIcon className="h-6 w-6 mr-1" />
+                    <div>Assets missing</div>
                   </div>
                 </div>
               )}

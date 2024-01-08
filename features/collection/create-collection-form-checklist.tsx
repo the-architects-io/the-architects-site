@@ -1,4 +1,3 @@
-import { Creator } from "@/app/blueprint/types";
 import { creatorsAreValid } from "@/app/blueprint/utils";
 import { SingleImageUploadResponse } from "@/features/upload/single-image/single-image-upload-field-wrapper";
 import {
@@ -9,14 +8,12 @@ import {
 
 export const CreateCollectionFormChecklist = ({
   collectionImage,
-  creators,
   collectionName,
   symbol,
   description,
   sellerFeeBasisPoints,
 }: {
   collectionImage: SingleImageUploadResponse | null;
-  creators: Creator[];
   collectionName?: string;
   symbol?: string;
   description?: string;
@@ -55,7 +52,7 @@ export const CreateCollectionFormChecklist = ({
           </li>
         </ul>
       </div>
-      <div className="flex flex-col">
+      {/* <div className="flex flex-col">
         <div className="flex space-x-3 items-center mb-3">
           <div>
             {creatorsAreValid(creators) ? (
@@ -76,7 +73,7 @@ export const CreateCollectionFormChecklist = ({
             Share total must be 100%
           </li>
         </ul>
-      </div>
+      </div> */}
     </div>
   );
 };

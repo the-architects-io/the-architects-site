@@ -50,6 +50,7 @@ export default function CollectionCreationUploadAssetsPage({
   const [shadowFileUploadId, setShadowFileUploadId] = useState<string | null>(
     null
   );
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [collectionMetadataStats, setCollectionMetadataStats] =
     useState<CollectionStatsFromCollectionMetadatas | null>(null);
   const [
@@ -73,6 +74,7 @@ export default function CollectionCreationUploadAssetsPage({
   const [zipFileUploadyInstance, setZipFileUploadyInstance] =
     useState<UploadyContextType | null>(null);
   const [driveAddress, setDriveAddress] = useState<string | null>(null);
+  const [hasStartedUpload, setHasStartedUpload] = useState<boolean>(false);
 
   const wallet = useWallet();
   const blueprint = createBlueprintClient({
@@ -144,6 +146,11 @@ export default function CollectionCreationUploadAssetsPage({
     if (!zipFileUploadyInstance || !jsonUploadyInstance || !user?.id) {
       throw new Error("Missing uploady instance");
     }
+
+    if (hasStartedUpload) return;
+
+    setHasStartedUpload(true);
+    setIsSubmitting(true);
 
     const sizeInBytes = fileStats?.totalUncompressedSize;
     let sizeInKb = sizeInBytes ? sizeInBytes / 1000 : 0;
@@ -377,7 +384,7 @@ export default function CollectionCreationUploadAssetsPage({
           <div className="flex justify-center w-full">
             <div className="fixed bottom-4 w-full px-8">
               <SubmitButton
-                isSubmitting={false}
+                isSubmitting={isSubmitting}
                 className="w-full"
                 onClick={handleUploadClick}
                 disabled={

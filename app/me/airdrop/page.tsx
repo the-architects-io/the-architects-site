@@ -116,7 +116,6 @@ export default function AirdropPage() {
     }
 
     router.push(`/me/airdrop/create/${airdrop.id}`);
-    setIsLoading(false);
   };
 
   if (isLoading) {

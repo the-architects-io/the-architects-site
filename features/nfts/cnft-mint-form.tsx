@@ -129,6 +129,7 @@ export default function CnftMintForm({
   }, [
     setIsLoading,
     recipientList,
+    cluster,
     mintedIds,
     failedMintedIds,
     successfulRecipients,

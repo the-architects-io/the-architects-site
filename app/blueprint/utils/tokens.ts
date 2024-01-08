@@ -6,7 +6,8 @@ import {
 import { isValidPublicKey } from "@/utils/rpc";
 import axios from "axios";
 
-export const creatorsAreValid = (creators: Creator[]) => {
+export const creatorsAreValid = (creators: Creator[] | null) => {
+  if (!creators) return false;
   const shareCount = creators.reduce((acc, curr) => acc + curr.share, 0);
   const sharesEqual100 = shareCount === 100;
 

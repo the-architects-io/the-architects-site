@@ -70,14 +70,12 @@ export default function CreateCollectionPage({
       description: "",
       sellerFeeBasisPoints: 0,
       iamge: "",
-      creators: [{ address: "", share: 0, sortOrder: 0, id: 0 }] as Creator[],
     },
     onSubmit: async ({
       collectionName,
       symbol,
       description,
       sellerFeeBasisPoints,
-      creators,
     }) => {
       if (
         !wallet?.publicKey ||
@@ -110,18 +108,13 @@ export default function CreateCollectionPage({
 
       if (!success) {
         showToast({
-          primaryMessage: "Saving collection failed",
+          primaryMessage: "There was a problem",
         });
+        setIsSavingCollection(false);
         return;
       }
 
-      showToast({
-        primaryMessage: "Collection details saved",
-      });
-
-      setIsSavingCollection(false);
-
-      router.push(`/me/collection/create/${collectionId}/upload-assets`);
+      router.push(`/me/collection/create/${collectionId}/set-creators`);
     },
   });
 
@@ -141,36 +134,6 @@ export default function CreateCollectionPage({
       }
     },
   });
-
-  const moveCard = useCallback(
-    (dragIndex: number, hoverIndex: number) => {
-      formik.setFieldValue(
-        "creators",
-        formik.values.creators.map((creator, index) => {
-          if (index === dragIndex) {
-            return { ...creator, sortOrder: hoverIndex };
-          }
-          if (index === hoverIndex) {
-            return { ...creator, sortOrder: dragIndex };
-          }
-          return creator;
-        })
-      );
-    },
-    [formik]
-  );
-
-  const handleAddCreator = useCallback(() => {
-    formik.setFieldValue("creators", [
-      ...formik.values.creators,
-      {
-        address: "",
-        share: 0,
-        sortOrder: formik.values.creators.length,
-        id: formik.values.creators.length,
-      },
-    ]);
-  }, [formik]);
 
   const handleMetadataJsonUploadComplete = useCallback(
     async ({ url, success }: UploadJsonResponse) => {
@@ -194,13 +157,6 @@ export default function CreateCollectionPage({
       return;
     }
 
-    if (creators?.length && formik.values.creators.length === 0) {
-      formik.setFieldValue(
-        "creators",
-        creators.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
-      );
-    }
-
     if (jsonBeingUploaded && !collectionMetadataStats) {
       const collectionMetadataStats =
         getCollectionStatsFromCollectionMetadatas(jsonBeingUploaded);
@@ -213,7 +169,6 @@ export default function CreateCollectionPage({
     params?.id,
     collectionMetadatasJsonUploadResponse,
     creators,
-    formik.values.creators.length,
     formik,
     handleMetadataJsonUploadComplete,
     router,
@@ -258,7 +213,6 @@ export default function CreateCollectionPage({
           </SingleImageUpload>
           <CreateCollectionFormChecklist
             collectionImage={collectionImage}
-            creators={formik.values.creators}
             collectionName={formik.values.collectionName}
             symbol={formik.values.symbol}
             description={formik.values.description}
@@ -303,91 +257,6 @@ export default function CreateCollectionPage({
               onChange={formik.handleChange}
             />
           </div>
-          <div
-            className={classNames([
-              "border rounded-lg px-4 w-full mb-4 flex flex-col items-center justify-center p-8",
-              creatorsAreValid(formik.values.creators)
-                ? "border-green-500 bg-green-500 bg-opacity-10"
-                : "border-gray-600",
-            ])}
-          >
-            <div className="text-lg mb-4">Creators</div>
-            <>
-              <DndProvider backend={HTML5Backend}>
-                <FormikProvider value={formik}>
-                  <FieldArray
-                    name="creators"
-                    render={(arrayHelpers) => (
-                      <div className="bg-black w-full">
-                        {formik.values.creators
-                          .sort((a, b) => a.sortOrder - b.sortOrder)
-                          .map((creator, index) => (
-                            <DndCard
-                              className="mb-4"
-                              key={creator.id}
-                              id={creator.id}
-                              index={index}
-                              moveCard={moveCard}
-                            >
-                              <div className="relative w-full flex">
-                                <div className="flex flex-1 mr-4">
-                                  <FormInputWithLabel
-                                    label="Creator Address"
-                                    name={`creators.${index}.address`}
-                                    placeholder="Creator Address"
-                                    onChange={formik.handleChange}
-                                    value={creator.address}
-                                  />
-                                  {isValidPublicKey(creator.address) ? (
-                                    <CheckBadgeIcon className="h-6 w-6 text-green-500 self-end ml-2 mb-1.5" />
-                                  ) : (
-                                    <XCircleIcon className="h-6 w-6 text-red-500 self-end ml-2 mb-1.5" />
-                                  )}
-                                </div>
-                                <div className="w-24 mr-8">
-                                  <FormInputWithLabel
-                                    label="Share (in %)"
-                                    name={`creators.${index}.share`}
-                                    placeholder="Share"
-                                    type="number"
-                                    min={0}
-                                    max={100}
-                                    onChange={formik.handleChange}
-                                    value={creator.share}
-                                  />
-                                </div>
-                                {formik.values.creators.length > 1 && (
-                                  <button
-                                    className=" absolute -top-2 -right-2.5 cursor-pointer"
-                                    type="button"
-                                    onClick={() => arrayHelpers.remove(index)}
-                                  >
-                                    <XMarkIcon className="h-6 w-6 text-gray-100" />
-                                  </button>
-                                )}
-                              </div>
-                            </DndCard>
-                          ))}
-                      </div>
-                    )}
-                  />
-                </FormikProvider>
-              </DndProvider>
-              <PrimaryButton
-                className="text-gray-100 mt-4"
-                onClick={handleAddCreator}
-                disabled={
-                  !(
-                    formik.values.creators.every(
-                      (c) => !!c.address && isValidPublicKey(c.address)
-                    ) && formik.values.creators.every((c) => c.share)
-                  )
-                }
-              >
-                <PlusIcon className="h-6 w-6" />
-              </PrimaryButton>
-            </>
-          </div>
         </div>
       </div>
       <div className="flex bottom-0 left-0 right-0 fixed w-full justify-center items-center">
@@ -401,13 +270,12 @@ export default function CreateCollectionPage({
                 !!formik.values.symbol &&
                 !!formik.values.description &&
                 !!formik.values.sellerFeeBasisPoints &&
-                !!collectionImage &&
-                creatorsAreValid(formik.values.creators)
+                !!collectionImage
               )
             }
             onClick={formik.handleSubmit}
           >
-            Next - Add Assets
+            Next - Add Creators
           </SubmitButton>
         </div>
       </div>

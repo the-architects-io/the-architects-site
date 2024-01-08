@@ -1,9 +1,12 @@
 import { UploadJob, UploadJobStatus } from "@/app/blueprint/types";
+import { BASE_URL } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
+import showToast from "@/features/toasts/show-toast";
 import { GET_UPLOAD_JOB_BY_ID } from "@/graphql/queries/get-upload-job-by-id";
 import { useLazyQuery, useQuery } from "@apollo/client";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { UploadyContextType } from "@rpldy/uploady";
+import { useRouter } from "next/navigation";
 import { Line } from "rc-progress";
 import { useEffect, useState } from "react";
 
@@ -25,6 +28,7 @@ export const UploadStatus = ({
   jsonUploadyInstance: UploadyContextType | null;
   zipFileUploadyInstance: UploadyContextType | null;
 }) => {
+  const router = useRouter();
   const { loading, data }: { loading: boolean; data: UploadJobResponse } =
     useQuery(GET_UPLOAD_JOB_BY_ID, {
       variables: { id: jobId },
@@ -36,6 +40,15 @@ export const UploadStatus = ({
     jsonUploadyInstance?.clearPending();
     zipFileUploadyInstance?.clearPending();
   };
+
+  useEffect(() => {
+    if (data?.uploadJobs_by_pk?.status?.name === UploadJobStatus.COMPLETE) {
+      showToast({
+        primaryMessage: "Asset upload complete!",
+      });
+      router.push(`${BASE_URL}/me//collection`);
+    }
+  }, [data?.uploadJobs_by_pk?.status?.name, router]);
 
   if (!loading && !data?.uploadJobs_by_pk) {
     return null;

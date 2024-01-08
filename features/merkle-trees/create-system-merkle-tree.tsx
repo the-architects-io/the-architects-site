@@ -32,11 +32,11 @@ export const CreateSystemTree = ({ refetch }: { refetch: () => void }) => {
         throw new Error("Invalid max depth or max buffer size");
       }
 
-      const client = createBlueprintClient({
+      const blueprint = createBlueprintClient({
         cluster,
       });
 
-      const { merkleTreeAddress } = await client.tokens.createTree({
+      const { merkleTreeAddress } = await blueprint.tokens.createTree({
         maxDepth,
         maxBufferSize,
         userId: SYSTEM_USER_ID,

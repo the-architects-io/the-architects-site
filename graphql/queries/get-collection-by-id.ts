@@ -18,12 +18,12 @@ export const GET_COLLECTION_BY_ID = gql`
         }
       }
       collectionNftAddress
-      # merkleTree {
-      #   id
-      #   address
-      #   maxDepth
-      #   maxBufferSize
-      # }
+      merkleTree {
+        id
+        address
+        maxDepth
+        maxBufferSize
+      }
       createdAt
       family
       driveAddress

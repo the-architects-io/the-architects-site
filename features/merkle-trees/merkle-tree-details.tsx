@@ -4,16 +4,31 @@ import {
   formatNumberWithCommas,
   getAbbreviatedAddress,
 } from "@/utils/formatting";
+import { ClipboardIcon } from "@heroicons/react/24/outline";
 
 export const MerkleTreeDetails = ({ tree }: { tree: MerkleTree }) => {
+  const handleCopyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
+
   return (
     <>
       <div className="flex w-full mb-8 px-4">
         <BackButton />
       </div>
       <div className="flex flex-col items-center space-y-2">
-        <div className="text-2xl mb-8">
-          {getAbbreviatedAddress(tree.address)}
+        <div className="text-2xl mb-8 flex space-x-4">
+          <div>{getAbbreviatedAddress(tree.address)}</div>
+          <div
+            className="cursor-pointer w-3"
+            onClick={() => handleCopyToClipboard(tree.address)}
+          >
+            <ClipboardIcon
+              height="1.5rem"
+              width="1.5rem"
+              className="h-6 w-6 flex-none hover:text-sky-200"
+            />
+          </div>
         </div>
         <div className="flex space-x-4">
           <div>
