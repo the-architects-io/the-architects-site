@@ -622,6 +622,7 @@ export type CreateTreeInput = {
   maxDepth: number;
   maxBufferSize: number;
   collectionId?: string;
+  userId?: string;
 };
 
 export type CreateTreeResponse = BaseBlueprintResponse & {

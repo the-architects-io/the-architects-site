@@ -159,6 +159,7 @@ export default function CollectionCreationUploadAssetsPage({
       uploadJobId: job.id,
     });
 
+    let driveAddress: string | null = null;
     try {
       const { address } = await blueprint.drive.createDrive({
         name: params.id,
@@ -166,6 +167,7 @@ export default function CollectionCreationUploadAssetsPage({
         ownerAddress: EXECUTION_WALLET_ADDRESS,
       });
       setDriveAddress(address);
+      driveAddress = address;
     } catch (error) {
       console.log({ error });
       showToast({
@@ -178,10 +180,6 @@ export default function CollectionCreationUploadAssetsPage({
       });
       throw new Error("Failed to create drive");
     }
-
-    console.log({
-      driveAddress,
-    });
 
     if (!zipFileBeingUploaded || !jsonBeingUploaded || !driveAddress) {
       blueprint.jobs.updateUploadJob({

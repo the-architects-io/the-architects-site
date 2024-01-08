@@ -8,7 +8,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import SharedHead from "@/features/UI/head";
 import { ItemsList } from "@/features/admin/items/items-list";
-import { TraitsList } from "@/features/admin/traits/traits-list";
 import { CommunitiesList } from "@/features/admin/communities/communities-list";
 import { NftCollectionsList } from "@/features/admin/nft-collections/nfts-collection-list";
 import Link from "next/link";

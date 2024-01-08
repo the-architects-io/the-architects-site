@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
 
   if (collection.apiKey) {
     delete collection.apiKey;
+    delete collection.cluster;
   }
 
   const {

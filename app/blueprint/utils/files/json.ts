@@ -115,9 +115,11 @@ export const getCollectionStatsFromCollectionMetadatas = (
     count: (json as []).length,
     creators: (json as [])
       .reduce((acc: any, curr: any) => {
-        const { properties } = curr;
-        const { creators } = properties;
+        const creators = curr?.properties?.creators;
 
+        if (!creators) {
+          return acc;
+        }
         const creatorAddresses = creators.map((creator: any) => {
           return creator.address;
         });
@@ -133,7 +135,7 @@ export const getCollectionStatsFromCollectionMetadatas = (
           attributes,
         }: { attributes: Array<{ trait_type: string; value: string }> } = curr;
 
-        attributes.forEach(({ trait_type, value }) => {
+        attributes?.forEach(({ trait_type, value }) => {
           acc.add(`${trait_type}:${value}`);
         });
 
