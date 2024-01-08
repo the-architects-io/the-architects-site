@@ -164,21 +164,16 @@ export async function POST(req: NextRequest) {
       );
     } else {
       console.log("3b");
-      const { signature, result } = await mintV1(
-        umi,
-        // @ts-ignore
-        {
-          ...mintConfig,
-          metadata: {
-            ...mintConfig.metadata,
-            collection: {
-              // generate new key
-              key: publicKey(Keypair.generate().publicKey),
-              verified: false,
-            },
+      const { signature, result } = await mintV1(umi, {
+        ...mintConfig,
+        metadata: {
+          ...mintConfig.metadata,
+          collection: {
+            key: publicKey(Keypair.generate().publicKey),
+            verified: false,
           },
-        }
-      ).sendAndConfirm(umi);
+        },
+      }).sendAndConfirm(umi);
 
       await client.request(UPDATE_MERKLE_TREE, {
         id: tree.id,

@@ -1015,6 +1015,6 @@ export type MerkleTree = {
   maxDepth: number;
   maxBufferSize: number;
   maxCapacity: number;
-  currentCapacity?: number;
+  currentCapacity: number;
   cluster: "devnet" | "mainnet-beta";
 };

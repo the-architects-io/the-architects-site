@@ -17,11 +17,14 @@ export const CreateCollectionButton = ({
   onSuccess?: (collection: Collection) => void;
   cluster?: "devnet" | "mainnet-beta";
 }) => {
+  const [isCreatingCollection, setIsCreatingCollection] =
+    useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const user = useUserData();
   const handleCreateCollection = async () => {
     setIsLoading(true);
     const blueprint = createBlueprintClient({ cluster });
+    setIsCreatingCollection(true);
 
     const { collection, success } =
       await blueprint.collections.createCollection({
@@ -38,7 +41,7 @@ export const CreateCollectionButton = ({
 
   return (
     <PrimaryButton onClick={handleCreateCollection}>
-      {isLoading ? <Spinner /> : "Create Collection"}
+      {isLoading || isCreatingCollection ? <Spinner /> : "Create Collection"}
     </PrimaryButton>
   );
 };

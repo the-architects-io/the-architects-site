@@ -24,7 +24,13 @@ import { v4 as uuidv4 } from "uuid";
 import { createJsonFileFromObject } from "@/app/blueprint/utils";
 import showToast from "@/features/toasts/show-toast";
 
-export const MintCnft = () => {
+export const MintCnft = ({
+  treeAddress,
+  onCompleted,
+}: {
+  treeAddress?: string;
+  onCompleted?: () => void;
+}) => {
   const { cluster } = useCluster();
   const [availableMerkleTrees, setAvailableMerkleTrees] = useState<
     (MerkleTree & { label: string; value: string })[]
@@ -51,7 +57,7 @@ export const MintCnft = () => {
 
   const formik = useFormik({
     initialValues: {
-      merkleTreeAddress: "",
+      merkleTreeAddress: treeAddress ?? "",
       sellerFeeBasisPoints: 0,
       name: "",
       uri: "",
@@ -134,6 +140,8 @@ export const MintCnft = () => {
         sigPubKey,
       });
 
+      onCompleted?.();
+
       showToast({
         primaryMessage: "Minted cNFT",
         link: {
@@ -145,20 +153,24 @@ export const MintCnft = () => {
   });
 
   return (
-    <div className="flex flex-col justify-center space-y-4">
-      <SelectInputWithLabel
-        value={formik.values.merkleTreeAddress}
-        label="Merkle Tree"
-        name="merkleTreeAddress"
-        options={availableMerkleTrees?.map((tree) => ({
-          value: tree.address,
-          label: tree.label,
-        }))}
-        onChange={formik.handleChange}
-        onBlur={formik.handleBlur}
-        placeholder="Select system merkle tree"
-        hideLabel={false}
-      />
+    <div className="flex flex-col justify-center space-y-4 w-full max-w-md">
+      <>
+        {!treeAddress && (
+          <SelectInputWithLabel
+            value={formik.values.merkleTreeAddress}
+            label="Merkle Tree"
+            name="merkleTreeAddress"
+            options={availableMerkleTrees?.map((tree) => ({
+              value: tree.address,
+              label: tree.label,
+            }))}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            placeholder="Select system merkle tree"
+            hideLabel={false}
+          />
+        )}
+      </>
       <FormInputWithLabel
         label="Name"
         name="name"

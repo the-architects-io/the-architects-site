@@ -154,7 +154,7 @@ export const MerkleTreesTable = ({ trees }: { trees: MerkleTree[] }) => {
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="py-2 mx-4 overflow-auto">
                     {
-                      <Link href={`/admin/merkle-trees/${row.original.id}`}>
+                      <Link href={`/admin/merkle-tree/${row.original.id}`}>
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
