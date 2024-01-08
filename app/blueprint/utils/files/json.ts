@@ -1,6 +1,7 @@
 import { CollectionStatsFromCollectionMetadatas } from "@/app/blueprint/types";
 import { ShadowFile } from "@shadow-drive/sdk";
 import { NextRequest } from "next/server";
+import { v4 as uuidv4 } from "uuid";
 
 export const jsonFileToJson = async (file: File): Promise<any> => {
   const buffer = await file.arrayBuffer();
@@ -143,4 +144,12 @@ export const getCollectionStatsFromCollectionMetadatas = (
       }, new Set<string>())
     ),
   };
+};
+
+export const createJsonFileFromObject = (object: any, fileName?: string) => {
+  fileName = fileName?.trim()?.length ? fileName : `${uuidv4()}.json`;
+
+  return new Blob([JSON.stringify(object)], {
+    type: "application/json",
+  });
 };

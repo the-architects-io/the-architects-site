@@ -24,7 +24,7 @@ import {
   useUploady,
 } from "@rpldy/uploady";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { v4 as uuidv4 } from "uuid"; // Ensure you have 'uuid' installed
+import { v4 as uuidv4 } from "uuid";
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 

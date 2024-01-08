@@ -73,6 +73,21 @@ export const MerkleTreesTable = ({ trees }: { trees: MerkleTree[] }) => {
         ),
       },
       {
+        header: () => <div className="uppercase py-2 mr-4 px-4">Remaining</div>,
+        size: 32,
+        accessorKey: "currentCapacity",
+        cell: (info) => (
+          <div className="flex px-4 space-x-2">
+            <div>{`${formatNumberWithCommas(info?.getValue() as number)}`}</div>
+            <div>{`(${Math.floor(
+              (Number(info?.getValue()) /
+                Number(info?.row.original.maxCapacity)) *
+                100
+            ).toFixed(1)}%)`}</div>
+          </div>
+        ),
+      },
+      {
         header: () => (
           <div className="uppercase py-2 mr-4 px-4">Total Capacity</div>
         ),
@@ -81,28 +96,6 @@ export const MerkleTreesTable = ({ trees }: { trees: MerkleTree[] }) => {
         cell: (info) => (
           <div className="flex flex-col px-4">
             <div>{`${formatNumberWithCommas(info?.getValue() as number)}`}</div>
-          </div>
-        ),
-      },
-      {
-        header: () => (
-          <div className="uppercase py-2 mr-4 px-4">Max Buffer Size</div>
-        ),
-        size: 8,
-        accessorKey: "maxBufferSize",
-        cell: (info) => (
-          <div className="flex flex-col px-4">
-            <div>{`${info?.getValue()}`}</div>
-          </div>
-        ),
-      },
-      {
-        header: () => <div className="uppercase py-2 mr-4 px-4">Max Depth</div>,
-        size: 8,
-        accessorKey: "maxDepth",
-        cell: (info) => (
-          <div className="flex flex-col px-4">
-            <div>{`${info?.getValue()}`}</div>
           </div>
         ),
       },
@@ -135,7 +128,7 @@ export const MerkleTreesTable = ({ trees }: { trees: MerkleTree[] }) => {
       <div style={{ height: "0.5rem" }} />
 
       <TableVirtuoso
-        style={{ height: "60vh", border: "1px solid lightgray" }}
+        style={{ height: "55vh", border: "1px solid lightgray" }}
         totalCount={rows.length}
         components={{
           Table: ({ style, ...props }) => {

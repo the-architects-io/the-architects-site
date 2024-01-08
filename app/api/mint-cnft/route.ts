@@ -1,5 +1,5 @@
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
-import { TransactionSignature } from "@solana/web3.js";
+import { Keypair, TransactionSignature } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 import {
   createSignerFromKeypair,
@@ -12,7 +12,38 @@ import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { mplToolbox } from "@metaplex-foundation/mpl-toolbox";
 import { dasApi } from "@metaplex-foundation/digital-asset-standard-api";
 import { getRpcEndpoint } from "@/utils/rpc";
-import { mintToCollectionV1 } from "@metaplex-foundation/mpl-bubblegum";
+import { mintToCollectionV1, mintV1 } from "@metaplex-foundation/mpl-bubblegum";
+import { Creator, MerkleTree } from "@/app/blueprint/types";
+import { PublicKey } from "@metaplex-foundation/js";
+import { UPDATE_MERKLE_TREE } from "@/graphql/mutations/update-merkle-tree";
+import { client } from "@/graphql/backend-client";
+import { GET_MERKLE_TREE_BY_ID } from "@/graphql/queries/get-merkle-tree-by-id";
+import { GET_MERKLE_TREE_BY_ADDRESS } from "@/graphql/queries/get-merkle-tree-by-address";
+
+const isValidCreatorsArray = (creators: any): boolean => {
+  if (!Array.isArray(creators)) {
+    return false;
+  }
+
+  if (creators?.length === 0) {
+    return false;
+  }
+
+  if (
+    creators?.some(
+      (creator) =>
+        !creator.address ||
+        !creator.share ||
+        isNaN(creator.share) ||
+        creator.share < 0 ||
+        creator.share > 100
+    )
+  ) {
+    return false;
+  }
+
+  return true;
+};
 
 export async function POST(req: NextRequest) {
   const {
@@ -24,6 +55,7 @@ export async function POST(req: NextRequest) {
     uri,
     leafOwnerAddress,
     cluster,
+    creators,
   } = await req.json();
 
   if (
@@ -44,7 +76,6 @@ export async function POST(req: NextRequest) {
     sellerFeeBasisPoints === undefined ||
     isNaN(sellerFeeBasisPoints) ||
     !merkleTreeAddress ||
-    !collectionNftAddress ||
     !creatorAddress ||
     !leafOwnerAddress
   ) {
@@ -64,33 +95,109 @@ export async function POST(req: NextRequest) {
     umi.use(keypairIdentity(keypair));
     umi.use(signerIdentity(createSignerFromKeypair(umi, keypair)));
 
-    const { signature, result } = await mintToCollectionV1(umi, {
+    console.log("1");
+
+    let formattedCreators = [
+      {
+        address: publicKey(creatorAddress),
+        verified: false,
+        share: 100,
+      },
+    ];
+
+    const mintConfig = {
       leafOwner: publicKey(leafOwnerAddress),
       merkleTree: publicKey(merkleTreeAddress),
-      collectionMint: publicKey(collectionNftAddress),
       metadata: {
         name,
         uri,
         sellerFeeBasisPoints,
-        collection: { key: publicKey(collectionNftAddress), verified: false },
-        creators: [
-          {
-            address: publicKey(creatorAddress),
-            verified: false,
-            share: 100,
-          },
-        ],
+        creators: formattedCreators,
       },
-    }).sendAndConfirm(umi);
+    };
 
-    return NextResponse.json(
+    const { merkleTrees }: { merkleTrees: MerkleTree[] } = await client.request(
+      GET_MERKLE_TREE_BY_ADDRESS,
       {
-        signature: signature.toString(),
-        result,
-        collectionAddress: collectionNftAddress,
-      },
-      { status: 200 }
+        address: merkleTreeAddress,
+      }
     );
+    const tree = merkleTrees?.[0];
+
+    console.log({ tree });
+
+    if (!tree) {
+      return NextResponse.json(
+        {
+          error: "Merkle tree not found in database",
+        },
+        { status: 500 }
+      );
+    }
+
+    if (!!collectionNftAddress) {
+      const { signature, result } = await mintToCollectionV1(umi, {
+        ...mintConfig,
+        collectionMint: publicKey(collectionNftAddress),
+        metadata: {
+          ...mintConfig.metadata,
+          collection: { key: publicKey(collectionNftAddress), verified: false },
+        },
+      }).sendAndConfirm(umi);
+
+      await client.request(UPDATE_MERKLE_TREE, {
+        id: tree.id,
+        merkleTree: {
+          currentCapacity: tree.currentCapacity
+            ? tree.currentCapacity
+            : tree.maxCapacity - 1,
+        },
+      });
+
+      return NextResponse.json(
+        {
+          signature: signature.toString(),
+          result,
+          collectionAddress: collectionNftAddress,
+        },
+        { status: 200 }
+      );
+    } else {
+      console.log("3b");
+      const { signature, result } = await mintV1(
+        umi,
+        // @ts-ignore
+        {
+          ...mintConfig,
+          metadata: {
+            ...mintConfig.metadata,
+            collection: {
+              // generate new key
+              key: publicKey(Keypair.generate().publicKey),
+              verified: false,
+            },
+          },
+        }
+      ).sendAndConfirm(umi);
+
+      await client.request(UPDATE_MERKLE_TREE, {
+        id: tree.id,
+        merkleTree: {
+          currentCapacity: tree.currentCapacity
+            ? tree.currentCapacity - 1
+            : tree.maxCapacity - 1,
+        },
+      });
+
+      return NextResponse.json(
+        {
+          signature: signature.toString(),
+          result,
+          collectionAddress: collectionNftAddress,
+        },
+        { status: 200 }
+      );
+    }
   } catch (error) {
     console.log("error", error);
     return NextResponse.json(

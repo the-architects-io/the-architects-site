@@ -60,15 +60,18 @@ export async function POST(req: NextRequest) {
 
   console.log("tree", tree);
 
+  const capacity = getMaxCapacityFromMaxBufferSizeAndMaxDepth(
+    Number(maxBufferSize),
+    Number(maxDepth)
+  );
+
   const { insert_merkle_trees_one }: { insert_merkle_trees_one: MerkleTree } =
     await client.request(ADD_MERKLE_TREE, {
       tree: {
         ...tree,
         ...(userId && { userId }),
-        maxCapacity: getMaxCapacityFromMaxBufferSizeAndMaxDepth(
-          Number(maxBufferSize),
-          Number(maxDepth)
-        ),
+        maxCapacity: capacity,
+        currentCapacity: capacity,
       },
     });
 

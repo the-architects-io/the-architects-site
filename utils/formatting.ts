@@ -1,3 +1,4 @@
+import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { isPublicKey } from "@metaplex-foundation/umi";
 import { PublicKey } from "@solana/web3.js";
 
@@ -74,4 +75,21 @@ export const getBestFittingStorageSizeString = (storageInBytes: number) => {
     : storageInKb > 1
     ? `${storageInKb.toFixed(2)}KB`
     : `${storageInBytes}B`;
+};
+
+export const getStringFromByteArrayString = (byteArrayString: string) => {
+  if (!byteArrayString?.length) return "";
+
+  // Convert the string to an array of byte values
+  const byteValues = byteArrayString.split(",").map(Number);
+
+  // Convert the array to a Buffer
+  const buffer = Buffer.from(byteValues);
+
+  // Encode the buffer as a base58 string
+  const base58Signature = bs58.encode(buffer);
+
+  console.log(base58Signature);
+
+  return base58Signature;
 };

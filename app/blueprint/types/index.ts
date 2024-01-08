@@ -593,7 +593,7 @@ export type MintNftResponse = BaseBlueprintResponse & {
 };
 
 export type UploadJsonInput = {
-  file: File | Blob;
+  file: Blob;
   fileName: string;
   driveAddress: string;
 };
@@ -604,7 +604,7 @@ export type UploadJsonResponse = BaseBlueprintResponse & {
 
 export type MintCnftInput = {
   merkleTreeAddress: string;
-  collectionNftAddress: string;
+  collectionNftAddress?: string;
   creatorAddress: string;
   sellerFeeBasisPoints: number;
   name: string;
@@ -1014,4 +1014,7 @@ export type MerkleTree = {
   address: string;
   maxDepth: number;
   maxBufferSize: number;
+  maxCapacity: number;
+  currentCapacity?: number;
+  cluster: "devnet" | "mainnet-beta";
 };
