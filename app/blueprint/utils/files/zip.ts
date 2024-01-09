@@ -8,7 +8,11 @@ const validateFileNames = (fileNames: string[]) => {
   let checkedFileNameNumbers: string[] = [];
 
   const fileNamesAreValid = fileNames.every((fileName) => {
-    const fileNameParts = fileName.split(".");
+    const fileNameWithoutFolder = fileName.split("/").pop();
+    if (!fileNameWithoutFolder) {
+      return false;
+    }
+    const fileNameParts = fileNameWithoutFolder.split(".");
     const fileNameWithoutExtension = fileNameParts[0];
     const fileNameNumber = parseInt(fileNameWithoutExtension);
 

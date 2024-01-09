@@ -11,12 +11,21 @@ export const GET_AIRDROPS_BY_OWNER_ID = gql`
         name
         symbol
       }
+      job {
+        id
+        status {
+          id
+          name
+        }
+        statusText
+      }
       collection {
         id
         name
         imageUrl
         description
         symbol
+        hasBeenMinted
       }
       isReadyToDrop
       startTime

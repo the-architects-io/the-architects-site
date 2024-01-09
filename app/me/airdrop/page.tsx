@@ -27,6 +27,7 @@ export default function AirdropPage() {
   const [readyToMintCollections, setReadyToMintCollections] = useState<
     Collection[]
   >([]);
+  const [completedAirdrops, setCompletedAirdrops] = useState<Airdrop[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const { loading } = useQuery(GET_COLLECTIONS_BY_OWNER_ID, {
@@ -37,11 +38,13 @@ export default function AirdropPage() {
     skip: !user?.id,
     onCompleted: ({ collections }: { collections: Collection[] }) => {
       console.log({ collections });
-      let readyToMintCollections = collections.filter(
-        (collection) =>
-          collection.isReadyToMint ||
-          collection?.uploadJob?.status?.name === UploadJobStatus.COMPLETE
-      );
+      let readyToMintCollections = collections
+        .filter(
+          (collection) =>
+            collection.isReadyToMint ||
+            collection?.uploadJob?.status?.name === UploadJobStatus.COMPLETE
+        )
+        .filter((collection) => !collection.hasBeenMinted);
       if (airdropsInProgress.length) {
         readyToMintCollections = readyToMintCollections
           .filter(
@@ -79,7 +82,10 @@ export default function AirdropPage() {
         airdrops.filter((airdrop) => !airdrop.isReadyToDrop)
       );
       setReadyToDropAirdrops(
-        airdrops.filter((airdrop) => airdrop.isReadyToDrop)
+        airdrops.filter(
+          (airdrop) =>
+            airdrop.isReadyToDrop && !airdrop.collection.hasBeenMinted
+        )
       );
       setReadyToMintCollections(
         readyToMintCollections.filter(
@@ -89,6 +95,9 @@ export default function AirdropPage() {
               return airdrop.collection?.id === collection.id;
             })
         )
+      );
+      setCompletedAirdrops(
+        airdrops.filter((airdrop) => airdrop.collection.hasBeenMinted)
       );
       if (!isAirdopsLoading || !loading) {
         setIsLoading(false);
@@ -116,6 +125,7 @@ export default function AirdropPage() {
     }
 
     router.push(`/me/airdrop/create/${airdrop.id}`);
+    setIsLoading(false);
   };
 
   if (isLoading) {
@@ -202,6 +212,18 @@ export default function AirdropPage() {
                   url={`${BASE_URL}/me/airdrop/${airdrop.id}`}
                   key={airdrop.id}
                 />
+              ))
+            ) : (
+              <>{isAirdopsLoading ? <Spinner /> : <>No airdrops found</>}</>
+            )}
+          </div>
+          <div className="max-w-3xl mx-auto mb-8 items-center flex flex-col">
+            <div className="text-2xl mb-4 mt-16 text-center">
+              Completed Airdrop
+            </div>
+            {!!completedAirdrops.length ? (
+              completedAirdrops.map((airdrop) => (
+                <AirdropListItem airdrop={airdrop} url={``} key={airdrop.id} />
               ))
             ) : (
               <>{isAirdopsLoading ? <Spinner /> : <>No airdrops found</>}</>

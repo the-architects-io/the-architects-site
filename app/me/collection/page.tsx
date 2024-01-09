@@ -27,6 +27,9 @@ export default function CollectionsPage() {
   const [readyToMintCollections, setReadyToMintCollections] = useState<
     Collection[]
   >([]);
+  const [completedCollections, setCompletedCollections] = useState<
+    Collection[]
+  >([]);
 
   const { loading } = useQuery(GET_COLLECTIONS_BY_OWNER_ID, {
     variables: {
@@ -38,18 +41,24 @@ export default function CollectionsPage() {
       console.log({ collections });
       setCollections(collections);
       setReadyToMintCollections(
-        collections.filter(
-          (collection) =>
-            collection.isReadyToMint ||
-            collection?.uploadJob?.status?.name === UploadJobStatus.COMPLETE
-        )
+        collections
+          .filter(
+            (collection) =>
+              collection.isReadyToMint ||
+              collection?.uploadJob?.status?.name === UploadJobStatus.COMPLETE
+          )
+          .filter((collection) => !collection.hasBeenMinted)
       );
       setInProgressCollection(
         collections.filter(
           (collection) =>
             !collection.isReadyToMint &&
+            !collection.hasBeenMinted &&
             collection?.uploadJob?.status?.name !== UploadJobStatus.COMPLETE
         )?.[0]
+      );
+      setCompletedCollections(
+        collections.filter((collection) => collection.hasBeenMinted)
       );
     },
   });
@@ -87,6 +96,17 @@ export default function CollectionsPage() {
               </div>
               <CollectionList
                 collections={readyToMintCollections}
+                linkBaseUrl="/me/collection"
+              />
+            </div>
+          )}
+          {!!completedCollections.length && (
+            <div className="max-w-3xl mx-auto">
+              <div className="text-2xl mb-4 mt-16 text-center">
+                Already Minted Collections
+              </div>
+              <CollectionList
+                collections={completedCollections}
                 linkBaseUrl="/me/collection"
               />
             </div>

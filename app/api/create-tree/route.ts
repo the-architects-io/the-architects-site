@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     Number(maxDepth)
   );
 
-  const { insert_merkle_trees_one }: { insert_merkle_trees_one: MerkleTree } =
+  const { insert_merkleTrees_one }: { insert_merkleTrees_one: MerkleTree } =
     await client.request(ADD_MERKLE_TREE, {
       tree: {
         ...tree,
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
       {
         id: collectionId,
         collection: {
-          merkleTreeId: insert_merkle_trees_one.id,
+          merkleTreeId: insert_merkleTrees_one.id,
         },
       }
     );

@@ -21,29 +21,19 @@ import axios from "axios";
 
 import { useCallback, useState } from "react";
 
-export const ExecuteAirdrop = ({ airdrop }: { airdrop: Airdrop }) => {
+export const ExecuteAirdrop = ({
+  airdrop,
+  setJobId,
+}: {
+  airdrop: Airdrop;
+  setJobId: (jobId: string) => void;
+}) => {
   const user = useUserData();
   const [isDisabled, setIsDisabled] = useState(false);
-  const [jobId, setJobId] = useState<string>("");
   const [shouldPoll, setShouldPoll] = useState<boolean>(false);
   const { cluster } = useCluster();
 
   const blueprint = createBlueprintClient({ cluster });
-
-  const {
-    loading,
-    data,
-  }: { loading: boolean; data: { jobs_by_pk: Job } | undefined } = useQuery(
-    GET_JOB_BY_ID,
-    {
-      variables: {
-        id: jobId,
-      },
-      skip: !shouldPoll,
-      pollInterval: 1000,
-      fetchPolicy: "network-only",
-    }
-  );
 
   const mintCollectionNft = useCallback(async () => {
     const {
@@ -76,6 +66,12 @@ export const ExecuteAirdrop = ({ airdrop }: { airdrop: Airdrop }) => {
       jobTypeId: JobTypeUUIDs.AIRDROP,
     });
 
+    const { success: airdropUpdateSuccess } =
+      await blueprint.airdrops.updateAirdrop({
+        id: airdrop.id,
+        jobId: job.id,
+      });
+
     if (!success || !job?.id) {
       console.log("Failed to create job");
       return;
@@ -85,8 +81,7 @@ export const ExecuteAirdrop = ({ airdrop }: { airdrop: Airdrop }) => {
     setJobId(job.id);
 
     const res = await axios.get(
-      // `${SHDW_DRIVE_BASE_URL}/${ASSET_SHDW_DRIVE_ADDRESS}/${id}-collection.png`,
-      `${SHDW_DRIVE_BASE_URL}/${ASSET_SHDW_DRIVE_ADDRESS}/collection.png`,
+      `${SHDW_DRIVE_BASE_URL}/${ASSET_SHDW_DRIVE_ADDRESS}/${id}-collection.png`,
       {
         responseType: "arraybuffer",
       }
@@ -125,8 +120,7 @@ export const ExecuteAirdrop = ({ airdrop }: { airdrop: Airdrop }) => {
           symbol,
           description,
           seller_fee_basis_points: sellerFeeBasisPoints,
-          // image: `${SHDW_DRIVE_BASE_URL}/${driveAddress}/${id}-collection.json`,
-          image: `${SHDW_DRIVE_BASE_URL}/${ASSET_SHDW_DRIVE_ADDRESS}/${id}-collection.png`,
+          image: `${SHDW_DRIVE_BASE_URL}/${driveAddress}/${id}-collection.json`,
         }),
       ],
       {
@@ -172,8 +166,6 @@ export const ExecuteAirdrop = ({ airdrop }: { airdrop: Airdrop }) => {
 
     const maxDepth = 14;
     const maxBufferSize = 64;
-    // const maxDepth = 3;
-    // const maxBufferSize = 8;
 
     let treeId;
 
@@ -225,11 +217,13 @@ export const ExecuteAirdrop = ({ airdrop }: { airdrop: Airdrop }) => {
   }, [
     airdrop.collection,
     airdrop.id,
+    blueprint.airdrops,
     blueprint.collections,
     blueprint.jobs,
     blueprint.tokens,
     blueprint.upload,
     cluster,
+    setJobId,
     user,
   ]);
 
@@ -241,20 +235,6 @@ export const ExecuteAirdrop = ({ airdrop }: { airdrop: Airdrop }) => {
 
   return (
     <ContentWrapper className="flex flex-col items-center justify-center">
-      <div className="h-24">
-        {!!data && (
-          <div className="flex flex-col items-center justify-center">
-            <div className="flex flex-col items-center justify-center">
-              <p className="text-lg font-semibold text-center">
-                {data?.jobs_by_pk?.statusText}
-              </p>
-              <p className="text-lg font-semibold text-center">
-                {data?.jobs_by_pk?.percentComplete}
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
       <SubmitButton
         onClick={handleExecuteAirdrop}
         disabled={isDisabled}

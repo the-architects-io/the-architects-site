@@ -504,6 +504,14 @@ export type Recipient = {
 export type Airdrop = {
   name: string;
   id: string;
+  job?: {
+    id: string;
+    status: {
+      id: string;
+      name: string;
+    };
+    statusText: string;
+  };
   owner: {
     id: string;
   };
@@ -976,6 +984,7 @@ export type UpdateAirdropInput = {
   shouldKickoffManually?: boolean;
   imageUrl?: string;
   isReadyToDrop?: boolean;
+  jobId?: string;
 };
 
 export type UpdateAirdropRespone = BaseBlueprintResponse & {

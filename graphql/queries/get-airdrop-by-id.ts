@@ -11,6 +11,14 @@ export const GET_AIRDROP_BY_ID = gql`
         name
         symbol
       }
+      job {
+        id
+        status {
+          id
+          name
+        }
+        statusText
+      }
       collection {
         id
         createdAt
