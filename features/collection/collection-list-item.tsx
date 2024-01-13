@@ -22,7 +22,7 @@ export const CollectionListItem = ({
 }) => {
   return (
     <div
-      className="flex flex-col items-center space-y-4 m-2 ma-auto w-full text-center"
+      className="flex flex-col items-center space-y-4 m-2 text-center"
       key={collection.id}
     >
       <Link
@@ -51,25 +51,28 @@ export const CollectionListItem = ({
         )}
         {shouldShowStats && (
           <>
-            <div className="flex justify-center items-center text-green-500 flex-wrap">
+            <div className="flex justify-center items-center flex-wrap">
               {collection.creators?.length ? (
                 <>
-                  <CheckBadgeIcon className="h-6 w-6 mr-1" />
-                  <div className="">Details added</div>
+                  <CheckBadgeIcon className="text-green-500 h-6 w-6 mr-1" />
+                  <div className="text-green-500">Details added</div>
                 </>
               ) : (
-                <div className="text-yellow-500">Details in progress</div>
+                <>
+                  <InformationCircleIcon className="text-yellow-500 h-6 w-6 mr-1" />
+                  <div className="text-yellow-500">Details in progress</div>
+                </>
               )}
             </div>
-            <div className="flex justify-center items-center text-green-500 flex-wrap">
+            <div className="flex justify-center items-center flex-wrap">
               {collection.creators?.length ? (
                 <>
-                  <CheckBadgeIcon className="h-6 w-6 mr-1" />
-                  <div className="">Creators added</div>
+                  <CheckBadgeIcon className="h-6 w-6 mr-1 text-green-500" />
+                  <div className="text-green-500">Creators added</div>
                 </>
               ) : (
                 <>
-                  <InformationCircleIcon className="h-6 w-6 mr-1" />
+                  <InformationCircleIcon className="h-6 w-6 mr-1 text-yellow-500" />
                   <div className="text-yellow-500">Creators missing</div>
                 </>
               )}
@@ -78,13 +81,13 @@ export const CollectionListItem = ({
               {collection?.uploadJob?.status?.name ===
               UploadJobStatus.COMPLETE ? (
                 <div className="flex flex-col">
-                  <div className="flex mb-2">
+                  <div className="flex mb-2 text-green-500">
                     <CheckBadgeIcon className="h-6 w-6 mr-1" />
-                    <div className="text-green-500">Metadata saved</div>
+                    <div>Metadata saved</div>
                   </div>
-                  <div className="flex">
+                  <div className="flex text-green-500">
                     <CheckBadgeIcon className="h-6 w-6 mr-1" />
-                    <div className="text-green-500">Assets uploaded</div>
+                    <div>Assets uploaded</div>
                   </div>
                 </div>
               ) : (
@@ -102,7 +105,7 @@ export const CollectionListItem = ({
             </div>
           </>
         )}
-        {children}
+        {!!children && <div className="py-2">{children}</div>}
       </Link>
     </div>
   );

@@ -1,16 +1,34 @@
 "use client";
 import { Collection, UploadJobStatus } from "@/app/blueprint/types";
 import { CreateCollectionButton } from "@/app/blueprint/ui/create-collection-button";
+import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
+import { ITab, Tabs } from "@/features/UI/tabs/tabs";
 import { CollectionList } from "@/features/collection/collection-list";
 import { CollectionListItem } from "@/features/collection/collection-list-item";
 import { GET_COLLECTIONS_BY_OWNER_ID } from "@/graphql/queries/get-collections-by-owner-id";
 import { useQuery } from "@apollo/client";
 import { useUserData } from "@nhost/nextjs";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
+const tabs: ITab[] = [
+  {
+    name: "In Progress",
+    value: "in-progress",
+  },
+  {
+    name: "Ready to Mint",
+    value: "ready-to-mint",
+  },
+  {
+    name: "Completed",
+    value: "completed",
+  },
+];
 
 export default function CollectionsPage() {
   const router = useRouter();
@@ -22,14 +40,17 @@ export default function CollectionsPage() {
   };
 
   const [collections, setCollections] = useState<Collection[]>([]);
-  const [inProgressCollection, setInProgressCollection] =
-    useState<Collection | null>(null);
+  const [inProgressCollections, setInProgressCollections] = useState<
+    Collection[] | null
+  >(null);
   const [readyToMintCollections, setReadyToMintCollections] = useState<
     Collection[]
   >([]);
   const [completedCollections, setCompletedCollections] = useState<
     Collection[]
   >([]);
+
+  const [activeTab, setActiveTab] = useState<ITab>(tabs[0]);
 
   const { loading } = useQuery(GET_COLLECTIONS_BY_OWNER_ID, {
     variables: {
@@ -49,13 +70,13 @@ export default function CollectionsPage() {
           )
           .filter((collection) => !collection.hasBeenMinted)
       );
-      setInProgressCollection(
+      setInProgressCollections(
         collections.filter(
           (collection) =>
             !collection.isReadyToMint &&
             !collection.hasBeenMinted &&
             collection?.uploadJob?.status?.name !== UploadJobStatus.COMPLETE
-        )?.[0]
+        )
       );
       setCompletedCollections(
         collections.filter((collection) => collection.hasBeenMinted)
@@ -64,55 +85,92 @@ export default function CollectionsPage() {
   });
 
   return (
-    <>
-      <ContentWrapper>
-        <div className="flex flex-col items-center">
-          <h1 className="text-3xl pb-8">My Collections</h1>
-          {!!inProgressCollection ? (
-            <div className="max-w-3xl mx-auto">
-              <div className="text-2xl mb-4 mt-16 text-center">
-                Collection in Progress
-              </div>
-              <CollectionListItem
-                shouldShowStats={true}
-                collection={inProgressCollection}
-                url={
-                  inProgressCollection.creators?.length
-                    ? `/me/collection/create/${inProgressCollection.id}/upload-assets`
-                    : `/me/collection/create/${inProgressCollection.id}`
-                }
-              />
-            </div>
-          ) : (
-            <CreateCollectionButton
-              name={`new-collection-${user?.id}`}
-              onSuccess={(collection) => handleRedirect(collection)}
-            />
-          )}
-          {!!readyToMintCollections.length && (
-            <div className="max-w-3xl mx-auto">
-              <div className="text-2xl mb-4 mt-16 text-center">
-                Mint Ready Collections
-              </div>
-              <CollectionList
-                collections={readyToMintCollections}
-                linkBaseUrl="/me/collection"
-              />
-            </div>
-          )}
-          {!!completedCollections.length && (
-            <div className="max-w-3xl mx-auto">
-              <div className="text-2xl mb-4 mt-16 text-center">
-                Already Minted Collections
-              </div>
-              <CollectionList
-                collections={completedCollections}
-                linkBaseUrl="/me/collection"
-              />
-            </div>
-          )}
+    <ContentWrapper>
+      <div className="flex flex-col items-center">
+        <div className="flex w-full justify-center mb-8">
+          <CreateCollectionButton
+            name={`new-collection-${user?.id}`}
+            onSuccess={(collection) => handleRedirect(collection)}
+          />
         </div>
-      </ContentWrapper>
-    </>
+        <Tabs
+          tabs={tabs}
+          activeTab={activeTab}
+          handleSetTab={(tab) => setActiveTab(tab)}
+        />
+        {!!activeTab && activeTab.value === "in-progress" && (
+          <>
+            <div className="w-full flex justify-center mx-auto py-8">
+              {!!inProgressCollections?.length ? (
+                <>
+                  {inProgressCollections.map((collection) => (
+                    <CollectionListItem
+                      key={collection.id}
+                      shouldShowStats={true}
+                      collection={collection}
+                      url={
+                        collection.creators?.length
+                          ? `/me/collection/create/${collection.id}/upload-assets`
+                          : `/me/collection/create/${collection.id}`
+                      }
+                    />
+                  ))}
+                </>
+              ) : (
+                <>No collections in progress</>
+              )}
+            </div>
+          </>
+        )}
+        {!!activeTab && activeTab.value === "ready-to-mint" && (
+          <>
+            <div className="w-full flex justify-center mx-auto py-8">
+              {!!readyToMintCollections?.length ? (
+                <>
+                  {readyToMintCollections.map((collection) => (
+                    <CollectionListItem
+                      key={collection.id}
+                      shouldShowStats={false}
+                      collection={collection}
+                      url={`/me/collection/${collection.id}`}
+                    >
+                      <PrimaryButton onClick={() => {}} className="w-full">
+                        Preview Collection
+                      </PrimaryButton>
+                    </CollectionListItem>
+                  ))}
+                </>
+              ) : (
+                <>No collections ready to mint</>
+              )}
+            </div>
+          </>
+        )}
+        {!!activeTab && activeTab.value === "completed" && (
+          <>
+            <div className="w-full flex justify-center mx-auto py-8">
+              {!!completedCollections?.length ? (
+                <>
+                  {completedCollections.map((collection) => (
+                    <CollectionListItem
+                      key={collection.id}
+                      shouldShowStats={false}
+                      collection={collection}
+                      url={`/me/collection/${collection.id}`}
+                    >
+                      <PrimaryButton onClick={() => {}} className="w-full">
+                        View Collection
+                      </PrimaryButton>
+                    </CollectionListItem>
+                  ))}
+                </>
+              ) : (
+                <>No collections completed</>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+    </ContentWrapper>
   );
 }

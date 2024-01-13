@@ -50,12 +50,6 @@ const NavbarItems = () => {
               Airdrops
             </Link>
             <Link
-              href="/me/mint"
-              className="hover:text-stone-200 uppercase text-sm tracking-widest"
-            >
-              Mints
-            </Link>
-            <Link
               href="/me/drive"
               className="hover:text-stone-200 uppercase text-sm tracking-widest"
             >

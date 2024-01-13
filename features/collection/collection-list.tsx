@@ -13,7 +13,7 @@ export const CollectionList = ({
   shouldShowStats?: boolean;
 }) => {
   return (
-    <div className="flex flex-wrap">
+    <div className="flex flex-wrap w-full justify-center">
       {collections.map((collection) => (
         <CollectionListItem
           shouldShowStats={shouldShowStats}
