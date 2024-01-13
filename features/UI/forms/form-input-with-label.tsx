@@ -1,8 +1,10 @@
 import { FormInput } from "@/features/UI/forms/form-input";
+import classNames from "classnames";
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   description?: string;
+  className?: string;
 }
 
 export const FormInputWithLabel = ({
@@ -11,10 +13,14 @@ export const FormInputWithLabel = ({
   value,
   label,
   description,
+  className,
   ...props
 }: Props) => {
   return (
-    <label htmlFor={props.name} className="flex flex-col w-full">
+    <label
+      htmlFor={props.name}
+      className={classNames(['"flex flex-col w-full"', className])}
+    >
       {label}
       <FormInput
         className="mt-2"
