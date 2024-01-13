@@ -52,7 +52,10 @@ export const CollectionListItem = ({
         {shouldShowStats && (
           <>
             <div className="flex justify-center items-center flex-wrap">
-              {collection.creators?.length ? (
+              {collection.name &&
+              collection.symbol &&
+              collection.description &&
+              collection.imageUrl ? (
                 <>
                   <CheckBadgeIcon className="text-green-500 h-6 w-6 mr-1" />
                   <div className="text-green-500">Details added</div>

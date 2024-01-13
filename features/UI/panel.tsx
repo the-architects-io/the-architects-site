@@ -9,7 +9,7 @@ export const Panel = ({ children, className, ...props }: PanelProps) => {
   return (
     <div
       className={classNames(
-        "bg-gray-800 rounded-xl shadow-2xl mx-auto p-4 min-w-[400px] text-gray-100 border-2 border-gray-100",
+        "bg-gray-800 rounded-xl shadow-2xl mx-auto p-4 min-w-[400px] text-gray-100 border border-gray-400",
         className?.includes("max-w-") ? "" : "max-w-lg",
         className
       )}

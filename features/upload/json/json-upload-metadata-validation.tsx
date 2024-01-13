@@ -9,6 +9,7 @@ import Spinner from "@/features/UI/spinner";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { XCircleIcon } from "@heroicons/react/24/solid";
 import { UploadyContextType } from "@rpldy/uploady";
+import classNames from "classnames";
 import { useCallback, useEffect, useState } from "react";
 
 export const JsonUploadMetadataValidation = ({
@@ -31,6 +32,8 @@ export const JsonUploadMetadataValidation = ({
   const [validationIssues, setValidationIssues] = useState<ValidationIssue[]>(
     []
   );
+  const [shouldShowValidationIssues, setShouldShowValidationIssues] =
+    useState(false);
   const [collectionStats, setCollectionStats] =
     useState<CollectionStatsFromCollectionMetadatas | null>(null);
 
@@ -146,7 +149,7 @@ export const JsonUploadMetadataValidation = ({
   };
 
   return (
-    <div className="flex w=full justify-center space-y-5">
+    <div className="flex w-full h-full justify-center space-y-5">
       {isMetadataValid === null && (
         <div className="flex items-center space-x-2">
           <Spinner />
@@ -154,37 +157,48 @@ export const JsonUploadMetadataValidation = ({
         </div>
       )}
       {isMetadataValid === false && (
-        <div className="flex flex-col items-center space-x-2">
-          <div className="flex items-center space-x-2">
+        <div
+          className={classNames([
+            "flex flex-col items-center space-x-2",
+            shouldShowValidationIssues ? "" : "mt-24",
+          ])}
+        >
+          <div className="flex items-center jusfity-center space-x-2">
             <XCircleIcon className="h-6 w-6 text-red-500" />
             <div>Invalid JSON</div>
           </div>
-          {!!validationIssues.length && (
-            <div className="flex flex-col space-y-2 mt-4">
-              <div className="mb-2 italic">Validation Issues:</div>
-              <div className="flex flex-col space-y-2">
-                {validationIssues.map((issue) => {
-                  return (
-                    <div key={issue.index}>
-                      <div className="text-gray-100">
-                        {issue.index + 1}: {issue.text}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-          <div className="mt-4">
+          <div className="mt-4 flex space-x-4">
             <SecondaryButton onClick={handleClearFile}>
               Clear JSON
             </SecondaryButton>
+            <SecondaryButton
+              onClick={() => {
+                setShouldShowValidationIssues((prev) => !prev);
+              }}
+            >
+              {shouldShowValidationIssues
+                ? "Hide Validation Issues"
+                : "Show Validation Issues"}
+            </SecondaryButton>
           </div>
+          {!!validationIssues.length && shouldShowValidationIssues && (
+            <div className="flex flex-col space-y-2 mt-6 overflow-y-auto">
+              {validationIssues.map((issue) => {
+                return (
+                  <div key={issue.index}>
+                    <div className="text-gray-100">
+                      {issue.index + 1}: {issue.text}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
       {isMetadataValid === true && (
         <div className="flex flex-col items-center space-x-2">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center justify-center h-full space-x-2">
             <CheckBadgeIcon className="h-6 w-6 text-green-500" />
             <div>JSON is Valid</div>
           </div>

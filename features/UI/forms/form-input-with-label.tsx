@@ -19,7 +19,7 @@ export const FormInputWithLabel = ({
   return (
     <label
       htmlFor={props.name}
-      className={classNames(['"flex flex-col w-full"', className])}
+      className={classNames(["flex flex-col w-full", className])}
     >
       {label}
       <FormInput

@@ -11,7 +11,7 @@ export const AirdropListItem = ({
 }) => {
   return (
     <div
-      className="flex flex-col items-center space-y-4 m-2 ma-auto w-full text-center"
+      className="flex flex-col items-center space-y-4 m-2 text-center"
       key={airdrop.id}
     >
       <Link

@@ -14,7 +14,8 @@ export const Tab = ({
     <button
       key={tab.value}
       className={classNames([
-        "text-center py-2 text-gray-100 px-3 cursor-pointer text-xm uppercase",
+        // if first tab, add rounded left
+        "text-center py-2 text-gray-100 px-6 cursor-pointer text-xm uppercase rounded-lg",
         tab.value === activeTab.value
           ? "bg-gray-300 text-gray-800 font-bold"
           : "hover:bg-gray-900",

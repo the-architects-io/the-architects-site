@@ -281,7 +281,7 @@ export default function CollectionCreationUploadAssetsPage({
             <div className="flex flex-col justify-center items-center w-full mb-8 space-y-4">
               <div
                 className={classNames([
-                  "border rounded-lg px-4 w-full mb-4 flex flex-col items-center justify-center p-8 min-h-[28vh]",
+                  "border rounded-lg px-4 w-full mb-4 p-8 min-h-[28vh] max-h-[28vh] overflow-y-auto",
                   !!collectionMetadataStats &&
                   !!collectionMetadatasJsonUploadResponse
                     ? "border-green-500 bg-green-500 bg-opacity-10"
@@ -306,33 +306,35 @@ export default function CollectionCreationUploadAssetsPage({
                     </div>
                   </div>
                 ) : (
-                  <div>
+                  <>
                     {!!jsonBeingUploaded ? (
-                      <div className="mt-4">
-                        <JsonUploadMetadataValidation
-                          uploadyInstance={jsonUploadyInstance}
-                          json={jsonBeingUploaded}
-                          isMetadataValid={isMetadataValid}
-                          setIsMetadataValid={setIsMetadataValid}
-                          setMetadataStas={setCollectionMetadataStats}
-                          setJsonBeingUploaded={setJsonBeingUploaded}
-                        />
-                      </div>
-                    ) : (
-                      <JsonUpload
-                        isFileValid={isMetadataValid}
+                      <JsonUploadMetadataValidation
                         uploadyInstance={jsonUploadyInstance}
-                        setUploadyInstance={setJsonUploadyInstance}
-                        setJsonFileBeingUploaded={setJsonFileBeingUploaded}
+                        json={jsonBeingUploaded}
+                        isMetadataValid={isMetadataValid}
+                        setIsMetadataValid={setIsMetadataValid}
+                        setMetadataStas={setCollectionMetadataStats}
                         setJsonBeingUploaded={setJsonBeingUploaded}
-                        setJsonUploadResponse={handleMetadataJsonUploadComplete}
-                        driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
-                        fileName={`${params.id}-collection-metadatas.json`}
-                      >
-                        Add Collection Metadata JSONs
-                      </JsonUpload>
+                      />
+                    ) : (
+                      <div className="flex flex-col justify-center items-center h-full">
+                        <JsonUpload
+                          isFileValid={isMetadataValid}
+                          uploadyInstance={jsonUploadyInstance}
+                          setUploadyInstance={setJsonUploadyInstance}
+                          setJsonFileBeingUploaded={setJsonFileBeingUploaded}
+                          setJsonBeingUploaded={setJsonBeingUploaded}
+                          setJsonUploadResponse={
+                            handleMetadataJsonUploadComplete
+                          }
+                          driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
+                          fileName={`${params.id}-collection-metadatas.json`}
+                        >
+                          Add Collection Metadata JSONs
+                        </JsonUpload>
+                      </div>
                     )}
-                  </div>
+                  </>
                 )}
               </div>
               <div

@@ -5,11 +5,19 @@ import ClusterMenu from "@/features/UI/menus/cluster-menu";
 import UserMenu from "@/features/UI/menus/user-menu";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { useUserData } from "@nhost/nextjs";
+import classNames from "classnames";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 const NavbarItems = () => {
   const user = useUserData();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    console.log(pathname);
+  }, [pathname]);
 
   return (
     <>
@@ -39,19 +47,28 @@ const NavbarItems = () => {
           <>
             <Link
               href="/me/collection"
-              className="hover:text-stone-200 uppercase text-sm tracking-widest"
+              className={classNames([
+                "hover:text-sky-400 uppercase text-sm tracking-[0.2em] py-4",
+                pathname.includes("/me/collection") && "text-sky-300 ",
+              ])}
             >
               Collections
             </Link>
             <Link
               href="/me/airdrop"
-              className="hover:text-stone-200 uppercase text-sm tracking-widest"
+              className={classNames([
+                "hover:text-sky-400 uppercase text-sm tracking-[0.2em]",
+                pathname.includes("/me/airdrop") && "text-sky-300",
+              ])}
             >
               Airdrops
             </Link>
             <Link
               href="/me/drive"
-              className="hover:text-stone-200 uppercase text-sm tracking-widest"
+              className={classNames([
+                "hover:text-sky-400 uppercase text-sm tracking-[0.2em]",
+                pathname.includes("/me/drive") && "text-sky-300",
+              ])}
             >
               Drive
             </Link>
