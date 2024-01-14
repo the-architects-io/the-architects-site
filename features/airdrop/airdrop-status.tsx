@@ -47,10 +47,10 @@ export const AirdropStatus = ({
     if (data?.jobs_by_pk?.status?.name === UploadJobStatus.COMPLETE) {
       setTimeout(() => {
         showToast({
-          primaryMessage: "Asset upload complete!",
+          primaryMessage: "Airdrop complete!",
         });
-        router.push(`${BASE_URL}/me//collection`);
-      }, 3000);
+        router.push(`${BASE_URL}/me//airdop`);
+      }, 5000);
     }
   }, [data?.jobs_by_pk?.status?.name, router]);
 

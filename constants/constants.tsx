@@ -41,3 +41,4 @@ export const SHDW_DRIVE_BASE_URL =
   "https://shdw-drive.genesysgo.net";
 
 export const SYSTEM_USER_ID = process.env.NEXT_PUBLIC_SYSTEM_USER_ID || "";
+export const ARCHITECTS_API_URL = process.env.NEXT_PUBLIC_ARCHITECTS_API_URL;

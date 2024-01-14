@@ -5,7 +5,7 @@ import { Job } from "@/app/blueprint/types";
 import { UPDATE_JOB } from "@/graphql/mutations/update-job";
 
 export async function POST(req: NextRequest) {
-  const { id, jobTypeId, percentComplete, userId, statusText, statusId } =
+  const { id, jobTypeId, percentComplete, userId, statusText, statusId, icon } =
     await req.json();
 
   if (!id) {
@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
           ...(statusId && { statusId }),
           ...(jobTypeId && { jobTypeId }),
           ...(userId && { userId }),
+          ...(icon && { icon }),
         },
       });
 

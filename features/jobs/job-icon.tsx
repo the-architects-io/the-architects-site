@@ -15,7 +15,7 @@ export const JobIcons = {
   ERROR: "ERROR",
   SUCCESS: "SUCCESS",
   MINTING_NFTS: "MINTING_NFTS",
-  UPLOADING_COLLECTION_IMAGE: "UPLOADING_COLLECTION_IMAGE",
+  COLLECTION_IMAGE: "COLLECTION_IMAGE",
   CREATING_TREE: "CREATING_TREE",
 } as const;
 
@@ -57,7 +57,7 @@ export const JobIcon = ({
         return <CheckMarkIcon />;
       case JobIcons.MINTING_NFTS:
         return <ArchitectureIcon />;
-      case JobIcons.UPLOADING_COLLECTION_IMAGE:
+      case JobIcons.COLLECTION_IMAGE:
         return <ImageIcon />;
       case JobIcons.CREATING_TREE:
         return <SproutIcon />;

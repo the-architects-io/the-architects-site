@@ -7,6 +7,7 @@ import {
   StatusUUIDs,
 } from "@/app/blueprint/types";
 import {
+  ARCHITECTS_API_URL,
   ASSET_SHDW_DRIVE_ADDRESS,
   SHDW_DRIVE_BASE_URL,
   SYSTEM_USER_ID,
@@ -65,7 +66,7 @@ export const ExecuteAirdrop = ({
       statusText: "Minting collection NFT",
       userId: user.id,
       jobTypeId: JobTypeUUIDs.AIRDROP,
-      icon: JobIcons.MINTING_NFTS,
+      icon: JobIcons.COLLECTION_IMAGE,
     });
 
     const { success: airdropUpdateSuccess } =
@@ -82,34 +83,34 @@ export const ExecuteAirdrop = ({
     setShouldPoll(true);
     setJobId(job.id);
 
-    const res = await axios.get(
-      `${SHDW_DRIVE_BASE_URL}/${ASSET_SHDW_DRIVE_ADDRESS}/${id}-collection.png`,
-      {
-        responseType: "arraybuffer",
-      }
-    );
+    // const res = await axios.get(
+    //   `${SHDW_DRIVE_BASE_URL}/${ASSET_SHDW_DRIVE_ADDRESS}/${id}-collection.png`,
+    //   {
+    //     responseType: "arraybuffer",
+    //   }
+    // );
 
-    const buffer = Buffer.from(res.data, "binary");
-    const file = new File([buffer], `${id}-collection.png`, {
-      type: "image/png",
-    });
+    // const buffer = Buffer.from(res.data, "binary");
+    // const file = new File([buffer], `${id}-collection.png`, {
+    //   type: "image/png",
+    // });
 
-    await blueprint.jobs.updateJob({
-      id: job.id,
-      statusText: "Updating collection image",
-      icon: JobIcons.UPLOADING_COLLECTION_IMAGE,
-    });
+    // await blueprint.jobs.updateJob({
+    //   id: job.id,
+    //   statusText: "Updating collection image",
+    //   icon: JobIcons.UPLOADING_COLLECTION_IMAGE,
+    // });
 
-    const { success: imageUploadSuccess } = await blueprint.upload.uploadFile({
-      file,
-      fileName: `${id}-collection.png`,
-      driveAddress,
-    });
+    // const { success: imageUploadSuccess } = await blueprint.upload.uploadFile({
+    //   file,
+    //   fileName: `${id}-collection.png`,
+    //   driveAddress,
+    // });
 
-    if (!imageUploadSuccess) {
-      console.log("Failed to upload image");
-      return;
-    }
+    // if (!imageUploadSuccess) {
+    //   console.log("Failed to upload image");
+    //   return;
+    // }
 
     await blueprint.jobs.updateJob({
       id: job.id,
@@ -223,7 +224,7 @@ export const ExecuteAirdrop = ({
 
     try {
       const { data, status } = await axios.post(
-        `http://164.90.244.66/api/airdrop-cnfts`,
+        `${ARCHITECTS_API_URL}/airdrop-cnfts`,
         {
           airdropId: airdrop.id,
           jobId: job.id,

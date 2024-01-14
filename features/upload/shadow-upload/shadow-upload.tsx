@@ -2,6 +2,7 @@ import ChunkedUploady, { UploadyContextType } from "@rpldy/chunked-uploady";
 import { ShadowUploadField } from "@/features/upload/shadow-upload/shadow-upload-field";
 import { CollectionFileStats, UploadJob } from "@/app/blueprint/types";
 import { getChunkedEnhancer } from "@rpldy/chunked-sender";
+import { ARCHITECTS_API_URL } from "@/constants/constants";
 
 type ShadowUploadProps = {
   ownerAddress: string;
@@ -35,7 +36,7 @@ const ShadowUpload = (params: ShadowUploadProps) => {
       multiple
       accept={params?.accept || "*/*"}
       destination={{
-        url: `http://164.90.244.66/api/upload`,
+        url: `${ARCHITECTS_API_URL}/upload`,
       }}
       autoUpload={false}
       chunkSize={5 * 1024 * 1024}

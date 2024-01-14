@@ -16,7 +16,7 @@ export const PercentCompleteIndicator = ({
             </div>
             <div className="w-full max-w-md mb-8">
               <Line
-                percent={percentComplete}
+                percent={Math.floor(percentComplete)}
                 trailWidth={1}
                 strokeWidth={3}
                 strokeColor="#a754ea"
