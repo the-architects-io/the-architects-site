@@ -13,9 +13,10 @@ import {
 } from "@/constants/constants";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
-import { GET_JOB_BY_ID } from "@/graphql/queries/get-job-by-id";
+import { JobIcons } from "@/features/jobs/job-icon";
+import showToast from "@/features/toasts/show-toast";
+
 import { useCluster } from "@/hooks/cluster";
-import { useQuery } from "@apollo/client";
 import { useUserData } from "@nhost/nextjs";
 import axios from "axios";
 
@@ -64,6 +65,7 @@ export const ExecuteAirdrop = ({
       statusText: "Minting collection NFT",
       userId: user.id,
       jobTypeId: JobTypeUUIDs.AIRDROP,
+      icon: JobIcons.MINTING_NFTS,
     });
 
     const { success: airdropUpdateSuccess } =
@@ -92,25 +94,27 @@ export const ExecuteAirdrop = ({
       type: "image/png",
     });
 
-    // await blueprint.jobs.updateJob({
-    //   id: job.id,
-    //   statusText: "Updating collection image",
-    // });
+    await blueprint.jobs.updateJob({
+      id: job.id,
+      statusText: "Updating collection image",
+      icon: JobIcons.UPLOADING_COLLECTION_IMAGE,
+    });
 
-    // const { success: imageUploadSuccess } = await blueprint.upload.uploadFile({
-    //   file,
-    //   fileName: `${id}-collection.png`,
-    //   driveAddress,
-    // });
+    const { success: imageUploadSuccess } = await blueprint.upload.uploadFile({
+      file,
+      fileName: `${id}-collection.png`,
+      driveAddress,
+    });
 
-    // if (!imageUploadSuccess) {
-    //   console.log("Failed to upload image");
-    //   return;
-    // }
+    if (!imageUploadSuccess) {
+      console.log("Failed to upload image");
+      return;
+    }
 
     await blueprint.jobs.updateJob({
       id: job.id,
       statusText: "Uploading collection NFT metadata",
+      icon: JobIcons.UPLOADING_FILES,
     });
 
     const jsonFile = new Blob(
@@ -137,12 +141,19 @@ export const ExecuteAirdrop = ({
 
       uri = url;
     } catch (error) {
+      blueprint.jobs.updateJob({
+        id: job.id,
+        statusId: StatusUUIDs.ERROR,
+        statusText: "Failed to upload collection NFT metadata",
+        icon: JobIcons.ERROR,
+      });
       console.log({ error });
     }
 
     await blueprint.jobs.updateJob({
       id: job.id,
       statusText: "Minting collection NFT",
+      icon: JobIcons.MINTING_NFTS,
     });
 
     let collectionNftMintAddress;
@@ -156,12 +167,19 @@ export const ExecuteAirdrop = ({
       });
       collectionNftMintAddress = mintAddress;
     } catch (error) {
+      blueprint.jobs.updateJob({
+        id: job.id,
+        statusId: StatusUUIDs.ERROR,
+        statusText: "Failed to mint collection NFT",
+        icon: JobIcons.ERROR,
+      });
       console.log({ error });
     }
 
     await blueprint.jobs.updateJob({
       id: job.id,
       statusText: "Creating merkle tree",
+      icon: JobIcons.CREATING_TREE,
     });
 
     const maxDepth = 14;
@@ -184,6 +202,12 @@ export const ExecuteAirdrop = ({
 
       if (!success) throw new Error("Error creating Merkle Tree");
     } catch (error) {
+      blueprint.jobs.updateJob({
+        id: job.id,
+        statusId: StatusUUIDs.ERROR,
+        statusText: "Failed to create merkle tree",
+        icon: JobIcons.ERROR,
+      });
       console.log({ error });
     }
 
@@ -198,7 +222,7 @@ export const ExecuteAirdrop = ({
     }
 
     try {
-      const { data } = await axios.post(
+      const { data, status } = await axios.post(
         `http://164.90.244.66/api/airdrop-cnfts`,
         {
           airdropId: airdrop.id,
@@ -207,10 +231,28 @@ export const ExecuteAirdrop = ({
         }
       );
 
+      if (status === 200) {
+        showToast({
+          primaryMessage: "Airdrop complete!",
+        });
+      }
+
       const {
-        airdrops_by_pk,
-        airdrop_recipients,
-      }: { airdrops_by_pk: Airdrop; airdrop_recipients: Recipient[] } = data;
+        recipientWalletAddresses,
+        signatures,
+      }: {
+        metadatas: string[];
+        recipientWalletAddresses: string[];
+        merkleTreeAddress: string;
+        collectionNftAddress: string;
+        creators: string[];
+        signatures: string[];
+      } = data;
+
+      console.log({
+        signatureCount: signatures.length,
+        recipientCount: recipientWalletAddresses.length,
+      });
     } catch (error) {
       console.log({ error });
     }

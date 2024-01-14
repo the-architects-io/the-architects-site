@@ -18,12 +18,13 @@ import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import Spinner from "@/features/UI/spinner";
 import { CreateCollectionAssetUploadChecklist } from "@/features/collection/create-collection-asset-upload-checklist";
+import { JobIcons } from "@/features/jobs/job-icon";
 import showToast from "@/features/toasts/show-toast";
 import { JsonUpload } from "@/features/upload/json/json-upload";
 import { JsonUploadMetadataValidation } from "@/features/upload/json/json-upload-metadata-validation";
 import ShadowUpload from "@/features/upload/shadow-upload/shadow-upload";
 import { ZipFileUploadValidation } from "@/features/upload/shadow-upload/zip-file-upload-validation";
-import { UploadStatus } from "@/features/upload/status/upload-status";
+import { JobStatus } from "@/features/jobs/job-status";
 import { GET_COLLECTION_BY_ID } from "@/graphql/queries/get-collection-by-id";
 import { GET_UPLOAD_JOB_BY_ID } from "@/graphql/queries/get-upload-job-by-id";
 import { useCluster } from "@/hooks/cluster";
@@ -37,6 +38,7 @@ import classNames from "classnames";
 import { useRouter } from "next/navigation";
 
 import { useCallback, useEffect, useState } from "react";
+import { ContentWrapperYAxisCenteredContent } from "@/features/UI/content-wrapper-y-axis-centered-content";
 
 export default function CollectionCreationUploadAssetsPage({
   params,
@@ -75,6 +77,10 @@ export default function CollectionCreationUploadAssetsPage({
     useState<UploadyContextType | null>(null);
   const [driveAddress, setDriveAddress] = useState<string | null>(null);
   const [hasStartedUpload, setHasStartedUpload] = useState<boolean>(false);
+  const [
+    hasSavedDriveAddressToCollection,
+    setHasSavedDriveAddressToCollection,
+  ] = useState<boolean>(false);
 
   const wallet = useWallet();
   const blueprint = createBlueprintClient({
@@ -157,8 +163,9 @@ export default function CollectionCreationUploadAssetsPage({
     sizeInKb += 1000; // add 1MB to sizeInKb for overhead
 
     const { job } = await blueprint.jobs.createUploadJob({
-      statusText: "Creating SHDW drive...",
+      statusText: "Creating Shadow drive",
       userId: user?.id,
+      icon: JobIcons.CREATING_SHADOW_DRIVE,
     });
 
     setUploadJob(job);
@@ -166,6 +173,7 @@ export default function CollectionCreationUploadAssetsPage({
     await blueprint.collections.updateCollection({
       id: params.id,
       uploadJobId: job.id,
+      tokenCount: collectionMetadataStats?.count,
     });
 
     let driveAddress: string | null = null;
@@ -241,14 +249,21 @@ export default function CollectionCreationUploadAssetsPage({
   }, [params.id, router]);
 
   useEffect(() => {
-    if (uploadJob && driveAddress) {
+    if (uploadJob && driveAddress && !hasSavedDriveAddressToCollection) {
       blueprint.collections.updateCollection({
         id: params.id,
         uploadJobId: uploadJob.id,
         driveAddress,
       });
+      setHasSavedDriveAddressToCollection(true);
     }
-  }, [uploadJob, blueprint, params.id, driveAddress]);
+  }, [
+    uploadJob,
+    blueprint,
+    params.id,
+    driveAddress,
+    hasSavedDriveAddressToCollection,
+  ]);
 
   if (loading) {
     return (
@@ -261,14 +276,14 @@ export default function CollectionCreationUploadAssetsPage({
   return (
     <ContentWrapper>
       {!!uploadJob ? (
-        <div className="pt-16">
-          <UploadStatus
+        <ContentWrapperYAxisCenteredContent>
+          <JobStatus
             jobId={uploadJob.id}
             setJob={setUploadJob}
             jsonUploadyInstance={jsonUploadyInstance}
             zipFileUploadyInstance={zipFileUploadyInstance}
           />
-        </div>
+        </ContentWrapperYAxisCenteredContent>
       ) : (
         <>
           <div className="flex space-x-8">

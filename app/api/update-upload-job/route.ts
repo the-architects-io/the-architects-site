@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
     statusText,
     driveAddress,
     fileCount,
+    icon,
   } = await req.json();
 
   if (!id) {
@@ -34,6 +35,7 @@ export async function POST(req: NextRequest) {
     statusText,
     driveAddress,
     fileCount,
+    icon,
   });
 
   try {
@@ -52,6 +54,7 @@ export async function POST(req: NextRequest) {
           ...(statusText && { statusText }),
           ...(driveAddress && { driveAddress }),
           ...(fileCount && { fileCount }),
+          ...(icon && { icon }),
         },
       }
     );

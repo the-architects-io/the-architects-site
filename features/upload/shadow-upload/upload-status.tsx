@@ -17,7 +17,8 @@ export const UploadStatus = ({ job }: { job: UploadJob }) => {
                 percent={job.percentComplete}
                 trailWidth={1}
                 strokeWidth={3}
-                strokeColor="#10B981"
+                strokeColor="#0ea5e9"
+                trailColor="#7cd2fb"
               />
             </div>
           </div>

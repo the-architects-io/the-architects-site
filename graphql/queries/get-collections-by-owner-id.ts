@@ -9,6 +9,7 @@ export const GET_COLLECTIONS_BY_OWNER_ID = gql`
         name
         imageUrl
       }
+      tokenCount
       collectionNftAddress
       # merkleTree {
       #   id

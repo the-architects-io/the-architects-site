@@ -2,10 +2,11 @@
 import { Airdrop, Job, StatusUUIDs } from "@/app/blueprint/types";
 import { BASE_URL } from "@/constants/constants";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
-import Spinner from "@/features/UI/spinner";
 import { ITab, Tabs } from "@/features/UI/tabs/tabs";
 import { ExecuteAirdrop } from "@/features/airdrop/execute-airdrop";
 import { RecipientListTable } from "@/features/airdrop/recipient-list-table";
+import { AirdropStatus } from "@/features/airdrop/airdrop-status";
+
 import { GET_AIRDROP_BY_ID } from "@/graphql/queries/get-airdrop-by-id";
 import { GET_JOB_BY_ID } from "@/graphql/queries/get-job-by-id";
 import { useQuery } from "@apollo/client";
@@ -13,6 +14,7 @@ import { useUserData } from "@nhost/nextjs";
 import { useRouter } from "next/navigation";
 import { Line } from "rc-progress";
 import { useEffect, useState } from "react";
+import { ContentWrapperYAxisCenteredContent } from "@/features/UI/content-wrapper-y-axis-centered-content";
 
 export default function AirdropDetailsPage({ params }: { params: any }) {
   const user = useUserData();
@@ -71,29 +73,18 @@ export default function AirdropDetailsPage({ params }: { params: any }) {
 
   return (
     <div className="w-full h-full min-h-screen text-stone-300">
-      {!!jobId ? (
+      {!!data?.jobs_by_pk ? (
         <ContentWrapper>
-          {!!data && (
-            <div className="flex flex-col items-center justify-center">
-              <div className="flex flex-col items-center justify-center pt-32">
-                <Spinner />
-                <p className="text-4xl font-semibold text-center pt-12">
-                  {data?.jobs_by_pk?.statusText}
-                </p>
-                {/* <Line
-                  className="px-4"
-                  percent={Number(
-
-                  )}
-                  strokeWidth={2}
-                  trailWidth={0.04}
-                  trailColor="#121212"
-                  // sky-400
-                  strokeColor="#38bdf8"
-                /> */}
-              </div>
-            </div>
-          )}
+          <ContentWrapperYAxisCenteredContent>
+            <AirdropStatus
+              jobId={data?.jobs_by_pk?.id}
+              setJob={(job) => {
+                if (!job) {
+                  setJobId(null);
+                }
+              }}
+            />
+          </ContentWrapperYAxisCenteredContent>
         </ContentWrapper>
       ) : (
         <ContentWrapper className="text-center">
@@ -101,6 +92,19 @@ export default function AirdropDetailsPage({ params }: { params: any }) {
           <div className="text-lg mb-4">
             <span className="font-semibold">Number of recipients: </span>
             {airdrop?.recipients_aggregate?.aggregate?.count}
+          </div>
+          <div className="text-lg mb-4">
+            <span className="font-semibold">Number of tokens allocated: </span>
+            {airdrop?.recipients?.reduce(
+              (acc, recipient) => acc + recipient.amount,
+              0
+            )}
+          </div>
+          <div className="text-lg mb-8">
+            <span className="font-semibold">
+              Number of tokens in collection:{" "}
+            </span>
+            {airdrop?.collection?.tokenCount}
           </div>
           <Tabs
             tabs={tabs}

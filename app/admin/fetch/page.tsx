@@ -462,9 +462,8 @@ export default function FetchPage() {
                   percent={Number(progress)}
                   strokeWidth={2}
                   trailWidth={0.04}
-                  trailColor="#121212"
-                  // sky-400
-                  strokeColor="#38bdf8"
+                  strokeColor="#0ea5e9"
+                  trailColor="#7cd2fb"
                 />
               </>
             )}

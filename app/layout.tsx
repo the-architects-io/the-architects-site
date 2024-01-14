@@ -45,7 +45,7 @@ export default function RootLayout({
 
                   <Toaster />
                   {/* <Sidebar /> */}
-                  <AdminToolbar />
+                  {/* <AdminToolbar /> */}
                 </AdminProvider>
               </SidebarProvider>
             </DebugModeProvider>

@@ -65,7 +65,8 @@ export default function StreamUploadPage() {
                     percent={data.uploadJobs_by_pk.percentComplete}
                     trailWidth={1}
                     strokeWidth={3}
-                    strokeColor="#10B981"
+                    strokeColor="#0ea5e9"
+                    trailColor="#7cd2fb"
                   />
                 </div>
               </div>

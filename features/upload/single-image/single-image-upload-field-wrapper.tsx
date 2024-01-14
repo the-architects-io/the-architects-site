@@ -44,6 +44,7 @@ export const SingleImageUploadFieldWrapper = ({
         }
         return false;
       }}
+      accept="image/*"
       autoUpload={autoUpload}
       multiple={multiple}
     >

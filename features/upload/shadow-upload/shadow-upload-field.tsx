@@ -2,6 +2,7 @@ import { createBlueprintClient } from "@/app/blueprint/client";
 import { CollectionFileStats, UploadJob } from "@/app/blueprint/types";
 import { inspectZipFile } from "@/app/blueprint/utils/files/zip";
 import Spinner from "@/features/UI/spinner";
+import { JobIcons } from "@/features/jobs/job-icon";
 import showToast from "@/features/toasts/show-toast";
 import { UploadStatus } from "@/features/upload/shadow-upload/upload-status";
 import { GET_UPLOAD_JOB_BY_ID } from "@/graphql/queries/get-upload-job-by-id";
@@ -192,8 +193,9 @@ export const ShadowUploadField = ({
         const { success, job } = await blueprint.jobs.updateUploadJob({
           id: uploadJobId,
           percentComplete: 0,
-          statusText: "Uploading assets to server...",
+          statusText: "Uploading assets to server",
           sizeInBytes,
+          icon: JobIcons.UPLOADING_FILES,
         });
 
         console.log("BATCH_START job", {
@@ -256,6 +258,7 @@ export const ShadowUploadField = ({
       uploady.off(UPLOADER_EVENTS.BATCH_ADD);
     };
   }, [
+    cluster,
     handleFileAdd,
     isFileValid,
     params,

@@ -5,6 +5,7 @@ export const GET_JOBS = gql`
     jobs(order_by: { createdAt: desc }) {
       createdAt
       id
+      icon
       jobType {
         id
         name

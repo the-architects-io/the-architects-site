@@ -5,7 +5,7 @@ export const GET_JOB_BY_ID = gql`
     jobs_by_pk(id: $id) {
       createdAt
       id
-      jobTypeId
+      icon
       percentComplete
       status {
         name

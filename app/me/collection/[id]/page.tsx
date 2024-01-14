@@ -1,17 +1,15 @@
 "use client";
 import { Collection } from "@/app/blueprint/types";
-import { SHDW_DRIVE_BASE_URL } from "@/constants/constants";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import Spinner from "@/features/UI/spinner";
 import { CollectionPreview } from "@/features/collection/collection-preview";
-import { DispenserControlPanel } from "@/features/dispensers/dispenser-control-panel";
 import { GET_COLLECTION_BY_ID } from "@/graphql/queries/get-collection-by-id";
 import { useAdmin } from "@/hooks/admin";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { useQuery } from "@apollo/client";
 import { useUserData } from "@nhost/nextjs";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function CollectionDetailsPage({ params }: { params: any }) {
   const user = useUserData();
@@ -19,11 +17,12 @@ export default function CollectionDetailsPage({ params }: { params: any }) {
 
   const [collection, setCollection] = useState<Collection | null>(null);
 
-  const { loading } = useQuery(GET_COLLECTION_BY_ID, {
+  const { loading, refetch } = useQuery(GET_COLLECTION_BY_ID, {
     variables: {
       id: params?.id,
     },
     skip: !params?.id,
+    fetchPolicy: "network-only",
     onCompleted: ({
       collections_by_pk: collection,
     }: {
@@ -33,6 +32,10 @@ export default function CollectionDetailsPage({ params }: { params: any }) {
       setCollection(collection);
     },
   });
+
+  useEffect(() => {
+    refetch();
+  }, [params.id, refetch, user?.id]);
 
   if (!params?.id)
     return (

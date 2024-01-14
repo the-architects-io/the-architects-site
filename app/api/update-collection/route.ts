@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
     uploadJobId,
     merkleTreeAddress,
     collectionNftAddress,
+    tokenCount,
   } = await req.json();
 
   if (!id) {
@@ -109,6 +110,7 @@ export async function POST(req: NextRequest) {
           ...(uploadJobId && { uploadJobId }),
           ...(collectionNftAddress && { collectionNftAddress }),
           ...(merkleTreeAddress && { merkleTreeAddress }),
+          ...(tokenCount && { tokenCount }),
         },
       }
     );

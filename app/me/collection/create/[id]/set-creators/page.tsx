@@ -229,7 +229,7 @@ export default function SetCreatorsPage({
       <div className="flex bottom-0 left-0 right-0 fixed w-full justify-center items-center">
         <div className="bg-gray-900 w-full p-8 py-4">
           <SubmitButton
-            isSubmitting={formik.isSubmitting}
+            isSubmitting={formik.isSubmitting || isSaving}
             className="w-full"
             disabled={!creatorsAreValid(formik.values.creators)}
             onClick={formik.handleSubmit}

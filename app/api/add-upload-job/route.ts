@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
     percentComplete,
     statusText,
     statusId,
+    icon,
   }: CreateUploadJobInput = await req.json();
 
   console.log({ sizeInBytes, userId });
@@ -39,6 +40,7 @@ export async function POST(req: NextRequest) {
           ...(sizeInBytes && { sizeInBytes }),
           ...(statusText && { statusText }),
           ...(statusId && { statusId }),
+          ...(icon && { icon }),
           userId,
           isComplete: false,
         },

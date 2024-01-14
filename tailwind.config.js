@@ -15,6 +15,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        sky: {
+          200: "#7cd2fb"
+        },
         slate: {
           500: '#6e7c7d',
           800: '#182022'

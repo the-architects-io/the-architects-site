@@ -4,6 +4,7 @@ import {
   ValidationIssue,
 } from "@/app/blueprint/types";
 import { getCollectionStatsFromCollectionMetadatas } from "@/app/blueprint/utils";
+import { HardDriveIcon } from "@/app/icons/hard-drive-icon";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import Spinner from "@/features/UI/spinner";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
@@ -160,7 +161,7 @@ export const JsonUploadMetadataValidation = ({
         <div
           className={classNames([
             "flex flex-col items-center space-x-2",
-            shouldShowValidationIssues ? "" : "mt-24",
+            shouldShowValidationIssues ? "" : "justify-center",
           ])}
         >
           <div className="flex items-center jusfity-center space-x-2">
@@ -197,25 +198,20 @@ export const JsonUploadMetadataValidation = ({
         </div>
       )}
       {isMetadataValid === true && (
-        <div className="flex flex-col items-center space-x-2">
-          <div className="flex items-center justify-center h-full space-x-2">
+        <div className="flex flex-col items-center justify-center space-x-2 h-full">
+          <div className="flex items-center justify-center space-x-2">
             <CheckBadgeIcon className="h-6 w-6 text-green-500" />
             <div>JSON is Valid</div>
           </div>
           {!!collectionStats && (
-            <div className="flex flex-col space-y-2 mt-4">
-              <div className="flex flex-col space-y-2 mb-4">
-                <div className="flex flex-col space-y-2 text-center">
-                  <div className="text-gray-100 text-sm">
-                    Total tokens: {collectionStats.count}
-                  </div>
-                  <div className="text-gray-100 text-sm">
-                    Uniquie traits across collection:{" "}
-                    {collectionStats.uniqueTraits.length}
-                  </div>
-                  <div className="text-gray-100 text-sm">
-                    Creators in metadata: {collectionStats.creators.length}
-                  </div>
+            <div className="flex flex-col mt-4">
+              <div className="flex flex-col items-center mb-4 text-sm text-gray-100">
+                <div className="mb-2">
+                  Tokens in collection: {collectionStats.count}
+                </div>
+                <div className="mb-2">
+                  Uniquie traits across collection:{" "}
+                  {collectionStats.uniqueTraits.length}
                 </div>
               </div>
               <SecondaryButton onClick={handleClearFile}>

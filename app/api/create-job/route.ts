@@ -10,6 +10,7 @@ export async function POST(req: NextRequest) {
     statusId,
     percentComplete,
     jobTypeId,
+    icon,
   }: CreateJobInput = await req.json();
 
   if (!userId || !jobTypeId) {
@@ -25,6 +26,7 @@ export async function POST(req: NextRequest) {
           ...(statusText && { statusText }),
           ...(statusId && { statusId }),
           ...(percentComplete && { percentComplete }),
+          ...(icon && { icon }),
         },
       });
 

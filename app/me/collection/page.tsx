@@ -3,22 +3,23 @@ import { Collection, UploadJobStatus } from "@/app/blueprint/types";
 import { CreateCollectionButton } from "@/app/blueprint/ui/create-collection-button";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
+import Spinner from "@/features/UI/spinner";
 import { ITab, Tabs } from "@/features/UI/tabs/tabs";
 import { CollectionListItem } from "@/features/collection/collection-list-item";
 import { GET_COLLECTIONS_BY_OWNER_ID } from "@/graphql/queries/get-collections-by-owner-id";
 import { useQuery } from "@apollo/client";
 import { useUserData } from "@nhost/nextjs";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const tabs: ITab[] = [
   {
-    name: "In Progress",
-    value: "in-progress",
-  },
-  {
     name: "Ready to Mint",
     value: "ready-to-mint",
+  },
+  {
+    name: "In Progress",
+    value: "in-progress",
   },
   {
     name: "Completed",
@@ -35,6 +36,7 @@ export default function CollectionsPage() {
     router.push(`/me/collection/create/${collection.id}`);
   };
 
+  const [isLoadingUi, setIsLoadingUi] = useState<boolean>(true);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [inProgressCollections, setInProgressCollections] = useState<
     Collection[] | null
@@ -48,7 +50,7 @@ export default function CollectionsPage() {
 
   const [activeTab, setActiveTab] = useState<ITab>(tabs[0]);
 
-  const { loading } = useQuery(GET_COLLECTIONS_BY_OWNER_ID, {
+  const { loading, refetch } = useQuery(GET_COLLECTIONS_BY_OWNER_ID, {
     variables: {
       id: user?.id,
     },
@@ -77,6 +79,7 @@ export default function CollectionsPage() {
       setCompletedCollections(
         collections.filter((collection) => collection.hasBeenMinted)
       );
+      setIsLoadingUi(false);
     },
   });
 
@@ -94,8 +97,14 @@ export default function CollectionsPage() {
       return `/me/collection/create/${collection.id}/set-creators`;
     }
 
-    return `/me/collection/upload/${collection.id}`;
+    return `/me/collection/create/${collection.id}`;
   };
+
+  useEffect(() => {
+    if (user?.id) {
+      refetch();
+    }
+  }, [user?.id, refetch]);
 
   return (
     <ContentWrapper>
@@ -112,7 +121,7 @@ export default function CollectionsPage() {
           handleSetTab={(tab) => setActiveTab(tab)}
         />
         {!!activeTab && activeTab.value === "in-progress" && (
-          <div className="w-full flex justify-center mx-auto py-8">
+          <div className="w-full flex flex-wrap py-8">
             {!!inProgressCollections?.length ? (
               <>
                 {inProgressCollections.map((collection) => (
@@ -125,12 +134,18 @@ export default function CollectionsPage() {
                 ))}
               </>
             ) : (
-              <>No collections in progress</>
+              <div className="flex justify-center w-full">
+                {!!isLoadingUi ? (
+                  <Spinner />
+                ) : (
+                  <div>No collections in progress</div>
+                )}
+              </div>
             )}
           </div>
         )}
         {!!activeTab && activeTab.value === "ready-to-mint" && (
-          <div className="w-full flex justify-center mx-auto py-8">
+          <div className="w-full flex flex-wrap py-8">
             {!!readyToMintCollections?.length ? (
               <>
                 {readyToMintCollections.map((collection) => (
@@ -147,12 +162,18 @@ export default function CollectionsPage() {
                 ))}
               </>
             ) : (
-              <>No collections ready to mint</>
+              <div className="flex justify-center w-full">
+                {!!isLoadingUi ? (
+                  <Spinner />
+                ) : (
+                  <div>No collections ready to mint</div>
+                )}
+              </div>
             )}
           </div>
         )}
         {!!activeTab && activeTab.value === "completed" && (
-          <div className="w-full flex justify-center mx-auto py-8">
+          <div className="w-full flex flex-wrap py-8">
             {!!completedCollections?.length ? (
               <>
                 {completedCollections.map((collection) => (
@@ -169,7 +190,13 @@ export default function CollectionsPage() {
                 ))}
               </>
             ) : (
-              <>No collections completed</>
+              <div className="flex justify-center w-full">
+                {!!isLoadingUi ? (
+                  <Spinner />
+                ) : (
+                  <div>No collections completed</div>
+                )}
+              </div>
             )}
           </div>
         )}

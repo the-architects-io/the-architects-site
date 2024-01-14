@@ -21,12 +21,9 @@ export const CollectionListItem = ({
   onClick?: (ags: any) => void;
 }) => {
   return (
-    <div
-      className="flex flex-col items-center space-y-4 m-2 text-center"
-      key={collection.id}
-    >
+    <div className="w-1/3" key={collection.id}>
       <Link
-        className="border border-gray-600 rounded-lg cursor-pointer p-4 space-y-2"
+        className="border border-gray-600 rounded-lg cursor-pointer p-4 space-y-2 m-2 flex flex-col items-center self-start"
         href={url || ""}
         onClick={onClick}
       >
@@ -34,8 +31,8 @@ export const CollectionListItem = ({
           <Image
             className="mb-4 rounded"
             src={collection.imageUrl}
-            width={250}
-            height={250}
+            width={350}
+            height={350}
             alt="Collection image"
           />
         )}

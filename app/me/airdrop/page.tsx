@@ -24,7 +24,7 @@ const tabs: ITab[] = [
     value: "eligible-to-drop",
   },
   {
-    name: "In Progress",
+    name: "In Setup",
     value: "in-progress",
   },
   {
@@ -146,7 +146,6 @@ export default function AirdropPage() {
     }
 
     router.push(`/me/airdrop/create/${airdrop.id}`);
-    setIsLoading(false);
   };
 
   if (isLoading) {
@@ -161,16 +160,14 @@ export default function AirdropPage() {
 
   return (
     <ContentWrapper>
-      <div className="flex flex-col items-center mb-32">
-        <div className="flex w-full justify-center">
-          <Tabs
-            tabs={tabs}
-            activeTab={activeTab}
-            handleSetTab={(tab) => setActiveTab(tab)}
-          />
-        </div>
+      <div className="flex flex-col items-center">
+        <Tabs
+          tabs={tabs}
+          activeTab={activeTab}
+          handleSetTab={(tab) => setActiveTab(tab)}
+        />
         {!!activeTab && activeTab.value === "eligible-to-drop" && (
-          <div className="w-full flex justify-center mx-auto py-8">
+          <div className="w-full flex flex-wrap py-8">
             {!!readyToMintCollections.length ? (
               <>
                 {readyToMintCollections.map((collection) => (
@@ -206,7 +203,7 @@ export default function AirdropPage() {
           </div>
         )}
         {!!activeTab && activeTab.value === "in-progress" && (
-          <div className="w-full flex justify-center mx-auto py-8">
+          <div className="w-full flex flex-wrap py-8">
             {!!airdropsInProgress?.length ? (
               <>
                 {airdropsInProgress.map((airdrop) => (
@@ -218,12 +215,14 @@ export default function AirdropPage() {
                 ))}
               </>
             ) : (
-              <>No collections in progress</>
+              <div className="flex w-full justify-center">
+                No collections in progress
+              </div>
             )}
           </div>
         )}
         {!!activeTab && activeTab.value === "ready-to-drop" && (
-          <div className="w-full flex justify-center mx-auto py-8">
+          <div className="w-full flex flex-wrap py-8">
             {!!readyToDropAirdrops.length ? (
               <>
                 {readyToDropAirdrops.map((airdrop) => (
@@ -235,12 +234,14 @@ export default function AirdropPage() {
                 ))}
               </>
             ) : (
-              <>No airdrops ready to drop</>
+              <div className="flex w-full justify-center">
+                No airdrops ready to drop
+              </div>
             )}
           </div>
         )}
         {!!activeTab && activeTab.value === "completed" && (
-          <div className="w-full flex justify-center mx-auto py-8">
+          <div className="w-full flex flex-wrap py-8">
             {!!completedAirdrops.length ? (
               <>
                 {completedAirdrops.map((airdrop) => (
@@ -252,7 +253,9 @@ export default function AirdropPage() {
                 ))}
               </>
             ) : (
-              <>No airdrops completed</>
+              <div className="flex w-full justify-center">
+                No airdrops completed
+              </div>
             )}
           </div>
         )}

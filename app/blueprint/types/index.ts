@@ -1,4 +1,5 @@
 import { Community } from "@/features/admin/communities/communities-list-item";
+import { JobIconType, JobIcons } from "@/features/jobs/job-icon";
 import { RpcConfirmTransactionResult } from "@metaplex-foundation/umi";
 import { User } from "@nhost/nextjs";
 import { ShadowFile, StorageAccount } from "@shadow-drive/sdk";
@@ -656,6 +657,7 @@ export type CreateCollectionInput = {
   ownerId?: string;
   communityId?: string;
   hasBeenMinted?: boolean;
+  tokenCount?: number;
 };
 
 export type UnmintedMetadata = {
@@ -689,6 +691,7 @@ export type Collection = {
   driveAddress: string;
   uploadJob: UploadJob;
   sellerFeeBasisPoints: number;
+  tokenCount: number;
 };
 
 export type CreateCollectionResponse = BaseBlueprintResponse & {
@@ -718,6 +721,7 @@ export type UpdateCollectionInput = {
   merkleTreeId?: string;
   collectionNftAddress?: string;
   nftId?: string;
+  tokenCount?: number;
 };
 
 export type UpdateCollectionResponse = BaseBlueprintResponse & {
@@ -857,6 +861,7 @@ export type CreateUploadJobInput = {
   isComplete?: boolean;
   log?: string;
   percentComplete?: number;
+  icon?: JobIconType;
 };
 
 export type CreateUploadJobResponse = BaseBlueprintResponse & {
@@ -894,6 +899,7 @@ export type UploadJob = {
   updatedAt: string;
   statusText: string;
   fileCount: number;
+  icon: typeof JobIcons;
   status: {
     id: string;
     name: string;
@@ -959,6 +965,7 @@ export type UpdateUploadJobInput = {
   sizeInBytes?: number;
   statusText?: string;
   statusId?: string;
+  icon?: JobIconType;
 };
 
 export type UpdateJobResponse = BaseBlueprintResponse & {
@@ -971,6 +978,7 @@ export type UpdateJobInput = {
   percentComplete?: number;
   statusText?: string;
   statusId?: string;
+  icon?: JobIconType;
 };
 
 export type ValidationIssue = { text: string; index: number };
@@ -997,6 +1005,7 @@ export type CreateJobInput = {
   jobTypeId?: string;
   statusText?: string;
   statusId?: string;
+  icon?: JobIconType;
 };
 
 export type CreateJobResponse = BaseBlueprintResponse & {
@@ -1009,6 +1018,7 @@ export type Job = {
     id: string;
     name: string;
   };
+  icon?: JobIconType;
   statusText?: string;
   user: User;
   percentComplete?: number;

@@ -21,6 +21,7 @@ export const GET_AIRDROP_BY_ID = gql`
       }
       collection {
         id
+        tokenCount
         createdAt
         updatedAt
         owner {

@@ -22,6 +22,7 @@ export default function CreateAirdropForm({
   const [files, setFiles] = useState<FileList | null>(null);
   const { cluster } = useCluster();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleFileInputTrigger = () => {
     if (!fileInputRef?.current) return;
@@ -34,6 +35,46 @@ export default function CreateAirdropForm({
     },
   });
 
+  const validateAirdropRecipientsFile = (file: File): Promise<boolean> => {
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        resolve(false);
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        const contents = e.target?.result;
+        if (!contents) {
+          resolve(false);
+          return;
+        }
+        try {
+          const parsedContents = JSON.parse(contents.toString());
+          const isValid =
+            Array.isArray(parsedContents) &&
+            parsedContents.every((item) => typeof item === "string");
+          resolve(isValid);
+        } catch (error) {
+          resolve(false);
+        }
+      };
+
+      reader.onerror = () => {
+        resolve(false);
+      };
+
+      reader.readAsText(file);
+    });
+  };
+
+  const clearFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -41,10 +82,24 @@ export default function CreateAirdropForm({
       shouldKickoffManually: true,
     },
     onSubmit: async ({ name, startTime, shouldKickoffManually }) => {
+      setIsLoading(true);
       if (!files?.length) {
         showToast({ primaryMessage: "No recipients file selected" });
         return;
       }
+
+      const isValid = validateAirdropRecipientsFile(files[0]);
+
+      if (!isValid) {
+        showToast({
+          primaryMessage: "Invalid recipients file",
+          secondaryMessage: "The file must be a valid JSON array of strings",
+        });
+        clearFileInput();
+        setIsLoading(false);
+        return;
+      }
+
       const blueprint = createBlueprintClient({
         cluster,
       });
@@ -70,6 +125,7 @@ export default function CreateAirdropForm({
         showToast({
           primaryMessage: "Error creating airdrop",
         });
+        setIsLoading(false);
         return;
       }
 
@@ -177,7 +233,7 @@ export default function CreateAirdropForm({
       <div className="flex w-full justify-center mb-4">
         <SubmitButton
           disabled={!formik.values.name || !files?.length}
-          isSubmitting={formik.isSubmitting}
+          isSubmitting={formik.isSubmitting || isLoading}
           onClick={formik.submitForm}
         />
       </div>

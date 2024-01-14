@@ -13,6 +13,7 @@ export const GET_UPLOAD_JOB_BY_ID = gql`
       updatedAt
       statusText
       fileCount
+      icon
       status {
         id
         name

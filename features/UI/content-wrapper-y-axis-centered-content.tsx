@@ -11,7 +11,7 @@ export const ContentWrapperYAxisCenteredContent = ({
 }: Props) => (
   <div
     className={classNames([
-      "flex flex-col items-center h-app justify-center -mt-36",
+      "flex flex-col items-center h-app justify-center -mt-36 min-h-screen",
       className,
     ])}
   >
