@@ -96,6 +96,7 @@ export default function CreateCollectionPage({
       });
 
       const { success } = await blueprint.collections.updateCollection({
+        imageSizeInBytes: collectionImage.sizeInBytes,
         imageUrl: collectionImage.url,
         id: collectionId,
         name: collectionName,

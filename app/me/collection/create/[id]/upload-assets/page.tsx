@@ -13,6 +13,7 @@ import {
 import {
   ASSET_SHDW_DRIVE_ADDRESS,
   EXECUTION_WALLET_ADDRESS,
+  SHDW_DRIVE_BASE_URL,
 } from "@/constants/constants";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
@@ -99,11 +100,12 @@ export default function CollectionCreationUploadAssetsPage({
     },
   });
 
-  const { loading } = useQuery(GET_COLLECTION_BY_ID, {
+  const { loading, data: collectionData } = useQuery(GET_COLLECTION_BY_ID, {
     variables: {
       id: params?.id,
     },
     skip: !params?.id,
+    fetchPolicy: "no-cache",
     onCompleted: ({
       collections_by_pk: collection,
     }: {
@@ -149,8 +151,13 @@ export default function CollectionCreationUploadAssetsPage({
   );
 
   const handleUploadClick = async () => {
-    if (!zipFileUploadyInstance || !jsonUploadyInstance || !user?.id) {
-      throw new Error("Missing uploady instance");
+    if (
+      !zipFileUploadyInstance ||
+      !jsonUploadyInstance ||
+      !user?.id ||
+      !collection?.id
+    ) {
+      throw new Error("Missing required data");
     }
 
     if (hasStartedUpload) return;
@@ -158,12 +165,18 @@ export default function CollectionCreationUploadAssetsPage({
     setHasStartedUpload(true);
     setIsSubmitting(true);
 
-    const sizeInBytes = fileStats?.totalUncompressedSize;
+    const collectionImageSizeInBytes = collection.imageSizeInBytes || 0;
+    const zipFileSizeInBytes = fileStats?.totalUncompressedSize || 0;
+
+    // fetch collection image
+    const collectionImage = await fetch(collection.imageUrl || "");
+
+    const sizeInBytes = zipFileSizeInBytes + collectionImageSizeInBytes;
     let sizeInKb = sizeInBytes ? sizeInBytes / 1000 : 0;
     sizeInKb += 1000; // add 1MB to sizeInKb for overhead
 
     const { job } = await blueprint.jobs.createUploadJob({
-      statusText: "Creating Shadow drive",
+      statusText: "Creating SHDW Drive",
       userId: user?.id,
       icon: JobIcons.CREATING_SHADOW_DRIVE,
     });
@@ -177,25 +190,94 @@ export default function CollectionCreationUploadAssetsPage({
     });
 
     let driveAddress: string | null = null;
-    try {
-      const { address } = await blueprint.drive.createDrive({
-        name: params.id,
-        sizeInKb,
-        ownerAddress: EXECUTION_WALLET_ADDRESS,
-      });
-      setDriveAddress(address);
-      driveAddress = address;
-    } catch (error) {
-      console.log({ error });
-      showToast({
-        primaryMessage: "Failed to create drive",
-      });
+
+    const maxRetries = 5;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const { address } = await blueprint.drive.createDrive({
+          name: params.id,
+          sizeInKb,
+          ownerAddress: EXECUTION_WALLET_ADDRESS,
+        });
+
+        setDriveAddress(address);
+        driveAddress = address;
+
+        break;
+      } catch (error) {
+        if (attempt === maxRetries) {
+          console.log({ error });
+          showToast({
+            primaryMessage: "Failed to create drive",
+          });
+          blueprint.jobs.updateUploadJob({
+            id: job.id,
+            statusId: StatusUUIDs.ERROR,
+            statusText: "Failed to create drive.",
+          });
+          throw error;
+        }
+        console.error(`Attempt ${attempt} failed: ${error}`);
+      }
+    }
+
+    console.log({ collection });
+
+    if (!collection.imageUrl?.length) {
       blueprint.jobs.updateUploadJob({
         id: job.id,
         statusId: StatusUUIDs.ERROR,
-        statusText: "Failed to create drive.",
+        statusText: "Collection image is missing",
       });
-      throw new Error("Failed to create drive");
+      return;
+    }
+
+    if (!driveAddress) {
+      blueprint.jobs.updateUploadJob({
+        id: job.id,
+        statusId: StatusUUIDs.ERROR,
+        statusText: "Drive address is missing",
+      });
+      return;
+    }
+
+    const response = await fetch(collection.imageUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.statusText}`);
+    }
+
+    // Convert the response to an ArrayBuffer
+    const arrayBuffer = await response.arrayBuffer();
+
+    // Convert the ArrayBuffer to a Blob
+    const blob = new Blob([arrayBuffer], { type: "image/png" });
+
+    const fileName = "collection.png";
+
+    // Convert the Blob to a File object
+    const file = new File([blob], fileName, { type: "image/png" });
+
+    await blueprint.jobs.updateUploadJob({
+      id: job.id,
+      statusText: "Transferring collection image",
+      icon: JobIcons.COLLECTION_IMAGE,
+    });
+
+    const { success: imageUploadSuccess, url } =
+      await blueprint.upload.uploadFile({
+        file,
+        fileName,
+        driveAddress,
+      });
+
+    if (!imageUploadSuccess) {
+      blueprint.jobs.updateUploadJob({
+        id: job.id,
+        statusId: StatusUUIDs.ERROR,
+        statusText: "Failed to transfer collection image",
+      });
+
+      return;
     }
 
     if (!zipFileBeingUploaded || !jsonBeingUploaded || !driveAddress) {
@@ -251,6 +333,7 @@ export default function CollectionCreationUploadAssetsPage({
   useEffect(() => {
     if (uploadJob && driveAddress && !hasSavedDriveAddressToCollection) {
       blueprint.collections.updateCollection({
+        imageUrl: `${SHDW_DRIVE_BASE_URL}/${driveAddress}/collection.png`,
         id: params.id,
         uploadJobId: uploadJob.id,
         driveAddress,
@@ -278,6 +361,7 @@ export default function CollectionCreationUploadAssetsPage({
       {!!uploadJob ? (
         <ContentWrapperYAxisCenteredContent>
           <JobStatus
+            collectionId={params.id}
             jobId={uploadJob.id}
             setJob={setUploadJob}
             jsonUploadyInstance={jsonUploadyInstance}

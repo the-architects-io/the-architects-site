@@ -85,13 +85,13 @@ export default function AirdropPage() {
           );
       }
       setReadyToMintCollections(readyToMintCollections);
-      if (!loading && !isAirdopsLoading) {
+      if (!loading && !isAirdropsLoading) {
         setIsLoading(false);
       }
     },
   });
 
-  const { loading: isAirdopsLoading } = useQuery(GET_AIRDROPS_BY_OWNER_ID, {
+  const { loading: isAirdropsLoading } = useQuery(GET_AIRDROPS_BY_OWNER_ID, {
     variables: {
       id: user?.id,
     },
@@ -120,7 +120,7 @@ export default function AirdropPage() {
       setCompletedAirdrops(
         airdrops.filter((airdrop) => airdrop.collection.hasBeenMinted)
       );
-      if (!isAirdopsLoading || !loading) {
+      if (!isAirdropsLoading || !loading) {
         setIsLoading(false);
       }
     },
@@ -186,7 +186,7 @@ export default function AirdropPage() {
                 ))}
               </>
             ) : (
-              <div className="flex flex-col items-center justify-center py-4">
+              <div className="flex flex-col items-center justify-center py-4 w-full">
                 <div className="mb-4">No collections found</div>
                 <div className="italic text-gray-400 max-w-xs mx-auto text-center">
                   Airdrops are created from collections.{" "}

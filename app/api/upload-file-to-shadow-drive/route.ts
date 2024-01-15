@@ -43,6 +43,8 @@ export async function POST(req: NextRequest) {
 
   const file = Buffer.from(await formDataFile.arrayBuffer());
 
+  const sizeInBytes = file.byteLength;
+
   try {
     const keypair = Keypair.fromSecretKey(
       bs58.decode(process.env.EXECUTION_WALLET_PRIVATE_KEY)
@@ -66,6 +68,7 @@ export async function POST(req: NextRequest) {
       {
         errors: upload_errors,
         url: finalized_locations[0],
+        sizeInBytes,
         message,
       },
       { status: 200 }

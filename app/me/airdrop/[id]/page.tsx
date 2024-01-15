@@ -57,13 +57,6 @@ export default function AirdropDetailsPage({ params }: { params: any }) {
     },
   });
 
-  useEffect(() => {
-    if (data?.jobs_by_pk?.status.id === StatusUUIDs.COMPLETE) {
-      setJobId(null);
-      router.push(`${BASE_URL}/me/airdrop`);
-    }
-  }, [jobId, data?.jobs_by_pk?.status.id, router]);
-
   if (!params?.id)
     return (
       <ContentWrapper className="text-center">
@@ -73,10 +66,11 @@ export default function AirdropDetailsPage({ params }: { params: any }) {
 
   return (
     <div className="w-full h-full min-h-screen text-stone-300">
-      {!!data?.jobs_by_pk ? (
+      {!!data?.jobs_by_pk && airdrop?.id ? (
         <ContentWrapper>
           <ContentWrapperYAxisCenteredContent>
             <AirdropStatus
+              airdropId={airdrop?.id}
               jobId={data?.jobs_by_pk?.id}
               setJob={(job) => {
                 if (!job) {

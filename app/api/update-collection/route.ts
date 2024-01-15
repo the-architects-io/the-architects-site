@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
     merkleTreeAddress,
     collectionNftAddress,
     tokenCount,
+    imageSizeInBytes,
   } = await req.json();
 
   if (!id) {
@@ -111,6 +112,7 @@ export async function POST(req: NextRequest) {
           ...(collectionNftAddress && { collectionNftAddress }),
           ...(merkleTreeAddress && { merkleTreeAddress }),
           ...(tokenCount && { tokenCount }),
+          ...(imageSizeInBytes && { imageSizeInBytes }),
         },
       }
     );

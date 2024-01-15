@@ -44,6 +44,7 @@ export const ExecuteAirdrop = ({
       description,
       sellerFeeBasisPoints,
       driveAddress,
+      imageUrl,
       id,
     } = airdrop.collection;
 
@@ -83,35 +84,6 @@ export const ExecuteAirdrop = ({
     setShouldPoll(true);
     setJobId(job.id);
 
-    // const res = await axios.get(
-    //   `${SHDW_DRIVE_BASE_URL}/${ASSET_SHDW_DRIVE_ADDRESS}/${id}-collection.png`,
-    //   {
-    //     responseType: "arraybuffer",
-    //   }
-    // );
-
-    // const buffer = Buffer.from(res.data, "binary");
-    // const file = new File([buffer], `${id}-collection.png`, {
-    //   type: "image/png",
-    // });
-
-    // await blueprint.jobs.updateJob({
-    //   id: job.id,
-    //   statusText: "Updating collection image",
-    //   icon: JobIcons.UPLOADING_COLLECTION_IMAGE,
-    // });
-
-    // const { success: imageUploadSuccess } = await blueprint.upload.uploadFile({
-    //   file,
-    //   fileName: `${id}-collection.png`,
-    //   driveAddress,
-    // });
-
-    // if (!imageUploadSuccess) {
-    //   console.log("Failed to upload image");
-    //   return;
-    // }
-
     await blueprint.jobs.updateJob({
       id: job.id,
       statusText: "Uploading collection NFT metadata",
@@ -125,7 +97,7 @@ export const ExecuteAirdrop = ({
           symbol,
           description,
           seller_fee_basis_points: sellerFeeBasisPoints,
-          image: `${SHDW_DRIVE_BASE_URL}/${driveAddress}/${id}-collection.json`,
+          image: imageUrl,
         }),
       ],
       {

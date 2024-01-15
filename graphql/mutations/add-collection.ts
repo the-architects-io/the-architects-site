@@ -4,6 +4,7 @@ export const ADD_COLLECTION = gql`
   mutation ADD_COLLECTION($collection: collections_insert_input = {}) {
     insert_collections_one(object: $collection) {
       id
+      imageUrl
       owner {
         id
       }

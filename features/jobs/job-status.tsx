@@ -22,11 +22,13 @@ type UploadJobResponse =
 export const JobStatus = ({
   jobId,
   setJob,
+  collectionId,
   jsonUploadyInstance,
   zipFileUploadyInstance,
 }: {
   jobId: string;
   setJob: (job: UploadJob | null) => void;
+  collectionId: string;
   jsonUploadyInstance?: UploadyContextType | null;
   zipFileUploadyInstance?: UploadyContextType | null;
 }) => {
@@ -62,8 +64,9 @@ export const JobStatus = ({
     <>
       {data?.uploadJobs_by_pk?.status?.name === UploadJobStatus.ERROR && (
         <div className="mb-8 flex flex-col items-center justify-center w-full h-full">
-          <div className="mb-4">Asset upload failed</div>
-          <PrimaryButton onClick={handleClearJob}>Retry</PrimaryButton>
+          <div className="mb-4">Asset upload encountered an error.</div>
+          <div className="mb-4">Collection ID:</div>
+          {collectionId}
         </div>
       )}
       {(data?.uploadJobs_by_pk?.status?.name === UploadJobStatus.IN_PROGRESS ||

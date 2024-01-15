@@ -19,11 +19,13 @@ type JobResponse =
 
 export const AirdropStatus = ({
   jobId,
+  airdropId,
   setJob,
   jsonUploadyInstance,
   zipFileUploadyInstance,
 }: {
   jobId: string;
+  airdropId: string;
   setJob: (job: UploadJob | null) => void;
   jsonUploadyInstance?: UploadyContextType | null;
   zipFileUploadyInstance?: UploadyContextType | null;
@@ -49,8 +51,8 @@ export const AirdropStatus = ({
         showToast({
           primaryMessage: "Airdrop complete!",
         });
-        router.push(`${BASE_URL}/me//airdop`);
-      }, 5000);
+        router.push(`${BASE_URL}/me/airdrop`);
+      }, 3000);
     }
   }, [data?.jobs_by_pk?.status?.name, router]);
 
@@ -62,8 +64,9 @@ export const AirdropStatus = ({
     <>
       {data?.jobs_by_pk?.status?.name === UploadJobStatus.ERROR && (
         <div className="mb-8 flex flex-col items-center justify-center w-full h-full">
-          <div className="mb-4">Asset upload failed</div>
-          <PrimaryButton onClick={handleClearJob}>Retry</PrimaryButton>
+          <div className="mb-4">Airdrop encountered an error.</div>
+          <div className="mb-4">Airdrop ID:</div>
+          {airdropId}
         </div>
       )}
       {(data?.jobs_by_pk?.status?.name === UploadJobStatus.IN_PROGRESS ||

@@ -588,6 +588,7 @@ export type UploadFileInput = {
 
 export type UploadFileResponse = BaseBlueprintResponse & {
   url: string;
+  sizeInBytes?: number;
 };
 
 export type MintNftInput = {
@@ -692,6 +693,7 @@ export type Collection = {
   uploadJob: UploadJob;
   sellerFeeBasisPoints: number;
   tokenCount: number;
+  imageSizeInBytes: number;
 };
 
 export type CreateCollectionResponse = BaseBlueprintResponse & {
@@ -722,6 +724,7 @@ export type UpdateCollectionInput = {
   collectionNftAddress?: string;
   nftId?: string;
   tokenCount?: number;
+  imageSizeInBytes?: number;
 };
 
 export type UpdateCollectionResponse = BaseBlueprintResponse & {
