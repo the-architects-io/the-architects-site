@@ -5,6 +5,7 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   description?: string;
   className?: string;
+  inputClassName?: string;
 }
 
 export const FormInputWithLabel = ({
@@ -14,6 +15,7 @@ export const FormInputWithLabel = ({
   label,
   description,
   className,
+  inputClassName,
   ...props
 }: Props) => {
   return (
@@ -23,7 +25,7 @@ export const FormInputWithLabel = ({
     >
       {label}
       <FormInput
-        className="mt-2"
+        className={classNames(["mt-2", inputClassName])}
         type={props.type || "text"}
         name={props.name}
         placeholder={props.placeholder}

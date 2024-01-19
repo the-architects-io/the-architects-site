@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
   const noop = res.get("noop");
   const tokenOwner = res.get("tokenOwner") as string;
   const imageFile = res.get("imageFile") as File;
+  const cluster = res.get("cluster") as string;
 
   if (noop)
     return NextResponse.json(
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const connection = new Connection(getRpcEndpoint());
+    const connection = new Connection(getRpcEndpoint(cluster as 'devnet' | 'mainnet-beta'), "finalized");
     const metaplex = Metaplex.make(connection);
     const umi = await getUmiClient();
 

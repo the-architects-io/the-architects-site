@@ -47,7 +47,9 @@ import {
   getPremintCollectionMetadata,
   jsonFileToJson,
 } from "@/app/blueprint/utils";
+import { takePayment } from "@/app/blueprint/utils/payments";
 import { BASE_URL } from "@/constants/constants";
+import { WalletContextState } from "@solana/wallet-adapter-react";
 import axios from "axios";
 
 export type BlueprintClientOptions = {
@@ -226,6 +228,14 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
           params,
           options
         ),
+    },
+    payments: {
+      takePayment: (params: {
+        wallet: WalletContextState,
+        mintAddress: string,
+        baseAmount: number,
+        cluster: 'devnet' | 'mainnet-beta'
+      }) => takePayment({ ...params, cluster: options.cluster }),
     },
     tokens: {
       createTree: (params: CreateTreeInput) =>

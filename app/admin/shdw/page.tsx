@@ -15,8 +15,10 @@ import { Connection } from "@solana/web3.js";
 import { useFormik } from "formik";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { useCluster } from "@/hooks/cluster";
 
 export default function ShdwPage() {
+  const { cluster } = useCluster();
   const wallet = useWallet();
 
   const [shadowDrive, setShadowDrive] = useState<ShdwDrive | null>(null);
@@ -57,7 +59,7 @@ export default function ShdwPage() {
   useEffect(() => {
     (async () => {
       if (wallet?.publicKey) {
-        const connection = new Connection(getRpcEndpoint(), "confirmed");
+        const connection = new Connection(getRpcEndpoint(cluster), "confirmed");
         const drive = await new ShdwDrive(connection, wallet).init();
         setShadowDrive(drive);
 

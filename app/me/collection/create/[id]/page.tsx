@@ -7,10 +7,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { SingleImageUpload } from "@/features/upload/single-image/single-image-upload";
-import {
-  creatorsAreValid,
-  getCollectionStatsFromCollectionMetadatas,
-} from "@/app/blueprint/utils";
+import { getCollectionStatsFromCollectionMetadatas } from "@/app/blueprint/utils";
 import { useQuery } from "@apollo/client";
 import { GET_COLLECTION_BY_ID } from "@/graphql/queries/get-collection-by-id";
 import {
@@ -21,21 +18,13 @@ import {
 } from "@/app/blueprint/types";
 import { useUserData } from "@nhost/nextjs";
 import { isUuid } from "uuidv4";
-import { FieldArray, FormikProvider, useFormik } from "formik";
+import { useFormik } from "formik";
 import { createBlueprintClient } from "@/app/blueprint/client";
 import showToast from "@/features/toasts/show-toast";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormTextareaWithLabel } from "@/features/UI/forms/form-textarea-with-label";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { DndProvider } from "react-dnd";
-import { DndCard } from "@/features/UI/dnd-card";
 import Spinner from "@/features/UI/spinner";
-import { PrimaryButton } from "@/features/UI/buttons/primary-button";
-import { PlusIcon, TrashIcon, XCircleIcon } from "@heroicons/react/24/outline";
-import { CheckBadgeIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { getRpcEndpoint, isValidPublicKey } from "@/utils/rpc";
 import axios from "axios";
-import classNames from "classnames";
 import { CreateCollectionFormChecklist } from "@/features/collection/create-collection-form-checklist";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { SingleImageUploadResponse } from "@/features/upload/single-image/single-image-upload-field-wrapper";

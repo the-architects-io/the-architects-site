@@ -29,6 +29,7 @@ import { Connection } from "@solana/web3.js";
 import { useAdmin } from "@/hooks/admin";
 import usePrevious from "@/hooks/previous";
 import { getRpcEndpoint } from "@/utils/rpc";
+import { useCluster } from "@/hooks/cluster";
 
 interface DispenserUiProps {
   dispenserId: string;
@@ -73,6 +74,7 @@ export default function DispenserUi({
   setDispensedInfo,
   children,
 }: DispenserUiProps) {
+  const { cluster } = useCluster();
   const searchParams = useSearchParams();
   const { isAdmin, setAdminToolbarData, shouldForceEnableClaim } = useAdmin();
   const [isClaiming, setIsClaiming] = useState(false);
@@ -199,7 +201,7 @@ export default function DispenserUi({
   const updateBalances = useCallback(async () => {
     if (!dispenser?.rewardWalletAddress || isFetchingBalances) return;
     setIsFetchingBalances(true);
-    const umi = createUmi(getRpcEndpoint());
+    const umi = createUmi(getRpcEndpoint(cluster));
 
     const onChainDispenserAssets = await fetchAllDigitalAssetWithTokenByOwner(
       umi,
@@ -211,7 +213,7 @@ export default function DispenserUi({
         walletAddress: dispenser?.rewardWalletAddress,
       });
 
-    const connection = new Connection(getRpcEndpoint());
+    const connection = new Connection(getRpcEndpoint(cluster));
 
     const hashList = onChainDispenserAssets.map((asset) =>
       asset.publicKey.toString()

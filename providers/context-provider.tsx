@@ -30,6 +30,7 @@ import showToast from "@/features/toasts/show-toast";
 import { NhostClient, NhostProvider } from "@nhost/nextjs";
 import { NhostApolloProvider } from "@nhost/react-apollo";
 import { getRpcEndpoint } from "@/utils/rpc";
+import { useCluster } from "@/hooks/cluster";
 require("@solana/wallet-adapter-react-ui/styles.css");
 
 const theme = createTheme({
@@ -74,6 +75,7 @@ const nhost = new NhostClient({
 
 const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const { autoConnect } = useAutoConnect();
+  const { cluster } = useCluster();
 
   // Can be set to 'devnet', 'testnet', or 'mainnet-beta'
   const network =
@@ -82,7 +84,7 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
       : WalletAdapterNetwork.Devnet;
 
   // You can also provide a custom RPC endpoint
-  const endpoint = useMemo(() => getRpcEndpoint(), []);
+  const endpoint = useMemo(() => getRpcEndpoint(cluster), [cluster]);
 
   // @solana/wallet-adapter-wallets includes all the adapters but supports tree shaking and lazy loading --
   // Only the wallets you configure here will be compiled into your application, and only the dependencies

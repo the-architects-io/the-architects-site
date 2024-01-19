@@ -13,24 +13,15 @@ import {
   useSignUpEmailPassword,
 } from "@nhost/nextjs";
 import { useFormik } from "formik";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Page() {
-  const [mode, setMode] = useState<"login" | "signup">("login");
   const router = useRouter();
 
   const { isAuthenticated, isLoading: isLoadingAuth } =
     useAuthenticationStatus();
-
-  const {
-    signUpEmailPassword,
-    needsEmailVerification: signUpNeedsEmailVerification,
-    isLoading: signUpIsLoading,
-    isSuccess: signUpIsSuccess,
-    isError: signUpIsError,
-    error: signUpError,
-  } = useSignUpEmailPassword();
 
   const {
     signInEmailPassword,
@@ -49,19 +40,13 @@ export default function Page() {
     onSubmit: async ({ email, password }) => {
       let res;
 
-      switch (mode) {
-        case "login":
-          res = await signInEmailPassword(email, password);
-          break;
-        case "signup":
-          res = await signUpEmailPassword(email, password, {
-            allowedRoles: ["user"],
-          });
-          break;
+      try {
+        res = await signInEmailPassword(email, password);
+      } catch (err) {
+        console.log(err);
       }
 
       formik.setValues({ email: "", password: "" });
-      console.log(res);
     },
   });
 
@@ -70,23 +55,10 @@ export default function Page() {
       router.push("/me");
     }
 
-    if (signUpIsSuccess && !signInIsSuccess) {
-      showToast({
-        primaryMessage: "Sign up successful",
-      });
-    }
-
     if (signInIsError) {
       showToast({
         primaryMessage: "Login failed",
         secondaryMessage: signInError?.message,
-      });
-    }
-
-    if (signUpIsError) {
-      showToast({
-        primaryMessage: "Sign up failed",
-        secondaryMessage: signUpError?.message,
       });
     }
   }, [
@@ -94,9 +66,6 @@ export default function Page() {
     router,
     signInError?.message,
     signInIsError,
-    signUpError?.message,
-    signUpIsError,
-    signUpIsSuccess,
     signInIsSuccess,
   ]);
 
@@ -111,9 +80,7 @@ export default function Page() {
   return (
     <ContentWrapper>
       <Panel className="flex flex-col items-center mb-8 w-full">
-        <h1 className="text-3xl font-bold mb-4">
-          {mode === "login" ? "Login" : "Sign up"}
-        </h1>
+        <h1 className="text-3xl font-bold mb-4">Login</h1>
         <FormWrapper onSubmit={formik.handleSubmit}>
           <FormInputWithLabel
             label="Email address"
@@ -130,21 +97,19 @@ export default function Page() {
           />
           <div className="w-full flex justify-center">
             <SubmitButton
-              isSubmitting={
-                formik.isSubmitting || signUpIsLoading || signInIsLoading
-              }
+              isSubmitting={formik.isSubmitting || signInIsLoading}
               onClick={formik.handleSubmit}
             >
               Submit
             </SubmitButton>
           </div>
           <div className="w-full flex justify-center">
-            <div
-              onClick={() => setMode(mode === "login" ? "signup" : "login")}
+            <Link
+              href="/signup"
               className="underline cursor-pointer text-center"
             >
-              {mode === "login" ? "Sign up" : "Login"}
-            </div>
+              Sign up
+            </Link>
           </div>
         </FormWrapper>
       </Panel>

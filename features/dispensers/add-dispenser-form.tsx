@@ -16,6 +16,7 @@ import { useUserData } from "@nhost/nextjs";
 import { useEffect } from "react";
 import { Connection } from "@solana/web3.js";
 import { getRpcEndpoint } from "@/utils/rpc";
+import { useCluster } from "@/hooks/cluster";
 
 export type DispenserResponse = {
   id: string;
@@ -31,12 +32,13 @@ export const AddDispenserForm = ({
   setStep: (step: number) => void;
 }) => {
   // const { connection } = useConnection();
+  const { cluster } = useCluster();
   const anchorWallet = useAnchorWallet();
   const router = useRouter();
 
   const user = useUserData();
 
-  const connection = new Connection(getRpcEndpoint());
+  const connection = new Connection(getRpcEndpoint(cluster));
 
   const formik = useFormik({
     initialValues: {

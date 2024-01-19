@@ -13,7 +13,7 @@ import axios from "axios";
 import { getRpcEndpoint } from "@/utils/rpc";
 
 export async function POST(req: NextRequest) {
-  const { collectionAddress } = await req.json();
+  const { collectionAddress, cluster } = await req.json();
 
   if (!collectionAddress || !process.env.HELIUS_API_KEY) {
     return NextResponse.json(
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
   const helius = new Helius(process.env.HELIUS_API_KEY);
 
-  const umi = await getUmiClient(getRpcEndpoint());
+  const umi = await getUmiClient(getRpcEndpoint(cluster));
   // const collectionNft = await umi.rpc.getAccount(publicKey(collectionAddress));
   const { metadata } = await fetchDigitalAsset(umi, collectionAddress);
 

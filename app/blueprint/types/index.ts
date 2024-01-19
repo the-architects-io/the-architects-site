@@ -491,6 +491,16 @@ export type ModeledNftMetadata = {
   mintAuthorityAddress: string;
 };
 
+export type InviteCode = {
+  code: string;
+  id: string;
+  user: {
+    id: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+};
+
 export enum LOCAL_OR_REMOTE {
   LOCAL = "local",
   REMOTE = "remote",
@@ -1039,4 +1049,8 @@ export type MerkleTree = {
   maxCapacity: number;
   currentCapacity: number;
   cluster: "devnet" | "mainnet-beta";
+};
+
+export type RefreshUploadInput = {
+  userId: string;
 };

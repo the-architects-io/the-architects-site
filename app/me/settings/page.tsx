@@ -7,6 +7,7 @@ import { Divider } from "@/features/UI/divider";
 import { Panel } from "@/features/UI/panel";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
+import { GET_INVITE_CODE_BY_USER_ID } from "@/graphql/queries/get-invite-code-by-user-id";
 import { GET_WALLETS_BY_USER_ID } from "@/graphql/queries/get-wallets-by-user-id";
 import { copyTextToClipboard } from "@/utils/clipboard";
 import { getAbbreviatedAddress } from "@/utils/formatting";
@@ -22,17 +23,23 @@ import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+
+const INVITE_CODE_EXPIRATION_TIME_IN_HOURS = 24;
 
 export default function Page() {
   const { isAuthenticated, isLoading } = useAuthenticationStatus();
-  const { discord } = useProviderLink();
   const user = useUserData();
   const { signOut } = useSignOut();
   const router = useRouter();
   const [userWallets, setUserWallets] = useState<Wallet[]>([]);
   const [unlinkingWalletAddress, setUnlinkingWalletAddress] =
     useState<String>("");
+
+  const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const [inviteCodeRefreshTimestamp, setInviteCodeRefreshTimestamp] = useState<
+    number | null
+  >(null);
 
   const {
     loading,
@@ -50,10 +57,36 @@ export default function Page() {
     },
   });
 
+  const {
+    refetch: refetchInviteCode,
+    data: inviteCodeData,
+    loading: isLoadingInviteCode,
+  } = useQuery(GET_INVITE_CODE_BY_USER_ID, {
+    variables: {
+      userId: user?.id,
+    },
+    skip: !user?.id,
+    fetchPolicy: "network-only",
+  });
+
   const handleSignOut = async () => {
     await signOut();
     router.push("/");
   };
+
+  const handleGenerateInviteCode = useCallback(async () => {
+    try {
+      const { data, status } = await axios.post(`/api/refresh-invite-code`, {
+        userId: user?.id,
+      });
+      if (status === 200) {
+        setInviteCode(data.code);
+        setInviteCodeRefreshTimestamp(data.createdAt);
+      }
+    } catch (error) {
+      console.log({ error });
+    }
+  }, [user?.id]);
 
   const handleUnlinkWallet = async (address: string) => {
     setUnlinkingWalletAddress(address);
@@ -65,19 +98,28 @@ export default function Page() {
           address,
         }
       );
-      console.log({ data });
-      if (status === 200) {
-        showToast({
-          primaryMessage: "Wallet unlinked",
-          secondaryMessage: `Wallet ${getAbbreviatedAddress(
-            address
-          )} has been unlinked from your account.`,
-        });
-        await refetch();
-      }
     } catch (error) {
       console.log({ error });
     }
+  };
+
+  const isExpired = (timestamp: string) => {
+    // example timestamp: "2024-01-19T07:37:56.746389+00:00"
+    const now = new Date();
+    const createdAt = new Date(timestamp);
+    const diff = now.getTime() - createdAt.getTime();
+    const diffInHours = diff / (1000 * 3600);
+    if (diffInHours > INVITE_CODE_EXPIRATION_TIME_IN_HOURS) {
+      return true;
+    }
+    return false;
+  };
+
+  const handleCopyCode = () => {
+    if (!inviteCode) {
+      return;
+    }
+    copyTextToClipboard(inviteCode);
   };
 
   useEffect(() => {
@@ -85,6 +127,17 @@ export default function Page() {
       router.push("/login");
     }
   }, [isAuthenticated, router, isLoading]);
+
+  useEffect(() => {
+    if (inviteCodeData?.inviteCodes?.[0]) {
+      setInviteCode(inviteCodeData?.inviteCodes?.[0]?.code);
+      setInviteCodeRefreshTimestamp(inviteCodeData.inviteCodes?.[0]?.createdAt);
+    }
+    if (isExpired(inviteCodeData?.inviteCodes?.[0]?.createdAt)) {
+      setInviteCode(null);
+      handleGenerateInviteCode();
+    }
+  }, [handleGenerateInviteCode, inviteCodeData, isLoadingInviteCode]);
 
   if (!isAuthenticated || !user || loading) {
     return (
@@ -99,7 +152,7 @@ export default function Page() {
   return (
     <ContentWrapper>
       <Panel className="flex flex-col items-center mb-8 w-full">
-        {!!user?.avatarUrl ? (
+        {/* {!!user?.avatarUrl ? (
           <Image
             alt="avatar"
             src={user?.avatarUrl}
@@ -109,21 +162,34 @@ export default function Page() {
           />
         ) : (
           <div className="w-16 h-16 rounded-full bg-stone-700 mb-8" />
+        )} */}
+        <h1 className="text-3xl font-bold my-4">{displayName}</h1>
+        {!!inviteCode && (
+          <>
+            <Divider />
+            <div className="flex flex-col justify-center items-center w-full">
+              <div className="uppercase text-sm mb-2 tracking-wider">
+                Invite Code
+              </div>
+              <div className="mb-4 text-6xl  tracking-widest">{inviteCode}</div>
+            </div>
+            <PrimaryButton className="mb-4" onClick={handleCopyCode}>
+              Copy Code
+            </PrimaryButton>
+            <p className="italic max-w-xs text-center">
+              <div className="mb-2">
+                Code will be refreshed every{" "}
+                {INVITE_CODE_EXPIRATION_TIME_IN_HOURS} hours.
+              </div>
+              {!!inviteCodeRefreshTimestamp && (
+                <div>
+                  Next refresh{" "}
+                  {new Date(inviteCodeRefreshTimestamp).toLocaleString()}
+                </div>
+              )}
+            </p>
+          </>
         )}
-        <h1 className="text-3xl font-bold mb-4">{displayName}</h1>
-        {/* <a
-          href={discord}
-          className="bg-purple-700 text-white p-2 px-4 rounded-lg mb-4 uppercase"
-        >
-          Sign in with Discord
-        </a> */}
-        <Divider />
-        <PrimaryButton className="mb-4">
-          <Link href="/me/dispenser/create">Create Dispenser</Link>
-        </PrimaryButton>
-        <PrimaryButton>
-          <Link href="/me/dispenser">My Dispensers</Link>
-        </PrimaryButton>
         <Divider />
         <div className="uppercase mb-4">Connected Wallet</div>
         <WalletButton />

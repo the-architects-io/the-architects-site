@@ -29,10 +29,12 @@ import WalletButton from "@/features/UI/buttons/wallet-button";
 import { Metaplex, PublicKey } from "@metaplex-foundation/js";
 import { ClipboardIcon } from "@heroicons/react/24/outline";
 import { copyTextToClipboard } from "@/utils/clipboard";
+import { useCluster } from "@/hooks/cluster";
 
 const { LOCAL, REMOTE } = LOCAL_OR_REMOTE;
 
 export default function AirdropPage() {
+  const { cluster } = useCluster();
   const { isAdmin } = useAdmin();
   const wallet = useWallet();
 
@@ -79,7 +81,7 @@ export default function AirdropPage() {
         return;
       }
 
-      const connection = new Connection(getRpcEndpoint());
+      const connection = new Connection(getRpcEndpoint(cluster));
       const metaplex = Metaplex.make(connection);
       const { json } = await metaplex
         .nfts()
@@ -105,25 +107,25 @@ export default function AirdropPage() {
 
     setHasInitializedUmiClient(true);
 
-    const umi = await createUmi(getRpcEndpoint())
+    const umi = await createUmi(getRpcEndpoint(cluster))
       .use(mplToolbox())
       .use(mplTokenMetadata())
       .use(dasApi())
       .use(walletAdapterIdentity(wallet));
 
     setUmi(umi);
-  }, [wallet]);
+  }, [wallet, cluster]);
 
   const handleCreateDriveClient = useCallback(async () => {
     await wallet?.connect();
 
     setHasCreatedDriveClient(true);
 
-    const connection = new Connection(getRpcEndpoint());
+    const connection = new Connection(getRpcEndpoint(cluster));
     const drive = await new ShdwDrive(connection, wallet).init();
 
     setDrive(drive);
-  }, [wallet]);
+  }, [wallet, cluster]);
 
   useEffect(() => {
     if (!isAdmin) return;

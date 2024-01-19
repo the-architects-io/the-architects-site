@@ -19,6 +19,7 @@ interface Props {
   setIsLoading?: (isLoading: boolean) => void;
   setHasBeenFetched?: (hasBeenFetched: boolean) => void;
   withMetadata?: boolean;
+  cluster?: "devnet" | "mainnet-beta";
 }
 
 const convertImageUrl = (imageUrl: string): string => {
@@ -36,10 +37,11 @@ export const fetchDaoNfts = async ({
   setIsLoading,
   setHasBeenFetched,
   withMetadata = true,
+  cluster = "mainnet-beta",
 }: Props): Promise<any[]> => {
   setIsLoading && setIsLoading(true);
   return new Promise(async (resolve, reject) => {
-    const connection = new Connection(getRpcEndpoint());
+    const connection = new Connection(getRpcEndpoint(cluster));
     const metaplex = Metaplex.make(connection);
 
     console.log("address", publicKey.toString());

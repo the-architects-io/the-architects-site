@@ -32,6 +32,7 @@ import { publicKey } from "@metaplex-foundation/umi";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { getRpcEndpoint } from "@/utils/rpc";
+import { useCluster } from "@/hooks/cluster";
 
 type Reward = {
   mint: string;
@@ -59,6 +60,7 @@ export const DispenserRewardForm = ({
   dispenserId: string;
   setStep: (step: number) => void;
 }) => {
+  const { cluster } = useCluster();
   const { dispenser, isLoading } = useDispenser(dispenserId);
   const [isFetchingTokens, setIsFetchingTokens] = useState(false);
   const [tokens, setTokens] = useState<TokenBalance[]>([]);
@@ -91,7 +93,7 @@ export const DispenserRewardForm = ({
       console.log({ allTokens });
 
       try {
-        const umi = createUmi(getRpcEndpoint());
+        const umi = createUmi(getRpcEndpoint(cluster));
         const nfts = await fetchAllDigitalAsset(
           umi,
           allTokens
@@ -204,7 +206,7 @@ export const DispenserRewardForm = ({
           walletAddress: dispenser?.rewardWalletAddress,
         }
       );
-      const umi = createUmi(getRpcEndpoint());
+      const umi = createUmi(getRpcEndpoint(cluster));
 
       const assets = await fetchAllDigitalAssetByOwner(
         umi,

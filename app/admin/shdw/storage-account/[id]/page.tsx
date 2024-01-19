@@ -12,6 +12,7 @@ import { ShdwDrive, StorageAccountV2 } from "@shadow-drive/sdk";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
 import { useEffect, useState } from "react";
+import { useCluster } from "@/hooks/cluster";
 
 export default function StorageAccountPage({
   params,
@@ -21,7 +22,7 @@ export default function StorageAccountPage({
   };
 }) {
   const wallet = useWallet();
-
+  const { cluster } = useCluster();
   const [shadowDrive, setShadowDrive] = useState<ShdwDrive | null>(null);
   const [storageAccount, setStorageAccount] = useState<StorageAccountV2 | null>(
     null

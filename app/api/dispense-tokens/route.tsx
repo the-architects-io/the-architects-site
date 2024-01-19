@@ -25,7 +25,7 @@ import { fromBaseUnit } from "@/utils/currency";
 import { getRpcEndpoint } from "@/utils/rpc";
 
 export async function POST(req: Request) {
-  const { noop, dispenserId, recipientAddress, mintAddress, amount, apiKey } =
+  const { noop, dispenserId, recipientAddress, mintAddress, amount, apiKey, cluster } =
     await req.json();
 
   if (!process.env.API_ACCESS_HOST_LIST) {
@@ -136,7 +136,7 @@ export async function POST(req: Request) {
   console.log(5);
 
   const anchorWallet = new NodeWallet(rewardKeypair);
-  const connection = new Connection(getRpcEndpoint(), "confirmed");
+  const connection = new Connection(getRpcEndpoint(cluster), "confirmed");
 
   console.log(6);
 
