@@ -1054,3 +1054,17 @@ export type MerkleTree = {
 export type RefreshUploadInput = {
   userId: string;
 };
+
+export type AddUserInviteInput = {
+  userId: string;
+  invitedUserId: string;
+};
+
+export type InviteCount = {
+  user: {
+    email: string;
+    id: string;
+    displayName: string;
+  };
+  inviteCount: number;
+};

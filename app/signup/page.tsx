@@ -1,5 +1,7 @@
 "use client";
 
+import { BASE_URL } from "@/constants/constants";
+import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
@@ -10,6 +12,7 @@ import showToast from "@/features/toasts/show-toast";
 import { GET_INVITE_CODE } from "@/graphql/queries/get-invite-code";
 import { useLazyQuery } from "@apollo/client";
 import { useAuthenticationStatus, useSignUpEmailPassword } from "@nhost/nextjs";
+import axios from "axios";
 import classNames from "classnames";
 import { useFormik } from "formik";
 import Link from "next/link";
@@ -21,6 +24,7 @@ export default function Page() {
   const [isValidInviteCode, setIsValidInviteCode] = useState<boolean>(false);
   const [isValidatingInviteCode, setIsValidatingInviteCode] =
     useState<boolean>(false);
+  const [invitingUserId, setInvitingUserId] = useState<string | null>(null);
 
   const [handleValidateInviteCode, { loading }] = useLazyQuery(
     GET_INVITE_CODE,
@@ -29,8 +33,10 @@ export default function Page() {
       onCompleted: ({ inviteCodes }) => {
         if (inviteCodes.length > 0) {
           setIsValidInviteCode(true);
+          setInvitingUserId(inviteCodes[0].user.id);
         } else {
           setIsValidInviteCode(false);
+          setInvitingUserId(null);
         }
       },
     }
@@ -61,11 +67,23 @@ export default function Page() {
         res = await signUpEmailPassword(email, password, {
           allowedRoles: ["user"],
         });
+        const { user } = res;
+
+        if (user) {
+          await axios.post(`${BASE_URL}/api/add-user-invite`, {
+            userId: invitingUserId,
+            invitedUserId: user.id,
+          });
+        }
       } catch (err) {
         console.log(err);
       }
 
-      formik.setValues({ email: "", password: "", inviteCode: "" });
+      formik.setValues({
+        email: "",
+        password: "",
+        inviteCode: formik.values.inviteCode,
+      });
     },
   });
 

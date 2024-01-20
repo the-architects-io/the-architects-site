@@ -1,48 +1,80 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   BlueprintClientOptions,
   createBlueprintClient,
 } from "@/app/blueprint/client";
+import useWebSocket, { ReadyState } from "react-use-websocket";
+import { ARCHITECTS_WS_API_URL } from "@/constants/constants";
+import { messageTypes } from "@/app/blueprint/types/websocket-messages";
+import { useCluster } from "@/hooks/cluster";
+
+const { PONG, PING } = messageTypes;
 
 // Assuming your API methods return a Promise of a specific type, you can define those types here.
 // For example:
 // interface CreateAirdropResponse { ... }
 
-const useBlueprint = (options: BlueprintClientOptions) => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null);
+type WebsocketMessage = {
+  type: string;
+  payload: any;
+};
 
-  // Instantiate the client
+const useBlueprint = (options?: BlueprintClientOptions) => {
+  const { cluster } = useCluster();
+  const { sendMessage, lastMessage, readyState } = useWebSocket(
+    `${ARCHITECTS_WS_API_URL}`
+  );
+  const [latencyInMs, setLatencyInMs] = useState<number | null>(null);
+
+  const handleMessageData = useCallback(
+    async ({ type, payload }: WebsocketMessage) => {
+      switch (type) {
+        case PONG:
+          setLatencyInMs(Date.now() - payload.timestamp);
+          console.log("PONG!", Date.now() - payload.timestamp);
+          break;
+        default:
+          break;
+      }
+    },
+    [setLatencyInMs]
+  );
+
+  useEffect(() => {
+    if (lastMessage !== null) {
+      handleMessageData(JSON.parse(lastMessage.data));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastMessage]);
+
+  if (!options) {
+    options = {
+      cluster,
+    };
+  }
+
   const client = createBlueprintClient(options);
 
-  // Higher-order function to wrap client methods
-  const wrapMethod =
-    <T,>(method: (...args: any[]) => Promise<T>) =>
-    async (...args: any[]): Promise<T> => {
-      try {
-        setLoading(true);
-        return await method(...args);
-      } catch (err) {
-        setError(err as Error);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    };
-
-  // Dynamically create the hook's return object
-  const wrappedMethods = Object.keys(client).reduce((acc, methodName) => {
-    const method = (client as any)[methodName] as (
-      ...args: any[]
-    ) => Promise<any>;
-    acc[methodName] = wrapMethod(method);
-    return acc;
-  }, {} as Record<string, (...args: any[]) => Promise<any>>);
-
   return {
-    ...wrappedMethods,
-    loading,
-    error,
+    ws: {
+      PING: () => {
+        if (readyState === ReadyState.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: PING,
+              payload: {
+                timestamp: Date.now(),
+              },
+            })
+          );
+        }
+      },
+      latencyInMs,
+      sendMessage,
+      lastMessage,
+      readyState,
+    },
+    blueprint: client,
   };
 };
 

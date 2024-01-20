@@ -1,4 +1,5 @@
 "use client";
+import useBlueprint from "@/app/blueprint/hooks/use-blueprint";
 import { Wallet } from "@/app/blueprint/types";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import WalletButton from "@/features/UI/buttons/wallet-button";
@@ -8,6 +9,7 @@ import { Panel } from "@/features/UI/panel";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
 import { GET_INVITE_CODE_BY_USER_ID } from "@/graphql/queries/get-invite-code-by-user-id";
+import { GET_USER_INVITES_COUNT } from "@/graphql/queries/get-user-invites-count";
 import { GET_WALLETS_BY_USER_ID } from "@/graphql/queries/get-wallets-by-user-id";
 import { copyTextToClipboard } from "@/utils/clipboard";
 import { getAbbreviatedAddress } from "@/utils/formatting";
@@ -40,6 +42,7 @@ export default function Page() {
   const [inviteCodeRefreshTimestamp, setInviteCodeRefreshTimestamp] = useState<
     number | null
   >(null);
+  const [inviteCount, setInviteCount] = useState<number>(0);
 
   const {
     loading,
@@ -54,6 +57,18 @@ export default function Page() {
     onCompleted: ({ wallets }) => {
       console.log({ wallets });
       setUserWallets(wallets);
+    },
+  });
+
+  const { data: inviteCountData } = useQuery(GET_USER_INVITES_COUNT, {
+    variables: {
+      userId: user?.id,
+    },
+    skip: !user?.id,
+    fetchPolicy: "network-only",
+    onCompleted: ({ userInvites_aggregate }) => {
+      console.log({ userInvites_aggregate });
+      setInviteCount(userInvites_aggregate.aggregate.count);
     },
   });
 
@@ -168,6 +183,10 @@ export default function Page() {
           <>
             <Divider />
             <div className="flex flex-col justify-center items-center w-full">
+              <div className="uppercase text-sm mb-2 tracking-wider">
+                My Invites
+              </div>
+              <div className="mb-8 text-6xl tracking-widest">{inviteCount}</div>
               <div className="uppercase text-sm mb-2 tracking-wider">
                 Invite Code
               </div>
