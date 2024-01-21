@@ -18,6 +18,7 @@ import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mi
 import { Dispenser, Token, Wallet } from "@/app/blueprint/types";
 import { RPC_ENDPOINT } from "@/constants/constants";
 import { getRpcEndpoint } from "@/utils/rpc";
+import { handleError } from "@/utils/errors/log-error";
 
 // Old endpoint currently supporting BUILD dispenser
 export async function POST(req: NextRequest) {
@@ -122,16 +123,17 @@ export async function POST(req: NextRequest) {
         }
       );
     } catch (error: any) {
-      console.log("1!!", error);
       const { logs }: { logs: string[] } = error;
 
       // only handles NFTs, not SFTs
       if (logs.includes("Program log: Incorrect account owner")) {
+        handleError(error as Error);
         return NextResponse.json(
           { error, message: "Stock empty" },
           { status: 400 }
         );
       } else {
+        handleError(error as Error);
         return NextResponse.json(
           { error, message: "Failed to send reward" },
           { status: 400 }
@@ -161,7 +163,7 @@ export async function POST(req: NextRequest) {
         wallet = insert_wallets_one;
       }
     } catch (error) {
-      console.log("2!!", error);
+      handleError(error as Error);
       return NextResponse.json(
         { error, message: "Failed to add wallet" },
         { status: 400 }
@@ -192,7 +194,7 @@ export async function POST(req: NextRequest) {
         });
       payout = insert_payouts_one;
     } catch (error) {
-      console.log("ADD PAYOUT ERROR", error);
+      handleError(error as Error);
       return NextResponse.json(
         { error, message: "Failed to add payout" },
         { status: 400 }
@@ -212,7 +214,7 @@ export async function POST(req: NextRequest) {
         });
       updatedToken = update_tokens_by_pk;
     } catch (error) {
-      console.log("LAST CLAIM TIME ERROR", error);
+      handleError(error as Error);
       return NextResponse.json(
         { error, message: "Failed to add last claim time" },
         { status: 400 }
@@ -221,7 +223,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ rewardTxAddress, payout }, { status: 200 });
   } catch (error: any) {
-    console.log("4!!", error);
+    handleError(error as Error);
     return NextResponse.json({ error: error?.message }, { status: 400 });
   }
 }

@@ -1,3 +1,4 @@
+import { handleError } from "@/utils/errors/log-error";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import { Metaplex } from "@metaplex-foundation/js";
 import { PublicKey } from "@solana/web3.js";
@@ -83,8 +84,7 @@ export const fetchNftsByFirstCreatorAddress = async ({
 
       resolve(nftsWithMetadata);
     } catch (error) {
-      console.log("fetchDaoNfts error", error);
-      console.error({ error });
+      handleError(error as Error);
       reject(error);
     } finally {
       setIsLoading && setIsLoading(false);

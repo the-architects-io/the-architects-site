@@ -29,6 +29,7 @@ import { GET_NFT_COLLECTION_BY_MINT_ADDRESS } from "@/graphql/queries/get-nft-co
 import { NftCollection } from "@/features/admin/nft-collections/nfts-collection-list-item";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import Stopwatch from "@/features/stopwatch/stopwatch";
+import { handleError } from "@/utils/errors/log-error";
 
 type AddCharactersFromNftsResponse = {
   data: {
@@ -197,7 +198,7 @@ export default function FetchPage() {
         formik.setFieldValue("hashList", "");
         setShouldStartStopwatch(false);
       } catch (error) {
-        console.log(error);
+        handleError(error as Error);
         showToast({
           primaryMessage: "Error adding characters to db",
         });
@@ -370,6 +371,7 @@ export default function FetchPage() {
           shouldOverwrite
         );
       } catch (error) {
+        handleError(error as Error);
         console.error("Error fetching NFTs:", error);
       }
     },

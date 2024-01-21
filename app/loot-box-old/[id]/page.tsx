@@ -30,6 +30,7 @@ import { NextPage } from "next";
 import { useCallback, useEffect, useState } from "react";
 import useCostBalance from "@/app/blueprint/hooks/use-cost-balance";
 import { Dispenser } from "@/app/blueprint/types";
+import { handleError } from "@/utils/errors/log-error";
 
 export default function LootBoxDetailPage({ params }: { params: any }) {
   const wallet = useWallet();
@@ -178,7 +179,7 @@ export default function LootBoxDetailPage({ params }: { params: any }) {
         primaryMessage: "Error",
         secondaryMessage: "Something went wrong.",
       });
-      console.log(error);
+      handleError(error as Error);
     } finally {
       setTransferInProgress(false);
     }

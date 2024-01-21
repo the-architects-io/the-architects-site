@@ -12,6 +12,7 @@ import { GET_INVITE_CODE_BY_USER_ID } from "@/graphql/queries/get-invite-code-by
 import { GET_USER_INVITES_COUNT } from "@/graphql/queries/get-user-invites-count";
 import { GET_WALLETS_BY_USER_ID } from "@/graphql/queries/get-wallets-by-user-id";
 import { copyTextToClipboard } from "@/utils/clipboard";
+import { handleError } from "@/utils/errors/log-error";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { useQuery } from "@apollo/client";
 import { ClipboardIcon, TrashIcon } from "@heroicons/react/24/outline";
@@ -99,7 +100,7 @@ export default function Page() {
         setInviteCodeRefreshTimestamp(data.createdAt);
       }
     } catch (error) {
-      console.log({ error });
+      handleError(error as Error);
     }
   }, [user?.id]);
 
@@ -114,7 +115,7 @@ export default function Page() {
         }
       );
     } catch (error) {
-      console.log({ error });
+      handleError(error as Error);
     }
   };
 

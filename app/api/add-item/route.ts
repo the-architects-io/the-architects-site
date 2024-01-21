@@ -4,6 +4,7 @@ import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { Item, NoopResponse } from "@/app/blueprint/types";
+import { handleError } from "@/utils/errors/log-error";
 
 type Data =
   | Item
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(insert_items_one, { status: 200 });
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json({ error }, { status: 500 });
   }
 }

@@ -12,6 +12,7 @@ import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { GET_ITEMS_BY_CATEGORY_ID } from "@/graphql/queries/get-items-by-category-id";
 import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-label";
 import { Item } from "@/app/blueprint/types";
+import { handleError } from "@/utils/errors/log-error";
 
 export const ITEM_CATEGORY_IDS = {
   Currency: "8d5ea141-ed79-42a3-aa09-363ed39a427b",
@@ -50,6 +51,7 @@ export const AddCostForm = ({
         showToast({
           primaryMessage: "Error adding cost",
         });
+        handleError(error as Error);
       } finally {
         setIsAddingCost(false);
       }

@@ -1,5 +1,6 @@
 import { mapShdwDriveAccountsToBlueprintDriveAccounts } from "@/app/blueprint/utils/mappers/drives";
 import { RPC_ENDPOINT } from "@/constants/constants";
+import { handleError } from "@/utils/errors/log-error";
 import { getBestFittingStorageSizeString } from "@/utils/formatting";
 import { getRpcEndpoint } from "@/utils/rpc";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
@@ -102,7 +103,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.log(error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         success: false,

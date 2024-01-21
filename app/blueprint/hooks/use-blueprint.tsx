@@ -8,11 +8,7 @@ import { ARCHITECTS_WS_API_URL } from "@/constants/constants";
 import { messageTypes } from "@/app/blueprint/types/websocket-messages";
 import { useCluster } from "@/hooks/cluster";
 
-const { PONG, PING } = messageTypes;
-
-// Assuming your API methods return a Promise of a specific type, you can define those types here.
-// For example:
-// interface CreateAirdropResponse { ... }
+const { PONG, PING, REPORT_ERROR } = messageTypes;
 
 type WebsocketMessage = {
   type: string;
@@ -57,6 +53,18 @@ const useBlueprint = (options?: BlueprintClientOptions) => {
 
   return {
     ws: {
+      REPORT_ERROR: (error: any) => {
+        if (readyState === ReadyState.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: REPORT_ERROR,
+              payload: {
+                error,
+              },
+            })
+          );
+        }
+      },
       PING: () => {
         if (readyState === ReadyState.OPEN) {
           sendMessage(

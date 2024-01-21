@@ -5,6 +5,7 @@ import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import showToast from "@/features/toasts/show-toast";
 import { GET_AIRDROP_BY_ID } from "@/graphql/queries/get-airdrop-by-id";
 import { useCluster } from "@/hooks/cluster";
+import { handleError } from "@/utils/errors/log-error";
 import { useQuery } from "@apollo/client";
 import { useUserData } from "@nhost/nextjs";
 
@@ -57,6 +58,7 @@ export default function CreateAirdropForm({
             parsedContents.every((item) => typeof item === "string");
           resolve(isValid);
         } catch (error) {
+          handleError(error as Error);
           resolve(false);
         }
       };

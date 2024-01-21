@@ -18,6 +18,7 @@ import { JobIcons } from "@/features/jobs/job-icon";
 import showToast from "@/features/toasts/show-toast";
 
 import { useCluster } from "@/hooks/cluster";
+import { handleError } from "@/utils/errors/log-error";
 import { useUserData } from "@nhost/nextjs";
 import axios from "axios";
 
@@ -120,7 +121,7 @@ export const ExecuteAirdrop = ({
         statusText: "Failed to upload collection NFT metadata",
         icon: JobIcons.ERROR,
       });
-      console.log({ error });
+      handleError(error as Error);
     }
 
     await blueprint.jobs.updateJob({
@@ -146,7 +147,7 @@ export const ExecuteAirdrop = ({
         statusText: "Failed to mint collection NFT",
         icon: JobIcons.ERROR,
       });
-      console.log({ error });
+      handleError(error as Error);
     }
 
     await blueprint.jobs.updateJob({
@@ -181,7 +182,7 @@ export const ExecuteAirdrop = ({
         statusText: "Failed to create merkle tree",
         icon: JobIcons.ERROR,
       });
-      console.log({ error });
+      handleError(error as Error);
     }
 
     try {
@@ -191,7 +192,7 @@ export const ExecuteAirdrop = ({
         merkleTreeId: treeId,
       });
     } catch (error) {
-      console.log({ error });
+      handleError(error as Error);
     }
 
     try {
@@ -227,7 +228,7 @@ export const ExecuteAirdrop = ({
         recipientCount: recipientWalletAddresses.length,
       });
     } catch (error) {
-      console.log({ error });
+      handleError(error as Error);
     }
   }, [
     airdrop.collection,

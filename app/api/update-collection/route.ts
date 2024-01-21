@@ -4,6 +4,7 @@ import { ADD_CREATORS } from "@/graphql/mutations/add-creators";
 import { ADD_WALLETS } from "@/graphql/mutations/add-wallets";
 import { UPDATE_COLLECTION } from "@/graphql/mutations/update-collection";
 import { GET_WALLETS_BY_ADDRESSES } from "@/graphql/queries/get-wallets-by-addresses";
+import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
       console.log("@@@@@@@ added creators");
       console.log({ addedCreators });
     } catch (error) {
-      console.log(JSON.stringify(error, null, 2));
+      handleError(error as Error);
       return NextResponse.json(
         {
           message: "Error adding creators",
@@ -118,7 +119,7 @@ export async function POST(req: NextRequest) {
     );
     updatedCollection = update_collections_by_pk;
   } catch (error) {
-    console.log("error", error);
+    handleError(error as Error);
     return NextResponse.json(
       { error: "Error updating collection" },
       { status: 500 }

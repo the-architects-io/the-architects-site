@@ -15,6 +15,7 @@ import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { mplToolbox } from "@metaplex-foundation/mpl-toolbox";
 import { dasApi } from "@metaplex-foundation/digital-asset-standard-api";
 import { getRpcEndpoint, isValidCluster } from "@/utils/rpc";
+import { handleError } from "@/utils/errors/log-error";
 
 export type UploadAssetsToShadowDriveResponse = {
   urls: string[];
@@ -122,7 +123,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.log("error", error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         error: JSON.stringify(error),

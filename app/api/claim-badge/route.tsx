@@ -21,6 +21,7 @@ import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
 import { Dispenser, Wallet } from "@/app/blueprint/types";
 import { getRpcEndpoint } from "@/utils/rpc";
+import { handleError } from "@/utils/errors/log-error";
 
 type Data =
   | {
@@ -130,7 +131,7 @@ export async function POST(req: NextRequest) {
         }
       );
     } catch (error: any) {
-      console.log(error);
+      handleError(error as Error);
       const { logs }: { logs: string[] } = error;
       if (logs.includes("Program log: Error: Account is frozen")) {
         return NextResponse.json(
@@ -167,7 +168,7 @@ export async function POST(req: NextRequest) {
         wallet = insert_wallets_one;
       }
     } catch (error) {
-      console.log(error);
+      handleError(error as Error);
       return NextResponse.json(
         { error, message: "Failed to add wallet" },
         { status: 400 }
@@ -193,7 +194,7 @@ export async function POST(req: NextRequest) {
         });
       payout = insert_payouts_one;
     } catch (error) {
-      console.log(error);
+      handleError(error as Error);
       return NextResponse.json(
         { error, message: "Failed to add payout" },
         { status: 400 }
@@ -202,7 +203,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ rewardTxAddress, payout }, { status: 200 });
   } catch (error: any) {
-    console.log(error);
+    handleError(error as Error);
     return NextResponse.json({ error: error?.message }, { status: 400 });
   }
 }

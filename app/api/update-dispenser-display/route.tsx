@@ -5,6 +5,7 @@ import { DispenserDisplay } from "@/app/blueprint/types";
 import { UPDATE_DISPENSER_DISPLAY } from "@/graphql/mutations/update-dispenser-display";
 import { GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID } from "@/graphql/queries/get-dispenser-displays-by-dispenser-id";
 import { ADD_DISPENSER_DISPLAY } from "@/graphql/mutations/add-dispenser-display";
+import { handleError } from "@/utils/errors/log-error";
 
 export async function POST(req: NextRequest) {
   const {
@@ -82,6 +83,7 @@ export async function POST(req: NextRequest) {
     console.log("=== FOUND DISPENSER DISPLAY ===");
     console.log({ dispenser_displays });
   } catch (error) {
+    handleError(error as Error);
     return NextResponse.json(
       { error: "Error getting dispenser display" },
       { status: 500 }
@@ -125,7 +127,7 @@ export async function POST(req: NextRequest) {
       console.log("=== UPDATED DISPENSER DISPLAY ===");
       console.log({ update_dispenser_displays_by_pk });
     } catch (error) {
-      console.error(error);
+      handleError(error as Error);
       return NextResponse.json(
         { error: "Error updating dispenser display" },
         { status: 500 }
@@ -147,7 +149,7 @@ export async function POST(req: NextRequest) {
 
       dispenserDisplay = insert_dispenser_displays_one;
     } catch (error) {
-      console.error(error);
+      handleError(error as Error);
       return NextResponse.json(
         { error: "Error creating dispenser display" },
         { status: 500 }

@@ -10,6 +10,7 @@ import { Panel } from "@/features/UI/panel";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
 import { GET_INVITE_CODE } from "@/graphql/queries/get-invite-code";
+import { handleError } from "@/utils/errors/log-error";
 import { useLazyQuery } from "@apollo/client";
 import { useAuthenticationStatus, useSignUpEmailPassword } from "@nhost/nextjs";
 import axios from "axios";
@@ -120,7 +121,7 @@ export default function Page() {
         },
       });
     } catch (error) {
-      console.error(error);
+      handleError(error as Error);
     } finally {
       setIsValidatingInviteCode(false);
     }

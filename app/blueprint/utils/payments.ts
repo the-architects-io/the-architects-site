@@ -2,6 +2,7 @@ import {
   BASE_URL,
   NEXT_PUBLIC_ARCHITECTS_COLLECTION_WALLET_ADDRESS,
 } from "@/constants/constants";
+import { handleError } from "@/utils/errors/log-error";
 import { getRpcEndpoint } from "@/utils/rpc";
 import { PublicKey } from "@metaplex-foundation/js";
 import {
@@ -63,8 +64,8 @@ const handleSolPayment = async ({
     txId = await wallet.sendTransaction(tx, connection);
     console.log({ txId });
     debugger;
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    handleError(error as Error);
     return {
       error: "Failed to send transaction",
     };
@@ -161,8 +162,8 @@ const handleSplPayment = async ({
   try {
     txId = await wallet.sendTransaction(tx, connection);
     console.log({ txId });
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    handleError(error as Error);
     return {
       error: "Failed to send transaction",
     };

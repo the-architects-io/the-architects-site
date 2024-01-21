@@ -13,6 +13,7 @@ import { Panel } from "@/features/UI/panel";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
 import { useCluster } from "@/hooks/cluster";
+import { handleError } from "@/utils/errors/log-error";
 import { makeNumberArray } from "@/utils/formatting";
 import { Umi, isPublicKey, publicKey } from "@metaplex-foundation/umi";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -110,7 +111,7 @@ export default function CnftMintForm({
         setMintedIds((mintedIds) => [...mintedIds, id]);
       } catch (error) {
         setFailedMintedIds((failedMintedIds) => [...failedMintedIds, id]);
-        console.log({ error });
+        handleError(error as Error);
       }
     }
 

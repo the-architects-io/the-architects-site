@@ -18,6 +18,7 @@ import {
 } from "@metaplex-foundation/digital-asset-standard-api";
 import showToast from "@/features/toasts/show-toast";
 import { getAbbreviatedAddress } from "@/utils/formatting";
+import { handleError } from "@/utils/errors/log-error";
 
 export const FetchUpdateAuthorityForm = ({
   updateAuthorityAddress,
@@ -45,7 +46,7 @@ export const FetchUpdateAuthorityForm = ({
       );
       return data;
     } catch (error) {
-      console.log(error);
+      handleError(error as Error);
       return null;
     } finally {
       setIsFetchingTokenMetadata(false);

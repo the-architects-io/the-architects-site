@@ -2,6 +2,7 @@ import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 import { del } from "@vercel/blob";
 import { BASE_URL } from "@/constants/constants";
+import { handleError } from "@/utils/errors/log-error";
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
@@ -106,6 +107,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
           await del(url);
         } catch (error) {
+          handleError(error as Error);
           throw new Error("Could not upload file");
         }
       },
@@ -113,6 +115,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     return NextResponse.json(jsonResponse);
   } catch (error) {
+    handleError(error as Error);
     return NextResponse.json(
       { error: (error as Error).message },
       { status: 400 } // The webhook will retry 5 times waiting for a 200

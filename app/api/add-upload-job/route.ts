@@ -1,6 +1,7 @@
 import { CreateUploadJobInput, UploadJob } from "@/app/blueprint/types";
 import { client } from "@/graphql/backend-client";
 import { ADD_UPLOAD_JOB } from "@/graphql/mutations/add-upload-job";
+import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
       }
     );
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         success: false,

@@ -5,6 +5,7 @@ import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { UploadJsonInput } from "@/app/blueprint/types";
+import { handleError } from "@/utils/errors/log-error";
 
 export type UploadAssetsToShadowDriveResponse = {
   urls: string[];
@@ -76,7 +77,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.log("error", error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         error: JSON.stringify(error),

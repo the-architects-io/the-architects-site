@@ -8,6 +8,7 @@ import {
   RewardCollection,
 } from "@/app/blueprint/types";
 import { ADD_COST_COLLECTION } from "@/graphql/mutations/add-cost-collection";
+import { handleError } from "@/utils/errors/log-error";
 
 type Data =
   | RewardCollection
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(costCollection, { status: 200 });
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json({ error }, { status: 500 });
   }
 }

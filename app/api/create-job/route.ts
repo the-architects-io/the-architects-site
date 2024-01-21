@@ -1,6 +1,7 @@
 import { CreateJobInput, Job } from "@/app/blueprint/types";
 import { client } from "@/graphql/backend-client";
 import { ADD_JOB } from "@/graphql/mutations/add-job";
+import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ job }, { status: 200 });
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json(
       { error: "There was an unexpected error" },
       { status: 500 }

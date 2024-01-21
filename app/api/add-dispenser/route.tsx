@@ -5,6 +5,7 @@ import type { NextRequest } from "next/server";
 import { ADD_DISPENSER } from "@/graphql/mutations/add-dispenser";
 import { Dispenser, NoopResponse } from "@/app/blueprint/types";
 import { ENV } from "@/constants/constants";
+import { handleError } from "@/utils/errors/log-error";
 
 type Data =
   | Dispenser
@@ -89,7 +90,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(dispenser, { status: 200 });
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json({ error }, { status: 500 });
   }
 }

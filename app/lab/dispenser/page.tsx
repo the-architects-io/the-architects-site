@@ -21,6 +21,7 @@ import { publicKey } from "@metaplex-foundation/umi";
 import { Dispenser, TokenBalance } from "@/app/blueprint/types";
 import { toBaseUnit } from "@/utils/currency";
 import { getRpcEndpoint } from "@/utils/rpc";
+import { handleError } from "@/utils/errors/log-error";
 
 export default function Page({ params }: { params: any }) {
   const user = useUserData();
@@ -135,6 +136,7 @@ export default function Page({ params }: { params: any }) {
       setIsClaiming(false);
       // refetch && refetch();
     } catch (error) {
+      handleError(error as Error);
       showToast({
         primaryMessage: "Error claiming token",
         secondaryMessage: "Please try again later.",

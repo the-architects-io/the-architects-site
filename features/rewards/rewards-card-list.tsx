@@ -1,22 +1,8 @@
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import { DispenserReward } from "@/app/blueprint/types";
-import { ContentWrapper } from "@/features/UI/content-wrapper";
-import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import RewardCard from "@/features/rewards/reward-card";
-import { getAbbreviatedAddress, round } from "@/utils/formatting";
-import { isPublicKey } from "@metaplex-foundation/umi";
 import axios from "axios";
-import classNames from "classnames";
 import { useCallback, useEffect, useState } from "react";
-
-const isJsonString = (str: string) => {
-  try {
-    JSON.parse(str);
-  } catch (e) {
-    return false;
-  }
-  return true;
-};
 
 export const RewardsCardList = ({
   dispenserId,

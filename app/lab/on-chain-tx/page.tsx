@@ -22,6 +22,7 @@ import {
   getAssociatedTokenAddress,
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
+import { handleError } from "@/utils/errors/log-error";
 
 const AUTHORITY_SEED = process.env.NEXT_PUBLIC_AUTHORITY_SEED || "";
 
@@ -48,7 +49,7 @@ export default function Page({ params }: { params: any }) {
         });
         formik.setValues({ walletAddress: "" });
       } catch (error: any) {
-        console.log("error", error);
+        handleError(error as Error);
         showToast({
           primaryMessage: "Error updating token",
           secondaryMessage: error?.response?.data?.error,
@@ -85,8 +86,8 @@ export default function Page({ params }: { params: any }) {
           title: "View Transaction",
         },
       });
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      handleError(error as Error);
     }
   };
 

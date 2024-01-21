@@ -1,5 +1,6 @@
 import { useState } from "react";
 import cloneDeep from "lodash.clonedeep";
+import { handleError } from "@/utils/errors/log-error";
 
 type UploadProps = any;
 
@@ -86,6 +87,7 @@ const useUploadFile: UseUploadFile = (
         setLoading(false);
         onSuccess(res, file);
       } catch (e) {
+        handleError(e as Error);
         setLoading(false);
         onError(e);
       }

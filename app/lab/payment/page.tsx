@@ -12,6 +12,7 @@ import { Panel } from "@/features/UI/panel";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
 import { useCluster } from "@/hooks/cluster";
+import { handleError } from "@/utils/errors/log-error";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Image from "next/image";
 import { useCallback, useState } from "react";
@@ -52,7 +53,7 @@ export default function Page() {
         });
       }
     } catch (error) {
-      console.log(error);
+      handleError(error as Error);
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +80,7 @@ export default function Page() {
         });
       }
     } catch (error) {
-      console.log(error);
+      handleError(error as Error);
     } finally {
       setIsLoading(false);
     }

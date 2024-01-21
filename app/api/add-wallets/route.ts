@@ -1,6 +1,7 @@
 import { client } from "@/graphql/backend-client";
 import { ADD_WALLETS } from "@/graphql/mutations/add-wallets";
 import { GET_WALLETS_BY_ADDRESSES } from "@/graphql/queries/get-wallets-by-addresses";
+import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error adding wallets:", error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         error: "Error adding wallets",

@@ -9,6 +9,7 @@ import {
   NoopResponse,
   RewardCollection,
 } from "@/app/blueprint/types";
+import { handleError } from "@/utils/errors/log-error";
 
 type Data =
   | RewardCollection
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(rewardCollection, { status: 200 });
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json({ error }, { status: 500 });
   }
 }

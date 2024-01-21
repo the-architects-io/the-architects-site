@@ -4,6 +4,7 @@ import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-la
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import showToast from "@/features/toasts/show-toast";
+import { handleError } from "@/utils/errors/log-error";
 import axios from "axios";
 import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
@@ -50,7 +51,7 @@ export const DispenserSettingsForm = ({
 
         router.push(`/me/dispenser/${dispenserId}`);
       } catch (error) {
-        console.log({ error });
+        handleError(error as Error);
         showToast({
           primaryMessage: "Error updating dispenser",
         });

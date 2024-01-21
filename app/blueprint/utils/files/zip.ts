@@ -1,4 +1,5 @@
 import { CollectionFileStats } from "@/app/blueprint/types";
+import { handleError } from "@/utils/errors/log-error";
 import { ZipReader, BlobReader } from "@zip.js/zip.js";
 
 const validateFileNames = (fileNames: string[]) => {
@@ -78,7 +79,7 @@ export async function inspectZipFile(file: File): Promise<CollectionFileStats> {
         fileNamesAreValid,
       });
     } catch (error) {
-      console.error("Error reading ZIP file:", error);
+      handleError(error as Error);
       reject(error);
     }
   });

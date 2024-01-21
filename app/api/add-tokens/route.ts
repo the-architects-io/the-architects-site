@@ -13,6 +13,7 @@ import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mi
 import { Mint, fetchAllMint } from "@metaplex-foundation/mpl-toolbox";
 import { publicKey } from "@metaplex-foundation/umi";
 import { getUmiClient } from "@/utils/umi";
+import { handleError } from "@/utils/errors/log-error";
 
 export type TokenMetadata = {
   image: string;
@@ -234,7 +235,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.log("error: ", error);
+    handleError(error as Error);
     return NextResponse.json({ error }, { status: 500 });
   }
 }

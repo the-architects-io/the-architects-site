@@ -21,6 +21,7 @@ import { TokenBalance } from "@/app/api/get-token-balances-from-helius/route";
 import axios from "axios";
 import { Dispenser } from "@/app/blueprint/types";
 import { getRpcEndpoint } from "@/utils/rpc";
+import { handleError } from "@/utils/errors/log-error";
 // import { GET_USER_BY_WALLET_ADDRESS } from "graphql/queries/get-user-by-wallet-address";
 
 type Data =
@@ -199,7 +200,7 @@ export async function POST(req: NextRequest) {
         });
       payout = insert_payouts_one;
     } catch (error) {
-      console.log(error);
+      handleError(error as Error);
       return NextResponse.json(
         { error, message: "Failed to add payout" },
         { status: 400 }
@@ -208,7 +209,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ rewardTxAddress, payout }, { status: 200 });
   } catch (error: any) {
-    console.log(error);
+    handleError(error as Error);
     return NextResponse.json({ error: error?.message }, { status: 400 });
   }
 }

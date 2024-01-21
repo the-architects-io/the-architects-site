@@ -5,6 +5,7 @@ import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { ADD_WALLET_WITH_USER } from "@/graphql/mutations/add-wallet-with-user";
 import { BIND_USER_TO_WALLET } from "@/graphql/mutations/bind-user-to-wallet";
 import { NoopResponse, Wallet } from "@/app/blueprint/types";
+import { handleError } from "@/utils/errors/log-error";
 
 type Data =
   | Wallet
@@ -62,6 +63,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<Data>> {
       return NextResponse.json(update_wallets_by_pk, { status: 200 });
     }
   } catch (error) {
+    handleError(error as Error);
     return NextResponse.json({ error }, { status: 500 });
   }
 }

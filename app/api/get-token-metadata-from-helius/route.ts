@@ -1,4 +1,5 @@
 import { NoopResponse } from "@/app/blueprint/types";
+import { handleError } from "@/utils/errors/log-error";
 import axios from "axios";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
@@ -79,7 +80,7 @@ export async function POST(req: NextRequest) {
     );
     metadata = data?.[0];
   } catch (error) {
-    console.log("Error fetching token metadata from Helius: ", error);
+    handleError(error as Error);
     return NextResponse.json(
       { error: "Error fetching token metadata from Helius" },
       { status: 500 }
@@ -99,7 +100,7 @@ export async function POST(req: NextRequest) {
       );
       offChainMetadata = data;
     } catch (error) {
-      console.log("Error fetching off-chain metadata: ", error);
+      handleError(error as Error);
     }
   }
 
@@ -124,7 +125,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(metadata, { status: 200 });
   } catch (error) {
-    console.log("~~error: ", error);
+    handleError(error as Error);
     return NextResponse.json({ error }, { status: 500 });
   }
 }

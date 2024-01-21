@@ -3,6 +3,7 @@ import { jsonFileToJson } from "@/app/blueprint/utils";
 import { BASE_URL } from "@/constants/constants";
 import { client } from "@/graphql/backend-client";
 import { ADD_AIRDROP_RECIPIENTS } from "@/graphql/mutations/add-airdrop-recipients";
+import { handleError } from "@/utils/errors/log-error";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -88,7 +89,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error adding recipients:", error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         error: "Error adding recipients",

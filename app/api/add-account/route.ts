@@ -4,7 +4,7 @@ import { User } from "@/features/admin/users/users-list-item";
 import { client } from "@/graphql/backend-client";
 import { ADD_ACCOUNT } from "@/graphql/mutations/add-account";
 import { UPDATE_USER } from "@/graphql/mutations/update-user";
-import { logErrorDeprecated } from "@/utils/errors/log-error";
+import { handleError, logErrorDeprecated } from "@/utils/errors/log-error";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -21,13 +21,6 @@ type Data =
     };
 
 export async function POST(req: NextRequest) {
-  logErrorDeprecated({
-    error: {
-      code: 2,
-      message: "Attempting to save Discord account info",
-      rawError: JSON.stringify(req.body),
-    },
-  });
   const {
     accessToken,
     tokenType,
@@ -60,24 +53,7 @@ export async function POST(req: NextRequest) {
     userId,
   });
 
-  logErrorDeprecated({
-    error: {
-      code: 3,
-      message: "Attempting to save Discord account info",
-      rawError: JSON.stringify(req.body),
-    },
-  });
-
   if (!imageUrl || !providerId || !providerAccountId || !username) {
-    logErrorDeprecated({
-      error: {
-        code: 500,
-        message: "Could not save Discord account info",
-        rawError: JSON.stringify({
-          discordUser: req.body,
-        }),
-      },
-    });
     return NextResponse.json(
       { error: "Required fields not set" },
       { status: 500 }
@@ -95,28 +71,12 @@ export async function POST(req: NextRequest) {
     accessToken,
   };
 
-  logErrorDeprecated({
-    error: {
-      code: 4,
-      message: "Attempting to save Discord account info",
-      rawError: JSON.stringify(req.body),
-    },
-  });
-
   try {
     const { insert_accounts_one }: { insert_accounts_one: Account } =
       await client.request({
         document: ADD_ACCOUNT,
         variables,
       });
-
-    logErrorDeprecated({
-      error: {
-        code: 5,
-        message: "Attempting to save Discord account info",
-        rawError: JSON.stringify(req.body),
-      },
-    });
 
     const { update_users_by_pk }: { update_users_by_pk: User } =
       await client.request({
@@ -131,14 +91,6 @@ export async function POST(req: NextRequest) {
         },
       });
 
-    logErrorDeprecated({
-      error: {
-        code: 6,
-        message: "Attempting to save Discord account info",
-        rawError: JSON.stringify(req.body),
-      },
-    });
-
     console.log("insert_accounts_one: ", insert_accounts_one);
 
     return NextResponse.json(
@@ -149,16 +101,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    logErrorDeprecated({
-      error: {
-        code: 500,
-        message: "Could not save Discord account info",
-        rawError: JSON.stringify({
-          error,
-          discordUser: req.body,
-        }),
-      },
-    });
+    handleError(error as Error);
     return NextResponse.json({ error }, { status: 500 });
   }
 }

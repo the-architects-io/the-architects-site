@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { UploadJob } from "@/app/blueprint/types";
 import { UPDATE_UPLOAD_JOB } from "@/graphql/mutations/update-upload-job";
+import { handleError } from "@/utils/errors/log-error";
 
 export async function POST(req: NextRequest) {
   const {
@@ -70,7 +71,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ job: updatedJob }, { status: 200 });
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json(
       { error: "There was an unexpected error" },
       { status: 500 }

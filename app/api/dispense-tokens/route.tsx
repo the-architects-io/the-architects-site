@@ -18,15 +18,22 @@ import { client } from "@/graphql/backend-client";
 import { ADD_ITEM_PAYOUT } from "@/graphql/mutations/add-item-payout";
 import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
-import { logError } from "@/utils/errors/log-error";
+import { handleError, logError } from "@/utils/errors/log-error";
 import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address";
 import { GET_ITEMS_BY_TOKEN_IDS } from "@/graphql/queries/get-items-by-token-ids";
 import { fromBaseUnit } from "@/utils/currency";
 import { getRpcEndpoint } from "@/utils/rpc";
 
 export async function POST(req: Request) {
-  const { noop, dispenserId, recipientAddress, mintAddress, amount, apiKey, cluster } =
-    await req.json();
+  const {
+    noop,
+    dispenserId,
+    recipientAddress,
+    mintAddress,
+    amount,
+    apiKey,
+    cluster,
+  } = await req.json();
 
   if (!process.env.API_ACCESS_HOST_LIST) {
     return NextResponse.json(
@@ -217,6 +224,7 @@ export async function POST(req: Request) {
       );
     }
   } catch (error) {
+    handleError(error as Error);
     return NextResponse.json(
       {
         error: {
@@ -280,6 +288,7 @@ export async function POST(req: Request) {
       });
     payout = insert_payouts_one;
   } catch (rawError) {
+    handleError(rawError as Error);
     return NextResponse.json(
       {
         error: rawError,
@@ -302,6 +311,7 @@ export async function POST(req: Request) {
       { status: 200 }
     );
   } catch (error) {
+    handleError(error as Error);
     return NextResponse.json({ error }, { status: 500 });
   }
 }

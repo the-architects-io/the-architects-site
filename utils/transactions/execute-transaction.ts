@@ -1,3 +1,4 @@
+import { handleError } from "@/utils/errors/log-error";
 import type {
   BlockheightBasedTransactionConfirmationStrategy,
   ConfirmOptions,
@@ -21,7 +22,7 @@ export const executeTransaction = async (
     callback?: () => void;
     successCallback?: () => void;
   },
-  wallet?: any,
+  wallet?: any
 ): Promise<string> => {
   let txId = "";
   try {
@@ -41,14 +42,14 @@ export const executeTransaction = async (
     const result = await connection.confirmTransaction(confirmStrategy);
     if (result.value.err) {
       throw new Error(
-        "failed to confirm transaction " + signature + ": " + result.value.err,
+        "failed to confirm transaction " + signature + ": " + result.value.err
       );
     }
-    
+
     txId = signature;
     config.successCallback && config.successCallback();
   } catch (error) {
-    console.error("error sending reward to burning wallet", { error });
+    handleError(error as Error);
   } finally {
     config.callback && config.callback();
   }

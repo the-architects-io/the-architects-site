@@ -25,6 +25,7 @@ import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import { Item } from "@/app/blueprint/types";
+import { handleError } from "@/utils/errors/log-error";
 
 export default function ItemDetailPage({ params }: { params: any }) {
   const [showBindToTokenInput, setShowBindToTokenInput] = useState(false);
@@ -59,7 +60,7 @@ export default function ItemDetailPage({ params }: { params: any }) {
         refetch();
         formik.setValues({ mintAddress: "" });
       } catch (error: any) {
-        console.log("error", error);
+        handleError(error as Error);
         showToast({
           primaryMessage: "Error updating token",
           secondaryMessage: error?.response?.data?.error,
@@ -80,7 +81,7 @@ export default function ItemDetailPage({ params }: { params: any }) {
       refetch();
       formik.setValues({ mintAddress: "" });
     } catch (error: any) {
-      console.log("error", error);
+      handleError(error as Error);
       showToast({
         primaryMessage: "Error updating token",
         secondaryMessage: error?.response?.data?.error,

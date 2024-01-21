@@ -30,6 +30,7 @@ import { useAdmin } from "@/hooks/admin";
 import usePrevious from "@/hooks/previous";
 import { getRpcEndpoint } from "@/utils/rpc";
 import { useCluster } from "@/hooks/cluster";
+import { handleError } from "@/utils/errors/log-error";
 
 interface DispenserUiProps {
   dispenserId: string;
@@ -317,6 +318,7 @@ export default function DispenserUi({
       console.log({ data });
       setDispensedInfo && setDispensedInfo(data);
     } catch (error) {
+      handleError(error as Error);
       showToast({
         primaryMessage: "Error claiming token",
         secondaryMessage: "Please try again later.",

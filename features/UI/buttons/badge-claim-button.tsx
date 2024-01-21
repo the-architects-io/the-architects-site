@@ -1,3 +1,4 @@
+import { handleError } from "@/utils/errors/log-error";
 import { PublicKey } from "@solana/web3.js";
 import axios from "axios";
 import { useCallback, useState } from "react";
@@ -33,8 +34,7 @@ export const BadgeClaimButton = ({
       });
       setWasClaimSucessful && setWasClaimSucessful(true);
     } catch (error: any) {
-      console.log("error", error);
-      console.log("error message", error?.response?.data?.message);
+      handleError(error as Error);
       if (error?.response?.data?.message === "Badge already claimed") {
         setIsClaimed(true);
       }

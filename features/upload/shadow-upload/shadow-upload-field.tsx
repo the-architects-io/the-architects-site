@@ -7,6 +7,7 @@ import showToast from "@/features/toasts/show-toast";
 import { UploadStatus } from "@/features/upload/shadow-upload/upload-status";
 import { GET_UPLOAD_JOB_BY_ID } from "@/graphql/queries/get-upload-job-by-id";
 import { useCluster } from "@/hooks/cluster";
+import { handleError } from "@/utils/errors/log-error";
 import { useQuery } from "@apollo/client";
 import {
   CHUNK_EVENTS,
@@ -145,7 +146,7 @@ export const ShadowUploadField = ({
         console.log("fileStats", fileStats);
         setFileStats(fileStats);
       } catch (error) {
-        console.error("File inspection failed:", error);
+        handleError(error as Error);
         showToast({
           primaryMessage: "File inspection failed, invalid zip file",
         });

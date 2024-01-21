@@ -28,6 +28,8 @@ import {
   MintNftResponse,
   ReduceStorageInput,
   ReduceStorageResponse,
+  ReportErrorInput,
+  ReportErrorResponse,
   UpdateAirdropInput,
   UpdateAirdropRespone,
   UpdateCollectionInput,
@@ -49,6 +51,7 @@ import {
 } from "@/app/blueprint/utils";
 import { takePayment } from "@/app/blueprint/utils/payments";
 import { BASE_URL } from "@/constants/constants";
+import { handleError } from "@/utils/errors/log-error";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import axios from "axios";
 
@@ -118,7 +121,7 @@ async function makeApiRequest<TResponse, TParams extends Record<string, any>>(
     const response = await axios.post(url, body, { headers });
     return response.data;
   } catch (error) {
-    console.log({ error });
+    handleError(error as Error);
     throw error;
   }
 }
@@ -203,6 +206,14 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
           options
         ),
     },
+    errors: {
+      reportError: (params: ReportErrorInput) =>
+        makeApiRequest<ReportErrorResponse, ReportErrorInput>(
+          BlueprintApiActions.REPORT_ERROR,
+          params,
+          options
+        ),
+    },
     jobs: {
       createJob: (params: CreateJobInput) =>
         makeApiRequest<CreateJobResponse, CreateJobInput>(
@@ -231,10 +242,10 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
     },
     payments: {
       takePayment: (params: {
-        wallet: WalletContextState,
-        mintAddress: string,
-        baseAmount: number,
-        cluster: 'devnet' | 'mainnet-beta'
+        wallet: WalletContextState;
+        mintAddress: string;
+        baseAmount: number;
+        cluster: "devnet" | "mainnet-beta";
       }) => takePayment({ ...params, cluster: options.cluster }),
     },
     tokens: {

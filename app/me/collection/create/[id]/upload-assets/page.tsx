@@ -40,6 +40,7 @@ import { useRouter } from "next/navigation";
 
 import { useCallback, useEffect, useState } from "react";
 import { ContentWrapperYAxisCenteredContent } from "@/features/UI/content-wrapper-y-axis-centered-content";
+import { handleError } from "@/utils/errors/log-error";
 
 export default function CollectionCreationUploadAssetsPage({
   params,
@@ -215,6 +216,7 @@ export default function CollectionCreationUploadAssetsPage({
             statusId: StatusUUIDs.ERROR,
             statusText: "Failed to create drive.",
           });
+          handleError(error as Error);
           throw error;
         }
         console.error(`Attempt ${attempt} failed: ${error}`);

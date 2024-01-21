@@ -15,6 +15,7 @@ import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-labe
 import { GET_REWARD_CATEGORIES } from "@/graphql/queries/get-reward-types";
 import { GET_ITEMS_BY_REWARD_CATEGORY_ID } from "@/graphql/queries/get-items-by-reward-category-id";
 import { Item } from "@/app/blueprint/types";
+import { handleError } from "@/utils/errors/log-error";
 
 export const REWARD_CATEGORY_IDS = {
   Item: "7322c862-f67c-4778-b950-6d26f7229c5d",
@@ -66,6 +67,7 @@ export const AddRewardForm = ({
         });
         refetch();
       } catch (error) {
+        handleError(error as Error);
         showToast({
           primaryMessage: "Error adding reward",
         });

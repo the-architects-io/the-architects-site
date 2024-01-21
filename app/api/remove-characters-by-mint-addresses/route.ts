@@ -1,5 +1,6 @@
 import { client } from "@/graphql/backend-client";
 import { REMOVE_CHARACTERS_BY_MINT_ADDRESSES } from "@/graphql/mutations/remove-characters-by-mint-addresses";
+import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
 
 type RemoveCharactersResponse = {
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         error,

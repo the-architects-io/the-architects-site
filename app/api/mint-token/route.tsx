@@ -11,6 +11,7 @@ import {
 import { Connection, Keypair } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 import { getRpcEndpoint } from "@/utils/rpc";
+import { handleError } from "@/utils/errors/log-error";
 
 export async function POST(req: NextRequest) {
   const res = await req.formData();
@@ -39,7 +40,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const connection = new Connection(getRpcEndpoint(cluster as 'devnet' | 'mainnet-beta'), "finalized");
+    const connection = new Connection(
+      getRpcEndpoint(cluster as "devnet" | "mainnet-beta"),
+      "finalized"
+    );
     const metaplex = Metaplex.make(connection);
     const umi = await getUmiClient();
 
@@ -109,7 +113,7 @@ export async function POST(req: NextRequest) {
     try {
       asset = await fetchDigitalAsset(umi, publicKey(mintAddress));
     } catch (error) {
-      console.log({ error });
+      handleError(error as Error);
     }
 
     return NextResponse.json(
@@ -120,7 +124,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error: any) {
-    console.log({ error });
+    handleError(error as Error);
     return NextResponse.json(
       {
         error: error?.message,

@@ -4,6 +4,7 @@ import type { NextRequest } from "next/server";
 import { NoopResponse, RewardCollection } from "@/app/blueprint/types";
 import { GET_REWARD_COLLECTIONS_BY_DISPENSER_ID } from "@/graphql/queries/get-reward-collections-by-dispenser-id";
 import { ADD_REWARD_COLLECTIONS } from "@/graphql/mutations/add-reward-collections";
+import { handleError } from "@/utils/errors/log-error";
 
 type Data =
   | RewardCollection
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(addedRewardCollections, { status: 200 });
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json({ error }, { status: 500 });
   }
 }

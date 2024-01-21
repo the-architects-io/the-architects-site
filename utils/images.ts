@@ -1,3 +1,5 @@
+import { handleError } from "@/utils/errors/log-error";
+
 export async function downloadImageAsFile(url: string, filename: string) {
   try {
     const response = await fetch(url);
@@ -6,6 +8,6 @@ export async function downloadImageAsFile(url: string, filename: string) {
     const blob = await response.blob();
     return new File([blob], filename, { type: "image/png" });
   } catch (error) {
-    console.error("Error downloading the image:", error);
+    handleError(error as Error);
   }
 }

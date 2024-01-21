@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { ItemCollection, NoopResponse } from "@/app/blueprint/types";
 import { ADD_ITEM_COLLECTION } from "@/graphql/mutations/add-item-collection";
+import { handleError } from "@/utils/errors/log-error";
 
 type Data =
   | ItemCollection
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(itemCollection, { status: 200 });
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json({ error }, { status: 500 });
   }
 }

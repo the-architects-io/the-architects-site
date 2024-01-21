@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { Airdrop } from "@/app/blueprint/types";
 import { UPDATE_AIRDROP } from "@/graphql/mutations/update-airdrop";
+import { handleError } from "@/utils/errors/log-error";
 
 export async function POST(req: NextRequest) {
   const {
@@ -73,6 +74,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    handleError(error as Error);
     return NextResponse.json(
       { error: "There was an unexpected error!" },
       { status: 500 }

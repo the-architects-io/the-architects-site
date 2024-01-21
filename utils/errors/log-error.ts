@@ -1,11 +1,12 @@
+import { createBlueprintClient } from "@/app/blueprint/client";
 import { MappedErrorResponse } from "@/app/blueprint/types";
+import { ENV } from "@/constants/constants";
 import { client } from "@/graphql/backend-client";
 import { LOG_ERROR } from "@/graphql/mutations/log-error";
 
 export type ErrorInstance = {
   code: number;
-  message: string;
-  rawError: string;
+  rawError: ErrorInstance;
 };
 
 type Params = {
@@ -15,7 +16,7 @@ type Params = {
 };
 
 export const logError = async (
-  error: MappedErrorResponse,
+  error: MappedErrorResponse | ErrorInstance,
   metadata: any = {}
 ) => {
   console.error({
@@ -39,4 +40,29 @@ export const logErrorDeprecated = async ({
       walletId,
     } as ErrorInstance
   );
+};
+
+export const handleError = async (error: Error, metadata?: any) => {
+  const blueprint = createBlueprintClient({ cluster: "devnet" });
+
+  if (ENV === "production" || ENV === "preview") {
+    const { success } = await blueprint.errors.reportError({
+      message: error.message,
+      metadata: {
+        ...metadata,
+        stack: error.stack,
+        name: error.name,
+      },
+    });
+    if (!success) {
+      console.log("Failed to report error to discord bot");
+    }
+  } else {
+    console.log("Skipping sending error to bot in development");
+  }
+
+  console.log({
+    error,
+    metadata,
+  });
 };

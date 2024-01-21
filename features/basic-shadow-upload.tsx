@@ -11,6 +11,7 @@ import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-la
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { encryptFileList } from "@/utils/encryption";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { handleError } from "@/utils/errors/log-error";
 
 export default function ShadowUpload({
   drive,
@@ -58,7 +59,7 @@ export default function ShadowUpload({
         setIsSending(false);
         onCompleted?.();
       } catch (error) {
-        console.log({ error });
+        handleError(error as Error);
         showToast({
           primaryMessage: "Error",
           secondaryMessage: `Failed to upload`,
@@ -78,7 +79,7 @@ export default function ShadowUpload({
         );
         setIsSending(false);
       } catch (error) {
-        console.log({ error });
+        handleError(error as Error);
         showToast({
           primaryMessage: "Error",
           secondaryMessage: `Failed to upload`,

@@ -11,6 +11,7 @@ import { FormTextareaWithLabel } from "@/features/UI/forms/form-textarea-with-la
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import showToast from "@/features/toasts/show-toast";
 import { useCluster } from "@/hooks/cluster";
+import { handleError } from "@/utils/errors/log-error";
 import { getSlug } from "@/utils/formatting";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useFormik } from "formik";
@@ -93,7 +94,7 @@ export default function CreateCollectionNftForm({
 
         uri = url;
       } catch (error) {
-        console.log({ error });
+        handleError(error as Error);
       }
 
       try {
@@ -126,7 +127,7 @@ export default function CreateCollectionNftForm({
           setStep?.(step + 1);
         }
       } catch (error) {
-        console.log({ error });
+        handleError(error as Error);
       }
     },
   });

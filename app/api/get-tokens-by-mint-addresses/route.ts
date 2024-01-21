@@ -1,5 +1,6 @@
 import { client } from "@/graphql/backend-client";
 import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
+import { handleError } from "@/utils/errors/log-error";
 import { Token } from "@metaplex-foundation/js";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         error,

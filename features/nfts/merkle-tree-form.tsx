@@ -9,6 +9,7 @@ import { Panel } from "@/features/UI/panel";
 import Spinner from "@/features/UI/spinner";
 import showToast from "@/features/toasts/show-toast";
 import { useCluster } from "@/hooks/cluster";
+import { handleError } from "@/utils/errors/log-error";
 import {
   MerkleTree,
   createTree,
@@ -118,7 +119,7 @@ export default function MerkleTreeForm({
             console.log("no tree found, trying again");
           }
         } catch (error) {
-          console.log({ error });
+          handleError(error as Error);
         }
       }, 3000);
 
@@ -131,14 +132,14 @@ export default function MerkleTreeForm({
       });
       if (tree) setMerkleTree(tree);
     } catch (error) {
-      console.log({ error });
+      handleError(error as Error);
       showToast({
         primaryMessage: "Error creating Merkle Tree",
       });
     } finally {
       setIsLoading(false);
     }
-  }, [setIsLoading, setMerkleTree, umi]);
+  }, [cluster, setIsLoading, setMerkleTree, umi]);
 
   const handleCreateTree = useCallback(async () => {
     if (localOrRemote === LOCAL_OR_REMOTE.REMOTE) {
@@ -158,6 +159,7 @@ export default function MerkleTreeForm({
       });
       await builder.sendAndConfirm(umi);
     } catch (error) {
+      handleError(error as Error);
       showToast({
         primaryMessage: "Error creating Merkle Tree",
       });

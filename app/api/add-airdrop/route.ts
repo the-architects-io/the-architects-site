@@ -1,6 +1,7 @@
 import { Airdrop } from "@/app/blueprint/types";
 import { client } from "@/graphql/backend-client";
 import { ADD_AIRDROP } from "@/graphql/mutations/add-airdrop";
+import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error adding airdrop:", error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         error: "Error adding airdrop",

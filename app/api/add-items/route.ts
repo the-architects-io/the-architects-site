@@ -8,6 +8,7 @@ import { ADD_ITEMS } from "@/graphql/mutations/add-items";
 import { GET_ITEMS_BY_IDS } from "@/graphql/queries/get-items-by-ids";
 import { GET_ITEMS_BY_TOKEN_MINT_ADDRESSES } from "@/graphql/queries/get-items-by-token-mint-addresses";
 import { GET_ITEMS_BY_TOKEN_IDS } from "@/graphql/queries/get-items-by-token-ids";
+import { handleError } from "@/utils/errors/log-error";
 
 type Data =
   | Item[]
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
 
     itemsInDb = itemsInDbResponse;
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json({ error }, { status: 500 });
   }
 
@@ -107,7 +108,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json({ error }, { status: 500 });
   }
 }

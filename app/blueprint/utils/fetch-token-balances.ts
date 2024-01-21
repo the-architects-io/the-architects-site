@@ -1,5 +1,6 @@
 import { TokenBalance } from "@/app/api/get-token-balances-from-helius/route";
 import { BASE_URL } from "@/constants/constants";
+import { handleError } from "@/utils/errors/log-error";
 import { PublicKey } from "@metaplex-foundation/js";
 import axios from "axios";
 
@@ -25,10 +26,7 @@ const fetchTokenBalances = async (
       console.log({ data });
       return resolve(data);
     } catch (error: any) {
-      console.log({
-        success: false,
-        message: error?.response?.data?.message,
-      });
+      handleError(error as Error);
       return reject([]);
     }
   });

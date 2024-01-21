@@ -17,6 +17,7 @@ import { useEffect } from "react";
 import { Connection } from "@solana/web3.js";
 import { getRpcEndpoint } from "@/utils/rpc";
 import { useCluster } from "@/hooks/cluster";
+import { handleError } from "@/utils/errors/log-error";
 
 export type DispenserResponse = {
   id: string;
@@ -99,7 +100,7 @@ export const AddDispenserForm = ({
         showToast({
           primaryMessage: "Error adding dispenser",
         });
-        console.log({ error });
+        handleError(error as Error);
       }
     },
   });

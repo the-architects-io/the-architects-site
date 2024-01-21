@@ -1,3 +1,4 @@
+import { handleError } from "@/utils/errors/log-error";
 import { Provider } from "@coral-xyz/anchor";
 import { Connection, Transaction } from "@solana/web3.js";
 
@@ -19,9 +20,9 @@ export const sendTransaction = async (
       txHash = await provider.sendAndConfirm(transaction);
       console.log("txHash", txHash);
       resolve(txHash);
-    } catch (err) {
-      console.log(err);
-      reject(err);
+    } catch (error) {
+      handleError(error as Error);
+      reject(error);
     }
   });
 };

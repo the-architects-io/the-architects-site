@@ -13,6 +13,7 @@ import { DndCard } from "@/features/UI/dnd-card";
 import axios from "axios";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { useRouter } from "next/navigation";
+import { handleError } from "@/utils/errors/log-error";
 
 export type DispenserResponse = {
   id: string;
@@ -80,7 +81,7 @@ export const DispenserPayoutStructureForm = ({
         showToast({
           primaryMessage: "Error updating rewards",
         });
-        console.log({ error });
+        handleError(error as Error);
       }
     },
   });

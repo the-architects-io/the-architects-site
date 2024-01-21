@@ -1,4 +1,5 @@
 import { RPC_ENDPOINT, SHDW_DRIVE_BASE_URL } from "@/constants/constants";
+import { handleError } from "@/utils/errors/log-error";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { PublicKey } from "@metaplex-foundation/js";
@@ -60,6 +61,7 @@ export async function POST(req: NextRequest) {
       count = parsedJson.length;
     }
   } catch (error) {
+    handleError(error as Error);
     return NextResponse.json(
       {
         error: "Invalid JSON",
@@ -133,7 +135,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.log("error", error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         error: JSON.stringify(error),

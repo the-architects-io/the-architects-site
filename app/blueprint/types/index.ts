@@ -1,5 +1,6 @@
 import { Community } from "@/features/admin/communities/communities-list-item";
 import { JobIconType, JobIcons } from "@/features/jobs/job-icon";
+import { ErrorInstance } from "@/utils/errors/log-error";
 import { RpcConfirmTransactionResult } from "@metaplex-foundation/umi";
 import { User } from "@nhost/nextjs";
 import { ShadowFile, StorageAccount } from "@shadow-drive/sdk";
@@ -939,6 +940,7 @@ export enum BlueprintApiActions {
   MINT_CNFT = "MINT_CNFT",
   MINT_NFT = "MINT_NFT",
   REDUCE_STORAGE = "REDUCE_STORAGE",
+  REPORT_ERROR = "REPORT_ERROR",
   UPDATE_AIRDROP = "UPDATE_AIRDROP",
   UPDATE_COLLECTION = "UPDATE_COLLECTION",
   UPDATE_JOB = "UPDATE_JOB",
@@ -1067,4 +1069,14 @@ export type InviteCount = {
     displayName: string;
   };
   inviteCount: number;
+};
+
+export type ReportErrorInput = {
+  message: string;
+  metadata?: any;
+};
+
+export type ReportErrorResponse = BaseBlueprintResponse & {
+  error: string;
+  metadata?: any;
 };

@@ -50,7 +50,6 @@ export type NftMetadata = {
 };
 
 export const isValidCollectionMetadatas = (json: any): boolean => {
-  // TODO: Check if this is working, i think it is not
   const parseJson = () => {
     try {
       return JSON.parse(json);

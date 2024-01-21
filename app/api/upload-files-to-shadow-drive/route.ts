@@ -9,6 +9,7 @@ import {
   RPC_ENDPOINT,
   SHDW_DRIVE_BASE_URL,
 } from "@/constants/constants";
+import { handleError } from "@/utils/errors/log-error";
 
 export type UploadAssetsToShadowDriveResponse = {
   urls: string[];
@@ -145,7 +146,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.log("error", error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         error: JSON.stringify(error),

@@ -7,6 +7,7 @@ import { GET_ITEM_BY_ID } from "@/graphql/queries/get-item-by-id";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { Item, NoopResponse, Token } from "@/app/blueprint/types";
+import { handleError } from "@/utils/errors/log-error";
 
 type Data =
   | Token
@@ -61,8 +62,7 @@ export async function POST(req: NextRequest) {
       );
       token = newToken;
     } catch (error: any) {
-      console.error({ error: error?.response?.data?.error?.response });
-      console.error({ error: JSON.stringify(error) });
+      handleError(error as Error);
       return NextResponse.json(
         {
           error:

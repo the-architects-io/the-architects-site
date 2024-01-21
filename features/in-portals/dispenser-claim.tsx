@@ -12,6 +12,7 @@ import axios from "axios";
 import { BuildTokenVestingDetails } from "@/features/dispensers/details/build-token-vesting-details";
 import { Dispenser, ModeledNftMetadata } from "@/app/blueprint/types";
 import { useUserData } from "@nhost/nextjs";
+import { handleError } from "@/utils/errors/log-error";
 
 export interface ITokenClaim {
   id: string;
@@ -78,7 +79,7 @@ export const DispenserClaim = ({
         setDispenser(dispenser);
         setupDispenser(dispenser);
       } catch (error) {
-        console.log({ error });
+        handleError(error as Error);
       } finally {
         setIsLoading(false);
       }

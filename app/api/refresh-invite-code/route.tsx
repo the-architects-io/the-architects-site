@@ -4,6 +4,7 @@ import { ADD_INVITE_CODE } from "@/graphql/mutations/add-invite-code";
 import { DELETE_INVITE_CODE } from "@/graphql/mutations/delete-invite-code";
 import { GET_INVITE_CODE } from "@/graphql/queries/get-invite-code";
 import { GET_INVITE_CODE_BY_USER_ID } from "@/graphql/queries/get-invite-code-by-user-id";
+import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
       codeId = inviteCodes[0].id;
     }
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         success: false,
@@ -72,7 +73,7 @@ export async function POST(req: NextRequest) {
         },
       });
     } catch (error) {
-      console.error(error);
+      handleError(error as Error);
       return NextResponse.json(
         {
           success: false,
@@ -115,7 +116,7 @@ export async function POST(req: NextRequest) {
       }
     }
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         success: false,
@@ -152,7 +153,7 @@ export async function POST(req: NextRequest) {
       }
     );
   } catch (error) {
-    console.error(error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         success: false,

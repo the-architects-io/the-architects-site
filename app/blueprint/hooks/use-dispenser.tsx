@@ -17,6 +17,7 @@ import { useQuery } from "@apollo/client";
 import axios from "axios";
 import { useState } from "react";
 import { BASE_URL } from "@/constants/constants";
+import { handleError } from "@/utils/errors/log-error";
 
 export type ClaimRewardResponse = {
   txAddress?: string;
@@ -78,6 +79,7 @@ const useDispenser = (dispenserId?: string) => {
           success: true,
         });
       } catch (error: any) {
+        handleError(error as Error);
         return reject({
           success: false,
           message: error?.response?.data?.message,

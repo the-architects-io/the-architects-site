@@ -11,6 +11,7 @@ import Spinner from "@/features/UI/spinner";
 import DispenserUi from "@/features/dispensers/dispenser-ui";
 import showToast from "@/features/toasts/show-toast";
 import { GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID } from "@/graphql/queries/get-dispenser-displays-by-dispenser-id";
+import { handleError } from "@/utils/errors/log-error";
 import { useQuery } from "@apollo/client";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import axios from "axios";
@@ -101,7 +102,7 @@ export default function Page({ params }: { params: any }) {
           cardWidth: cardWidth || 320,
         });
       } catch (error) {
-        console.log(error);
+        handleError(error as Error);
       }
     },
   });

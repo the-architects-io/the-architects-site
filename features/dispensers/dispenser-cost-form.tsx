@@ -23,6 +23,7 @@ import useDispenser from "@/app/blueprint/hooks/use-dispenser";
 import Spinner from "@/features/UI/spinner";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
+import { handleError } from "@/utils/errors/log-error";
 
 export const DispenserCostForm = ({
   dispenserId,
@@ -62,7 +63,7 @@ export const DispenserCostForm = ({
         allTokens = data?.allTokens;
         console.log(data?.allTokens);
       } catch (error) {
-        console.log({ error });
+        handleError(error as Error);
       }
 
       try {
@@ -77,7 +78,7 @@ export const DispenserCostForm = ({
 
         allItems = data?.allItems;
       } catch (error) {
-        console.log({ error });
+        handleError(error as Error);
       }
 
       try {
@@ -95,7 +96,7 @@ export const DispenserCostForm = ({
 
         allItemCollections = data?.addedItemCollections;
       } catch (error) {
-        console.log({ error });
+        handleError(error as Error);
       }
 
       try {
@@ -116,7 +117,7 @@ export const DispenserCostForm = ({
         });
         setStep(2);
       } catch (error) {
-        console.log({ error });
+        handleError(error as Error);
       }
     },
   });
@@ -149,7 +150,7 @@ export const DispenserCostForm = ({
         isFree: false,
       });
     } catch (error) {
-      console.log({ error });
+      handleError(error as Error);
     } finally {
       setIsFetching(false);
     }

@@ -1,5 +1,6 @@
 import { NftMetadataJson } from "@/app/blueprint/types";
 import { Trait } from "@/features/admin/traits/traits-list-item";
+import { handleError } from "@/utils/errors/log-error";
 import { ModeledNftMetadata } from "@/utils/nfts/fetch-nfts-by-first-creator-address";
 import { Metaplex } from "@metaplex-foundation/js";
 import { PublicKey } from "@solana/web3.js";
@@ -64,8 +65,7 @@ export const fetchNftsByHashList = async ({
 
       resolve(nftsWithMetadata);
     } catch (error) {
-      console.log("fetchDaoNfts error", error);
-      console.error({ error });
+      handleError(error as Error);
       reject(error);
     } finally {
       setIsLoading && setIsLoading(false);

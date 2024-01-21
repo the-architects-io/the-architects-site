@@ -12,6 +12,7 @@ import Spinner from "@/features/UI/spinner";
 import SharedHead from "@/features/UI/head";
 import { BASE_URL } from "@/constants/constants";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
+import { handleError } from "@/utils/errors/log-error";
 
 export const AddTokenForm = () => {
   const [tokenMetadata, setTokenMetadata] = useState<TokenMetadata | null>(
@@ -31,6 +32,7 @@ export const AddTokenForm = () => {
         });
         router.push("/admin?tab=tokens");
       } catch (error) {
+        handleError(error as Error);
         showToast({
           primaryMessage: "Error adding token",
         });
@@ -52,7 +54,7 @@ export const AddTokenForm = () => {
       );
       setTokenMetadata(data);
     } catch (error) {
-      console.log(error);
+      handleError(error as Error);
     } finally {
       setFetchingTokenMetadata(false);
     }

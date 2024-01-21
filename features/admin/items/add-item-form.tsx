@@ -11,6 +11,7 @@ import SharedHead from "@/features/UI/head";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
 import { ItemCategoriesSelectInput } from "@/features/admin/items/item-categories-select-input";
 import { FormTextareaWithLabel } from "@/features/UI/forms/form-textarea-with-label";
+import { handleError } from "@/utils/errors/log-error";
 
 export const AddItemForm = () => {
   const router = useRouter();
@@ -31,6 +32,7 @@ export const AddItemForm = () => {
         });
         router.push("/admin?tab=items");
       } catch (error) {
+        handleError(error as Error);
         showToast({
           primaryMessage: "Error adding item",
         });

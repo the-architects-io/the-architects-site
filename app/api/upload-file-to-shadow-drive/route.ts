@@ -6,6 +6,7 @@ import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { PublicKey } from "@metaplex-foundation/js";
 import { getSlug } from "@/utils/formatting";
 import { RPC_ENDPOINT } from "@/constants/constants";
+import { handleError } from "@/utils/errors/log-error";
 
 export type UploadAssetsToShadowDriveResponse = {
   urls: string[];
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.log("upload-file-to-shadow-drive error", error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         error: JSON.stringify(error),

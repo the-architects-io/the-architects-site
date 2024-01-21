@@ -19,6 +19,7 @@ import { UPDATE_MERKLE_TREE } from "@/graphql/mutations/update-merkle-tree";
 import { client } from "@/graphql/backend-client";
 import { GET_MERKLE_TREE_BY_ID } from "@/graphql/queries/get-merkle-tree-by-id";
 import { GET_MERKLE_TREE_BY_ADDRESS } from "@/graphql/queries/get-merkle-tree-by-address";
+import { handleError } from "@/utils/errors/log-error";
 
 const isValidCreatorsArray = (creators: any): boolean => {
   if (!Array.isArray(creators)) {
@@ -194,7 +195,7 @@ export async function POST(req: NextRequest) {
       );
     }
   } catch (error) {
-    console.log("error", error);
+    handleError(error as Error);
     return NextResponse.json(
       {
         error: JSON.stringify(error),

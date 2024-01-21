@@ -3,7 +3,7 @@ import {
   MappedErrorResponse,
 } from "@/app/blueprint/types";
 import { BASE_URL, ENV } from "@/constants/constants";
-import { logError } from "@/utils/errors/log-error";
+import { handleError, logError } from "@/utils/errors/log-error";
 import axios from "axios";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -24,6 +24,7 @@ const {
   MINT_CNFT,
   MINT_NFT,
   REDUCE_STORAGE,
+  REPORT_ERROR,
   UPDATE_AIRDROP,
   UPDATE_JOB,
   UPDATE_COLLECTION,
@@ -50,6 +51,7 @@ const BlueprintApiActionUrls = {
   [MINT_CNFT]: `${BASE_URL}/api/mint-cnft`,
   [MINT_NFT]: `${BASE_URL}/api/mint-nft`,
   [REDUCE_STORAGE]: `${BASE_URL}/api/reduce-storage`,
+  [REPORT_ERROR]: `${BASE_URL}/api/report-error`,
   [UPDATE_JOB]: `${BASE_URL}/api/update-job`,
   [UPDATE_AIRDROP]: `${BASE_URL}/api/update-airdrop`,
   [UPDATE_COLLECTION]: `${BASE_URL}/api/update-collection`,
@@ -131,6 +133,7 @@ async function makeBlueprintApiRequest(
       }
     );
   } catch (rawError: any) {
+    handleError(rawError as Error);
     const { error, status } = mapErrorToResponse(rawError);
     logError({ error, status });
     return NextResponse.json({ error }, { status });
@@ -179,8 +182,6 @@ export async function POST(req: NextRequest) {
   console.log({
     action,
     params,
-    isFormData,
-    contentType: req.headers.get("content-type"),
   });
 
   // Make API request based on action

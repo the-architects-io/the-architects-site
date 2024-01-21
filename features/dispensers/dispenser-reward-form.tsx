@@ -33,6 +33,7 @@ import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { getRpcEndpoint } from "@/utils/rpc";
 import { useCluster } from "@/hooks/cluster";
+import { handleError } from "@/utils/errors/log-error";
 
 type Reward = {
   mint: string;
@@ -87,7 +88,7 @@ export const DispenserRewardForm = ({
         allTokens = data?.allTokens;
         console.log({ allTokens });
       } catch (error) {
-        console.log({ error });
+        handleError(error as Error);
       }
 
       console.log({ allTokens });
@@ -126,7 +127,7 @@ export const DispenserRewardForm = ({
 
         allItems = data?.allItems;
       } catch (error) {
-        console.log({ error });
+        handleError(error as Error);
       }
 
       try {
@@ -145,7 +146,7 @@ export const DispenserRewardForm = ({
 
         allItemCollections = data?.addedItemCollections;
       } catch (error) {
-        console.log({ error });
+        handleError(error as Error);
       }
 
       try {
@@ -184,7 +185,7 @@ export const DispenserRewardForm = ({
         });
         setStep(2);
       } catch (error) {
-        console.log({ error });
+        handleError(error as Error);
       }
     },
   });
@@ -250,11 +251,11 @@ export const DispenserRewardForm = ({
         ],
       });
     } catch (error) {
-      console.log({ error });
+      handleError(error as Error);
     } finally {
       setIsFetchingTokens(false);
     }
-  }, [dispenser?.rewardWalletAddress, formik]);
+  }, [cluster, dispenser.rewardWalletAddress, formik]);
 
   useEffect(() => {
     if (!tokens.length && !isFetchingTokens && !hasBeenFetched) {

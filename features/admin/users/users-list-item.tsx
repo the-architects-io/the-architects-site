@@ -3,6 +3,7 @@ import { TableRow } from "@/features/UI/tables/table-row";
 import showToast from "@/features/toasts/show-toast";
 import { copyTextToClipboard } from "@/utils/clipboard";
 import { formatDateTime } from "@/utils/date-time";
+import { handleError } from "@/utils/errors/log-error";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import {
   CheckCircleIcon,
@@ -54,6 +55,7 @@ export const UsersListItem = ({
         });
         refetch();
       } catch (error) {
+        handleError(error as Error);
         showToast({
           primaryMessage: "Error deleting user",
         });

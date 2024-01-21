@@ -46,6 +46,7 @@ import dataJSON from "./MOCK_DATA.json";
 import { DebouncedInput } from "@/features/UI/forms/debounced-input";
 import { decryptData } from "@/utils/encryption";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { handleError } from "@/utils/errors/log-error";
 
 type DriveFileList = {
   filename: JSX.Element | string;
@@ -121,8 +122,9 @@ export default function DriveFileList({
         a.download = filename.replace(".arc", "");
         a.click();
         a.remove();
-      } catch (err) {
-        console.error("Error during decryption:", err);
+      } catch (error) {
+        handleError(error as Error);
+        console.error("Error during decryption:", error);
       }
     },
     [driveAddress, publicKey]
@@ -154,7 +156,8 @@ export default function DriveFileList({
           new PublicKey(driveAddress),
           `https://shdw-drive.genesysgo.net/${driveAddress}/${filename}`
         );
-      } catch {
+      } catch (error) {
+        handleError(error as Error);
         showToast({
           primaryMessage: "Error",
           secondaryMessage: `Failed to delete file`,

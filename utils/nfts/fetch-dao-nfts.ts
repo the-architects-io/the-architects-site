@@ -1,4 +1,5 @@
 import { NftMetadataJson } from "@/app/blueprint/types";
+import { handleError } from "@/utils/errors/log-error";
 import { getRpcEndpoint } from "@/utils/rpc";
 import {
   FindNftsByOwnerOutput,
@@ -125,8 +126,7 @@ export const fetchDaoNfts = async ({
 
       resolve(nftsWithMetadata);
     } catch (error) {
-      console.log("fetchDaoNfts error", error);
-      console.error({ error });
+      handleError(error as Error);
       reject(error);
     } finally {
       setIsLoading && setIsLoading(false);
