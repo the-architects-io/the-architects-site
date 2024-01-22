@@ -4,6 +4,7 @@ import { ErrorInstance } from "@/utils/errors/log-error";
 import { RpcConfirmTransactionResult } from "@metaplex-foundation/umi";
 import { User } from "@nhost/nextjs";
 import { ShadowFile, StorageAccount } from "@shadow-drive/sdk";
+import { AxiosError } from "axios";
 
 export type ErrorResponse = {
   success: boolean;
@@ -1072,7 +1073,7 @@ export type InviteCount = {
 };
 
 export type ReportErrorInput = {
-  message: string;
+  error: Error | AxiosError;
   metadata?: any;
 };
 

@@ -50,19 +50,22 @@ export const handleError = async (
   const blueprint = createBlueprintClient({ cluster: "devnet" });
 
   let errorResponse;
+  let message;
 
   if (error instanceof Error) {
     console.log({ ...error });
     errorResponse = { ...error };
+    message = error.message;
   }
   if (error instanceof AxiosError) {
     console.log({ error: error?.response?.data?.error });
     errorResponse = error?.response?.data?.error;
+    message = errorResponse?.message;
   }
 
   if (ENV === "production" || ENV === "preview") {
     const { success } = await blueprint.errors.reportError({
-      message: error.message,
+      error,
       metadata: {
         ...metadata,
         rawError: { ...error },
