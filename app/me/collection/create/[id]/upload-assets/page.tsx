@@ -11,6 +11,7 @@ import {
   UploadJsonResponse,
 } from "@/app/blueprint/types";
 import {
+  ARCHITECTS_API_URL,
   ASSET_SHDW_DRIVE_ADDRESS,
   EXECUTION_WALLET_ADDRESS,
   SHDW_DRIVE_BASE_URL,
@@ -192,14 +193,25 @@ export default function CollectionCreationUploadAssetsPage({
 
     let driveAddress: string | null = null;
 
-    const maxRetries = 5;
+    const maxRetries = 2;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const { address } = await blueprint.drive.createDrive({
-          name: params.id,
-          sizeInKb,
-          ownerAddress: EXECUTION_WALLET_ADDRESS,
-        });
+        const { data, status } = await axios.post(
+          `${ARCHITECTS_API_URL}/create-drive`,
+          {
+            name: params.id,
+            sizeInKb,
+            ownerAddress: EXECUTION_WALLET_ADDRESS,
+          }
+        );
+
+        if (status !== 200) {
+          throw new Error("Failed to create drive");
+        }
+
+        const { address, txSig } = data;
+
+        console.log({ address, txSig });
 
         setDriveAddress(address);
         driveAddress = address;
