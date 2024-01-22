@@ -7,6 +7,10 @@ import {
   StatusUUIDs,
 } from "@/app/blueprint/types";
 import {
+  getMaxBufferSize,
+  getMaxBufferSizeAndMaxDepthForCapacity,
+} from "@/app/blueprint/utils/merkle-trees";
+import {
   ARCHITECTS_API_URL,
   ASSET_SHDW_DRIVE_ADDRESS,
   SHDW_DRIVE_BASE_URL,
@@ -156,10 +160,12 @@ export const ExecuteAirdrop = ({
       icon: JobIcons.CREATING_TREE,
     });
 
-    const maxDepth = 14;
-    const maxBufferSize = 64;
+    const collectionSize = airdrop.collection.tokenCount;
 
     let treeId;
+
+    const { maxBufferSize, maxDepth } =
+      getMaxBufferSizeAndMaxDepthForCapacity(collectionSize);
 
     try {
       const { success, merkleTreeAddress, id } =

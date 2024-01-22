@@ -59,6 +59,48 @@ export const isValidMaxNumberOfCnftsInMerkleTree = (
   ].includes(maxNumberOfCnfts);
 };
 
+export const getMaxBufferSizeAndMaxDepthForCapacity = (
+  capacity: number
+): { maxBufferSize: number; maxDepth: number } => {
+  if (capacity <= 8) {
+    return { maxBufferSize: 8, maxDepth: 3 };
+  }
+  if (capacity <= 32) {
+    return { maxBufferSize: 8, maxDepth: 5 };
+  }
+  if (capacity <= 16384) {
+    return { maxBufferSize: 64, maxDepth: 14 };
+  }
+  if (capacity <= 32768) {
+    return { maxBufferSize: 64, maxDepth: 15 };
+  }
+  if (capacity <= 65536) {
+    return { maxBufferSize: 64, maxDepth: 16 };
+  }
+  if (capacity <= 131072) {
+    return { maxBufferSize: 64, maxDepth: 17 };
+  }
+  if (capacity <= 262144) {
+    return { maxBufferSize: 64, maxDepth: 18 };
+  }
+  if (capacity <= 524288) {
+    return { maxBufferSize: 64, maxDepth: 19 };
+  }
+  if (capacity <= 1048576) {
+    return { maxBufferSize: 64, maxDepth: 20 };
+  }
+  if (capacity <= 16777216) {
+    return { maxBufferSize: 64, maxDepth: 24 };
+  }
+  if (capacity <= 67108864) {
+    return { maxBufferSize: 512, maxDepth: 26 };
+  }
+  if (capacity <= 1073741824) {
+    return { maxBufferSize: 512, maxDepth: 30 };
+  }
+  throw new Error("Invalid capacity");
+};
+
 export const getMaxCapacityFromMaxBufferSizeAndMaxDepth = (
   maxBufferSize: number,
   maxDepth: number

@@ -1,18 +1,11 @@
-import {
-  ARCHITECTS_API_URL,
-  BASE_URL,
-  RPC_ENDPOINT,
-} from "@/constants/constants";
+import { BASE_URL, RPC_ENDPOINT } from "@/constants/constants";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormWrapper } from "@/features/UI/forms/form-wrapper";
 import showToast from "@/features/toasts/show-toast";
-import { handleError } from "@/utils/errors/log-error";
-import { getAbbreviatedAddress } from "@/utils/formatting";
 import { ShdwDrive } from "@shadow-drive/sdk";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
-import axios from "axios";
 import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -24,69 +17,62 @@ export default function CreateDriveForm() {
 
   const formik = useFormik({
     initialValues: {
-      name: "",
-      sizeInKb: "",
-      ownerAddress: "",
+      storageName: "",
+      sizeInMb: "10",
     },
-    onSubmit: async ({ name, sizeInKb }) => {
-      let driveAddress: string | null = null;
+    onSubmit: async ({ storageName, sizeInMb }) => {
+      if (!wallet?.publicKey || !shadowDrive) return;
+      const sizeInKb = parseInt(sizeInMb) * 1024;
 
-      const maxRetries = 2;
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-          const { data, status } = await axios.post(
-            `${ARCHITECTS_API_URL}/create-drive`,
-            {
-              name,
-              sizeInKb,
-              ownerAddress: wallet?.publicKey?.toString(),
-            }
-          );
+      const { shdw_bucket, transaction_signature: tx } =
+        await shadowDrive.createStorageAccount(storageName, `${sizeInKb}KB`);
 
-          if (status !== 200) {
-            throw new Error("Failed to create drive");
-          }
+      if (tx) {
+        showToast({
+          primaryMessage: "Drive created",
+          link: {
+            title: "View transaction",
+            url: `https://explorer.solana.com/tx/${tx}`,
+          },
+        });
 
-          const { address, txSig } = data;
-
-          console.log({ address, txSig });
-
-          showToast({
-            primaryMessage: "Drive created",
-            secondaryMessage: `Drive address: ${getAbbreviatedAddress(
-              address
-            )}`,
-          });
-
-          break;
-        } catch (error) {
-          if (attempt === maxRetries) {
-            showToast({
-              primaryMessage: "Failed to create drive",
-            });
-            handleError(error as Error);
-            throw error;
-          }
-          console.error(`Attempt ${attempt} failed: ${error}`);
-        }
+        const mintAddress = shdw_bucket.replace("%7D", "");
+        formik.setValues({ storageName: "", sizeInMb: "" });
+        router.push(`${BASE_URL}/me/drive`);
+      } else {
+        showToast({
+          primaryMessage: "Error creating drive",
+        });
       }
     },
   });
+
+  useEffect(() => {
+    (async () => {
+      if (wallet?.publicKey) {
+        // Always use mainnet
+        const connection = new Connection(RPC_ENDPOINT, "confirmed");
+        const drive = await new ShdwDrive(connection, wallet).init();
+        setShadowDrive(drive);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wallet?.publicKey]);
 
   return (
     <FormWrapper onSubmit={formik.handleSubmit} className="mb-8">
       <h1 className="mb-4 text-2xl">Create Drive</h1>
       <FormInputWithLabel
         label="Name"
-        name="name"
-        value={formik.values.name}
+        name="storageName"
+        value={formik.values.storageName}
         onChange={formik.handleChange}
       />
       <FormInputWithLabel
-        label="Size in KB"
-        name="sizeInKb"
+        label="Size in MB"
+        name="sizeInMb"
         type="number"
-        value={formik.values.sizeInKb}
+        value={formik.values.sizeInMb}
         onChange={formik.handleChange}
       />
       <div className="w-full flex justify-center">
