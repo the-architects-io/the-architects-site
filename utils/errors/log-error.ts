@@ -51,16 +51,19 @@ export const handleError = async (
 
   let errorResponse;
   let message;
+  let rawError;
 
   if (error instanceof Error) {
     console.log({ ...error });
     errorResponse = { ...error };
+    rawError = { ...error };
     message = error.message;
   }
   if (error instanceof AxiosError) {
     console.log({ error: error?.response?.data?.error });
     errorResponse = error?.response?.data?.error;
     message = errorResponse?.message;
+    rawError = error;
   }
 
   if (ENV === "production" || ENV === "preview" || ENV === "local") {
