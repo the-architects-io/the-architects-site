@@ -27,6 +27,22 @@
 // 30	1,024	1,073,741,824
 // 30	2,048	1,073,741,824
 
+import {
+  ALL_DEPTH_SIZE_PAIRS,
+  ValidDepthSizePair,
+} from "@solana/spl-account-compression";
+
+export const allDepthSizes = ALL_DEPTH_SIZE_PAIRS.flatMap(
+  (pair) => pair.maxDepth
+).filter((item, pos, self) => self.indexOf(item) == pos);
+
+export const largestDepth = allDepthSizes[allDepthSizes.length - 1];
+
+export const defaultDepthPair: ValidDepthSizePair = {
+  maxDepth: 3,
+  maxBufferSize: 8,
+};
+
 export type MaxNumberOfCnft =
   | 8
   | 32
@@ -59,7 +75,7 @@ export const isValidMaxNumberOfCnftsInMerkleTree = (
   ].includes(maxNumberOfCnfts);
 };
 
-export const getMaxBufferSizeAndMaxDepthForCapacity = (
+export const getMinimumMaxBufferSizeAndMaxDepthForCapacity = (
   capacity: number
 ): { maxBufferSize: number; maxDepth: number } => {
   if (capacity <= 8) {
