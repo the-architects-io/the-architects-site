@@ -29,6 +29,7 @@ export const GET_AIRDROPS_BY_OWNER_ID = gql`
       }
       isReadyToDrop
       startTime
+      cluster
       recipients_aggregate {
         aggregate {
           count

@@ -80,6 +80,7 @@ export const ExecuteAirdrop = ({
       await blueprint.airdrops.updateAirdrop({
         id: airdrop.id,
         jobId: job.id,
+        cluster,
       });
 
     if (!success || !job?.id) {

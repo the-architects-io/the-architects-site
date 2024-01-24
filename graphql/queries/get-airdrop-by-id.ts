@@ -8,6 +8,7 @@ export const GET_AIRDROP_BY_ID = gql`
       maxBufferSize
       maxDepth
       canopyDepth
+      cluster
       collectionNft {
         id
         mintAddress

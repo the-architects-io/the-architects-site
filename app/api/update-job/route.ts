@@ -4,10 +4,20 @@ import type { NextRequest } from "next/server";
 import { Job } from "@/app/blueprint/types";
 import { UPDATE_JOB } from "@/graphql/mutations/update-job";
 import { handleError } from "@/utils/errors/log-error";
+import axios from "axios";
+import { BASE_URL } from "@/constants/constants";
 
 export async function POST(req: NextRequest) {
-  const { id, jobTypeId, percentComplete, userId, statusText, statusId, icon } =
-    await req.json();
+  const {
+    id,
+    jobTypeId,
+    percentComplete,
+    userId,
+    statusText,
+    statusId,
+    icon,
+    cluster,
+  } = await req.json();
 
   if (!id) {
     return NextResponse.json(
@@ -36,10 +46,19 @@ export async function POST(req: NextRequest) {
           ...(jobTypeId && { jobTypeId }),
           ...(userId && { userId }),
           ...(icon && { icon }),
+          ...(cluster && { cluster }),
         },
       });
 
     console.log({ updatedJob });
+
+    const { data } = await axios.post(`${BASE_URL}/api/report-job`, {
+      job: updatedJob,
+      metadata: {
+        context: "frontend",
+        cluster,
+      },
+    });
 
     if (!updatedJob) {
       return NextResponse.json(

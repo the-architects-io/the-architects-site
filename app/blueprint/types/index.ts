@@ -949,6 +949,7 @@ export enum BlueprintApiActions {
   MINT_NFT = "MINT_NFT",
   REDUCE_STORAGE = "REDUCE_STORAGE",
   REPORT_ERROR = "REPORT_ERROR",
+  REPORT_JOB = "REPORT_JOB",
   UPDATE_AIRDROP = "UPDATE_AIRDROP",
   UPDATE_COLLECTION = "UPDATE_COLLECTION",
   UPDATE_JOB = "UPDATE_JOB",
@@ -1016,6 +1017,7 @@ export type UpdateAirdropInput = {
   imageUrl?: string;
   isReadyToDrop?: boolean;
   jobId?: string;
+  cluster?: "devnet" | "mainnet-beta";
 };
 
 export type UpdateAirdropRespone = BaseBlueprintResponse & {
@@ -1093,3 +1095,13 @@ export enum TreeCreationMethod {
   CHEAPEST = "CHEAPEST",
   TRADABLE = "TRADABLE",
 }
+
+export type ReportJobResponse = BaseBlueprintResponse & {
+  job: Job;
+  metadata?: any;
+};
+
+export type ReportJobInput = {
+  job: Job;
+  metadata?: any;
+};
