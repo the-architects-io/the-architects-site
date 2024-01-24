@@ -40,7 +40,9 @@ export const CreateCollectionAssetUploadChecklist = ({
       <ul className="px-6 space-y-2">
         <li className="text-sm text-gray-400">
           <ChevronDoubleRightIcon className="h-4 w-4 inline-block mr-1" />
-          Total images count must be equal to the number of tokens being created
+          Total images count must be equal to the number of cNFTs being minted.
+          Your collection metadatas define{" "}
+          <span className="font-bold">{tokenCount}</span> cNFTs.
         </li>
         <li className="text-sm text-gray-400">
           <ChevronDoubleRightIcon className="h-4 w-4 inline-block mr-1" />
