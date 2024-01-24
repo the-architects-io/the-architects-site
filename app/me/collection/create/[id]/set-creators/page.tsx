@@ -220,7 +220,12 @@ export default function SetCreatorsPage({
     },
 
     onSubmit: async ({ creators }) => {
-      if (!collectionId || !jsonUploadyInstance) {
+      if (
+        !collectionId ||
+        !jsonUploadyInstance ||
+        !treeMaxBufferSize ||
+        !treeMaxDepth
+      ) {
         showToast({
           primaryMessage: "There was a problem",
         });
@@ -236,7 +241,11 @@ export default function SetCreatorsPage({
         id: collectionId,
         creators,
         tokenCount: collectionMetadataStats?.count,
+        maxDepth: treeMaxDepth,
+        maxBufferSize: treeMaxBufferSize,
+        canopyDepth: treeCanopyDepth || 0,
       });
+      debugger;
 
       jsonUploadyInstance.processPending({
         params: {

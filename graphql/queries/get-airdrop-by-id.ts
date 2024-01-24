@@ -5,6 +5,9 @@ export const GET_AIRDROP_BY_ID = gql`
     airdrops_by_pk(id: $id) {
       id
       name
+      maxBufferSize
+      maxDepth
+      canopyDepth
       collectionNft {
         id
         mintAddress

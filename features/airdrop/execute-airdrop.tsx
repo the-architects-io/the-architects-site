@@ -7,10 +7,6 @@ import {
   StatusUUIDs,
 } from "@/app/blueprint/types";
 import {
-  getMaxBufferSize,
-  getMaxBufferSizeAndMaxDepthForCapacity,
-} from "@/app/blueprint/utils/merkle-trees";
-import {
   ARCHITECTS_API_URL,
   ASSET_SHDW_DRIVE_ADDRESS,
   SHDW_DRIVE_BASE_URL,
@@ -51,6 +47,9 @@ export const ExecuteAirdrop = ({
       driveAddress,
       imageUrl,
       id,
+      maxBufferSize,
+      maxDepth,
+      canopyDepth,
     } = airdrop.collection;
 
     if (
@@ -59,7 +58,9 @@ export const ExecuteAirdrop = ({
       !description ||
       !sellerFeeBasisPoints ||
       !driveAddress ||
-      !user
+      !user ||
+      !maxBufferSize ||
+      !maxDepth
     ) {
       console.log("Missing collection data");
       return;
@@ -160,18 +161,14 @@ export const ExecuteAirdrop = ({
       icon: JobIcons.CREATING_TREE,
     });
 
-    const collectionSize = airdrop.collection.tokenCount;
-
     let treeId;
-
-    const { maxBufferSize, maxDepth } =
-      getMaxBufferSizeAndMaxDepthForCapacity(collectionSize);
 
     try {
       const { success, merkleTreeAddress, id } =
         await blueprint.tokens.createTree({
-          maxBufferSize,
-          maxDepth,
+          maxBufferSize: maxBufferSize,
+          maxDepth: maxDepth,
+          canopyDepth: canopyDepth,
           collectionId: airdrop.collection.id,
           userId: SYSTEM_USER_ID,
         });

@@ -643,6 +643,7 @@ export type MintCnftResponse = BaseBlueprintResponse & {
 export type CreateTreeInput = {
   maxDepth: number;
   maxBufferSize: number;
+  canopyDepth?: number;
   collectionId?: string;
   userId?: string;
 };
@@ -706,6 +707,9 @@ export type Collection = {
   sellerFeeBasisPoints: number;
   tokenCount: number;
   imageSizeInBytes: number;
+  maxDepth?: number;
+  maxBufferSize?: number;
+  canopyDepth?: number;
 };
 
 export type CreateCollectionResponse = BaseBlueprintResponse & {
@@ -737,6 +741,9 @@ export type UpdateCollectionInput = {
   nftId?: string;
   tokenCount?: number;
   imageSizeInBytes?: number;
+  maxDepth?: number;
+  maxBufferSize?: number;
+  canopyDepth?: number;
 };
 
 export type UpdateCollectionResponse = BaseBlueprintResponse & {

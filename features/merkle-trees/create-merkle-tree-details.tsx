@@ -42,11 +42,7 @@ export const CreateMerkleTreeDetails = ({
           <div>Number of cNFTs:</div>
           <>
             <div className="ml-2">
-              {tokenCount && !isCalculating ? (
-                `${tokenCount} bytes`
-              ) : (
-                <Spinner />
-              )}
+              {tokenCount && !isCalculating ? `${tokenCount}` : <Spinner />}
             </div>
           </>
         </div>

@@ -23,6 +23,9 @@ export async function POST(req: NextRequest) {
     collectionNftAddress,
     tokenCount,
     imageSizeInBytes,
+    maxDepth,
+    maxBufferSize,
+    canopyDepth,
   } = await req.json();
 
   if (!id) {
@@ -114,6 +117,9 @@ export async function POST(req: NextRequest) {
           ...(merkleTreeAddress && { merkleTreeAddress }),
           ...(tokenCount && { tokenCount }),
           ...(imageSizeInBytes && { imageSizeInBytes }),
+          ...(maxDepth && { maxDepth }),
+          ...(maxBufferSize && { maxBufferSize }),
+          ...(canopyDepth !== undefined && { canopyDepth: canopyDepth }),
         },
       }
     );
