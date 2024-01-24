@@ -52,14 +52,6 @@ export async function POST(req: NextRequest) {
 
     console.log({ updatedJob });
 
-    const { data } = await axios.post(`${BASE_URL}/api/report-job`, {
-      job: updatedJob,
-      metadata: {
-        context: "frontend",
-        cluster,
-      },
-    });
-
     if (!updatedJob) {
       return NextResponse.json(
         { error: "There was an unexpected error" },
@@ -67,6 +59,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const { data } = await axios.post(`${BASE_URL}/api/report-job`, {
+      job: updatedJob,
+      metadata: {
+        context: "frontend",
+        cluster,
+      },
+    });
     return NextResponse.json({ job: updatedJob }, { status: 200 });
   } catch (error) {
     handleError(error as Error);

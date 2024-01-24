@@ -197,6 +197,7 @@ export const ShadowUploadField = ({
           statusText: "Uploading assets to server",
           sizeInBytes,
           icon: JobIcons.UPLOADING_FILES,
+          cluster,
         });
 
         console.log("BATCH_START job", {

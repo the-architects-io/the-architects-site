@@ -990,6 +990,7 @@ export type UpdateUploadJobInput = {
   statusText?: string;
   statusId?: string;
   icon?: JobIconType;
+  cluster?: "devnet" | "mainnet-beta";
 };
 
 export type UpdateJobResponse = BaseBlueprintResponse & {

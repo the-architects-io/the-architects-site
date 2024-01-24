@@ -4,6 +4,8 @@ import type { NextRequest } from "next/server";
 import { UploadJob } from "@/app/blueprint/types";
 import { UPDATE_UPLOAD_JOB } from "@/graphql/mutations/update-upload-job";
 import { handleError } from "@/utils/errors/log-error";
+import axios from "axios";
+import { BASE_URL } from "@/constants/constants";
 
 export async function POST(req: NextRequest) {
   const {
@@ -17,6 +19,7 @@ export async function POST(req: NextRequest) {
     driveAddress,
     fileCount,
     icon,
+    cluster,
   } = await req.json();
 
   if (!id) {
@@ -37,6 +40,7 @@ export async function POST(req: NextRequest) {
     driveAddress,
     fileCount,
     icon,
+    cluster,
   });
 
   try {
@@ -56,6 +60,7 @@ export async function POST(req: NextRequest) {
           ...(driveAddress && { driveAddress }),
           ...(fileCount && { fileCount }),
           ...(icon && { icon }),
+          ...(cluster && { cluster }),
         },
       }
     );
@@ -68,6 +73,14 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+
+    const { data } = await axios.post(`${BASE_URL}/api/report-job`, {
+      job: updatedJob,
+      metadata: {
+        context: "frontend",
+        cluster,
+      },
+    });
 
     return NextResponse.json({ job: updatedJob }, { status: 200 });
   } catch (error) {

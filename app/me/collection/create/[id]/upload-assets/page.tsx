@@ -190,6 +190,7 @@ export default function CollectionCreationUploadAssetsPage({
             id: job.id,
             statusId: StatusUUIDs.ERROR,
             statusText: "Failed to create drive.",
+            cluster,
           });
           handleError(error as Error);
           throw error;
@@ -205,6 +206,7 @@ export default function CollectionCreationUploadAssetsPage({
         id: job.id,
         statusId: StatusUUIDs.ERROR,
         statusText: "Collection image is missing",
+        cluster,
       });
       return;
     }
@@ -214,6 +216,7 @@ export default function CollectionCreationUploadAssetsPage({
         id: job.id,
         statusId: StatusUUIDs.ERROR,
         statusText: "Drive address is missing",
+        cluster,
       });
       return;
     }
@@ -238,6 +241,7 @@ export default function CollectionCreationUploadAssetsPage({
       id: job.id,
       statusText: "Transferring collection image",
       icon: JobIcons.COLLECTION_IMAGE,
+      cluster,
     });
 
     const { success: imageUploadSuccess, url } =
@@ -252,6 +256,7 @@ export default function CollectionCreationUploadAssetsPage({
         id: job.id,
         statusId: StatusUUIDs.ERROR,
         statusText: "Failed to transfer collection image",
+        cluster,
       });
 
       return;
@@ -262,6 +267,7 @@ export default function CollectionCreationUploadAssetsPage({
         id: job.id,
         statusId: StatusUUIDs.ERROR,
         statusText: "An unexpected error occurred.",
+        cluster,
       });
       throw new Error("Missing files or drive address");
     }
