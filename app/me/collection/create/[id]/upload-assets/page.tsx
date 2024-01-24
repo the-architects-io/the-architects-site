@@ -52,19 +52,8 @@ export default function CollectionCreationUploadAssetsPage({
   const router = useRouter();
   const { cluster } = useCluster();
 
-  const [shadowFileUploadId, setShadowFileUploadId] = useState<string | null>(
-    null
-  );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [collectionMetadataStats, setCollectionMetadataStats] =
-    useState<CollectionStatsFromCollectionMetadatas | null>(null);
-  const [
-    collectionMetadatasJsonUploadResponse,
-    setCollectionMetadatasJsonUploadResponse,
-  ] = useState<UploadJsonResponse | null>(null);
-  const [jsonBeingUploaded, setJsonBeingUploaded] = useState<any | null>(null);
-  const [jsonFileBeingUploaded, setJsonFileBeingUploaded] =
-    useState<File | null>(null);
+
   const [zipFileBeingUploaded, setZipFileBeingUploaded] = useState<File | null>(
     null
   );
@@ -73,9 +62,6 @@ export default function CollectionCreationUploadAssetsPage({
   const [uploadJob, setUploadJob] = useState<UploadJob | null>(null);
   const [fileStats, setFileStats] = useState<CollectionFileStats | null>(null);
   const [isZipFileValid, setIsZipFileValid] = useState<boolean | null>(null);
-  const [isMetadataValid, setIsMetadataValid] = useState<boolean | null>(null);
-  const [jsonUploadyInstance, setJsonUploadyInstance] =
-    useState<UploadyContextType | null>(null);
   const [zipFileUploadyInstance, setZipFileUploadyInstance] =
     useState<UploadyContextType | null>(null);
   const [driveAddress, setDriveAddress] = useState<string | null>(null);
@@ -84,6 +70,7 @@ export default function CollectionCreationUploadAssetsPage({
     hasSavedDriveAddressToCollection,
     setHasSavedDriveAddressToCollection,
   ] = useState<boolean>(false);
+  const [tokenCount, setTokenCount] = useState<number>(0);
 
   const wallet = useWallet();
   const blueprint = createBlueprintClient({
@@ -119,24 +106,9 @@ export default function CollectionCreationUploadAssetsPage({
       if (collection?.uploadJob?.id) {
         setUploadJob(collection.uploadJob);
       }
+      setTokenCount(collection.tokenCount);
     },
   });
-
-  const handleMetadataJsonUploadComplete = useCallback(
-    async ({ url, success }: UploadJsonResponse) => {
-      if (!success) {
-        showToast({
-          primaryMessage: "Collection Metadata JSON Upload Failed",
-        });
-        return;
-      }
-
-      const { data } = await axios.get(url);
-
-      setCollectionMetadatasJsonUploadResponse(data);
-    },
-    []
-  );
 
   const handleCollectionImagesCompleted = useCallback(
     async (res: UploadFilesResponse) => {
@@ -153,12 +125,7 @@ export default function CollectionCreationUploadAssetsPage({
   );
 
   const handleUploadClick = async () => {
-    if (
-      !zipFileUploadyInstance ||
-      !jsonUploadyInstance ||
-      !user?.id ||
-      !collection?.id
-    ) {
+    if (!zipFileUploadyInstance || !user?.id || !collection?.id) {
       throw new Error("Missing required data");
     }
 
@@ -169,9 +136,6 @@ export default function CollectionCreationUploadAssetsPage({
 
     const collectionImageSizeInBytes = collection.imageSizeInBytes || 0;
     const zipFileSizeInBytes = fileStats?.totalUncompressedSize || 0;
-
-    // fetch collection image
-    const collectionImage = await fetch(collection.imageUrl || "");
 
     const sizeInBytes = zipFileSizeInBytes + collectionImageSizeInBytes;
     let sizeInKb = sizeInBytes ? sizeInBytes / 1000 : 0;
@@ -188,7 +152,6 @@ export default function CollectionCreationUploadAssetsPage({
     await blueprint.collections.updateCollection({
       id: params.id,
       uploadJobId: job.id,
-      tokenCount: collectionMetadataStats?.count,
     });
 
     let driveAddress: string | null = null;
@@ -294,7 +257,7 @@ export default function CollectionCreationUploadAssetsPage({
       return;
     }
 
-    if (!zipFileBeingUploaded || !jsonBeingUploaded || !driveAddress) {
+    if (!zipFileBeingUploaded || !driveAddress) {
       blueprint.jobs.updateUploadJob({
         id: job.id,
         statusId: StatusUUIDs.ERROR,
@@ -302,19 +265,6 @@ export default function CollectionCreationUploadAssetsPage({
       });
       throw new Error("Missing files or drive address");
     }
-
-    jsonUploadyInstance.processPending({
-      params: {
-        driveAddress,
-        uploadJobId: job.id,
-        action: BlueprintApiActions.UPLOAD_JSON,
-        fileName: `${params.id}-collection-metadatas.json`,
-        overwrite: true,
-        userId: user?.id,
-        uploadId: shadowFileUploadId,
-        collectionId: params.id,
-      },
-    });
 
     const exisitingOptions = zipFileUploadyInstance.getOptions();
 
@@ -328,7 +278,6 @@ export default function CollectionCreationUploadAssetsPage({
       collectionId: params.id,
       shouldUnzip: true,
       userId: user?.id,
-      uploadId: shadowFileUploadId,
     };
 
     console.log({ newParams });
@@ -378,7 +327,6 @@ export default function CollectionCreationUploadAssetsPage({
             collectionId={params.id}
             jobId={uploadJob.id}
             setJob={setUploadJob}
-            jsonUploadyInstance={jsonUploadyInstance}
             zipFileUploadyInstance={zipFileUploadyInstance}
           />
         </ContentWrapperYAxisCenteredContent>
@@ -387,69 +335,11 @@ export default function CollectionCreationUploadAssetsPage({
           <div className="flex space-x-8">
             <div className="w-1/3 max-w-[500px]">
               <CreateCollectionAssetUploadChecklist
-                metadataStats={collectionMetadataStats}
+                tokenCount={tokenCount}
                 fileStats={fileStats}
               />
             </div>
             <div className="flex flex-col justify-center items-center w-full mb-8 space-y-4">
-              <div
-                className={classNames([
-                  "border rounded-lg px-4 w-full mb-4 p-8 min-h-[28vh] max-h-[28vh] overflow-y-auto",
-                  !!collectionMetadataStats &&
-                  !!collectionMetadatasJsonUploadResponse
-                    ? "border-green-500 bg-green-500 bg-opacity-10"
-                    : "border-gray-600",
-                ])}
-              >
-                {!!collectionMetadataStats &&
-                !!collectionMetadatasJsonUploadResponse ? (
-                  <div className="flex flex-col items-center">
-                    <div className="text-green-500 flex items-center gap-x-2 mb-4">
-                      <CheckBadgeIcon className="h-5 w-5" />
-                      <div>Token Metadatas Added</div>
-                    </div>
-                    <p className="text-gray-100 text-lg mb-2">
-                      {collectionMetadataStats.count} token metadatas
-                    </p>
-                    <div className="text-gray-100 text-lg mb-2 text-center">
-                      <div>
-                        {collectionMetadataStats.uniqueTraits.length} unique
-                        traits across collection
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    {!!jsonBeingUploaded ? (
-                      <JsonUploadMetadataValidation
-                        uploadyInstance={jsonUploadyInstance}
-                        json={jsonBeingUploaded}
-                        isMetadataValid={isMetadataValid}
-                        setIsMetadataValid={setIsMetadataValid}
-                        setMetadataStas={setCollectionMetadataStats}
-                        setJsonBeingUploaded={setJsonBeingUploaded}
-                      />
-                    ) : (
-                      <div className="flex flex-col justify-center items-center h-full">
-                        <JsonUpload
-                          isFileValid={isMetadataValid}
-                          uploadyInstance={jsonUploadyInstance}
-                          setUploadyInstance={setJsonUploadyInstance}
-                          setJsonFileBeingUploaded={setJsonFileBeingUploaded}
-                          setJsonBeingUploaded={setJsonBeingUploaded}
-                          setJsonUploadResponse={
-                            handleMetadataJsonUploadComplete
-                          }
-                          driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
-                          fileName={`${params.id}-collection-metadatas.json`}
-                        >
-                          Add Collection Metadata JSONs
-                        </JsonUpload>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
               <div
                 className={classNames([
                   "border rounded-lg px-4 w-full mb-4 flex flex-col items-center justify-center p-8 min-h-[28vh]",
@@ -472,7 +362,7 @@ export default function CollectionCreationUploadAssetsPage({
                     {!!user?.id && !!params?.id && (
                       <ShadowUpload
                         uploadJob={uploadJob}
-                        setShadowFileUploadId={setShadowFileUploadId}
+                        setShadowFileUploadId={() => {}}
                         isFileValid={isZipFileValid}
                         uploadyInstance={zipFileUploadyInstance}
                         setUploadyInstance={setZipFileUploadyInstance}
@@ -503,9 +393,7 @@ export default function CollectionCreationUploadAssetsPage({
                 className="w-full"
                 onClick={handleUploadClick}
                 disabled={
-                  !isMetadataValid ||
-                  !isZipFileValid ||
-                  fileStats?.files.length !== collectionMetadataStats?.count
+                  !isZipFileValid || fileStats?.files.length !== tokenCount
                 }
               >
                 Upload Assets

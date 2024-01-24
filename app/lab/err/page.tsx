@@ -19,7 +19,7 @@ export default function Page() {
       );
     } catch (err) {
       console.log("err", err);
-      debugger;
+
       handleError(err as AxiosError, {
         message: "This is a test from axios request exception!",
       });

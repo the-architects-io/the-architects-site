@@ -63,7 +63,6 @@ const handleSolPayment = async ({
   try {
     txId = await wallet.sendTransaction(tx, connection);
     console.log({ txId });
-    debugger;
   } catch (error) {
     handleError(error as Error);
     return {

@@ -1,8 +1,14 @@
 "use client";
 import { createBlueprintClient } from "@/app/blueprint/client";
-import { Collection, Creator } from "@/app/blueprint/types";
+import {
+  BlueprintApiActions,
+  Collection,
+  CollectionStatsFromCollectionMetadatas,
+  Creator,
+  UploadJsonResponse,
+} from "@/app/blueprint/types";
 import { creatorsAreValid } from "@/app/blueprint/utils";
-import { BASE_URL } from "@/constants/constants";
+import { ASSET_SHDW_DRIVE_ADDRESS, BASE_URL } from "@/constants/constants";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
@@ -41,6 +47,14 @@ import {
 } from "@/app/blueprint/utils/merkle-trees";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { useConnection } from "@solana/wallet-adapter-react";
+import { MerkleTreeDetails } from "@/features/merkle-trees/merkle-tree-details";
+import { CreateMerkleTreeDetails } from "@/features/merkle-trees/create-merkle-tree-details";
+import { CreateCollectionMetadataUploadChecklist } from "@/features/collection/create-collection-metadata-upload-checklist";
+import classNames from "classnames";
+import { JsonUploadMetadataValidation } from "@/features/upload/json/json-upload-metadata-validation";
+import { JsonUpload } from "@/features/upload/json/json-upload";
+import { UploadyContextType } from "@rpldy/uploady";
+import axios from "axios";
 
 export enum TreeCreationMethod {
   CHEAPEST = "CHEAPEST",
@@ -82,9 +96,22 @@ export default function SetCreatorsPage({
     null
   );
   const [treeCanopyDepth, setTreeCanopyDepth] = useState<number | null>(null);
-  const [tokenCount, setTokenCount] = useState<number>(100);
+  const [treeProofLength, setTreeProofLength] = useState<number | null>(null);
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
   const [hasCalcError, setHasCalcError] = useState<boolean>(false);
+  const [collectionMetadataStats, setCollectionMetadataStats] =
+    useState<CollectionStatsFromCollectionMetadatas | null>(null);
+  const [jsonUploadyInstance, setJsonUploadyInstance] =
+    useState<UploadyContextType | null>(null);
+  const [isMetadataValid, setIsMetadataValid] = useState<boolean | null>(null);
+
+  const [jsonBeingUploaded, setJsonBeingUploaded] = useState<any | null>(null);
+  const [jsonFileBeingUploaded, setJsonFileBeingUploaded] =
+    useState<File | null>(null);
+  const [
+    collectionMetadatasJsonUploadResponse,
+    setCollectionMetadatasJsonUploadResponse,
+  ] = useState<UploadJsonResponse | null>(null);
 
   function calculateSpaceRequired(options: TreeOptions): number {
     return getConcurrentMerkleTreeAccountSize(
@@ -193,7 +220,12 @@ export default function SetCreatorsPage({
     },
 
     onSubmit: async ({ creators }) => {
-      if (!collectionId) return;
+      if (!collectionId || !jsonUploadyInstance) {
+        showToast({
+          primaryMessage: "There was a problem",
+        });
+        return;
+      }
       setIsSaving(true);
 
       const blueprint = createBlueprintClient({
@@ -203,6 +235,18 @@ export default function SetCreatorsPage({
       const { success } = await blueprint.collections.updateCollection({
         id: collectionId,
         creators,
+        tokenCount: collectionMetadataStats?.count,
+      });
+
+      jsonUploadyInstance.processPending({
+        params: {
+          driveAddress: ASSET_SHDW_DRIVE_ADDRESS,
+          action: BlueprintApiActions.UPLOAD_JSON,
+          fileName: `${params.id}-collection-metadatas.json`,
+          overwrite: true,
+          userId: user?.id,
+          collectionId: params.id,
+        },
       });
 
       if (!success) {
@@ -264,7 +308,7 @@ export default function SetCreatorsPage({
       setTreeCanopyDepth(0);
       setTreeMaxDepth(maxDepth);
       setTreeMaxBufferSize(maxBufferSize);
-      debugger;
+      setTreeProofLength(maxDepth);
 
       return cost / LAMPORTS_PER_SOL;
     },
@@ -272,11 +316,16 @@ export default function SetCreatorsPage({
   );
 
   useEffect(() => {
+    if (!collectionMetadataStats) return;
+    const tokenCount = collectionMetadataStats?.count || 0;
     console.log(tokenCount);
     const creatorCount = formik.values.creators.length;
 
     if (tokenCount <= 0) {
       setIsCalculating(false);
+      showToast({
+        primaryMessage: "Unable to parse collection metadata JSONs",
+      });
       return;
     }
 
@@ -302,6 +351,7 @@ export default function SetCreatorsPage({
           setTreeCanopyDepth(canopyDepth);
           setTreeMaxDepth(maxDepth);
           setTreeMaxBufferSize(maxBufferSize);
+          setTreeProofLength(maxDepth - canopyDepth);
         }
 
         if (!cost) {
@@ -320,13 +370,29 @@ export default function SetCreatorsPage({
 
     calculateCost();
   }, [
+    collectionMetadataStats,
     creators,
     findBestTreeCost,
     findCheapestTreeCost,
     formik.values.creators.length,
     formik.values.treeCreationMethod,
-    tokenCount,
   ]);
+
+  const handleMetadataJsonUploadComplete = useCallback(
+    async ({ url, success }: UploadJsonResponse) => {
+      if (!success) {
+        showToast({
+          primaryMessage: "Collection Metadata JSON Upload Failed",
+        });
+        return;
+      }
+
+      const { data } = await axios.get(url);
+
+      setCollectionMetadatasJsonUploadResponse(data);
+    },
+    []
+  );
 
   useEffect(() => {
     if (creators?.length && formik.values.creators.length === 0) {
@@ -353,8 +419,11 @@ export default function SetCreatorsPage({
             <CreateCollectionCreatorsChecklist
               creators={formik.values.creators}
             />
+            <CreateCollectionMetadataUploadChecklist
+              metadataStats={collectionMetadataStats}
+            />
           </div>
-          <div className="flex flex-col items-center w-full px-8">
+          <div className="flex flex-col items-center w-full px-8 mb-16">
             <div className="text-lg mb-4">Creators</div>
             <p className="text-sm mb-4 max-w-sm italic text-gray-200 text-center">
               The wallets that will receive royalties from the sale of items in
@@ -434,87 +503,89 @@ export default function SetCreatorsPage({
               </PrimaryButton>
             </>
             <div className="flex flex-col items-center mb-16 w-full md:w-[500px] mt-16">
-              <div className="text-lg mb-4">Merkle Tree</div>
-
-              <SelectInputWithLabel
-                value={formik.values.treeCreationMethod}
-                label="Tree Creation Method"
-                name="treeCreationMethod"
-                options={treeCreationMethodOptions}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder="Select tree creation method"
-                hideLabel={false}
-              />
-              <FormInputWithLabel
-                label="Number of tokens"
-                name="tokenCount"
-                placeholder="Number of tokens"
-                type="number"
-                min={0}
-                onChange={(e) => {
-                  setTokenCount(parseInt(e.target.value));
-                }}
-                value={tokenCount}
-              />
-              <div className="flex mt-8">
-                <div>Estimated cost:</div>
-                {!!hasCalcError ? (
-                  <div className="ml-2 text-red-500">Invalid tree size</div>
+              <div
+                className={classNames([
+                  "border rounded-lg px-4 w-full mb-4 p-8 min-h-[20vh] max-h-[20vh] overflow-y-auto",
+                  !!collectionMetadataStats &&
+                  !!collectionMetadatasJsonUploadResponse
+                    ? "border-green-500 bg-green-500 bg-opacity-10"
+                    : "border-gray-600",
+                ])}
+              >
+                {!!collectionMetadataStats &&
+                !!collectionMetadatasJsonUploadResponse ? (
+                  <div className="flex flex-col items-center">
+                    <div className="text-green-500 flex items-center gap-x-2 mb-4">
+                      <CheckBadgeIcon className="h-5 w-5" />
+                      <div>Token Metadatas Added</div>
+                    </div>
+                    <p className="text-gray-100 text-lg mb-2">
+                      {collectionMetadataStats.count} token metadatas
+                    </p>
+                    <div className="text-gray-100 text-lg mb-2 text-center">
+                      <div>
+                        {collectionMetadataStats.uniqueTraits.length} unique
+                        traits across collection
+                      </div>
+                    </div>
+                  </div>
                 ) : (
                   <>
-                    <div className="ml-2">
-                      {treeCost && !isCalculating ? (
-                        `${treeCost} SOL`
-                      ) : (
-                        <Spinner />
-                      )}
-                    </div>
+                    {!!jsonBeingUploaded ? (
+                      <JsonUploadMetadataValidation
+                        uploadyInstance={jsonUploadyInstance}
+                        json={jsonBeingUploaded}
+                        isMetadataValid={isMetadataValid}
+                        setIsMetadataValid={setIsMetadataValid}
+                        setMetadataStas={setCollectionMetadataStats}
+                        setJsonBeingUploaded={setJsonBeingUploaded}
+                      />
+                    ) : (
+                      <div className="flex flex-col justify-center items-center h-full">
+                        <JsonUpload
+                          isFileValid={isMetadataValid}
+                          uploadyInstance={jsonUploadyInstance}
+                          setUploadyInstance={setJsonUploadyInstance}
+                          setJsonFileBeingUploaded={setJsonFileBeingUploaded}
+                          setJsonBeingUploaded={setJsonBeingUploaded}
+                          setJsonUploadResponse={
+                            handleMetadataJsonUploadComplete
+                          }
+                          driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
+                          fileName={`${params.id}-collection-metadatas.json`}
+                        >
+                          Add Collection Metadata JSONs
+                        </JsonUpload>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
-              {!hasCalcError && !!treeMaxBufferSize && (
-                <div className="flex mt-8">
-                  <div>Max Buffer Size:</div>
-                  <>
-                    <div className="ml-2">
-                      {treeMaxBufferSize && !isCalculating ? (
-                        `${treeMaxBufferSize} bytes`
-                      ) : (
-                        <Spinner />
-                      )}
-                    </div>
-                  </>
-                </div>
-              )}
-              {!hasCalcError && !!treeMaxDepth && (
-                <div className="flex mt-8">
-                  <div>Max Depth:</div>
-                  <>
-                    <div className="ml-2">
-                      {treeMaxDepth && !isCalculating ? (
-                        `${treeMaxDepth} bytes`
-                      ) : (
-                        <Spinner />
-                      )}
-                    </div>
-                  </>
-                </div>
-              )}
-              {!hasCalcError && !!treeCanopyDepth && (
-                <div className="flex mt-8">
-                  <div>Canopy depth:</div>
-                  <>
-                    <div className="ml-2">
-                      {treeCanopyDepth && !isCalculating ? (
-                        `${treeCanopyDepth} bytes`
-                      ) : (
-                        <Spinner />
-                      )}
-                    </div>
-                  </>
-                </div>
-              )}
+            </div>
+            <div className="flex flex-col items-center mb-16 w-full md:w-[500px]">
+              <div className="text-lg mb-4">Merkle Tree</div>
+              <div className="flex max-w-sm mx-auto mb-8">
+                <SelectInputWithLabel
+                  value={formik.values.treeCreationMethod}
+                  label="Tree Creation Method"
+                  name="treeCreationMethod"
+                  options={treeCreationMethodOptions}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  placeholder="Select tree creation method"
+                  hideLabel={false}
+                />
+              </div>
+              <CreateMerkleTreeDetails
+                tokenCount={collectionMetadataStats?.count || null}
+                treeCost={treeCost}
+                treeMaxDepth={treeMaxDepth}
+                treeMaxBufferSize={treeMaxBufferSize}
+                treeCanopyDepth={treeCanopyDepth}
+                treeProofLength={treeProofLength}
+                isCalculating={isCalculating}
+                hasCalcError={hasCalcError}
+              />
             </div>
           </div>
           <div className="flex bottom-0 left-0 right-0 fixed w-full justify-center items-center">
@@ -522,7 +593,9 @@ export default function SetCreatorsPage({
               <SubmitButton
                 isSubmitting={formik.isSubmitting || isSaving}
                 className="w-full"
-                disabled={!creatorsAreValid(formik.values.creators)}
+                disabled={
+                  !creatorsAreValid(formik.values.creators) || !isMetadataValid
+                }
                 onClick={formik.handleSubmit}
               >
                 Next - Add Assets
