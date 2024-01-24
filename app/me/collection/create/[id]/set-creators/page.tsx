@@ -5,6 +5,7 @@ import {
   Collection,
   CollectionStatsFromCollectionMetadatas,
   Creator,
+  TreeCreationMethod,
   UploadJsonResponse,
 } from "@/app/blueprint/types";
 import { creatorsAreValid } from "@/app/blueprint/utils";
@@ -55,11 +56,6 @@ import { JsonUploadMetadataValidation } from "@/features/upload/json/json-upload
 import { JsonUpload } from "@/features/upload/json/json-upload";
 import { UploadyContextType } from "@rpldy/uploady";
 import axios from "axios";
-
-export enum TreeCreationMethod {
-  CHEAPEST = "CHEAPEST",
-  TRADABLE = "TRADABLE",
-}
 
 const treeCreationMethodOptions = [
   {

@@ -1088,3 +1088,8 @@ export type ReportErrorResponse = BaseBlueprintResponse & {
   error: string;
   metadata?: any;
 };
+
+export enum TreeCreationMethod {
+  CHEAPEST = "CHEAPEST",
+  TRADABLE = "TRADABLE",
+}

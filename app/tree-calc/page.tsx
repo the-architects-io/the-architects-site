@@ -1,7 +1,7 @@
 "use client";
 import { createBlueprintClient } from "@/app/blueprint/client";
 import useBlueprint from "@/app/blueprint/hooks/use-blueprint";
-import { getMaxBufferSizeAndMaxDepthForCapacity } from "@/app/blueprint/utils/merkle-trees";
+import { getMinimumMaxBufferSizeAndMaxDepthForCapacity } from "@/app/blueprint/utils/merkle-trees";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
@@ -37,7 +37,7 @@ export default function Page() {
     }
     try {
       const { maxBufferSize, maxDepth } =
-        getMaxBufferSizeAndMaxDepthForCapacity(formik.values.capacity);
+        getMinimumMaxBufferSizeAndMaxDepthForCapacity(formik.values.capacity);
       setMaxBufferSize(maxBufferSize);
       setMaxDepth(maxDepth);
     } catch (error) {}

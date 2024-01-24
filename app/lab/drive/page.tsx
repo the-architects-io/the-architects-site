@@ -58,7 +58,7 @@ export default function DriveTestPage() {
     }
     setSelectedDrive(drive);
     setIsFetchingDrive(false);
-  }, [selectedDriveAddress]);
+  }, [cluster, selectedDriveAddress]);
 
   const getDrives = async () => {
     setIsFetchingDrives(true);
@@ -124,6 +124,7 @@ export default function DriveTestPage() {
   }, [
     drives,
     getDrive,
+    getDrives,
     isFetchingDrive,
     isFetchingDrives,
     selectedDrive,
