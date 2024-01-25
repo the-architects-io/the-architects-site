@@ -66,7 +66,7 @@ export const handleError = async (
     rawError = error;
   }
 
-  if (ENV === "production" || ENV === "preview") {
+  if (ENV === "production" || ENV === "preview" || ENV === "local") {
     const { success } = await blueprint.errors.reportError({
       error,
       metadata: {

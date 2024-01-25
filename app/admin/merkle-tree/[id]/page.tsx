@@ -3,16 +3,19 @@
 import { MerkleTree } from "@/app/blueprint/types";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import Spinner from "@/features/UI/spinner";
+import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import { MintCnft } from "@/features/cnfts/mint-cnft";
 import { MerkleTreeDetails } from "@/features/merkle-trees/merkle-tree-details";
 import { GET_MERKLE_TREE_BY_ADDRESS } from "@/graphql/queries/get-merkle-tree-by-address";
 import { GET_MERKLE_TREE_BY_ID } from "@/graphql/queries/get-merkle-tree-by-id";
+import { useAdmin } from "@/hooks/admin";
 import { isValidPublicKey } from "@/utils/rpc";
 import { useQuery } from "@apollo/client";
 import { useState } from "react";
 
 export default function Page({ params }: { params: { id: string } }) {
   const { id } = params;
+  const { isAdmin } = useAdmin();
 
   const [tree, setTree] = useState<MerkleTree | null>(null);
 
@@ -44,6 +47,8 @@ export default function Page({ params }: { params: { id: string } }) {
       },
     }
   );
+
+  if (!isAdmin) return <NotAdminBlocker />;
 
   if (loadingTreeById || loadingTreeByAddress) {
     return (

@@ -884,6 +884,7 @@ export type CreateUploadJobInput = {
   log?: string;
   percentComplete?: number;
   icon?: JobIconType;
+  cluster?: "devnet" | "mainnet-beta";
 };
 
 export type CreateUploadJobResponse = BaseBlueprintResponse & {
@@ -1032,6 +1033,7 @@ export type CreateJobInput = {
   statusText?: string;
   statusId?: string;
   icon?: JobIconType;
+  cluster?: "devnet" | "mainnet-beta";
 };
 
 export type CreateJobResponse = BaseBlueprintResponse & {

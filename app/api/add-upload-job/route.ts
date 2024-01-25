@@ -1,7 +1,9 @@
 import { CreateUploadJobInput, UploadJob } from "@/app/blueprint/types";
+import { BASE_URL } from "@/constants/constants";
 import { client } from "@/graphql/backend-client";
 import { ADD_UPLOAD_JOB } from "@/graphql/mutations/add-upload-job";
 import { handleError } from "@/utils/errors/log-error";
+import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -13,6 +15,7 @@ export async function POST(req: NextRequest) {
     statusText,
     statusId,
     icon,
+    cluster,
   }: CreateUploadJobInput = await req.json();
 
   console.log({ sizeInBytes, userId });
@@ -29,7 +32,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const {
-      insert_uploadJobs_one,
+      insert_uploadJobs_one: newJob,
     }: {
       insert_uploadJobs_one: UploadJob;
     } = await client.request({
@@ -42,16 +45,25 @@ export async function POST(req: NextRequest) {
           ...(statusText && { statusText }),
           ...(statusId && { statusId }),
           ...(icon && { icon }),
+          ...(cluster && { cluster }),
           userId,
           isComplete: false,
         },
       },
     });
 
+    const { data } = await axios.post(`${BASE_URL}/api/report-job`, {
+      job: newJob,
+      metadata: {
+        context: "frontend",
+        cluster,
+      },
+    });
+
     return NextResponse.json(
       {
         success: true,
-        job: insert_uploadJobs_one,
+        job: newJob,
       },
       {
         status: 200,

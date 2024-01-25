@@ -74,6 +74,7 @@ export const ExecuteAirdrop = ({
       userId: user.id,
       jobTypeId: JobTypeUUIDs.AIRDROP,
       icon: JobIcons.COLLECTION_IMAGE,
+      cluster,
     });
 
     const { success: airdropUpdateSuccess } =

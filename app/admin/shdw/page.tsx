@@ -14,12 +14,15 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
 import { useFormik } from "formik";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useCluster } from "@/hooks/cluster";
+import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
+import { useAdmin } from "@/hooks/admin";
 
 export default function ShdwPage() {
   const { cluster } = useCluster();
   const wallet = useWallet();
+  const { isAdmin } = useAdmin();
 
   const [shadowDrive, setShadowDrive] = useState<ShdwDrive | null>(null);
   const [storageAccounts, setStorageAccounts] = useState<
@@ -71,6 +74,8 @@ export default function ShdwPage() {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wallet?.publicKey]);
+
+  if (!isAdmin) return <NotAdminBlocker />;
 
   return (
     <ContentWrapper className="flex flex-col items-center">

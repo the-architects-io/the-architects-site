@@ -1,7 +1,9 @@
 import { CreateJobInput, Job } from "@/app/blueprint/types";
+import { BASE_URL } from "@/constants/constants";
 import { client } from "@/graphql/backend-client";
 import { ADD_JOB } from "@/graphql/mutations/add-job";
 import { handleError } from "@/utils/errors/log-error";
+import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -12,6 +14,7 @@ export async function POST(req: NextRequest) {
     percentComplete,
     jobTypeId,
     icon,
+    cluster,
   }: CreateJobInput = await req.json();
 
   if (!userId || !jobTypeId) {
@@ -28,10 +31,19 @@ export async function POST(req: NextRequest) {
           ...(statusId && { statusId }),
           ...(percentComplete && { percentComplete }),
           ...(icon && { icon }),
+          ...(cluster && { cluster }),
         },
       });
 
     console.log({ job });
+
+    const { data } = await axios.post(`${BASE_URL}/api/report-job`, {
+      job,
+      metadata: {
+        context: "frontend",
+        cluster,
+      },
+    });
 
     if (!job) {
       return NextResponse.json(

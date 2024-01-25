@@ -145,6 +145,7 @@ export default function CollectionCreationUploadAssetsPage({
       statusText: "Creating SHDW Drive",
       userId: user?.id,
       icon: JobIcons.CREATING_SHADOW_DRIVE,
+      cluster,
     });
 
     setUploadJob(job);
