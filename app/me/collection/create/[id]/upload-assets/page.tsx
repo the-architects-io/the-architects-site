@@ -238,6 +238,13 @@ export default function CollectionCreationUploadAssetsPage({
     // Convert the Blob to a File object
     const file = new File([blob], fileName, { type: "image/png" });
 
+    console.log({
+      "transferring collection image": "true",
+      file,
+      fileName,
+      driveAddress,
+    });
+
     await blueprint.jobs.updateUploadJob({
       id: job.id,
       statusText: "Transferring collection image",
