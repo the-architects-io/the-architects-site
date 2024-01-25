@@ -230,6 +230,9 @@ export default function CollectionCreationUploadAssetsPage({
     // Convert the response to an ArrayBuffer
     const arrayBuffer = await response.arrayBuffer();
 
+    // create buffer from arrayBuffer
+    const buffer = Buffer.from(arrayBuffer);
+
     // Convert the ArrayBuffer to a Blob
     const blob = new Blob([arrayBuffer], { type: "image/png" });
 
@@ -252,10 +255,14 @@ export default function CollectionCreationUploadAssetsPage({
       cluster,
     });
 
-    const { success: imageUploadSuccess, url } =
-      await blueprint.upload.uploadFile({
-        file,
-        fileName,
+    const { success: imageUploadSuccess, urls } =
+      await blueprint.upload.uploadFiles({
+        files: [
+          {
+            file: buffer,
+            name: fileName,
+          },
+        ],
         driveAddress,
       });
 
