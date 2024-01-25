@@ -71,28 +71,16 @@ const isCircular = (object: any) => {
 const getFormData = async (params: Record<string, any>) => {
   const formData = new FormData();
   for (const key in params) {
-    try {
-      if (params[key] instanceof File) {
-        const file = params[key] as File;
-        if (file.type === "application/json") {
-          const json = await jsonFileToJson(file);
-          formData.append(key, JSON.stringify(json));
-        } else {
-          formData.append(key, file);
-        }
+    if (params[key] instanceof File) {
+      const file = params[key] as File;
+      if (file.type === "application/json") {
+        const json = await jsonFileToJson(file);
+        formData.append(key, JSON.stringify(json));
       } else {
-        formData.append(key, safeStringify(params[key]));
+        formData.append(key, file);
       }
-    } catch (error) {
-      console.error(`Error processing key ${key}:`, error);
-      const blueprint = createBlueprintClient({ cluster: "devnet" });
-      blueprint.errors.reportError({
-        error: error as Error,
-        metadata: {
-          key,
-          params,
-        },
-      });
+    } else {
+      formData.append(key, params[key]);
     }
   }
   return formData;

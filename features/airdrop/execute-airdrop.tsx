@@ -112,16 +112,18 @@ export const ExecuteAirdrop = ({
         type: "application/json",
       }
     );
-
+    console.log({ jsonFile });
+    debugger;
     try {
       const { url } = await blueprint.upload.uploadJson({
         file: jsonFile,
         fileName: `${id}-collection.json`,
         driveAddress,
       });
-
+      debugger;
       uri = url;
     } catch (error) {
+      debugger;
       blueprint.jobs.updateJob({
         id: job.id,
         statusId: StatusUUIDs.ERROR,
@@ -165,6 +167,14 @@ export const ExecuteAirdrop = ({
 
     let treeId;
 
+    console.log({
+      maxBufferSize,
+      maxDepth,
+      canopyDepth,
+      collectionId: airdrop.collection.id,
+      userId: SYSTEM_USER_ID,
+    });
+    debugger;
     try {
       const { success, merkleTreeAddress, id } =
         await blueprint.tokens.createTree({

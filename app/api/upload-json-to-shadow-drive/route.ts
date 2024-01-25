@@ -14,7 +14,7 @@ export type UploadAssetsToShadowDriveResponse = {
 };
 
 export async function POST(req: NextRequest) {
-  const { file, fileName, driveAddress }: UploadJsonInput = await req.json();
+  let { file, fileName, driveAddress }: UploadJsonInput = await req.json();
 
   console.log({
     file,
@@ -34,6 +34,14 @@ export async function POST(req: NextRequest) {
       },
       { status: 500 }
     );
+  }
+
+  if (fileName.includes('"')) {
+    fileName = fileName.replace(/"/g, "");
+  }
+
+  if (driveAddress.includes('"')) {
+    driveAddress = driveAddress.replace(/"/g, "");
   }
 
   if (!file) {

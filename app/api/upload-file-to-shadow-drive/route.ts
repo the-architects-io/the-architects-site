@@ -32,7 +32,6 @@ export async function POST(req: NextRequest) {
   let fileName = formData.get("fileName") as string;
   let driveAddress = formData.get("driveAddress") as string;
 
-  // if fileName has " character, strip it
   if (fileName.includes('"')) {
     fileName = fileName.replace(/"/g, "");
   }

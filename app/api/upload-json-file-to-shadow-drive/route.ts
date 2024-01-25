@@ -34,13 +34,27 @@ export async function POST(req: NextRequest) {
   }
 
   const formData = await req.formData();
+  const formDataEntries = Array.from(formData.entries());
+
   const formDataFile = formData.get("file") as unknown as File | null;
-  const fileName = formData.get("fileName") as string;
-  const driveAddress = formData.get("driveAddress") as string;
+  let fileName = formData.get("fileName") as string;
+  let driveAddress = formData.get("driveAddress") as string;
   const overwriteString = formData.get("overwrite") as string;
   const overwrite = !!overwriteString;
 
-  console.log("sanitycheck", { formDataFile, fileName, driveAddress });
+  if (fileName.includes('"')) {
+    fileName = fileName.replace(/"/g, "");
+  }
+
+  if (driveAddress.includes('"')) {
+    driveAddress = driveAddress.replace(/"/g, "");
+  }
+
+  console.log("sanitycheck", {
+    formDataEntries,
+    fileName,
+    driveAddress,
+  });
 
   if (!formDataFile || !fileName || !driveAddress) {
     return NextResponse.json(
