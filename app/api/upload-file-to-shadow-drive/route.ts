@@ -29,14 +29,19 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData();
   const formDataFile = formData.get("file") as unknown as File | null;
-  const fileName = formData.get("fileName") as string;
+  let fileName = formData.get("fileName") as string;
   const driveAddress = formData.get("driveAddress") as string;
 
-  console.log({
+  console.log("in upload-file-to-shadow-drive", {
     formDataFile,
     fileName,
     driveAddress,
   });
+
+  // if fileName has " character, strip it
+  if (fileName.includes('"')) {
+    fileName = fileName.replace(/"/g, "");
+  }
 
   if (!formDataFile || !fileName || !driveAddress) {
     return NextResponse.json(null, { status: 400 });

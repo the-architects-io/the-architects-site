@@ -230,9 +230,6 @@ export default function CollectionCreationUploadAssetsPage({
     // Convert the response to an ArrayBuffer
     const arrayBuffer = await response.arrayBuffer();
 
-    // create buffer from arrayBuffer
-    const buffer = Buffer.from(arrayBuffer);
-
     // Convert the ArrayBuffer to a Blob
     const blob = new Blob([arrayBuffer], { type: "image/png" });
 
@@ -241,13 +238,6 @@ export default function CollectionCreationUploadAssetsPage({
     // Convert the Blob to a File object
     const file = new File([blob], fileName, { type: "image/png" });
 
-    console.log({
-      "transferring collection image": "true",
-      file,
-      fileName,
-      driveAddress,
-    });
-
     await blueprint.jobs.updateUploadJob({
       id: job.id,
       statusText: "Transferring collection image",
@@ -255,14 +245,10 @@ export default function CollectionCreationUploadAssetsPage({
       cluster,
     });
 
-    const { success: imageUploadSuccess, urls } =
-      await blueprint.upload.uploadFiles({
-        files: [
-          {
-            file: buffer,
-            name: fileName,
-          },
-        ],
+    const { success: imageUploadSuccess, url } =
+      await blueprint.upload.uploadFile({
+        file,
+        fileName,
         driveAddress,
       });
 
@@ -317,6 +303,7 @@ export default function CollectionCreationUploadAssetsPage({
   useEffect(() => {
     if (uploadJob && driveAddress && !hasSavedDriveAddressToCollection) {
       blueprint.collections.updateCollection({
+        imageUrl: `${SHDW_DRIVE_BASE_URL}/${driveAddress}/collection.png`,
         id: params.id,
         uploadJobId: uploadJob.id,
         driveAddress,
