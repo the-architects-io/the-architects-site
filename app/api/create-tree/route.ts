@@ -102,6 +102,7 @@ export async function POST(req: NextRequest) {
     {
       success: true,
       merkleTreeAddress,
+      id: insert_merkleTrees_one.id,
     },
     { status: 200 }
   );

@@ -156,12 +156,18 @@ export const createJsonFileFromObject = (object: any, fileName?: string) => {
 export const safeStringify = (obj: any) => {
   const seen = new WeakSet();
   return JSON.stringify(obj, (key, value) => {
+    // Check if value is a string and return it directly
+    if (typeof value === "string") {
+      return value;
+    }
+
     if (typeof value === "object" && value !== null) {
       if (seen.has(value)) {
         return; // Duplicate reference found, skip it
       }
       seen.add(value);
     }
+
     return value;
   });
 };

@@ -149,6 +149,11 @@ export const ExecuteAirdrop = ({
         isCollection: true,
       });
       collectionNftMintAddress = mintAddress;
+      console.log("minting collection NFT", {
+        success,
+        mintAddress,
+      });
+      debugger;
     } catch (error) {
       blueprint.jobs.updateJob({
         id: job.id,
@@ -198,6 +203,17 @@ export const ExecuteAirdrop = ({
         icon: JobIcons.ERROR,
       });
       handleError(error as Error);
+    }
+
+    if (!collectionNftMintAddress) {
+      blueprint.jobs.updateJob({
+        id: job.id,
+        statusId: StatusUUIDs.ERROR,
+        statusText: "Failed to mint collection NFT",
+        icon: JobIcons.ERROR,
+      });
+      debugger;
+      return;
     }
 
     try {

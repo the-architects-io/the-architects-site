@@ -80,13 +80,7 @@ const getFormData = async (params: Record<string, any>) => {
         formData.append(key, file);
       }
     } else {
-      // Use safeStringify only for objects or arrays
-      if (typeof params[key] === "object" && params[key] !== null) {
-        formData.append(key, safeStringify(params[key]));
-      } else {
-        // For simple data types, use the value directly
-        formData.append(key, params[key]);
-      }
+      formData.append(key, params[key]);
     }
   }
   return formData;
@@ -117,13 +111,21 @@ async function makeApiRequest<TResponse, TParams extends Record<string, any>>(
     body = formData;
     headers = { "Content-Type": "multipart/form-data" };
   } else {
-    body = safeStringify({
-      action,
-      params: {
-        ...params,
-        cluster: options.cluster,
-      },
-    });
+    body = isCircular(params)
+      ? safeStringify({
+          action,
+          params: {
+            ...params,
+            cluster: options.cluster,
+          },
+        })
+      : JSON.stringify({
+          action,
+          params: {
+            ...params,
+            cluster: options.cluster,
+          },
+        });
     headers = { "Content-Type": "application/json" };
   }
 
