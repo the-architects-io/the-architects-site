@@ -30,17 +30,15 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const formDataFile = formData.get("file") as unknown as File | null;
   let fileName = formData.get("fileName") as string;
-  const driveAddress = formData.get("driveAddress") as string;
-
-  console.log("in upload-file-to-shadow-drive", {
-    formDataFile,
-    fileName,
-    driveAddress,
-  });
+  let driveAddress = formData.get("driveAddress") as string;
 
   // if fileName has " character, strip it
   if (fileName.includes('"')) {
     fileName = fileName.replace(/"/g, "");
+  }
+
+  if (driveAddress.includes('"')) {
+    driveAddress = driveAddress.replace(/"/g, "");
   }
 
   if (!formDataFile || !fileName || !driveAddress) {
@@ -52,14 +50,19 @@ export async function POST(req: NextRequest) {
   const sizeInBytes = file.byteLength;
 
   try {
-    // log first 5 chars of private key
-    console.log("upload-file-to-shadow-drive", {
+    console.log("in upload-file-to-shadow-drive", {
+      formDataFile,
+      fileName,
+      driveAddress,
       executionWalletPrivateKey:
         process.env.EXECUTION_WALLET_PRIVATE_KEY?.slice(0, 5),
     });
+    console.log("attempting decode");
     const keypair = Keypair.fromSecretKey(
       bs58.decode(process.env.EXECUTION_WALLET_PRIVATE_KEY)
     );
+
+    console.log("keypair", keypair);
 
     const wallet = new NodeWallet(keypair);
 
