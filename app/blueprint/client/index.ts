@@ -80,7 +80,13 @@ const getFormData = async (params: Record<string, any>) => {
         formData.append(key, file);
       }
     } else {
-      formData.append(key, params[key]);
+      // Use safeStringify only for objects or arrays
+      if (typeof params[key] === "object" && params[key] !== null) {
+        formData.append(key, safeStringify(params[key]));
+      } else {
+        // For simple data types, use the value directly
+        formData.append(key, params[key]);
+      }
     }
   }
   return formData;
