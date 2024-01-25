@@ -94,7 +94,7 @@ export default function CollectionsPage() {
       collection.description &&
       collection.imageUrl
     ) {
-      return `/me/collection/create/${collection.id}/set-creators`;
+      return `/me/collection/create/${collection.id}/select-method`;
     }
 
     return `/me/collection/create/${collection.id}`;
