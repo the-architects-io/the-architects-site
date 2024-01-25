@@ -47,6 +47,11 @@ export async function POST(req: NextRequest) {
   const sizeInBytes = file.byteLength;
 
   try {
+    // log first 5 chars of private key
+    console.log("upload-file-to-shadow-drive", {
+      executionWalletPrivateKey:
+        process.env.EXECUTION_WALLET_PRIVATE_KEY?.slice(0, 5),
+    });
     const keypair = Keypair.fromSecretKey(
       bs58.decode(process.env.EXECUTION_WALLET_PRIVATE_KEY)
     );

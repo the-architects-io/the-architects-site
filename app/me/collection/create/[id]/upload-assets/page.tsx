@@ -310,7 +310,6 @@ export default function CollectionCreationUploadAssetsPage({
   useEffect(() => {
     if (uploadJob && driveAddress && !hasSavedDriveAddressToCollection) {
       blueprint.collections.updateCollection({
-        imageUrl: `${SHDW_DRIVE_BASE_URL}/${driveAddress}/collection.png`,
         id: params.id,
         uploadJobId: uploadJob.id,
         driveAddress,
