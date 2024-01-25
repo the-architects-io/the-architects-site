@@ -16,8 +16,14 @@ import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { maxDepth, maxBufferSize, collectionId, cluster, userId } =
-    await req.json();
+  const {
+    maxDepth,
+    maxBufferSize,
+    collectionId,
+    cluster,
+    userId,
+    canopyDepth,
+  } = await req.json();
 
   if (
     !maxDepth ||
@@ -47,6 +53,7 @@ export async function POST(req: NextRequest) {
     merkleTree,
     maxDepth: Number(maxDepth),
     maxBufferSize: Number(maxBufferSize),
+    canopyDepth: Number(canopyDepth),
   });
 
   const merkleTreeAddress = merkleTree.publicKey.toString();
