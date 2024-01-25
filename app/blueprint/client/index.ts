@@ -48,6 +48,7 @@ import {
 import {
   getPremintCollectionMetadata,
   jsonFileToJson,
+  safeStringify,
 } from "@/app/blueprint/utils";
 import { takePayment } from "@/app/blueprint/utils/payments";
 import { BASE_URL } from "@/constants/constants";
@@ -58,20 +59,40 @@ import axios from "axios";
 export type BlueprintClientOptions = {
   cluster: "devnet" | "mainnet-beta";
 };
+const isCircular = (object: any) => {
+  try {
+    JSON.stringify(object);
+  } catch (e) {
+    return true;
+  }
+  return false;
+};
 
 const getFormData = async (params: Record<string, any>) => {
   const formData = new FormData();
   for (const key in params) {
-    if (params[key] instanceof File) {
-      const file = params[key] as File;
-      if (file.type === "application/json") {
-        const json = await jsonFileToJson(file);
-        formData.append(key, JSON.stringify(json));
+    try {
+      if (params[key] instanceof File) {
+        const file = params[key] as File;
+        if (file.type === "application/json") {
+          const json = await jsonFileToJson(file);
+          formData.append(key, JSON.stringify(json));
+        } else {
+          formData.append(key, file);
+        }
       } else {
-        formData.append(key, file);
+        formData.append(key, safeStringify(params[key]));
       }
-    } else {
-      formData.append(key, params[key]);
+    } catch (error) {
+      console.error(`Error processing key ${key}:`, error);
+      const blueprint = createBlueprintClient({ cluster: "devnet" });
+      blueprint.errors.reportError({
+        error: error as Error,
+        metadata: {
+          key,
+          params,
+        },
+      });
     }
   }
   return formData;
@@ -102,7 +123,7 @@ async function makeApiRequest<TResponse, TParams extends Record<string, any>>(
     body = formData;
     headers = { "Content-Type": "multipart/form-data" };
   } else {
-    body = JSON.stringify({
+    body = safeStringify({
       action,
       params: {
         ...params,

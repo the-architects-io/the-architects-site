@@ -241,7 +241,6 @@ export default function SetCreatorsPage({
         maxBufferSize: treeMaxBufferSize,
         canopyDepth: treeCanopyDepth || 0,
       });
-      debugger;
 
       jsonUploadyInstance.processPending({
         params: {

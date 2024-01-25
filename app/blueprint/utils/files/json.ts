@@ -152,3 +152,16 @@ export const createJsonFileFromObject = (object: any, fileName?: string) => {
     type: "application/json",
   });
 };
+
+export const safeStringify = (obj: any) => {
+  const seen = new WeakSet();
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === "object" && value !== null) {
+      if (seen.has(value)) {
+        return; // Duplicate reference found, skip it
+      }
+      seen.add(value);
+    }
+    return value;
+  });
+};

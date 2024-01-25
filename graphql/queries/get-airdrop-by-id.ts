@@ -5,9 +5,6 @@ export const GET_AIRDROP_BY_ID = gql`
     airdrops_by_pk(id: $id) {
       id
       name
-      maxBufferSize
-      maxDepth
-      canopyDepth
       cluster
       collectionNft {
         id
@@ -24,6 +21,9 @@ export const GET_AIRDROP_BY_ID = gql`
         statusText
       }
       collection {
+        maxBufferSize
+        maxDepth
+        canopyDepth
         id
         tokenCount
         createdAt

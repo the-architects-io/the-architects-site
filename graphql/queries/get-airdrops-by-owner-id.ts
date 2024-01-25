@@ -20,6 +20,9 @@ export const GET_AIRDROPS_BY_OWNER_ID = gql`
         statusText
       }
       collection {
+        maxBufferSize
+        maxDepth
+        canopyDepth
         id
         name
         imageUrl

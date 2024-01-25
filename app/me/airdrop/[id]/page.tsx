@@ -88,7 +88,7 @@ export default function AirdropDetailsPage({ params }: { params: any }) {
             {airdrop?.recipients_aggregate?.aggregate?.count}
           </div>
           <div className="text-lg mb-4">
-            <span className="font-semibold">Number of tokens allocated: </span>
+            <span className="font-semibold">Number of recipients: </span>
             {airdrop?.recipients?.reduce(
               (acc, recipient) => acc + recipient.amount,
               0
