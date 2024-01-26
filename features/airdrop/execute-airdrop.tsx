@@ -9,6 +9,7 @@ import {
 import {
   ARCHITECTS_API_URL,
   ASSET_SHDW_DRIVE_ADDRESS,
+  EXECUTION_WALLET_ADDRESS,
   SHDW_DRIVE_BASE_URL,
   SYSTEM_USER_ID,
 } from "@/constants/constants";
@@ -142,10 +143,13 @@ export const ExecuteAirdrop = ({
 
     try {
       const { data, status } = await axios.post(
-        `${ARCHITECTS_API_URL}/airdrop-cnfts`,
+        `${ARCHITECTS_API_URL}/mint-nft`,
         {
-          airdropId: airdrop.id,
-          jobId: job.id,
+          name,
+          uri,
+          sellerFeeBasisPoints,
+          isCollection: true,
+          creatorAddress: EXECUTION_WALLET_ADDRESS,
           cluster,
         }
       );
