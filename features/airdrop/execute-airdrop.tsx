@@ -141,15 +141,20 @@ export const ExecuteAirdrop = ({
     let collectionNftMintAddress;
 
     try {
-      const { success, mintAddress } = await blueprint.tokens.mintNft({
-        name,
-        uri,
-        sellerFeeBasisPoints,
-        isCollection: true,
-      });
+      const { data, status } = await axios.post(
+        `${ARCHITECTS_API_URL}/airdrop-cnfts`,
+        {
+          airdropId: airdrop.id,
+          jobId: job.id,
+          cluster,
+        }
+      );
+
+      const { signature, result, mintAddress } = data;
       collectionNftMintAddress = mintAddress;
+      debugger;
       console.log("minting collection NFT", {
-        success,
+        signature,
         mintAddress,
       });
     } catch (error) {
