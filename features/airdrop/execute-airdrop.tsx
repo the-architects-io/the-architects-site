@@ -113,17 +113,16 @@ export const ExecuteAirdrop = ({
       }
     );
     console.log({ jsonFile });
-    debugger;
+
     try {
       const { url } = await blueprint.upload.uploadJson({
         file: jsonFile,
         fileName: `${id}-collection.json`,
         driveAddress,
       });
-      debugger;
+
       uri = url;
     } catch (error) {
-      debugger;
       blueprint.jobs.updateJob({
         id: job.id,
         statusId: StatusUUIDs.ERROR,
@@ -153,7 +152,6 @@ export const ExecuteAirdrop = ({
         success,
         mintAddress,
       });
-      debugger;
     } catch (error) {
       blueprint.jobs.updateJob({
         id: job.id,
@@ -181,18 +179,27 @@ export const ExecuteAirdrop = ({
     });
     debugger;
     try {
-      const { success, merkleTreeAddress, id } =
-        await blueprint.tokens.createTree({
+      const { data, status } = await axios.post(
+        `${ARCHITECTS_API_URL}/create-tree`,
+        {
           maxBufferSize: maxBufferSize,
           maxDepth: maxDepth,
           canopyDepth: canopyDepth,
           collectionId: airdrop.collection.id,
           userId: SYSTEM_USER_ID,
-        });
+          cluster,
+        }
+      );
 
-      treeId = id;
+      treeId = data.id;
 
-      console.log({ merkleTreeAddress });
+      console.log({
+        data,
+        status,
+        treeId,
+      });
+
+      debugger;
 
       if (!success) throw new Error("Error creating Merkle Tree");
     } catch (error) {
