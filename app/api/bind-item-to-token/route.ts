@@ -1,6 +1,6 @@
 import { client } from "@/graphql/backend-client";
 import { BIND_ITEM_TO_TOKEN } from "@/graphql/mutations/bind-item-to-token";
-import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address";
+import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address-deprecated";
 import axios from "axios";
 import { BASE_URL } from "@/constants/constants";
 import { GET_ITEM_BY_ID } from "@/graphql/queries/get-item-by-id";

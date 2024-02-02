@@ -10,6 +10,7 @@ export const SingleImageUpload = ({
   driveAddress,
   children,
   setImage,
+  setImageSizeInBytes,
 }: {
   fileName: string;
   driveAddress: string;
@@ -21,12 +22,7 @@ export const SingleImageUpload = ({
   const [isSuccessful, setIsSuccessful] = useState<boolean | null>(null);
 
   return (
-    <SingleImageUploadFieldWrapper
-      autoUpload={true}
-      fileName={fileName}
-      driveAddress={driveAddress}
-      setImage={setImage}
-    >
+    <SingleImageUploadFieldWrapper setImage={setImage}>
       <SingleImageUploadField
         isInProgress={isInProgress}
         driveAddress={driveAddress}

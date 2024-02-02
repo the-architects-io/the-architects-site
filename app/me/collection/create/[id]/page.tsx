@@ -104,7 +104,7 @@ export default function CreateCollectionPage({
         return;
       }
 
-      router.push(`/me/collection/create/${collectionId}/upload-metadatas`);
+      router.push(`/me/collection/create/${collectionId}/select-method`);
     },
   });
 

@@ -1,5 +1,5 @@
 import { client } from "@/graphql/backend-client";
-import { REMOVE_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/mutations/remove-tokens-by-mint-addresses";
+import { REMOVE_TOKENS_BY_MINT_ADDRESSES_DEPRECATED } from "@/graphql/mutations/remove-tokens-by-mint-addresses-deprecated";
 import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     const {
       delete_tokens: deletedTokens,
     }: { delete_tokens: RemoveTokensResponse } = await client.request({
-      document: REMOVE_TOKENS_BY_MINT_ADDRESSES,
+      document: REMOVE_TOKENS_BY_MINT_ADDRESSES_DEPRECATED,
       variables: {
         mintAddresses,
       },

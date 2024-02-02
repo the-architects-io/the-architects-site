@@ -7,7 +7,8 @@ import { MerkleTreesTable } from "@/features/merkle-trees/merkle-trees-table";
 import { useQuery } from "@apollo/client";
 import { GET_MERKLE_TREES_BY_USER_ID } from "@/graphql/queries/get-merkle-trees-by-user-id";
 import { SYSTEM_USER_ID } from "@/constants/constants";
-import { MintCnft } from "@/features/cnfts/mint-cnft";
+import { MintCnftBasic } from "@/features/cnfts/mint-cnft-basic";
+import { MintCnftAdvanced } from "@/features/cnfts/mint-cnft-advanced";
 
 const tabs: ITab[] = [
   {
@@ -15,8 +16,12 @@ const tabs: ITab[] = [
     value: "merkle-trees",
   },
   {
-    name: "CNFTs",
+    name: "Mint CNFT",
     value: "cnfts",
+  },
+  {
+    name: "Mint CNFT Advanced",
+    value: "cnfts-advanced",
   },
 ];
 
@@ -49,7 +54,12 @@ export const AdminToolsPanel = () => {
       )}
       {!!activeTab && activeTab.value === "cnfts" && (
         <div className="pt-8 w-full mx-auto max-w-md">
-          <MintCnft />
+          <MintCnftBasic />
+        </div>
+      )}
+      {!!activeTab && activeTab.value === "cnfts-advanced" && (
+        <div className="pt-8 w-full mx-auto">
+          <MintCnftAdvanced />
         </div>
       )}
     </div>

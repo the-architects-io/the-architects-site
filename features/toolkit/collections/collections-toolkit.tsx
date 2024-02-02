@@ -7,7 +7,6 @@ import { MerkleTreesTable } from "@/features/merkle-trees/merkle-trees-table";
 import { useQuery } from "@apollo/client";
 import { GET_MERKLE_TREES_BY_USER_ID } from "@/graphql/queries/get-merkle-trees-by-user-id";
 import { SYSTEM_USER_ID } from "@/constants/constants";
-import { MintCnft } from "@/features/cnfts/mint-cnft";
 import { UpdateAuthorityForm } from "@/features/toolkit/collections/update-authority-form";
 
 const tabs: ITab[] = [

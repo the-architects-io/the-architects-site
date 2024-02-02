@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ADD_TOKEN } from "@/graphql/mutations/add-token";
+import { ADD_TOKENS_DEPRECATED } from "@/graphql/mutations/add-token-deprecated";
 import { BASE_URL } from "@/constants/constants";
 import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   try {
     const { insert_tokens_one }: { insert_tokens_one: Data } =
       await client.request({
-        document: ADD_TOKEN,
+        document: ADD_TOKENS_DEPRECATED,
         variables: {
           mintAddress,
           ...tokenMetadata,

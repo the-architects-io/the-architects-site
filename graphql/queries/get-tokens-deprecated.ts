@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
-export const GET_TOKEN_BY_MINT_ADDRESS = gql`
-  query GET_TOKEN_BY_MINT_ADDRESS($mintAddress: String!) {
-    tokens(where: { mintAddress: { _eq: $mintAddress } }) {
+export const GET_TOKENS_DEPRECATED = gql`
+  query GET_TOKENS_DEPRECATED {
+    tokens_deprecated(order_by: { createdAt: desc }) {
       id
       createdAt
       decimals
@@ -11,6 +11,10 @@ export const GET_TOKEN_BY_MINT_ADDRESS = gql`
       name
       symbol
       items {
+        id
+        name
+      }
+      mounts {
         id
         name
       }

@@ -275,7 +275,7 @@ export type Dispenser = {
   };
 };
 
-export type Token = {
+export type TokenDeprecated = {
   id: string;
   createdAt: string;
   decimals: number;
@@ -376,7 +376,7 @@ export enum TokenType {
 }
 
 export type Trait = {
-  id: string;
+  id?: string;
   name: string;
   value: string;
 };
@@ -648,6 +648,25 @@ export type CreateTreeInput = {
   userId?: string;
 };
 
+export type Token = {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  mintAddress?: string;
+  userId?: string;
+  merkleTreeId?: string;
+  isPremint?: boolean;
+  cluster?: "devnet" | "mainnet-beta";
+} & TokenMetadata;
+
+export type CreateTokensInput = {
+  tokens: Token[];
+};
+
+export type CreateTokenResponse = BaseBlueprintResponse & {
+  tokens: Token[];
+};
+
 export type CreateTreeResponse = BaseBlueprintResponse & {
   merkleTreeAddress: string;
   id: string;
@@ -767,6 +786,10 @@ export type TokenMetadata = {
     trait_type: string;
     value: string;
   }[];
+  creators?: {
+    address: string;
+    share: number;
+  }[];
   properties?: {
     files: {
       uri: string;
@@ -780,6 +803,44 @@ export type TokenMetadata = {
     }[];
   };
   index?: number; // sort order in original metadata JSON file
+};
+
+export type OffChainMetadataCamelCase = {
+  name: string;
+  symbol: string;
+  description: string;
+  sellerFeeBasisPoints: number;
+  image?: string;
+  animationUrl?: string;
+  externalUrl: string;
+  edition?: number;
+  attributes: {
+    traitType: string;
+    value: string;
+  }[];
+  properties?: {
+    files: {
+      uri: string;
+      type: string;
+      cdn?: string;
+    }[];
+    category: string;
+    creators: {
+      address: string;
+      share: number;
+    }[];
+  };
+};
+
+export type OnChainMetadataCamelCase = {
+  name: string;
+  symbol: string;
+  description: string;
+  sellerFeeBasisPoints: number;
+  creators: {
+    address: string;
+    share: number;
+  }[];
 };
 
 export type CreateDriveInput = {
@@ -938,6 +999,7 @@ export enum BlueprintApiActions {
   CREATE_COLLECTION = "CREATE_COLLECTION",
   CREATE_DRIVE = "CREATE_DRIVE",
   CREATE_DISENSER = "CREATE_DISENSER",
+  CREATE_TOKENS = "CREATE_TOKENS",
   CREATE_TREE = "CREATE_TREE",
   CREATE_JOB = "CREATE_JOB",
   CREATE_UPLOAD_JOB = "CREATE_UPLOAD_JOB",

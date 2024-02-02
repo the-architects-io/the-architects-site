@@ -4,7 +4,7 @@ import { MerkleTree } from "@/app/blueprint/types";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import Spinner from "@/features/UI/spinner";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
-import { MintCnft } from "@/features/cnfts/mint-cnft";
+import { MintCnftBasic } from "@/features/cnfts/mint-cnft-basic";
 import { MerkleTreeDetails } from "@/features/merkle-trees/merkle-tree-details";
 import { GET_MERKLE_TREE_BY_ADDRESS } from "@/graphql/queries/get-merkle-tree-by-address";
 import { GET_MERKLE_TREE_BY_ID } from "@/graphql/queries/get-merkle-tree-by-id";
@@ -71,7 +71,7 @@ export default function Page({ params }: { params: { id: string } }) {
       <MerkleTreeDetails tree={tree} />
 
       <div className="text-2xl mt-8">Mint cNFT to Tree</div>
-      <MintCnft
+      <MintCnftBasic
         onCompleted={() => {
           refetchById();
           refetchByAddress();

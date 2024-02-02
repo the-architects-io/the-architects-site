@@ -19,7 +19,7 @@ import { ADD_ITEM_PAYOUT } from "@/graphql/mutations/add-item-payout";
 import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
 import { handleError, logError } from "@/utils/errors/log-error";
-import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address";
+import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address-deprecated";
 import { GET_ITEMS_BY_TOKEN_IDS } from "@/graphql/queries/get-items-by-token-ids";
 import { fromBaseUnit } from "@/utils/currency";
 import { getRpcEndpoint } from "@/utils/rpc";

@@ -17,7 +17,7 @@ import Uploady, {
   useUploady,
 } from "@rpldy/uploady";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const SingleImageUploadField = ({
   driveAddress,
@@ -40,10 +40,30 @@ export const SingleImageUploadField = ({
 
   const [batch, setBatch] = useState<Batch | null>(null);
   const [isSuccessful, setIsSuccessful] = useState<boolean | null>(null);
+  const [isReadyToUpload, setIsReadyToUpload] = useState(false);
 
   useBatchAddListener((batch: Batch) => {
     setBatch(batch);
+    const extension = batch.items[0]?.file.name.split(".").pop() ?? "";
+    if (!extension) {
+      alert("Invalid file type");
+      return;
+    }
+
+    const fullFileName = `${fileName}.${extension}`;
+
+    debugger;
     setIsInProgress(true);
+    setTimeout(() => {
+      uploady.processPending({
+        params: {
+          action: "UPLOAD_FILE",
+          driveAddress,
+          fileName: fullFileName,
+          overwrite: true,
+        },
+      });
+    }, 1000);
   });
 
   useBatchFinishListener((batch: Batch) => {
@@ -56,6 +76,7 @@ export const SingleImageUploadField = ({
       <UploadPreview
         previewMethodsRef={imagePreviewMethodsRef}
         onPreviewsChanged={(previews) => {
+          if (!previews.length) return;
           console.log({ previews });
           setSelectedCollectionImagePreview(previews[0]);
         }}
@@ -68,16 +89,10 @@ export const SingleImageUploadField = ({
           />
         )}
       />
-
       {!selectedCollectionImagePreview && (
         <UploadButton
+          autoUpload={false}
           className="underline border border-gray-600 rounded-lg py-12 px-4 w-full"
-          params={{
-            action: "UPLOAD_FILE",
-            driveAddress,
-            fileName,
-            overwrite: true,
-          }}
         >
           {!!children ? children : "Add Image"}
         </UploadButton>

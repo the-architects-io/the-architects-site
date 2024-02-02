@@ -1,8 +1,8 @@
 import { client } from "@/graphql/backend-client";
-import { ADD_TOKENS } from "@/graphql/mutations/add-tokens";
+import { ADD_TOKENS } from "@/graphql/mutations/add-tokens-deprecated";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses";
+import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses-deprecated";
 import { Metaplex, PublicKey } from "@metaplex-foundation/js";
 import { Connection } from "@solana/web3.js";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";

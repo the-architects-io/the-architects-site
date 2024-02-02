@@ -11,16 +11,10 @@ export type SingleImageUploadResponse = UploadFileResponse &
 
 export const SingleImageUploadFieldWrapper = ({
   children,
-  fileName,
-  driveAddress,
-  autoUpload = false,
   multiple = false,
   setImage,
 }: {
   children: JSX.Element | JSX.Element[];
-  fileName: string;
-  driveAddress: string;
-  autoUpload?: boolean;
   multiple?: boolean;
   setImage?: (response: UploadFileResponse & BaseBlueprintResponse) => void;
 }) => {
@@ -28,12 +22,6 @@ export const SingleImageUploadFieldWrapper = ({
     <Uploady
       destination={{
         url: `${BASE_URL}/api/blueprint`,
-        params: {
-          action: BlueprintApiActions.UPLOAD_FILE,
-          fileName,
-          driveAddress,
-          overwrite: true,
-        },
       }}
       isSuccessfulCall={({ response }: { response: string }) => {
         const parsedResponse: UploadFileResponse & BaseBlueprintResponse =
@@ -45,7 +33,7 @@ export const SingleImageUploadFieldWrapper = ({
         return false;
       }}
       accept="image/*"
-      autoUpload={autoUpload}
+      autoUpload={false}
       multiple={multiple}
     >
       {children}

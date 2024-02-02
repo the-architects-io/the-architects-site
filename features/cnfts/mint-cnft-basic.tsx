@@ -24,7 +24,7 @@ import { v4 as uuidv4 } from "uuid";
 import { createJsonFileFromObject } from "@/app/blueprint/utils";
 import showToast from "@/features/toasts/show-toast";
 
-export const MintCnft = ({
+export const MintCnftBasic = ({
   treeAddress,
   onCompleted,
 }: {

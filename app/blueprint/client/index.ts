@@ -10,6 +10,8 @@ import {
   CreateDriveResponse,
   CreateJobInput,
   CreateJobResponse,
+  CreateTokenResponse,
+  CreateTokensInput,
   CreateTreeInput,
   CreateTreeResponse,
   CreateUploadJobInput,
@@ -266,6 +268,12 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
       }) => takePayment({ ...params, cluster: options.cluster }),
     },
     tokens: {
+      createTokens: (params: CreateTokensInput) =>
+        makeApiRequest<CreateTokenResponse, CreateTokensInput>(
+          BlueprintApiActions.CREATE_TOKENS,
+          params,
+          options
+        ),
       createTree: (params: CreateTreeInput) =>
         makeApiRequest<CreateTreeResponse, CreateTreeInput>(
           BlueprintApiActions.CREATE_TREE,
