@@ -9,7 +9,7 @@ dependencies:
     specifier: ^3.8.8
     version: 3.9.2(@types/react@18.2.7)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
   '@blueprint/graphql':
-    specifier: git+https://warlyware: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@github.com/the-architects-io/blueprint-graphql.git#main
+    specifier: git+https://warlyware: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@github.com/the-architects-io/blueprint-graphql.git
     version: git@github.com+the-architects-io/blueprint-graphql/c1da097f4a5b04afe2bd2b7aaed0ecab11e5eceb(@types/react@18.2.7)(react-dom@18.2.0)(react@18.2.0)
   '@bonfida/spl-name-service':
     specifier: ^2.3.2
@@ -19082,6 +19082,7 @@ packages:
   /tmp@0.2.1:
     resolution: {integrity: sha512-76SUhtfqR2Ijn+xllcI5P1oyannHNHByD80W1q447gU3mp9G9PSpGdWmjUOHRDPiHYacIk66W7ubDTuPF3BEtQ==}
     engines: {node: '>=8.17.0'}
+    requiresBuild: true
     dependencies:
       rimraf: 3.0.2
     dev: false
