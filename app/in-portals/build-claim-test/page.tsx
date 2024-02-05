@@ -8,7 +8,7 @@ import { ENV } from "@/constants/constants";
 import { DispenserClaim } from "@/features/in-portals/dispenser-claim";
 import { fetchDaoNfts } from "@/utils/nfts/fetch-dao-nfts";
 import WalletButton from "@/features/UI/buttons/wallet-button";
-import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses-deprecated";
+import { GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED } from "@/graphql/queries/get-tokens-by-mint-addresses-deprecated";
 import { useQuery } from "@apollo/client";
 import { ModeledNftMetadata, Token } from "@/app/blueprint/types";
 
@@ -30,12 +30,12 @@ export default function DispenserClaimTestPage({ params }: { params: any }) {
   );
   const [isFetchingLastClaimTime, setIsFetchingLastClaimTime] = useState(true);
 
-  const { loading } = useQuery(GET_TOKENS_BY_MINT_ADDRESSES, {
+  const { loading } = useQuery(GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED, {
     skip: !collectionNfts?.length,
     variables: {
       mintAddresses: collectionNfts?.map((nft) => nft.mintAddress),
     },
-    onCompleted: ({ tokens }: { tokens: Token[] }) => {
+    onCompleted: ({ tokens }: { tokens: any[] }) => {
       console.log({ tokens });
       const lastClaimTimeToken = tokens.reduce((prev, current) => {
         return prev?.lastClaim?.createdAt > current?.lastClaim?.createdAt

@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { Metaplex, PublicKey } from "@metaplex-foundation/js";
 import { Connection } from "@solana/web3.js";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
-import { ADD_TOKENS } from "@/graphql/mutations/add-tokens-deprecated";
+import { ADD_TOKENS_DEPRECATED } from "@/graphql/mutations/add-tokens-deprecated";
 import {
   AddCharactersResponse,
   AddTokensResponse,
@@ -15,7 +15,7 @@ import {
 import { ADD_TRAITS } from "@/graphql/mutations/add-traits";
 import { ADD_TRAIT_INSTANCES } from "@/graphql/mutations/add-trait-instances";
 import { ADD_CHARACTERS } from "@/graphql/mutations/add-characters";
-import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses-deprecated";
+import { GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED } from "@/graphql/queries/get-tokens-by-mint-addresses-deprecated";
 import { getRpcEndpoint } from "@/utils/rpc";
 
 export async function POST(req: NextRequest) {
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
 
   // first get the tokens that are already in the db
   const { tokens }: { tokens: Token[] } = await client.request({
-    document: GET_TOKENS_BY_MINT_ADDRESSES,
+    document: GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED,
     variables: {
       mintAddresses: jsonHashList,
     },
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
   );
 
   const tokensResponse: AddTokensResponse = await client.request({
-    document: ADD_TOKENS,
+    document: ADD_TOKENS_DEPRECATED,
     variables: {
       tokens: tokensToInsert,
     },

@@ -14,7 +14,7 @@ import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
 import { keypairIdentity, Metaplex, token } from "@metaplex-foundation/js";
 import { ADD_LAST_CLAIM_TIMES } from "@/graphql/mutations/add-last-claim-time";
 import { caluclateBuildVestingRewardAmount } from "@/utils/dispensers/calculate-token-claim-reward-amount";
-import { GET_TOKENS_BY_MINT_ADDRESSES } from "@/graphql/queries/get-tokens-by-mint-addresses-deprecated";
+import { GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED } from "@/graphql/queries/get-tokens-by-mint-addresses-deprecated";
 import { Dispenser, Token, Wallet } from "@/app/blueprint/types";
 import { RPC_ENDPOINT } from "@/constants/constants";
 import { getRpcEndpoint } from "@/utils/rpc";
@@ -41,8 +41,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { tokens }: { tokens: Token[] } = await client.request({
-    document: GET_TOKENS_BY_MINT_ADDRESSES,
+  const { tokens }: { tokens: any[] } = await client.request({
+    document: GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED,
     variables: {
       mintAddresses,
     },
