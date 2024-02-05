@@ -8,8 +8,10 @@ import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { NoopResponse, Token } from "@/app/blueprint/types";
-import { ADD_TOKENS_DEPRECATED } from "@/graphql/mutations/add-tokens-deprecated";
-import { GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED } from "@/graphql/queries/get-tokens-by-mint-addresses-deprecated";
+import {
+  ADD_TOKENS_DEPRECATED,
+  GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED,
+} from "@the-architects/blueprint-graphql";
 import { Mint, fetchAllMint } from "@metaplex-foundation/mpl-toolbox";
 import { publicKey } from "@metaplex-foundation/umi";
 import { getUmiClient } from "@/utils/umi";

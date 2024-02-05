@@ -1,6 +1,8 @@
 import { client } from "@/graphql/backend-client";
-import { ADD_WALLETS } from "@/graphql/mutations/add-wallets";
-import { GET_WALLETS_BY_ADDRESSES } from "@/graphql/queries/get-wallets-by-addresses";
+import {
+  GET_WALLETS_BY_ADDRESSES,
+  ADD_WALLETS,
+} from "@the-architects/blueprint-graphql";
 import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
 

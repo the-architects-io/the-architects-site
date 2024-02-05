@@ -2,7 +2,8 @@ import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { Airdrop } from "@/app/blueprint/types";
-import { UPDATE_AIRDROP } from "@/graphql/mutations/update-airdrop";
+import { UPDATE_AIRDROP } from "@the-architects/blueprint-graphql";
+
 import { handleError } from "@/utils/errors/log-error";
 
 export async function POST(req: NextRequest) {

@@ -1,6 +1,7 @@
 import { AddUserInviteInput, UploadJob } from "@/app/blueprint/types";
 import { client } from "@/graphql/backend-client";
-import { ADD_USER_INVITE } from "@/graphql/mutations/add-user-invite";
+import { ADD_USER_INVITE } from "@the-architects/blueprint-graphql";
+
 import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
 

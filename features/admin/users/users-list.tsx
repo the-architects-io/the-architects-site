@@ -1,6 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { TableWrapper } from "@/features/UI/tables/table-wrapper";
-import { GET_USERS } from "@/graphql/queries/get-users";
+import { GET_USERS } from "@the-architects/blueprint-graphql";
+
 import { User, UsersListItem } from "@/features/admin/users/users-list-item";
 import axios from "axios";
 import { useState } from "react";

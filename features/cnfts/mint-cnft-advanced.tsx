@@ -11,7 +11,8 @@ import {
 } from "@/utils/formatting";
 import { useCluster } from "@/hooks/cluster";
 import { useQuery } from "@apollo/client";
-import { GET_MERKLE_TREES_BY_USER_ID } from "@/graphql/queries/get-merkle-trees-by-user-id";
+import { GET_MERKLE_TREES_BY_USER_ID } from "@the-architects/blueprint-graphql";
+
 import {
   ASSET_SHDW_DRIVE_ADDRESS,
   SYSTEM_USER_ID,

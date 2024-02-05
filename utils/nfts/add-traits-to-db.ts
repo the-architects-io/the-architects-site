@@ -1,7 +1,8 @@
 import { Trait } from "@/app/blueprint/types";
 import { client } from "@/graphql/backend-client";
-import { ADD_TRAIT } from "@/graphql/mutations/add-trait";
-import { GET_TRAITS_BY_NFT_COLLECTION } from "@/graphql/queries/get-traits-by-nft-collection";
+import { ADD_TRAIT } from "@the-architects/blueprint-graphql";
+
+import { GET_TRAITS_BY_NFT_COLLECTION } from "@the-architects/blueprint-graphql";
 
 export const addTraitsToDb = async (nfts: any[], nftCollectionId: string) => {
   const { traits: traitsFromDb }: { traits: Trait[] } = await client.request({

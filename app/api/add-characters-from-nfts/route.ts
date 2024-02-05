@@ -4,7 +4,6 @@ import type { NextRequest } from "next/server";
 import { Metaplex, PublicKey } from "@metaplex-foundation/js";
 import { Connection } from "@solana/web3.js";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
-import { ADD_TOKENS_DEPRECATED } from "@/graphql/mutations/add-tokens-deprecated";
 import {
   AddCharactersResponse,
   AddTokensResponse,
@@ -12,11 +11,15 @@ import {
   AddTraitsResponse,
   Token,
 } from "@/app/blueprint/types";
-import { ADD_TRAITS } from "@/graphql/mutations/add-traits";
-import { ADD_TRAIT_INSTANCES } from "@/graphql/mutations/add-trait-instances";
-import { ADD_CHARACTERS } from "@/graphql/mutations/add-characters";
-import { GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED } from "@/graphql/queries/get-tokens-by-mint-addresses-deprecated";
+
 import { getRpcEndpoint } from "@/utils/rpc";
+import {
+  GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED,
+  ADD_TOKENS_DEPRECATED,
+  ADD_TRAITS,
+  ADD_CHARACTERS,
+  ADD_TRAIT_INSTANCES,
+} from "@the-architects/blueprint-graphql";
 
 export async function POST(req: NextRequest) {
   const { hashList, noop } = await req.json();

@@ -4,7 +4,7 @@ import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-labe
 import { FormikHandlers } from "formik";
 
 import { useEffect, useState } from "react";
-import { GET_ITEM_CATEGORIES } from "@/graphql/queries/get-item-categories";
+import { GET_ITEM_CATEGORIES } from "@the-architects/blueprint-graphql";
 
 interface Props {
   value: string;

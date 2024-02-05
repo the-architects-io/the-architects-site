@@ -1,6 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { TableWrapper } from "@/features/UI/tables/table-wrapper";
-import { GET_TRAITS } from "@/graphql/queries/get-traits";
+import { GET_TRAITS } from "@the-architects/blueprint-graphql";
+
 import {
   Trait,
   TraitsListItem,

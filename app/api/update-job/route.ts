@@ -2,7 +2,8 @@ import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { Job } from "@/app/blueprint/types";
-import { UPDATE_JOB } from "@/graphql/mutations/update-job";
+import { UPDATE_JOB } from "@the-architects/blueprint-graphql";
+
 import { handleError } from "@/utils/errors/log-error";
 import axios from "axios";
 import { BASE_URL } from "@/constants/constants";

@@ -8,9 +8,8 @@ import {
 } from "@solana/web3.js";
 import bs58 from "bs58";
 import { client } from "@/graphql/backend-client";
-import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
+
 import { BASE_URL } from "@/constants/constants";
-import { ADD_ITEM_PAYOUT } from "@/graphql/mutations/add-item-payout";
 import {
   createAssociatedTokenAccountInstruction,
   createTransferInstruction,
@@ -22,7 +21,10 @@ import axios from "axios";
 import { Dispenser } from "@/app/blueprint/types";
 import { getRpcEndpoint } from "@/utils/rpc";
 import { handleError } from "@/utils/errors/log-error";
-// import { GET_USER_BY_WALLET_ADDRESS } from "graphql/queries/get-user-by-wallet-address";
+import {
+  ADD_ITEM_PAYOUT,
+  GET_DISPENSER_BY_ID,
+} from "@the-architects/blueprint-graphql";
 
 type Data =
   | {

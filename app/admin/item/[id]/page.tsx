@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { BackButton } from "@/features/UI/buttons/back-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
-import { GET_ITEM_BY_ID } from "@/graphql/queries/get-item-by-id";
+import { GET_ITEM_BY_ID } from "@the-architects/blueprint-graphql";
 import { useAdmin } from "@/hooks/admin";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";

@@ -2,7 +2,7 @@ import { Dispenser } from "@/app/blueprint/types";
 import { Card } from "@/features/UI/card";
 import { ContentWrapperYAxisCenteredContent } from "@/features/UI/content-wrapper-y-axis-centered-content";
 import Spinner from "@/features/UI/spinner";
-import { GET_ENABLED_DISPENSERS } from "@/graphql/queries/get-enabled-dispensers";
+import { GET_ENABLED_DISPENSERS } from "@the-architects/blueprint-graphql";
 
 import { useQuery } from "@apollo/client";
 import Link from "next/link";

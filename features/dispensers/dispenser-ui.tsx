@@ -22,7 +22,8 @@ import { useSearchParams } from "next/navigation";
 import classNames from "classnames";
 import { RewardsUI } from "@/features/rewards/rewards-ui";
 import { useQuery } from "@apollo/client";
-import { GET_PAYOUTS } from "@/graphql/queries/get-payouts";
+import { GET_PAYOUTS } from "@the-architects/blueprint-graphql";
+
 import { Payout } from "@/app/profile/[id]/page";
 import { fetchNftsByHashList } from "@/utils/nfts/fetch-nfts-by-hash-list";
 import { Connection } from "@solana/web3.js";

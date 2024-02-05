@@ -5,9 +5,12 @@ import { ContentWrapper } from "@/features/UI/content-wrapper";
 import Spinner from "@/features/UI/spinner";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import showToast from "@/features/toasts/show-toast";
-import { GET_CHARACTER_BY_ID } from "@/graphql/queries/get-character-by-id";
-import { GET_CHARACTER_BY_TOKEN_MINT_ADDRESS } from "@/graphql/queries/get-character-by-token-mint-address";
-import { GET_PAYOUTS_BY_CHARACTER_ID } from "@/graphql/queries/get-payouts-by-character-id";
+import {
+  GET_CHARACTER_BY_ID,
+  GET_CHARACTER_BY_TOKEN_MINT_ADDRESS,
+  GET_PAYOUTS_BY_CHARACTER_ID,
+} from "@the-architects/blueprint-graphql";
+
 import { useAdmin } from "@/hooks/admin";
 import { formatDateTime } from "@/utils/date-time";
 import { getAbbreviatedAddress } from "@/utils/formatting";

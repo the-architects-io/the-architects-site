@@ -2,9 +2,11 @@ import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { NoopResponse, RewardCollection } from "@/app/blueprint/types";
-import { GET_REWARD_COLLECTIONS_BY_DISPENSER_ID } from "@/graphql/queries/get-reward-collections-by-dispenser-id";
-import { ADD_REWARD_COLLECTIONS } from "@/graphql/mutations/add-reward-collections";
 import { handleError } from "@/utils/errors/log-error";
+import {
+  GET_REWARD_COLLECTIONS_BY_DISPENSER_ID,
+  ADD_REWARD_COLLECTIONS,
+} from "@the-architects/blueprint-graphql";
 
 type Data =
   | RewardCollection

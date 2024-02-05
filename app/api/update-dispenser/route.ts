@@ -1,7 +1,8 @@
 import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { UPDATE_DISPENSER } from "@/graphql/mutations/update-dispenser";
+import { UPDATE_DISPENSER } from "@the-architects/blueprint-graphql";
+
 import { Dispenser } from "@/app/blueprint/types";
 
 type UpdateDispenserInput = {

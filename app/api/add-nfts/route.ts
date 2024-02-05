@@ -1,13 +1,15 @@
 import { client } from "@/graphql/backend-client";
-import { ADD_TOKENS_DEPRECATED } from "@/graphql/mutations/add-tokens-deprecated";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED } from "@/graphql/queries/get-tokens-by-mint-addresses-deprecated";
 import { Metaplex, PublicKey } from "@metaplex-foundation/js";
 import { Connection } from "@solana/web3.js";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import { Token } from "@/app/blueprint/types";
 import { getRpcEndpoint } from "@/utils/rpc";
+import {
+  ADD_TOKENS_DEPRECATED,
+  GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED,
+} from "@the-architects/blueprint-graphql";
 
 export async function POST(req: NextRequest) {
   const { hashList, noop, nftCollectionId } = await req.json();

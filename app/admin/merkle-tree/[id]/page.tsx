@@ -6,8 +6,10 @@ import Spinner from "@/features/UI/spinner";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import { MintCnftBasic } from "@/features/cnfts/mint-cnft-basic";
 import { MerkleTreeDetails } from "@/features/merkle-trees/merkle-tree-details";
-import { GET_MERKLE_TREE_BY_ADDRESS } from "@/graphql/queries/get-merkle-tree-by-address";
-import { GET_MERKLE_TREE_BY_ID } from "@/graphql/queries/get-merkle-tree-by-id";
+import {
+  GET_MERKLE_TREE_BY_ADDRESS,
+  GET_MERKLE_TREE_BY_ID,
+} from "@the-architects/blueprint-graphql";
 import { useAdmin } from "@/hooks/admin";
 import { isValidPublicKey } from "@/utils/rpc";
 import { useQuery } from "@apollo/client";

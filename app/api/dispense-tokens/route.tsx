@@ -13,14 +13,16 @@ import {
 import { sendTransaction } from "@/utils/transactions/send-transaction";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
-import { Item, Token, Wallet } from "@/app/blueprint/types";
+import { Item, TokenDeprecated, Wallet } from "@/app/blueprint/types";
 import { client } from "@/graphql/backend-client";
-import { ADD_ITEM_PAYOUT } from "@/graphql/mutations/add-item-payout";
-import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
-import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
+import {
+  ADD_ITEM_PAYOUT,
+  ADD_WALLET,
+  GET_ITEMS_BY_TOKEN_IDS,
+  GET_TOKEN_BY_MINT_ADDRESS_DEPRECATED,
+  GET_WALLET_BY_ADDRESS,
+} from "@the-architects/blueprint-graphql";
 import { handleError, logError } from "@/utils/errors/log-error";
-import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address-deprecated";
-import { GET_ITEMS_BY_TOKEN_IDS } from "@/graphql/queries/get-items-by-token-ids";
 import { fromBaseUnit } from "@/utils/currency";
 import { getRpcEndpoint } from "@/utils/rpc";
 
@@ -106,8 +108,8 @@ export async function POST(req: Request) {
     new PublicKey(DISPENSER_PROGRAM_ID)
   );
 
-  const { tokens }: { tokens: Token[] } = await client.request({
-    document: GET_TOKEN_BY_MINT_ADDRESS,
+  const { tokens }: { tokens: TokenDeprecated[] } = await client.request({
+    document: GET_TOKEN_BY_MINT_ADDRESS_DEPRECATED,
     variables: {
       mintAddress,
     },

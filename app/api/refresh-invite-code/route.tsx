@@ -1,12 +1,13 @@
 import { InviteCode, RefreshUploadInput } from "@/app/blueprint/types";
 import { client } from "@/graphql/backend-client";
-import { ADD_INVITE_CODE } from "@/graphql/mutations/add-invite-code";
-import { DELETE_INVITE_CODE } from "@/graphql/mutations/delete-invite-code";
-import { GET_INVITE_CODE } from "@/graphql/queries/get-invite-code";
-import { GET_INVITE_CODE_BY_USER_ID } from "@/graphql/queries/get-invite-code-by-user-id";
+import {
+  ADD_INVITE_CODE,
+  DELETE_INVITE_CODE,
+  GET_INVITE_CODE,
+  GET_INVITE_CODE_BY_USER_ID,
+} from "@the-architects/blueprint-graphql";
 import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
-import { v4 as uuidv4 } from "uuid";
 
 const generateRandomCode = () => {
   // Generate a number between 0 and 999999

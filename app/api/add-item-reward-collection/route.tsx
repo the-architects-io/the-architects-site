@@ -2,8 +2,11 @@
 import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { ADD_ITEM_REWARD_COLLECTION } from "@/graphql/mutations/add-item-reward-collection";
-import { ADD_ITEM_COLLECTION } from "@/graphql/mutations/add-item-collection";
+import {
+  ADD_ITEM_REWARD_COLLECTION,
+  ADD_ITEM_COLLECTION,
+} from "@the-architects/blueprint-graphql";
+
 import {
   ItemCollection,
   NoopResponse,

@@ -9,11 +9,12 @@ import {
 } from "@/app/blueprint/types";
 import { BASE_URL } from "@/constants/constants";
 import { client } from "@/graphql/backend-client";
-import { ADD_CHARACTERS } from "@/graphql/mutations/add-characters";
-import { ADD_TRAIT_INSTANCES } from "@/graphql/mutations/add-trait-instances";
-import { ADD_TRAITS } from "@/graphql/mutations/add-traits";
+import {
+  ADD_CHARACTERS,
+  ADD_TRAIT_INSTANCES,
+  ADD_TRAITS,
+} from "@the-architects/blueprint-graphql";
 import { Mint } from "@metaplex-foundation/js";
-// import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
 import { DigitalAsset } from "@metaplex-foundation/mpl-token-metadata";
 import { NextRequest } from "next/server";
 

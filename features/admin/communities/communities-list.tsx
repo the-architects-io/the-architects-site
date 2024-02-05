@@ -4,7 +4,7 @@ import {
   CommunitiesListItem,
   Community,
 } from "@/features/admin/communities/communities-list-item";
-import { GET_COMMUNITIES } from "@/graphql/queries/get-communities";
+import { GET_COMMUNITIES } from "@the-architects/blueprint-graphql";
 
 export const CommunitiesList = () => {
   const { data } = useQuery(GET_COMMUNITIES, {

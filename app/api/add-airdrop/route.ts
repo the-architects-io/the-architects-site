@@ -1,6 +1,7 @@
 import { Airdrop } from "@/app/blueprint/types";
 import { client } from "@/graphql/backend-client";
-import { ADD_AIRDROP } from "@/graphql/mutations/add-airdrop";
+import { ADD_AIRDROP } from "@the-architects/blueprint-graphql";
+
 import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
 

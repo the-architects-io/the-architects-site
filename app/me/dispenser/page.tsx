@@ -4,7 +4,7 @@ import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { Card } from "@/features/UI/card";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import Spinner from "@/features/UI/spinner";
-import { GET_DISPENSERS_BY_OWNER_ID } from "@/graphql/queries/get-dispensers-by-owner-id";
+import { GET_DISPENSERS_BY_OWNER_ID } from "@the-architects/blueprint-graphql";
 import { useQuery } from "@apollo/client";
 import { RemoveCircleOutline } from "@mui/icons-material";
 import { useUserData } from "@nhost/nextjs";

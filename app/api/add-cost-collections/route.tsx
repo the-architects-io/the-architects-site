@@ -6,9 +6,11 @@ import {
   NoopResponse,
   RewardCollection,
 } from "@/app/blueprint/types";
-import { ADD_COST_COLLECTIONS } from "@/graphql/mutations/add-cost-collections";
-import { GET_COST_COLLECTIONS_BY_DISPENSER_ID } from "@/graphql/queries/get-cost-collections-by-dispenser-id";
 import { handleError } from "@/utils/errors/log-error";
+import {
+  ADD_COST_COLLECTIONS,
+  GET_COST_COLLECTIONS_BY_DISPENSER_ID,
+} from "@the-architects/blueprint-graphql";
 
 type Data =
   | RewardCollection

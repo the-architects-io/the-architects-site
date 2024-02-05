@@ -2,7 +2,7 @@ import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { RewardCollection, Token } from "@/app/blueprint/types";
-import { UPDATE_DISPENSER_REWARD } from "@/graphql/mutations/update-dispenser-reward";
+import { UPDATE_DISPENSER_REWARD } from "@the-architects/blueprint-graphql";
 
 export async function POST(req: NextRequest) {
   const { rewards, noop } = await req.json();

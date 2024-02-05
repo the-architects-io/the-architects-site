@@ -5,11 +5,10 @@ import {
   DispenseTokensApiResponse,
   RewardDisplayTypes,
 } from "@/app/blueprint/types";
-import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import ConfettiBackground from "@/features/animations/confetti-background";
 import DispenserUi from "@/features/dispensers/dispenser-ui";
-import { GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID } from "@/graphql/queries/get-dispenser-displays-by-dispenser-id";
+import { GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID } from "@the-architects/blueprint-graphql";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { useQuery } from "@apollo/client";
 import { XCircleIcon } from "@heroicons/react/24/outline";

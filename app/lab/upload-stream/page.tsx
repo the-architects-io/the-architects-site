@@ -1,14 +1,13 @@
 "use client";
 import { EXECUTION_WALLET_ADDRESS } from "@/constants/constants";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
-import ShadowUpload from "@/features/upload/shadow-upload/shadow-upload";
-import { GET_UPLOAD_JOB_BY_ID } from "@/graphql/queries/get-upload-job-by-id";
 import { useQuery } from "@apollo/client";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { Line } from "rc-progress";
 import { useUserData } from "@nhost/nextjs";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
+import { GET_UPLOAD_JOB_BY_ID } from "@the-architects/blueprint-graphql";
 
 export default function StreamUploadPage() {
   const [uploadJobId, setUploadJobId] = useState<string | undefined>(undefined);

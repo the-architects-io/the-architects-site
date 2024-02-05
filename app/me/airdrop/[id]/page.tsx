@@ -7,8 +7,10 @@ import { ExecuteAirdrop } from "@/features/airdrop/execute-airdrop";
 import { RecipientListTable } from "@/features/airdrop/recipient-list-table";
 import { AirdropStatus } from "@/features/airdrop/airdrop-status";
 
-import { GET_AIRDROP_BY_ID } from "@/graphql/queries/get-airdrop-by-id";
-import { GET_JOB_BY_ID } from "@/graphql/queries/get-job-by-id";
+import {
+  GET_AIRDROP_BY_ID,
+  GET_JOB_BY_ID,
+} from "@the-architects/blueprint-graphql";
 import { useQuery } from "@apollo/client";
 import { useUserData } from "@nhost/nextjs";
 import { useRouter } from "next/navigation";

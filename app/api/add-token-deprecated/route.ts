@@ -1,5 +1,6 @@
 import axios from "axios";
-import { ADD_TOKENS_DEPRECATED } from "@/graphql/mutations/add-token-deprecated";
+import { ADD_TOKENS_DEPRECATED } from "@the-architects/blueprint-graphql";
+
 import { BASE_URL } from "@/constants/constants";
 import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";

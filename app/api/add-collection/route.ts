@@ -1,5 +1,6 @@
 import { client } from "@/graphql/backend-client";
-import { ADD_COLLECTION } from "@/graphql/mutations/add-collection";
+import { ADD_COLLECTION } from "@the-architects/blueprint-graphql";
+
 import { Collection } from "@metaplex-foundation/mpl-token-metadata";
 import { NextRequest, NextResponse } from "next/server";
 

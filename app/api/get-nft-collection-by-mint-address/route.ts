@@ -1,6 +1,6 @@
 import { NftCollection } from "@/features/admin/nft-collections/nfts-collection-list-item";
 import { client } from "@/graphql/backend-client";
-import { GET_NFT_COLLECTION_BY_MINT_ADDRESS } from "@/graphql/queries/get-nft-collection-by-mint-address";
+import { GET_NFT_COLLECTION_BY_MINT_ADDRESS } from "@the-architects/blueprint-graphql";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest, res: NextResponse) {

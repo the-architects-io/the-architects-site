@@ -1,5 +1,5 @@
 "use client";
-import useBlueprint from "@/app/blueprint/hooks/use-blueprint";
+
 import { Wallet } from "@/app/blueprint/types";
 import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import WalletButton from "@/features/UI/buttons/wallet-button";
@@ -7,9 +7,6 @@ import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { Divider } from "@/features/UI/divider";
 import { Panel } from "@/features/UI/panel";
 import Spinner from "@/features/UI/spinner";
-import showToast from "@/features/toasts/show-toast";
-import { GET_INVITE_CODE_BY_USER_ID } from "@/graphql/queries/get-invite-code-by-user-id";
-import { GET_USER_INVITES_COUNT } from "@/graphql/queries/get-user-invites-count";
 
 import { copyTextToClipboard } from "@/utils/clipboard";
 import { handleError } from "@/utils/errors/log-error";
@@ -25,7 +22,12 @@ import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { GET_WALLETS_BY_USER_ID } from "@blueprint/graphql";
+
+import {
+  GET_INVITE_CODE_BY_USER_ID,
+  GET_USER_INVITE_COUNTS,
+  GET_WALLETS_BY_USER_ID,
+} from "@the-architects/blueprint-graphql";
 
 const INVITE_CODE_EXPIRATION_TIME_IN_HOURS = 24;
 
@@ -60,7 +62,7 @@ export default function Page() {
     },
   });
 
-  const { data: inviteCountData } = useQuery(GET_USER_INVITES_COUNT, {
+  const { data: inviteCountData } = useQuery(GET_USER_INVITE_COUNTS, {
     variables: {
       userId: user?.id,
     },

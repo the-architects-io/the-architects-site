@@ -9,8 +9,10 @@ import { ITab, Tabs } from "@/features/UI/tabs/tabs";
 import { AirdropListItem } from "@/features/airdrop/airdrop-list-item";
 import { CollectionListItem } from "@/features/collection/collection-list-item";
 import showToast from "@/features/toasts/show-toast";
-import { GET_AIRDROPS_BY_OWNER_ID } from "@/graphql/queries/get-airdrops-by-owner-id";
-import { GET_COLLECTIONS_BY_OWNER_ID } from "@/graphql/queries/get-collections-by-owner-id";
+import {
+  GET_AIRDROPS_BY_OWNER_ID,
+  GET_COLLECTIONS_BY_OWNER_ID,
+} from "@the-architects/blueprint-graphql";
 import { useCluster } from "@/hooks/cluster";
 import { useQuery } from "@apollo/client";
 import { useUserData } from "@nhost/nextjs";

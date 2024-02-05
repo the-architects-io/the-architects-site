@@ -10,7 +10,7 @@ import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-labe
 import Spinner from "@/features/UI/spinner";
 import DispenserUi from "@/features/dispensers/dispenser-ui";
 import showToast from "@/features/toasts/show-toast";
-import { GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID } from "@/graphql/queries/get-dispenser-displays-by-dispenser-id";
+import { GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID } from "@the-architects/blueprint-graphql";
 import { handleError } from "@/utils/errors/log-error";
 import { useQuery } from "@apollo/client";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";

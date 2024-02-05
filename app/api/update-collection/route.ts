@@ -1,9 +1,11 @@
 import { Collection, Creator, Wallet } from "@/app/blueprint/types";
 import { client } from "@/graphql/backend-client";
-import { ADD_CREATORS } from "@/graphql/mutations/add-creators";
-import { ADD_WALLETS } from "@/graphql/mutations/add-wallets";
-import { UPDATE_COLLECTION } from "@/graphql/mutations/update-collection";
-import { GET_WALLETS_BY_ADDRESSES } from "@/graphql/queries/get-wallets-by-addresses";
+import {
+  ADD_CREATORS,
+  ADD_WALLETS,
+  UPDATE_COLLECTION,
+  GET_WALLETS_BY_ADDRESSES,
+} from "@the-architects/blueprint-graphql";
 import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
 

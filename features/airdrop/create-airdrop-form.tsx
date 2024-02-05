@@ -3,11 +3,11 @@ import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import showToast from "@/features/toasts/show-toast";
-import { GET_AIRDROP_BY_ID } from "@/graphql/queries/get-airdrop-by-id";
+import { GET_AIRDROP_BY_ID } from "@the-architects/blueprint-graphql";
+
 import { useCluster } from "@/hooks/cluster";
 import { handleError } from "@/utils/errors/log-error";
 import { useQuery } from "@apollo/client";
-import { useUserData } from "@nhost/nextjs";
 
 import { useFormik } from "formik";
 import Image from "next/image";

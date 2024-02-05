@@ -8,7 +8,7 @@ import {
   DispenserReward,
 } from "@/app/blueprint/types";
 import { Payout } from "@/app/profile/[id]/page";
-import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
+import { GET_DISPENSER_BY_ID } from "@the-architects/blueprint-graphql";
 import { mapCosts } from "@/app/blueprint/utils/mappers/cost";
 import { mapGates } from "@/app/blueprint/utils/mappers/gates";
 import { mapRestrictions } from "@/app/blueprint/utils/mappers/restrictions";

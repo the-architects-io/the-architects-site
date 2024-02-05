@@ -6,8 +6,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Spinner from "@/features/UI/spinner";
 import { BadgeClaimButton } from "@/features/UI/buttons/badge-claim-button";
-import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
-import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
+import { GET_DISPENSER_BY_ID } from "@the-architects/blueprint-graphql";
+
 import ConfettiBackground from "@/features/animations/confetti-background";
 import { Dispenser } from "@/app/blueprint/types";
 

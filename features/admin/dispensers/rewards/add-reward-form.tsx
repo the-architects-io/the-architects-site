@@ -12,8 +12,11 @@ import { useQuery } from "@apollo/client";
 import { useState } from "react";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-label";
-import { GET_REWARD_CATEGORIES } from "@/graphql/queries/get-reward-types";
-import { GET_ITEMS_BY_REWARD_CATEGORY_ID } from "@/graphql/queries/get-items-by-reward-category-id";
+import {
+  GET_REWARD_CATEGORIES,
+  GET_ITEMS_BY_REWARD_CATEGORY_ID,
+} from "@the-architects/blueprint-graphql";
+
 import { Item } from "@/app/blueprint/types";
 import { handleError } from "@/utils/errors/log-error";
 

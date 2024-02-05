@@ -2,9 +2,9 @@
 import { InviteCount } from "@/app/blueprint/types";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { InviteLeaderboardTable } from "@/features/invites/invite-leaderboard-table";
-import { GET_USER_INVITE_COUNTS } from "@/graphql/queries/get-user-invite-counts";
 import { useQuery } from "@apollo/client";
 import { User } from "@nhost/nextjs";
+import { GET_USER_INVITE_COUNTS } from "@the-architects/blueprint-graphql";
 import { useState } from "react";
 
 export default function Page() {

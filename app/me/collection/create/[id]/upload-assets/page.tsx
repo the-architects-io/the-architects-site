@@ -27,8 +27,10 @@ import { JsonUploadMetadataValidation } from "@/features/upload/json/json-upload
 import ShadowUpload from "@/features/upload/shadow-upload/shadow-upload";
 import { ZipFileUploadValidation } from "@/features/upload/shadow-upload/zip-file-upload-validation";
 import { JobStatus } from "@/features/jobs/job-status";
-import { GET_COLLECTION_BY_ID } from "@/graphql/queries/get-collection-by-id";
-import { GET_UPLOAD_JOB_BY_ID } from "@/graphql/queries/get-upload-job-by-id";
+import {
+  GET_COLLECTION_BY_ID,
+  GET_UPLOAD_JOB_BY_ID,
+} from "@the-architects/blueprint-graphql";
 import { useCluster } from "@/hooks/cluster";
 import { useQuery } from "@apollo/client";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";

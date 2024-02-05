@@ -4,7 +4,8 @@ import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-labe
 import { FormikHandlers } from "formik";
 
 import { useEffect, useState } from "react";
-import { GET_NFT_COLLECTIONS } from "@/graphql/queries/get-nft-collections";
+import { GET_NFT_COLLECTIONS } from "@the-architects/blueprint-graphql";
+
 import { NftCollection } from "@/features/admin/nft-collections/nfts-collection-list-item";
 
 interface Props {

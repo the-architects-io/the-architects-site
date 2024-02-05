@@ -21,15 +21,13 @@ import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import { FormInputWithLabel } from "@/features/UI/forms/form-input-with-label";
 import { FormCheckboxWithLabel } from "@/features/UI/forms/form-checkbox-with-label";
 import { BASE_URL } from "@/constants/constants";
-import { Metaplex, PublicKey } from "@metaplex-foundation/js";
-import { Helius } from "helius-sdk";
 import Image from "next/image";
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { GET_NFT_COLLECTION_BY_MINT_ADDRESS } from "@/graphql/queries/get-nft-collection-by-mint-address";
 import { NftCollection } from "@/features/admin/nft-collections/nfts-collection-list-item";
 import { SecondaryButton } from "@/features/UI/buttons/secondary-button";
 import Stopwatch from "@/features/stopwatch/stopwatch";
 import { handleError } from "@/utils/errors/log-error";
+import { GET_NFT_COLLECTION_BY_MINT_ADDRESS } from "@the-architects/blueprint-graphql";
 
 type AddCharactersFromNftsResponse = {
   data: {

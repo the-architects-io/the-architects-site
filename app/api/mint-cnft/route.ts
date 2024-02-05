@@ -14,11 +14,11 @@ import { dasApi } from "@metaplex-foundation/digital-asset-standard-api";
 import { getRpcEndpoint } from "@/utils/rpc";
 import { mintToCollectionV1, mintV1 } from "@metaplex-foundation/mpl-bubblegum";
 import { Creator, MerkleTree } from "@/app/blueprint/types";
-import { PublicKey } from "@metaplex-foundation/js";
-import { UPDATE_MERKLE_TREE } from "@/graphql/mutations/update-merkle-tree";
 import { client } from "@/graphql/backend-client";
-import { GET_MERKLE_TREE_BY_ID } from "@/graphql/queries/get-merkle-tree-by-id";
-import { GET_MERKLE_TREE_BY_ADDRESS } from "@/graphql/queries/get-merkle-tree-by-address";
+import {
+  GET_MERKLE_TREE_BY_ADDRESS,
+  UPDATE_MERKLE_TREE,
+} from "@the-architects/blueprint-graphql";
 import { handleError } from "@/utils/errors/log-error";
 
 const isValidCreatorsArray = (creators: any): boolean => {

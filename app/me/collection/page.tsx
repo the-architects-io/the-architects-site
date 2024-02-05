@@ -6,7 +6,7 @@ import { ContentWrapper } from "@/features/UI/content-wrapper";
 import Spinner from "@/features/UI/spinner";
 import { ITab, Tabs } from "@/features/UI/tabs/tabs";
 import { CollectionListItem } from "@/features/collection/collection-list-item";
-import { GET_COLLECTIONS_BY_OWNER_ID } from "@/graphql/queries/get-collections-by-owner-id";
+import { GET_COLLECTIONS_BY_OWNER_ID } from "@the-architects/blueprint-graphql";
 import { useQuery } from "@apollo/client";
 import { useUserData } from "@nhost/nextjs";
 import { useRouter } from "next/navigation";

@@ -4,7 +4,8 @@ import { PublicKey } from "@solana/web3.js";
 
 import { useEffect, useState } from "react";
 import Spinner from "@/features/UI/spinner";
-import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
+import { GET_DISPENSER_BY_ID } from "@the-architects/blueprint-graphql";
+
 import ConfettiBackground from "@/features/animations/confetti-background";
 import { DispenserClaimButton } from "@/features/UI/buttons/dispenser-claim-button";
 import { BASE_URL, BUILD_REWARD_WALLET } from "@/constants/constants";

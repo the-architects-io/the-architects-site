@@ -2,8 +2,8 @@
 import { Account, NoopResponse } from "@/app/blueprint/types";
 import { User } from "@/features/admin/users/users-list-item";
 import { client } from "@/graphql/backend-client";
-import { ADD_ACCOUNT } from "@/graphql/mutations/add-account";
-import { UPDATE_USER } from "@/graphql/mutations/update-user";
+import { ADD_ACCOUNT, UPDATE_USER } from "@the-architects/blueprint-graphql";
+
 import { handleError, logErrorDeprecated } from "@/utils/errors/log-error";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";

@@ -2,9 +2,11 @@ import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { DispenserDisplay } from "@/app/blueprint/types";
-import { UPDATE_DISPENSER_DISPLAY } from "@/graphql/mutations/update-dispenser-display";
-import { GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID } from "@/graphql/queries/get-dispenser-displays-by-dispenser-id";
-import { ADD_DISPENSER_DISPLAY } from "@/graphql/mutations/add-dispenser-display";
+import {
+  ADD_DISPENSER_DISPLAY,
+  GET_DISPENSER_DISPLAYS_BY_DISPENSER_ID,
+  UPDATE_DISPENSER_DISPLAY,
+} from "@the-architects/blueprint-graphql";
 import { handleError } from "@/utils/errors/log-error";
 
 export async function POST(req: NextRequest) {

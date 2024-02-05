@@ -19,7 +19,7 @@ import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-labe
 import Spinner from "@/features/UI/spinner";
 import { CreateCollectionCreatorsChecklist } from "@/features/collection/create-collection-creators-checklist";
 import showToast from "@/features/toasts/show-toast";
-import { GET_COLLECTION_BY_ID } from "@/graphql/queries/get-collection-by-id";
+import { GET_COLLECTION_BY_ID } from "@the-architects/blueprint-graphql";
 import { useCluster } from "@/hooks/cluster";
 import { isValidPublicKey } from "@/utils/rpc";
 import { useQuery } from "@apollo/client";

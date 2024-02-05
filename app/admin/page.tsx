@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import SharedHead from "@/features/UI/head";
 import { NotAdminBlocker } from "@/features/admin/not-admin-blocker";
 import { JobsTable } from "@/features/jobs/jobs-table";
-import { GET_JOBS } from "@/graphql/queries/get-jobs";
+import { GET_JOBS } from "@the-architects/blueprint-graphql";
 import { useQuery } from "@apollo/client";
 import { AdminToolsPanel } from "@/features/admin/tools/tools-panel";
 

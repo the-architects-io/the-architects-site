@@ -1,5 +1,5 @@
 import { client } from "@/graphql/backend-client";
-import { GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED } from "@/graphql/queries/get-tokens-by-mint-addresses-deprecated";
+import { GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED } from "@the-architects/blueprint-graphql";
 import { handleError } from "@/utils/errors/log-error";
 import { Token } from "@metaplex-foundation/js";
 import { NextRequest, NextResponse } from "next/server";

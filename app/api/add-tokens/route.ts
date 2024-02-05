@@ -1,6 +1,7 @@
 import { Token } from "@/app/blueprint/types";
 import { client } from "@/graphql/backend-client";
-import { ADD_TOKENS } from "@/graphql/mutations/add-tokens";
+import { ADD_TOKENS } from "@the-architects/blueprint-graphql";
+
 import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
 

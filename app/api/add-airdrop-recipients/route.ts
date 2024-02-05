@@ -2,7 +2,8 @@ import { AddWalletsResponse } from "@/app/blueprint/types";
 import { jsonFileToJson } from "@/app/blueprint/utils";
 import { BASE_URL } from "@/constants/constants";
 import { client } from "@/graphql/backend-client";
-import { ADD_AIRDROP_RECIPIENTS } from "@/graphql/mutations/add-airdrop-recipients";
+import { ADD_AIRDROP_RECIPIENTS } from "@the-architects/blueprint-graphql";
+
 import { handleError } from "@/utils/errors/log-error";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";

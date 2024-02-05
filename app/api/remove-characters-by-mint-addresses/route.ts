@@ -1,5 +1,6 @@
 import { client } from "@/graphql/backend-client";
-import { REMOVE_CHARACTERS_BY_MINT_ADDRESSES } from "@/graphql/mutations/remove-characters-by-mint-addresses";
+import { REMOVE_CHARACTERS_BY_MINT_ADDRESSES } from "@the-architects/blueprint-graphql";
+
 import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
 

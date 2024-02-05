@@ -2,7 +2,8 @@ import { createBlueprintClient } from "@/app/blueprint/client";
 import { MappedErrorResponse } from "@/app/blueprint/types";
 import { ENV } from "@/constants/constants";
 import { client } from "@/graphql/backend-client";
-import { LOG_ERROR } from "@/graphql/mutations/log-error";
+import { LOG_ERROR } from "@the-architects/blueprint-graphql";
+
 import { AxiosError } from "axios";
 
 export type ErrorInstance = {

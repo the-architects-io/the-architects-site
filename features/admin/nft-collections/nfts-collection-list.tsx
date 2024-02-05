@@ -1,7 +1,8 @@
 import { useQuery } from "@apollo/client";
 import { TableWrapper } from "@/features/UI/tables/table-wrapper";
 
-import { GET_NFT_COLLECTIONS } from "@/graphql/queries/get-nft-collections";
+import { GET_NFT_COLLECTIONS } from "@the-architects/blueprint-graphql";
+
 import {
   NftCollection,
   NftCollectionsListItem,

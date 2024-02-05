@@ -1,7 +1,8 @@
 import { CreateUploadJobInput, UploadJob } from "@/app/blueprint/types";
 import { BASE_URL } from "@/constants/constants";
 import { client } from "@/graphql/backend-client";
-import { ADD_UPLOAD_JOB } from "@/graphql/mutations/add-upload-job";
+import { ADD_UPLOAD_JOB } from "@the-architects/blueprint-graphql";
+
 import { handleError } from "@/utils/errors/log-error";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";

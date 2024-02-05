@@ -4,7 +4,8 @@ import { PrimaryButton } from "@/features/UI/buttons/primary-button";
 import { JobIcon, JobIconType } from "@/features/jobs/job-icon";
 import { PercentCompleteIndicator } from "@/features/jobs/percent-complete-indicator";
 import showToast from "@/features/toasts/show-toast";
-import { GET_UPLOAD_JOB_BY_ID } from "@/graphql/queries/get-upload-job-by-id";
+import { GET_UPLOAD_JOB_BY_ID } from "@the-architects/blueprint-graphql";
+
 import { useLazyQuery, useQuery } from "@apollo/client";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { UploadyContextType } from "@rpldy/uploady";

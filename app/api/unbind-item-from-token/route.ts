@@ -1,5 +1,6 @@
 import { client } from "@/graphql/backend-client";
-import { UNBIND_ITEM_FROM_TOKEN } from "@/graphql/mutations/unbind-item-from-token";
+import { UNBIND_ITEM_FROM_TOKEN } from "@the-architects/blueprint-graphql";
+
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { NoopResponse, Token } from "@/app/blueprint/types";

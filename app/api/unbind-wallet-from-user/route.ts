@@ -1,7 +1,8 @@
 import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { UNBIND_USER_FROM_WALLET } from "@/graphql/mutations/unbind-user-from-wallet";
+import { UNBIND_USER_FROM_WALLET } from "@the-architects/blueprint-graphql";
+
 import { Wallet } from "@/app/blueprint/types";
 
 export async function POST(req: NextRequest) {

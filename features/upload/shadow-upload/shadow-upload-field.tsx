@@ -5,7 +5,8 @@ import Spinner from "@/features/UI/spinner";
 import { JobIcons } from "@/features/jobs/job-icon";
 import showToast from "@/features/toasts/show-toast";
 import { UploadStatus } from "@/features/upload/shadow-upload/upload-status";
-import { GET_UPLOAD_JOB_BY_ID } from "@/graphql/queries/get-upload-job-by-id";
+import { GET_UPLOAD_JOB_BY_ID } from "@the-architects/blueprint-graphql";
+
 import { useCluster } from "@/hooks/cluster";
 import { handleError } from "@/utils/errors/log-error";
 import { useQuery } from "@apollo/client";

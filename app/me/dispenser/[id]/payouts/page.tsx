@@ -3,7 +3,8 @@ import { Payout } from "@/app/profile/[id]/page";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { AggregatePayoutStats } from "@/features/dispensers/payouts/aggregate-payout-stats";
 import { PayoutList } from "@/features/dispensers/payouts/payout-list";
-import { GET_PAYOUTS_BY_DISPENSER_ID } from "@/graphql/queries/get-payouts-by-dispenser-id";
+import { GET_PAYOUTS_BY_DISPENSER_ID } from "@the-architects/blueprint-graphql";
+
 import { useQuery } from "@apollo/client";
 import { useState } from "react";
 

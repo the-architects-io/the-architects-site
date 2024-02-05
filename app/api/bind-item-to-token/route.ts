@@ -1,9 +1,11 @@
 import { client } from "@/graphql/backend-client";
-import { BIND_ITEM_TO_TOKEN } from "@/graphql/mutations/bind-item-to-token";
-import { GET_TOKEN_BY_MINT_ADDRESS } from "@/graphql/queries/get-token-by-mint-address-deprecated";
+import {
+  BIND_ITEM_TO_TOKEN,
+  GET_ITEM_BY_ID,
+  GET_TOKEN_BY_MINT_ADDRESS_DEPRECATED,
+} from "@the-architects/blueprint-graphql";
 import axios from "axios";
 import { BASE_URL } from "@/constants/constants";
-import { GET_ITEM_BY_ID } from "@/graphql/queries/get-item-by-id";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { Item, NoopResponse, Token } from "@/app/blueprint/types";
@@ -36,7 +38,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { tokens }: { tokens: Token[] } = await client.request(
-    GET_TOKEN_BY_MINT_ADDRESS,
+    GET_TOKEN_BY_MINT_ADDRESS_DEPRECATED,
     {
       mintAddress,
     }

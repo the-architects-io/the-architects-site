@@ -7,11 +7,10 @@ import { SubmitButton } from "@/features/UI/buttons/submit-button";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import Spinner from "@/features/UI/spinner";
-import { UserWithoutAccountBlocker } from "@/features/UI/user-without-account-blocker";
-import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
+
+import { GET_DISPENSER_BY_ID } from "@the-architects/blueprint-graphql";
 import { useAdmin } from "@/hooks/admin";
 import useDispenser from "@/app/blueprint/hooks/use-dispenser";
-import { formatDateTime } from "@/utils/date-time";
 import { fetchNftsByHashList } from "@/utils/nfts/fetch-nfts-by-hash-list";
 import { executeTransaction } from "@/utils/transactions/execute-transaction";
 import { useMutation, useQuery } from "@apollo/client";

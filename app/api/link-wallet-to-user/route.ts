@@ -1,9 +1,11 @@
 import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
-import { ADD_WALLET_WITH_USER } from "@/graphql/mutations/add-wallet-with-user";
-import { BIND_USER_TO_WALLET } from "@/graphql/mutations/bind-user-to-wallet";
+import {
+  ADD_WALLET_WITH_USER,
+  BIND_USER_TO_WALLET,
+  GET_WALLET_BY_ADDRESS,
+} from "@the-architects/blueprint-graphql";
 import { NoopResponse, Wallet } from "@/app/blueprint/types";
 import { handleError } from "@/utils/errors/log-error";
 

@@ -3,7 +3,7 @@ import { Collection } from "@/app/blueprint/types";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import Spinner from "@/features/UI/spinner";
 import { CollectionPreview } from "@/features/collection/collection-preview";
-import { GET_COLLECTION_BY_ID } from "@/graphql/queries/get-collection-by-id";
+import { GET_COLLECTION_BY_ID } from "@the-architects/blueprint-graphql";
 import { useAdmin } from "@/hooks/admin";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 import { useQuery } from "@apollo/client";

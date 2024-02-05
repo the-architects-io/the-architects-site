@@ -8,8 +8,6 @@ import {
 } from "@solana/web3.js";
 import bs58 from "bs58";
 import { client } from "@/graphql/backend-client";
-import { GET_DISPENSER_BY_ID } from "@/graphql/queries/get-dispenser-by-id";
-import { ADD_ITEM_PAYOUT } from "@/graphql/mutations/add-item-payout";
 import {
   createAssociatedTokenAccountInstruction,
   createFreezeAccountInstruction,
@@ -17,8 +15,12 @@ import {
   getAssociatedTokenAddress,
 } from "@solana/spl-token";
 import { NextRequest, NextResponse } from "next/server";
-import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
-import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
+import {
+  ADD_ITEM_PAYOUT,
+  ADD_WALLET,
+  GET_DISPENSER_BY_ID,
+  GET_WALLET_BY_ADDRESS,
+} from "@the-architects/blueprint-graphql";
 import { Dispenser, Wallet } from "@/app/blueprint/types";
 import { getRpcEndpoint } from "@/utils/rpc";
 import { handleError } from "@/utils/errors/log-error";

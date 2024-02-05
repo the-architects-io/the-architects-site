@@ -8,7 +8,7 @@ import { ENV } from "@/constants/constants";
 import { DispenserClaim } from "@/features/in-portals/dispenser-claim";
 import { fetchDaoNfts } from "@/utils/nfts/fetch-dao-nfts";
 import WalletButton from "@/features/UI/buttons/wallet-button";
-import { GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED } from "@/graphql/queries/get-tokens-by-mint-addresses-deprecated";
+import { GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED } from "@the-architects/blueprint-graphql";
 import { useQuery } from "@apollo/client";
 import { ModeledNftMetadata, Token } from "@/app/blueprint/types";
 

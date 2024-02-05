@@ -2,7 +2,8 @@
 import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { ADD_DISPENSER } from "@/graphql/mutations/add-dispenser";
+import { ADD_DISPENSER } from "@the-architects/blueprint-graphql";
+
 import { Dispenser, NoopResponse } from "@/app/blueprint/types";
 import { ENV } from "@/constants/constants";
 import { handleError } from "@/utils/errors/log-error";

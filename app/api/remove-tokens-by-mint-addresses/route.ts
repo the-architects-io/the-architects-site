@@ -1,5 +1,6 @@
 import { client } from "@/graphql/backend-client";
-import { REMOVE_TOKENS_BY_MINT_ADDRESSES_DEPRECATED } from "@/graphql/mutations/remove-tokens-by-mint-addresses-deprecated";
+import { REMOVE_TOKENS_BY_MINT_ADDRESSES_DEPRECATED } from "@the-architects/blueprint-graphql";
+
 import { handleError } from "@/utils/errors/log-error";
 import { NextRequest, NextResponse } from "next/server";
 

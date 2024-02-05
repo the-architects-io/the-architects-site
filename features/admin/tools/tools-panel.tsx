@@ -5,13 +5,15 @@ import { CreateSystemTree } from "@/features/merkle-trees/create-system-merkle-t
 import { ITab, Tabs } from "@/features/UI/tabs/tabs";
 import { MerkleTreesTable } from "@/features/merkle-trees/merkle-trees-table";
 import { useQuery } from "@apollo/client";
-import { GET_MERKLE_TREES_BY_USER_ID } from "@/graphql/queries/get-merkle-trees-by-user-id";
+import {
+  GET_MERKLE_TREES_BY_USER_ID,
+  GET_PREMINT_TOKENS_BY_USER_ID,
+} from "@the-architects/blueprint-graphql";
 import { SYSTEM_USER_ID } from "@/constants/constants";
 import { MintCnftBasic } from "@/features/cnfts/mint-cnft-basic";
 import { MintCnftAdvanced } from "@/features/cnfts/mint-cnft-advanced";
 import { PremintTokensTable } from "@/features/admin/premint-tokens/premint-tokens-table";
 import { useUserData } from "@nhost/nextjs";
-import { GET_PREMINT_TOKENS_BY_USER_ID } from "@/graphql/queries/get-premint-tokens-by-user-id";
 
 const tabs: ITab[] = [
   {

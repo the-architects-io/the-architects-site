@@ -1,5 +1,5 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { ADD_ITEM } from "@/graphql/mutations/add-item";
+import { ADD_ITEM } from "@the-architects/blueprint-graphql";
+
 import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";

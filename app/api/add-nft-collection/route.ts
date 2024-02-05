@@ -1,6 +1,7 @@
 import { NftCollection } from "@/features/admin/nft-collections/nfts-collection-list-item";
 import { client } from "@/graphql/backend-client";
-import { ADD_NFT_COLLECTION } from "@/graphql/mutations/add-nft-collection";
+import { ADD_NFT_COLLECTION } from "@the-architects/blueprint-graphql";
+
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {

@@ -1,7 +1,8 @@
 import { useQuery } from "@apollo/client";
 import { TokensListItem } from "@/features/admin/tokens/tokens-list-item";
 import { TableWrapper } from "@/features/UI/tables/table-wrapper";
-import { GET_TOKENS_DEPRECATED } from "@/graphql/queries/get-tokens-deprecated";
+import { GET_TOKENS_DEPRECATED } from "@the-architects/blueprint-graphql";
+
 import { Token } from "@/app/blueprint/types";
 
 export const TokensList = () => {

@@ -1,8 +1,11 @@
 import { MerkleTree } from "@/app/blueprint/types";
 import { getMaxCapacityFromMaxBufferSizeAndMaxDepth } from "@/app/blueprint/utils/merkle-trees";
 import { client } from "@/graphql/backend-client";
-import { ADD_MERKLE_TREE } from "@/graphql/mutations/add-merkle-tree";
-import { UPDATE_COLLECTION } from "@/graphql/mutations/update-collection";
+import {
+  UPDATE_COLLECTION,
+  ADD_MERKLE_TREE,
+} from "@the-architects/blueprint-graphql";
+
 import { getRpcEndpoint } from "@/utils/rpc";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { createTree } from "@metaplex-foundation/mpl-bubblegum";
