@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.8.8",
-    "@blueprint/graphql": "git+https://warly42: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@github.com/the-architects-io/blueprint-graphql.git#main",
+    "@blueprint/graphql": "git+https://warlyware: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@github.com/the-architects-io/blueprint-graphql.git#main",
     "@bonfida/spl-name-service": "^2.3.2",
     "@coral-xyz/anchor": "0.28.1-beta.1",
     "@emotion/react": "^11.11.3",
