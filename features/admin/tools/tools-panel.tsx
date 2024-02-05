@@ -9,6 +9,9 @@ import { GET_MERKLE_TREES_BY_USER_ID } from "@/graphql/queries/get-merkle-trees-
 import { SYSTEM_USER_ID } from "@/constants/constants";
 import { MintCnftBasic } from "@/features/cnfts/mint-cnft-basic";
 import { MintCnftAdvanced } from "@/features/cnfts/mint-cnft-advanced";
+import { PremintTokensTable } from "@/features/admin/premint-tokens/premint-tokens-table";
+import { useUserData } from "@nhost/nextjs";
+import { GET_PREMINT_TOKENS_BY_USER_ID } from "@/graphql/queries/get-premint-tokens-by-user-id";
 
 const tabs: ITab[] = [
   {
@@ -23,14 +26,26 @@ const tabs: ITab[] = [
     name: "Mint CNFT Advanced",
     value: "cnfts-advanced",
   },
+  {
+    name: "Premint Tokens",
+    value: "premint-tokens",
+  },
 ];
 
 export const AdminToolsPanel = () => {
   const [activeTab, setActiveTab] = useState<ITab>(tabs[0]);
+  const user = useUserData();
 
   const { data, refetch } = useQuery(GET_MERKLE_TREES_BY_USER_ID, {
     variables: {
       userId: SYSTEM_USER_ID,
+    },
+    fetchPolicy: "no-cache",
+  });
+
+  const { data: tokenData } = useQuery(GET_PREMINT_TOKENS_BY_USER_ID, {
+    variables: {
+      userId: user?.id,
     },
     fetchPolicy: "no-cache",
   });
@@ -60,6 +75,13 @@ export const AdminToolsPanel = () => {
       {!!activeTab && activeTab.value === "cnfts-advanced" && (
         <div className="pt-8 w-full mx-auto">
           <MintCnftAdvanced />
+        </div>
+      )}
+      {!!activeTab && activeTab.value === "premint-tokens" && (
+        <div className="pt-8 w-full mx-auto">
+          {!!tokenData?.tokens?.length && (
+            <PremintTokensTable tokens={tokenData.tokens} />
+          )}
         </div>
       )}
     </div>
