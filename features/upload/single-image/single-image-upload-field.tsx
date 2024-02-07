@@ -52,7 +52,6 @@ export const SingleImageUploadField = ({
 
     const fullFileName = `${fileName}.${extension}`;
 
-    debugger;
     setIsInProgress(true);
     setTimeout(() => {
       uploady.processPending({

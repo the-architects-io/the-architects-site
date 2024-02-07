@@ -32,6 +32,7 @@ const {
   UPDATE_COLLECTION,
   UPDATE_UPLOAD_JOB,
   UPLOAD_JSON,
+  UPDATE_TOKENS,
   UPLOAD_FILE,
   UPLOAD_FILES,
 } = BlueprintApiActions;
@@ -59,6 +60,7 @@ const BlueprintApiActionUrls = {
   [UPDATE_JOB]: `${BASE_URL}/api/update-job`,
   [UPDATE_AIRDROP]: `${BASE_URL}/api/update-airdrop`,
   [UPDATE_COLLECTION]: `${BASE_URL}/api/update-collection`,
+  [UPDATE_TOKENS]: `${BASE_URL}/api/update-tokens`,
   [UPDATE_UPLOAD_JOB]: `${BASE_URL}/api/update-upload-job`,
   [UPLOAD_JSON]: `${BASE_URL}/api/upload-json-file-to-shadow-drive`,
   [UPLOAD_FILE]: `${BASE_URL}/api/upload-file-to-shadow-drive`,

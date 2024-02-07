@@ -265,7 +265,7 @@ export default function CreateCollectionPage({
             }
             onClick={formik.handleSubmit}
           >
-            Next - Add Creators
+            Next - Build Collection
           </SubmitButton>
         </div>
       </div>

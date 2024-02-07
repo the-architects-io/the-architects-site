@@ -657,13 +657,15 @@ export type Token = {
   merkleTreeId?: string;
   isPremint?: boolean;
   cluster?: "devnet" | "mainnet-beta";
+  collectionId?: string;
+  amountToMint?: number;
 } & TokenMetadata;
 
-export type CreateTokensInput = {
+export type TokensInput = {
   tokens: Token[];
 };
 
-export type CreateTokenResponse = BaseBlueprintResponse & {
+export type TokensResponse = BaseBlueprintResponse & {
   tokens: Token[];
 };
 
@@ -763,6 +765,7 @@ export type UpdateCollectionInput = {
   maxDepth?: number;
   maxBufferSize?: number;
   canopyDepth?: number;
+  collectionBuildSourceId?: string;
 };
 
 export type UpdateCollectionResponse = BaseBlueprintResponse & {
@@ -972,6 +975,18 @@ export const JobTypeUUIDs = {
   [JobType.AIRDROP]: "46f35399-cfd3-4db7-ad22-12c06347d5f5",
 };
 
+export enum CollectionBuildSources {
+  METADATA_JSONS = "METADATA_JSONS",
+  PREMINT_TOKENS = "PREMINT_TOKENS",
+}
+
+export const CollectionBuildSourceUUIDs = {
+  [CollectionBuildSources.METADATA_JSONS]:
+    "fa6b02c0-82ab-4412-8bce-aaf861129d5d",
+  [CollectionBuildSources.PREMINT_TOKENS]:
+    "645294b3-aed0-4f48-bb8b-3f52bb1dcaa4",
+};
+
 export type UploadJob = {
   createdAt: string;
   driveAddress: string;
@@ -1020,6 +1035,7 @@ export enum BlueprintApiActions {
   UPLOAD_FILE = "UPLOAD_FILE",
   UPLOAD_FILES = "UPLOAD_FILES",
   UPLOAD_JSON = "UPLOAD_JSON",
+  UPDATE_TOKENS = "UPDATE_TOKENS",
 }
 
 export type CollectionMetadataStats = {

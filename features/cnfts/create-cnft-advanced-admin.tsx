@@ -7,7 +7,6 @@ import { SelectInputWithLabel } from "@/features/UI/forms/select-input-with-labe
 import {
   formatNumberWithCommas,
   getAbbreviatedAddress,
-  getStringFromByteArrayString,
 } from "@/utils/formatting";
 import { useCluster } from "@/hooks/cluster";
 import { useQuery } from "@apollo/client";
@@ -50,7 +49,7 @@ enum SAVE_ACTIONS {
 
 type SortedTrait = Trait & { sortOrder: number };
 
-export const MintCnftAdvanced = ({
+export const CreateCnftAdvancedAdmin = ({
   onCompleted,
 }: {
   onCompleted?: () => void;
@@ -237,187 +236,124 @@ export const MintCnftAdvanced = ({
     formik.values.traits.filter((trait) => trait.name === name).length === 1;
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <FormikProvider value={formik}>
-        <>
-          <div className="max-w-md mx-auto">
-            <SingleImageUpload
-              fileName={`${tokenId}`}
-              driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
-              setImage={setImage}
-            >
-              Add cNFT Image
-            </SingleImageUpload>
-          </div>
-          <div className="max-w-md mx-auto">
-            <SelectInputWithLabel
-              value={formik.values.merkleTreeId}
-              label={
-                cluster === "devnet"
-                  ? "Devnet Merkle Tree"
-                  : "Mainnet Merkle Tree"
-              }
-              name="merkleTreeId"
-              options={availableMerkleTrees?.map((tree) => ({
-                value: tree.id,
-                label: tree.label,
-              }))}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Select system merkle tree"
-              hideLabel={false}
-            />
-          </div>
-        </>
-        <div className="flex flex-wrap w-full">
-          <div className="flex flex-col w-full md:w-1/2 px-4 space-y-4">
-            <FormInputWithLabel
-              label="Name"
-              name="name"
-              placeholder="Name"
-              onChange={formik.handleChange}
-              value={formik.values.name}
-            />
-            <FormInputWithLabel
-              label="Symbol"
-              name="symbol"
-              placeholder="Symbol"
-              onChange={formik.handleChange}
-              value={formik.values.symbol}
-            />
-            <FormInputWithLabel
-              label="External URL"
-              name="externalUrl"
-              placeholder="External URL"
-              onChange={formik.handleChange}
-              value={formik.values.externalUrl}
-            />
-            <FormTextareaWithLabel
-              label="Description"
-              name="description"
-              value={formik.values.description}
-              onChange={formik.handleChange}
-            />
-            <FormInputWithLabel
-              label="Creator Royalties (in %)"
-              name="sellerFeeBasisPoints"
-              type="number"
-              min={0}
-              max={100}
-              placeholder="Seller Fee Basis Points"
-              onChange={formik.handleChange}
-              value={formik.values.sellerFeeBasisPoints}
-            />
-          </div>
-          <div className="flex flex-col w-full md:w-1/2 px-4 pt-8">
-            <div className="text-lg text-center mb-2">Creators</div>
-            <>
-              <FieldArray
-                name="creators"
-                render={(arrayHelpers) => (
-                  <div className="bg-black w-full">
-                    {formik.values.creators
-                      .sort((a, b) => a.sortOrder - b.sortOrder)
-                      .map((creator, index) => (
-                        <DndCard
-                          className="mb-4"
-                          key={creator.id}
-                          id={creator.id}
-                          index={index}
-                          moveCard={moveCreatorCard}
-                        >
-                          <div className="relative w-full flex">
-                            <div className="flex flex-1 mr-4">
-                              <FormInputWithLabel
-                                label="Creator Address"
-                                name={`creators.${index}.address`}
-                                placeholder="Creator Address"
-                                onChange={formik.handleChange}
-                                value={creator.address}
-                              />
-                              {isValidPublicKey(creator.address) ? (
-                                <CheckBadgeIcon className="h-6 w-6 text-green-500 self-end ml-2 mb-1.5" />
-                              ) : (
-                                <XCircleIcon className="h-6 w-6 text-red-500 self-end ml-2 mb-1.5" />
-                              )}
-                            </div>
-                            <div className="w-24 mr-8">
-                              <FormInputWithLabel
-                                label="Share (in %)"
-                                name={`creators.${index}.share`}
-                                placeholder="Share"
-                                type="number"
-                                min={0}
-                                max={100}
-                                onChange={formik.handleChange}
-                                value={creator.share}
-                              />
-                            </div>
-                            {formik.values.creators.length > 1 && (
-                              <button
-                                className=" absolute -top-2 -right-2.5 cursor-pointer"
-                                type="button"
-                                onClick={() => arrayHelpers.remove(index)}
-                              >
-                                <XMarkIcon className="h-6 w-6 text-gray-100" />
-                              </button>
-                            )}
-                          </div>
-                        </DndCard>
-                      ))}
-                  </div>
-                )}
-              />
-              <PrimaryButton
-                className="text-gray-100 mt-4"
-                onClick={handleAddCreator}
-                disabled={
-                  !(
-                    formik.values.creators.every(
-                      (c) => !!c.address && isValidPublicKey(c.address)
-                    ) && formik.values.creators.every((c) => c.share)
-                  )
-                }
+    <div className="flex flex-col items-center">
+      <DndProvider backend={HTML5Backend}>
+        <FormikProvider value={formik}>
+          <>
+            <div className="max-w-md mx-auto">
+              <SingleImageUpload
+                fileName={`${tokenId}`}
+                driveAddress={ASSET_SHDW_DRIVE_ADDRESS}
+                setImage={setImage}
               >
-                <PlusIcon className="h-6 w-6" />
-                Add Creator
-              </PrimaryButton>
-              <div className="text-lg text-center pt-8">Traits</div>
+                Add cNFT Image
+              </SingleImageUpload>
+            </div>
+            <div className="max-w-md mx-auto">
+              <SelectInputWithLabel
+                value={formik.values.merkleTreeId}
+                label={
+                  cluster === "devnet"
+                    ? "Devnet Merkle Tree"
+                    : "Mainnet Merkle Tree"
+                }
+                name="merkleTreeId"
+                options={availableMerkleTrees?.map((tree) => ({
+                  value: tree.id,
+                  label: tree.label,
+                }))}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Select system merkle tree"
+                hideLabel={false}
+              />
+            </div>
+          </>
+          <div className="flex flex-wrap w-full">
+            <div className="flex flex-col w-full md:w-1/2 px-4 space-y-4">
+              <FormInputWithLabel
+                label="Name"
+                name="name"
+                placeholder="Name"
+                onChange={formik.handleChange}
+                value={formik.values.name}
+              />
+              <FormInputWithLabel
+                label="Symbol"
+                name="symbol"
+                placeholder="symbol"
+                onChange={formik.handleChange}
+                value={formik.values.symbol}
+              />
+              <FormInputWithLabel
+                label="Link"
+                name="externalUrl"
+                placeholder="Link to include in cNFT"
+                onChange={formik.handleChange}
+                value={formik.values.externalUrl}
+              />
+              <FormTextareaWithLabel
+                label="Description"
+                name="description"
+                value={formik.values.description}
+                onChange={formik.handleChange}
+              />
+              <FormInputWithLabel
+                label="Creator Royalties (in %)"
+                name="sellerFeeBasisPoints"
+                type="number"
+                min={0}
+                max={100}
+                placeholder="Seller Fee Basis Points"
+                onChange={formik.handleChange}
+                value={formik.values.sellerFeeBasisPoints}
+              />
+            </div>
+            <div className="flex flex-col w-full md:w-1/2 px-4 pt-8">
+              <div className="text-lg text-center mb-2">Creators</div>
               <>
                 <FieldArray
-                  name="traits"
+                  name="creators"
                   render={(arrayHelpers) => (
                     <div className="bg-black w-full">
-                      {formik.values.traits
+                      {formik.values.creators
                         .sort((a, b) => a.sortOrder - b.sortOrder)
-                        .map((trait, index) => (
+                        .map((creator, index) => (
                           <DndCard
                             className="mb-4"
-                            key={trait.id}
-                            id={trait.id}
+                            key={creator.id}
+                            id={creator.id}
                             index={index}
-                            moveCard={moveTraitCard}
+                            moveCard={moveCreatorCard}
                           >
                             <div className="relative w-full flex">
                               <div className="flex flex-1 mr-4">
                                 <FormInputWithLabel
-                                  label="Name"
-                                  name={`traits.${index}.name`}
-                                  placeholder="e.g. Background, Eyes, Mouth"
+                                  label="Creator Address"
+                                  name={`creators.${index}.address`}
+                                  placeholder="Creator Address"
                                   onChange={formik.handleChange}
-                                  value={trait.name}
+                                  value={creator.address}
                                 />
+                                {isValidPublicKey(creator.address) ? (
+                                  <CheckBadgeIcon className="h-6 w-6 text-green-500 self-end ml-2 mb-1.5" />
+                                ) : (
+                                  <XCircleIcon className="h-6 w-6 text-red-500 self-end ml-2 mb-1.5" />
+                                )}
                               </div>
                               <div className="w-24 mr-8">
                                 <FormInputWithLabel
-                                  label="Value"
-                                  name={`traits.${index}.value`}
-                                  placeholder="e.g. Red, Googly, Smiling"
+                                  label="Share (in %)"
+                                  name={`creators.${index}.share`}
+                                  placeholder="Share"
+                                  type="number"
+                                  min={0}
+                                  max={100}
                                   onChange={formik.handleChange}
-                                  value={trait.value}
+                                  value={creator.share}
                                 />
                               </div>
-                              {formik.values.traits.length > 1 && (
+                              {formik.values.creators.length > 1 && (
                                 <button
                                   className=" absolute -top-2 -right-2.5 cursor-pointer"
                                   type="button"
@@ -434,54 +370,105 @@ export const MintCnftAdvanced = ({
                 />
                 <PrimaryButton
                   className="text-gray-100 mt-4"
-                  onClick={handleAddTrait}
+                  onClick={handleAddCreator}
                   disabled={
                     !(
-                      formik.values.traits.every(
-                        (t) => !!t.name && isUniqueName(t.name)
-                      ) &&
-                      formik.values.traits.every((t) => !!t.value && !!t.name)
+                      formik.values.creators.every(
+                        (c) => !!c.address && isValidPublicKey(c.address)
+                      ) && formik.values.creators.every((c) => c.share)
                     )
                   }
                 >
                   <PlusIcon className="h-6 w-6" />
-                  Add Trait
+                  Add Creator
                 </PrimaryButton>
+                <div className="text-lg text-center pt-8">Traits</div>
+                <>
+                  <FieldArray
+                    name="traits"
+                    render={(arrayHelpers) => (
+                      <div className="bg-black w-full">
+                        {formik.values.traits
+                          .sort((a, b) => a.sortOrder - b.sortOrder)
+                          .map((trait, index) => (
+                            <DndCard
+                              className="mb-4"
+                              key={trait.id}
+                              id={trait.id}
+                              index={index}
+                              moveCard={moveTraitCard}
+                            >
+                              <div className="relative w-full flex">
+                                <div className="flex flex-1 mr-4">
+                                  <FormInputWithLabel
+                                    label="Name"
+                                    name={`traits.${index}.name`}
+                                    placeholder="e.g. Background, Eyes, Mouth"
+                                    onChange={formik.handleChange}
+                                    value={trait.name}
+                                  />
+                                </div>
+                                <div className="w-24 mr-8">
+                                  <FormInputWithLabel
+                                    label="Value"
+                                    name={`traits.${index}.value`}
+                                    placeholder="e.g. Red, Googly, Smiling"
+                                    onChange={formik.handleChange}
+                                    value={trait.value}
+                                  />
+                                </div>
+                                {formik.values.traits.length > 1 && (
+                                  <button
+                                    className=" absolute -top-2 -right-2.5 cursor-pointer"
+                                    type="button"
+                                    onClick={() => arrayHelpers.remove(index)}
+                                  >
+                                    <XMarkIcon className="h-6 w-6 text-gray-100" />
+                                  </button>
+                                )}
+                              </div>
+                            </DndCard>
+                          ))}
+                      </div>
+                    )}
+                  />
+                  <PrimaryButton
+                    className="text-gray-100 mt-4"
+                    onClick={handleAddTrait}
+                    disabled={
+                      !(
+                        formik.values.traits.every(
+                          (t) => !!t.name && isUniqueName(t.name)
+                        ) &&
+                        formik.values.traits.every((t) => !!t.value && !!t.name)
+                      )
+                    }
+                  >
+                    <PlusIcon className="h-6 w-6" />
+                    Add Trait
+                  </PrimaryButton>
+                </>
               </>
-            </>
+            </div>
           </div>
-        </div>
-        <div className="pt-4 w-full flex justify-center my-8">
-          <SubmitButton
-            isSubmitting={formik.isSubmitting}
-            onClick={() => {
-              formik.setFieldValue("saveAction", "mint");
-              formik.submitForm();
-            }}
-            disabled={
-              formik.isSubmitting ||
-              !formik.isValid ||
-              !formik.values.merkleTreeId?.length
-            }
-          >
-            Mint cNFT
-          </SubmitButton>
-          <SubmitButton
-            isSubmitting={formik.isSubmitting}
-            onClick={() => {
-              formik.setFieldValue("saveAction", "premint");
-              formik.submitForm();
-            }}
-            disabled={
-              formik.isSubmitting ||
-              !formik.isValid ||
-              !formik.values.merkleTreeId?.length
-            }
-          >
-            Save Premint cNFT
-          </SubmitButton>
-        </div>
-      </FormikProvider>
-    </DndProvider>
+          <div className="pt-4 w-full flex justify-center my-8">
+            <SubmitButton
+              isSubmitting={formik.isSubmitting}
+              onClick={() => {
+                formik.setFieldValue("saveAction", "premint");
+                formik.submitForm();
+              }}
+              disabled={
+                formik.isSubmitting ||
+                !formik.isValid ||
+                !formik.values.merkleTreeId?.length
+              }
+            >
+              Save Premint cNFT
+            </SubmitButton>
+          </div>
+        </FormikProvider>
+      </DndProvider>
+    </div>
   );
 };

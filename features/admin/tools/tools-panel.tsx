@@ -11,7 +11,7 @@ import {
 } from "@the-architects/blueprint-graphql";
 import { SYSTEM_USER_ID } from "@/constants/constants";
 import { MintCnftBasic } from "@/features/cnfts/mint-cnft-basic";
-import { MintCnftAdvanced } from "@/features/cnfts/mint-cnft-advanced";
+import { CreateCnftAdvancedAdmin } from "@/features/cnfts/create-cnft-advanced-admin";
 import { PremintTokensTable } from "@/features/admin/premint-tokens/premint-tokens-table";
 import { useUserData } from "@nhost/nextjs";
 
@@ -76,7 +76,7 @@ export const AdminToolsPanel = () => {
       )}
       {!!activeTab && activeTab.value === "cnfts-advanced" && (
         <div className="pt-8 w-full mx-auto">
-          <MintCnftAdvanced />
+          <CreateCnftAdvancedAdmin />
         </div>
       )}
       {!!activeTab && activeTab.value === "premint-tokens" && (

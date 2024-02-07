@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
     maxDepth,
     maxBufferSize,
     canopyDepth,
+    collectionBuildSourceId,
   } = await req.json();
 
   if (!id) {
@@ -122,6 +123,7 @@ export async function POST(req: NextRequest) {
           ...(maxDepth && { maxDepth }),
           ...(maxBufferSize && { maxBufferSize }),
           ...(canopyDepth !== undefined && { canopyDepth: canopyDepth }),
+          ...(collectionBuildSourceId && { collectionBuildSourceId }),
         },
       }
     );

@@ -21,6 +21,9 @@ export const creatorsAreValid = (creators: Creator[] | null) => {
 export const getPremintCollectionMetadata = async (
   collectionId: string
 ): Promise<TokenMetadata[]> => {
+  if (!collectionId) {
+    throw new Error("Invalid collectionId");
+  }
   const url = `${SHDW_DRIVE_BASE_URL}/${ASSET_SHDW_DRIVE_ADDRESS}/${collectionId}-collection-metadatas.json`;
   const { data } = await axios.get(url);
   return data;

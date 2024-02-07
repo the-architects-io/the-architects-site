@@ -40,15 +40,15 @@ export const PremintTokensTable = ({ tokens }: { tokens: Token[] }) => {
     () => [
       {
         header: () => <div className="uppercase py-2 mr-4 px-4">Image</div>,
-        size: 24,
+        size: 8,
         accessorKey: "image",
         cell: (info) => (
           <div className="flex flex-col px-4">
             <Image
               src={info.getValue() as string}
               alt="Premint Token Image"
-              width={50}
-              height={50}
+              width={100}
+              height={100}
             />
           </div>
         ),
@@ -60,21 +60,6 @@ export const PremintTokensTable = ({ tokens }: { tokens: Token[] }) => {
         cell: (info) => (
           <div className="flex px-4">
             <div>{`${info?.getValue()}`}</div>
-          </div>
-        ),
-      },
-      {
-        header: () => <div className="uppercase py-2 mr-4 px-4">Created</div>,
-        size: 20,
-        accessorKey: "createdAt",
-        cell: (info) => (
-          <div className="flex flex-col px-4">
-            <div>{`${dayjs(info.getValue() as Date).format(
-              "MM/DD/YYYY"
-            )} `}</div>
-            <div className="text-gray-400">
-              {dayjs(info.getValue() as Date).format("hh:mm:ss A")}
-            </div>
           </div>
         ),
       },

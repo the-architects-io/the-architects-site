@@ -10,8 +10,8 @@ import {
   CreateDriveResponse,
   CreateJobInput,
   CreateJobResponse,
-  CreateTokenResponse,
-  CreateTokensInput,
+  TokensResponse,
+  TokensInput,
   CreateTreeInput,
   CreateTreeResponse,
   CreateUploadJobInput,
@@ -145,10 +145,6 @@ async function makeApiRequest<TResponse, TParams extends Record<string, any>>(
   }
 }
 
-const collectionUtils = {
-  getPremintCollectionMetadata,
-};
-
 export const createBlueprintClient = (options: BlueprintClientOptions) => {
   return {
     airdrops: {
@@ -184,7 +180,7 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
           params,
           options
         ),
-      ...collectionUtils,
+      getPremintCollectionMetadata,
     },
     drive: {
       createDrive: (params: CreateDriveInput) =>
@@ -268,8 +264,8 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
       }) => takePayment({ ...params, cluster: options.cluster }),
     },
     tokens: {
-      createTokens: (params: CreateTokensInput) =>
-        makeApiRequest<CreateTokenResponse, CreateTokensInput>(
+      createTokens: (params: TokensInput) =>
+        makeApiRequest<TokensResponse, TokensInput>(
           BlueprintApiActions.CREATE_TOKENS,
           params,
           options
@@ -289,6 +285,12 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
       mintNft: (params: MintNftInput) =>
         makeApiRequest<MintNftResponse, MintNftInput>(
           BlueprintApiActions.MINT_NFT,
+          params,
+          options
+        ),
+      updateTokens: (params: TokensInput) =>
+        makeApiRequest<TokensResponse, TokensInput>(
+          BlueprintApiActions.UPDATE_TOKENS,
           params,
           options
         ),

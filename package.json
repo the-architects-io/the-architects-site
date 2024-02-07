@@ -54,7 +54,7 @@
     "@tanstack/react-table": "^8.11.8",
     "@tanstack/react-virtual": "3.0.0-alpha.0",
     "@tanstack/table-core": "^8.11.8",
-    "@the-architects/blueprint-graphql": "^0.2.5",
+    "@the-architects/blueprint-graphql": "^0.2.6",
     "@types/node": "20.2.5",
     "@types/react": "18.2.7",
     "@types/react-dom": "18.2.4",

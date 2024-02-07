@@ -6,11 +6,6 @@ import { useCluster } from "@/hooks/cluster";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
-type CollectionPreviewToken = {
-  name: string;
-  imageUrl: string;
-};
-
 export const CollectionPreview = ({
   collection,
 }: {
@@ -22,6 +17,7 @@ export const CollectionPreview = ({
   const { cluster } = useCluster();
 
   const createPreviewTokens = useCallback(async () => {
+    if (!collection) return;
     const blueprint = createBlueprintClient({
       cluster,
     });
@@ -35,7 +31,7 @@ export const CollectionPreview = ({
         index,
       }))
     );
-  }, [collection.id, cluster]);
+  }, [collection, cluster]);
 
   useEffect(() => {
     if (!collection) return;
