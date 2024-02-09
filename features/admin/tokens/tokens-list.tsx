@@ -3,7 +3,7 @@ import { TokensListItem } from "@/features/admin/tokens/tokens-list-item";
 import { TableWrapper } from "@/features/UI/tables/table-wrapper";
 import { GET_TOKENS_DEPRECATED } from "@the-architects/blueprint-graphql";
 
-import { Token } from "@/app/blueprint/types";
+import { Token, TokenDeprecated } from "@/app/blueprint/types";
 
 export const TokensList = () => {
   const { data } = useQuery(GET_TOKENS_DEPRECATED, {
@@ -12,7 +12,7 @@ export const TokensList = () => {
 
   return (
     <TableWrapper>
-      {data?.tokens?.map((token: Token) => {
+      {data?.tokens?.map((token: TokenDeprecated) => {
         return <TokensListItem key={token.id} token={token} />;
       })}
     </TableWrapper>

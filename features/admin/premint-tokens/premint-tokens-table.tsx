@@ -10,11 +10,6 @@ import { TableVirtuoso } from "react-virtuoso";
 import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Token } from "@/app/blueprint/types";
-import { dayjs } from "@/utils/date-time";
-import {
-  formatNumberWithCommas,
-  getAbbreviatedAddress,
-} from "@/utils/formatting";
 import Image from "next/image";
 
 export const PremintTokensTable = ({ tokens }: { tokens: Token[] }) => {

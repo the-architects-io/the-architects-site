@@ -11,6 +11,7 @@ import {
   ItemCollection,
   Token,
   TokenBalance,
+  TokenDeprecated,
 } from "@/app/blueprint/types";
 import { useCallback, useState } from "react";
 import { BASE_URL } from "@/constants/constants";
@@ -48,17 +49,23 @@ export const DispenserCostForm = ({
       isFree: false,
     },
     onSubmit: async (values) => {
-      let allTokens: Token[] = [];
+      let allTokens: TokenDeprecated[] = [];
       let allItems: Item[] = [];
       let allItemCollections: ItemCollection[] = [];
 
       try {
-        const { data }: { data: { allTokens: Token[]; addedTokens: Token[] } } =
-          await axios.post("/api/add-tokens", {
-            mintAddresses: values.costs
-              .filter((cost) => cost.costAmount > 0 && cost.isSelected)
-              .map((cost) => cost.mint),
-          });
+        const {
+          data,
+        }: {
+          data: {
+            allTokens: TokenDeprecated[];
+            addedTokens: TokenDeprecated[];
+          };
+        } = await axios.post("/api/add-tokens", {
+          mintAddresses: values.costs
+            .filter((cost) => cost.costAmount > 0 && cost.isSelected)
+            .map((cost) => cost.mint),
+        });
 
         allTokens = data?.allTokens;
         console.log(data?.allTokens);

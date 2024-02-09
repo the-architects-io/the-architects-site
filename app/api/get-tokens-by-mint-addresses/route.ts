@@ -3,12 +3,13 @@ import { GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED } from "@the-architects/bluepri
 import { handleError } from "@/utils/errors/log-error";
 import { Token } from "@metaplex-foundation/js";
 import { NextRequest, NextResponse } from "next/server";
+import { TokenDeprecated } from "@/app/blueprint/types";
 
 export async function POST(req: NextRequest) {
   const { mintAddresses } = await req.json();
 
   try {
-    const { tokens }: { tokens: Token[] } = await client.request({
+    const { tokens }: { tokens: TokenDeprecated[] } = await client.request({
       document: GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED,
       variables: {
         mintAddresses,

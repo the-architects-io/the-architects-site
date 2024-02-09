@@ -430,7 +430,7 @@ export type DispenseTokensApiResponse = {
       mintAddress: string;
     };
   };
-  token: Token;
+  token: TokenDeprecated;
   item: Item;
 };
 

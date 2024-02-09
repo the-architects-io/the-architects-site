@@ -11,6 +11,7 @@ import {
   RewardCollection,
   Token,
   TokenBalance,
+  TokenDeprecated,
 } from "@/app/blueprint/types";
 import React, { useCallback, useEffect, useState } from "react";
 import { BASE_URL } from "@/constants/constants";
@@ -73,17 +74,23 @@ export const DispenserRewardForm = ({
       rewards: [] as Reward[],
     },
     onSubmit: async (values) => {
-      let allTokens: Token[] = [];
+      let allTokens: TokenDeprecated[] = [];
       let allItems: Item[] = [];
       let allItemCollections: ItemCollection[] = [];
 
       try {
-        const { data }: { data: { allTokens: Token[]; addedTokens: Token[] } } =
-          await axios.post("/api/add-tokens", {
-            mintAddresses: values.rewards
-              .filter((reward) => reward.isSelected && reward.rewardAmount > 0)
-              .map((reward) => reward.mint),
-          });
+        const {
+          data,
+        }: {
+          data: {
+            allTokens: TokenDeprecated[];
+            addedTokens: TokenDeprecated[];
+          };
+        } = await axios.post("/api/add-tokens", {
+          mintAddresses: values.rewards
+            .filter((reward) => reward.isSelected && reward.rewardAmount > 0)
+            .map((reward) => reward.mint),
+        });
 
         allTokens = data?.allTokens;
         console.log({ allTokens });

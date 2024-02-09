@@ -8,7 +8,12 @@ import axios from "axios";
 import { BASE_URL } from "@/constants/constants";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { Item, NoopResponse, Token } from "@/app/blueprint/types";
+import {
+  Item,
+  NoopResponse,
+  Token,
+  TokenDeprecated,
+} from "@/app/blueprint/types";
 import { handleError } from "@/utils/errors/log-error";
 
 type Data =
@@ -37,7 +42,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { tokens }: { tokens: Token[] } = await client.request(
+  const { tokens }: { tokens: TokenDeprecated[] } = await client.request(
     GET_TOKEN_BY_MINT_ADDRESS_DEPRECATED,
     {
       mintAddress,
@@ -58,7 +63,7 @@ export async function POST(req: NextRequest) {
   if (!token) {
     console.log("Token not found, adding it to the database");
     try {
-      const { data: newToken }: { data: Token } = await axios.post(
+      const { data: newToken }: { data: TokenDeprecated } = await axios.post(
         `${BASE_URL}/api/add-token`,
         { mintAddress }
       );

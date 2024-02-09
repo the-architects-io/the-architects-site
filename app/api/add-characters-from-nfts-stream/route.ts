@@ -102,7 +102,6 @@ const handleHashListChunk = async (
 
   // instead of fetching all tokens we'll let add-tokens handle it
   // and pass back all tokens that were added
-  const tokens: Token[] = [];
 
   const res = await fetch(`${BASE_URL}/api/add-tokens`, {
     method: "POST",

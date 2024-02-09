@@ -10,6 +10,7 @@ import {
   AddTraitInstancesResponse,
   AddTraitsResponse,
   Token,
+  TokenDeprecated,
 } from "@/app/blueprint/types";
 
 import { getRpcEndpoint } from "@/utils/rpc";
@@ -66,7 +67,7 @@ export async function POST(req: NextRequest) {
   const traitInstancesToInsert = [];
 
   // first get the tokens that are already in the db
-  const { tokens }: { tokens: Token[] } = await client.request({
+  const { tokens }: { tokens: TokenDeprecated[] } = await client.request({
     document: GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED,
     variables: {
       mintAddresses: jsonHashList,
@@ -105,7 +106,9 @@ export async function POST(req: NextRequest) {
   }
 
   // then filter out the ones that are already in the db
-  const existingMintAddresses = tokens.map((token: Token) => token.mintAddress);
+  const existingMintAddresses = tokens.map(
+    (token: TokenDeprecated) => token.mintAddress
+  );
 
   const tokensToAdd = tokensToInsert.filter(
     (token) => !existingMintAddresses.includes(token.mintAddress)

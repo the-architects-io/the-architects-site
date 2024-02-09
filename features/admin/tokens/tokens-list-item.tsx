@@ -1,11 +1,11 @@
-import { Token } from "@/app/blueprint/types";
+import { Token, TokenDeprecated } from "@/app/blueprint/types";
 import { ImageWithFallback } from "@/features/UI/image-with-fallback";
 import { TableRow } from "@/features/UI/tables/table-row";
 import { getAbbreviatedAddress } from "@/utils/formatting";
 
 import Link from "next/link";
 
-export const TokensListItem = ({ token }: { token: Token }) => {
+export const TokensListItem = ({ token }: { token: TokenDeprecated }) => {
   return (
     <TableRow keyId={token.id}>
       <ImageWithFallback

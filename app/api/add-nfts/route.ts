@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { Metaplex, PublicKey } from "@metaplex-foundation/js";
 import { Connection } from "@solana/web3.js";
 import { fetchNftsWithMetadata } from "@/utils/nfts/fetch-nfts-with-metadata";
-import { Token } from "@/app/blueprint/types";
+import { Token, TokenDeprecated } from "@/app/blueprint/types";
 import { getRpcEndpoint } from "@/utils/rpc";
 import {
   ADD_TOKENS_DEPRECATED,
@@ -72,15 +72,16 @@ export async function POST(req: NextRequest) {
     metaplex
   );
 
-  const existingTokensResponse: { tokens: Token[] } = await client.request({
-    document: GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED,
-    variables: {
-      mintAddresses: jsonHashList,
-    },
-  });
+  const existingTokensResponse: { tokens: TokenDeprecated[] } =
+    await client.request({
+      document: GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED,
+      variables: {
+        mintAddresses: jsonHashList,
+      },
+    });
 
   const existingMintAddresses = existingTokensResponse.tokens.map(
-    (token: Token) => token.mintAddress
+    (token: TokenDeprecated) => token.mintAddress
   );
   const newNFTs = nftsWithMetadata.filter(
     (nft) => !existingMintAddresses.includes(nft.mintAddress)

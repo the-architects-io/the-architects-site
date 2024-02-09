@@ -7,7 +7,7 @@ import {
 import { client } from "@/graphql/backend-client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { NoopResponse, Token } from "@/app/blueprint/types";
+import { NoopResponse, Token, TokenDeprecated } from "@/app/blueprint/types";
 import {
   ADD_TOKENS_DEPRECATED,
   GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED,
@@ -26,7 +26,7 @@ export type TokenMetadata = {
 
 type TokenDbReturnData = {
   affected_rows: number;
-  returning: Token[];
+  returning: TokenDeprecated[];
 };
 
 type Data =
@@ -73,12 +73,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { tokens: tokensInDb }: { tokens: Token[] } = await client.request({
-    document: GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED,
-    variables: {
-      mintAddresses,
-    },
-  });
+  const { tokens: tokensInDb }: { tokens: TokenDeprecated[] } =
+    await client.request({
+      document: GET_TOKENS_BY_MINT_ADDRESSES_DEPRECATED,
+      variables: {
+        mintAddresses,
+      },
+    });
 
   const umi = getUmiClient();
 
@@ -110,23 +111,27 @@ export async function POST(req: NextRequest) {
           isAsset: true,
           asset,
           token: tokensInDb.find(
-            (token: Token) => publicKey(asset.mint) === token.mintAddress
+            (token: TokenDeprecated) =>
+              publicKey(asset.mint) === token.mintAddress
           ),
         });
 
         return tokensInDb.find(
-          (token: Token) => publicKey(asset.mint) === token.mintAddress
+          (token: TokenDeprecated) =>
+            publicKey(asset.mint) === token.mintAddress
         );
       } else if (isMint(asset)) {
         console.log({
           isMint: true,
           asset,
           token: tokensInDb.find(
-            (token: Token) => publicKey(asset.publicKey) === token.mintAddress
+            (token: TokenDeprecated) =>
+              publicKey(asset.publicKey) === token.mintAddress
           ),
         });
         return tokensInDb.find(
-          (token: Token) => publicKey(asset.publicKey) === token.mintAddress
+          (token: TokenDeprecated) =>
+            publicKey(asset.publicKey) === token.mintAddress
         );
       }
       return false;
@@ -137,11 +142,13 @@ export async function POST(req: NextRequest) {
     (asset: DigitalAsset | Mint) => {
       if (isAsset(asset)) {
         return !tokensInDb.find(
-          (token: Token) => publicKey(asset.mint) === token.mintAddress
+          (token: TokenDeprecated) =>
+            publicKey(asset.mint) === token.mintAddress
         );
       } else if (isMint(asset)) {
         return !tokensInDb.find(
-          (token: Token) => publicKey(asset.publicKey) === token.mintAddress
+          (token: TokenDeprecated) =>
+            publicKey(asset.publicKey) === token.mintAddress
         );
       }
       return false;
@@ -221,13 +228,14 @@ export async function POST(req: NextRequest) {
   try {
     const {
       insert_tokens: addedTokens,
-    }: { insert_tokens: { affected_rows: string; returning: Token[] } } =
-      await client.request({
-        document: ADD_TOKENS_DEPRECATED,
-        variables: {
-          tokens: toAdd,
-        },
-      });
+    }: {
+      insert_tokens: { affected_rows: string; returning: TokenDeprecated[] };
+    } = await client.request({
+      document: ADD_TOKENS_DEPRECATED,
+      variables: {
+        tokens: toAdd,
+      },
+    });
     return NextResponse.json(
       {
         assets,
