@@ -120,7 +120,9 @@ export async function POST(req: NextRequest) {
 
   const mintAddressToTokenId: Record<string, string> = {};
   tokensResponse?.insert_tokens?.returning.forEach((token) => {
-    mintAddressToTokenId[token.mintAddress] = token.id;
+    if (token.mintAddress && typeof token.id === "string") {
+      mintAddressToTokenId[token.mintAddress] = token.id;
+    }
   });
 
   const traitsResponse: AddTraitsResponse = await client.request({
@@ -134,7 +136,9 @@ export async function POST(req: NextRequest) {
 
   const traitNameToId: Record<string, string> = {};
   traitsResponse?.insert_traits?.returning.forEach((trait) => {
-    traitNameToId[trait.name] = trait.id;
+    if (trait.name && trait.id) {
+      traitNameToId[trait.name] = trait.id;
+    }
   });
 
   const charactersResponse: AddCharactersResponse = await client.request({
