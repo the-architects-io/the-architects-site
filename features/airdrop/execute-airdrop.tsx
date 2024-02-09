@@ -247,7 +247,7 @@ export const ExecuteAirdrop = ({
       );
 
       console.log({ data, status });
-      debugger;
+
       const {
         recipientWalletAddresses,
         signatures,

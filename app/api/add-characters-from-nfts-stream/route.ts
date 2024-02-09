@@ -185,7 +185,9 @@ const handleHashListChunk = async (
 
   const mintAddressToTokenId: Record<string, string> = {};
   addedTokens.forEach((token) => {
-    mintAddressToTokenId[token.mintAddress] = token.id;
+    if (token.mintAddress && typeof token.id === "string") {
+      mintAddressToTokenId[token.mintAddress] = token.id;
+    }
   });
 
   const traitsResponse: AddTraitsResponse = await client.request({
@@ -199,7 +201,9 @@ const handleHashListChunk = async (
 
   const traitNameToId: Record<string, string> = {};
   traitsResponse?.insert_traits?.returning.forEach((trait) => {
-    traitNameToId[trait.name] = trait.id;
+    if (trait.name && trait.id) {
+      traitNameToId[trait.name] = trait.id;
+    }
   });
 
   const charactersResponse: AddCharactersResponse = await client.request({
