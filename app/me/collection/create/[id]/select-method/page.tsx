@@ -1,10 +1,10 @@
+"use client";
 import { createBlueprintClient } from "@/app/blueprint/client";
 import { CollectionBuildSourceUUIDs } from "@/app/blueprint/types";
 import { ContentWrapper } from "@/features/UI/content-wrapper";
 import showToast from "@/features/toasts/show-toast";
 import { useCluster } from "@/hooks/cluster";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function SelectMethodPage({
   params,

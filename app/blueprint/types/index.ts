@@ -659,6 +659,7 @@ export type Token = {
   cluster?: "devnet" | "mainnet-beta";
   collectionId?: string;
   amountToMint?: number;
+  imageSizeInBytes?: number;
 } & TokenMetadata;
 
 export type TokensInput = {

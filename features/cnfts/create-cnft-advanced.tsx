@@ -155,6 +155,7 @@ export const CreateCnftAdvanced = ({
             userId: user?.id,
             isPremint: true,
             collectionId,
+            imageSizeInBytes: image.sizeInBytes,
           },
         ],
       });

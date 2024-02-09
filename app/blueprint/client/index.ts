@@ -51,6 +51,7 @@ import {
   getPremintCollectionMetadata,
   jsonFileToJson,
   safeStringify,
+  createFileFromUrl,
 } from "@/app/blueprint/utils";
 import { takePayment } from "@/app/blueprint/utils/payments";
 import { BASE_URL } from "@/constants/constants";
@@ -228,6 +229,9 @@ export const createBlueprintClient = (options: BlueprintClientOptions) => {
           params,
           options
         ),
+    },
+    files: {
+      createFileFromUrl,
     },
     jobs: {
       createJob: (params: CreateJobInput) =>

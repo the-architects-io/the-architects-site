@@ -72,6 +72,7 @@
     "encoding": "^0.1.13",
     "eslint": "8.41.0",
     "eslint-config-next": "14.0.4",
+    "file-type": "^19.0.0",
     "form-data": "^4.0.0",
     "formdata-node": "^6.0.3",
     "formidable": "^3.5.1",

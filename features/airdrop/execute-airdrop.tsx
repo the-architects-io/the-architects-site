@@ -55,10 +55,7 @@ export const ExecuteAirdrop = ({
 
     if (
       !name ||
-      !symbol ||
-      !description ||
       !sellerFeeBasisPoints ||
-      !driveAddress ||
       !user ||
       !maxBufferSize ||
       !maxDepth
@@ -156,7 +153,7 @@ export const ExecuteAirdrop = ({
 
       const { signature, result, mintAddress } = data;
       collectionNftMintAddress = mintAddress;
-      debugger;
+
       console.log("minting collection NFT", {
         signature,
         mintAddress,
@@ -186,7 +183,7 @@ export const ExecuteAirdrop = ({
       collectionId: airdrop.collection.id,
       userId: SYSTEM_USER_ID,
     });
-    debugger;
+
     try {
       const { data, status } = await axios.post(
         `${ARCHITECTS_API_URL}/create-tree`,
@@ -208,8 +205,6 @@ export const ExecuteAirdrop = ({
         treeId,
       });
 
-      debugger;
-
       if (!success) throw new Error("Error creating Merkle Tree");
     } catch (error) {
       blueprint.jobs.updateJob({
@@ -228,7 +223,6 @@ export const ExecuteAirdrop = ({
         statusText: "Failed to mint collection NFT",
         icon: JobIcons.ERROR,
       });
-      debugger;
       return;
     }
 
@@ -252,12 +246,8 @@ export const ExecuteAirdrop = ({
         }
       );
 
-      if (status === 200) {
-        showToast({
-          primaryMessage: "Airdrop complete!",
-        });
-      }
-
+      console.log({ data, status });
+      debugger;
       const {
         recipientWalletAddresses,
         signatures,
@@ -283,7 +273,6 @@ export const ExecuteAirdrop = ({
     blueprint.airdrops,
     blueprint.collections,
     blueprint.jobs,
-    blueprint.tokens,
     blueprint.upload,
     cluster,
     setJobId,

@@ -22,8 +22,6 @@ import Spinner from "@/features/UI/spinner";
 import { CreateCollectionAssetUploadChecklist } from "@/features/collection/create-collection-asset-upload-checklist";
 import { JobIcons } from "@/features/jobs/job-icon";
 import showToast from "@/features/toasts/show-toast";
-import { JsonUpload } from "@/features/upload/json/json-upload";
-import { JsonUploadMetadataValidation } from "@/features/upload/json/json-upload-metadata-validation";
 import ShadowUpload from "@/features/upload/shadow-upload/shadow-upload";
 import { ZipFileUploadValidation } from "@/features/upload/shadow-upload/zip-file-upload-validation";
 import { JobStatus } from "@/features/jobs/job-status";
@@ -33,7 +31,6 @@ import {
 } from "@the-architects/blueprint-graphql";
 import { useCluster } from "@/hooks/cluster";
 import { useQuery } from "@apollo/client";
-import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { useUserData } from "@nhost/nextjs";
 import { UploadyContextType } from "@rpldy/uploady";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -224,21 +221,20 @@ export default function CollectionCreationUploadAssetsPage({
       return;
     }
 
-    const response = await fetch(collection.imageUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch image: ${response.statusText}`);
+    const file = await blueprint.files.createFileFromUrl({
+      url: collection.imageUrl,
+      fileName: "collection",
+    });
+
+    if (!file) {
+      blueprint.jobs.updateUploadJob({
+        id: job.id,
+        statusId: StatusUUIDs.ERROR,
+        statusText: "Failed to fetch collection image",
+        cluster,
+      });
+      return;
     }
-
-    // Convert the response to an ArrayBuffer
-    const arrayBuffer = await response.arrayBuffer();
-
-    // Convert the ArrayBuffer to a Blob
-    const blob = new Blob([arrayBuffer], { type: "image/png" });
-
-    const fileName = "collection.png";
-
-    // Convert the Blob to a File object
-    const file = new File([blob], fileName, { type: "image/png" });
 
     await blueprint.jobs.updateUploadJob({
       id: job.id,
@@ -250,7 +246,7 @@ export default function CollectionCreationUploadAssetsPage({
     const { success: imageUploadSuccess, url } =
       await blueprint.upload.uploadFile({
         file,
-        fileName,
+        fileName: "collection.png",
         driveAddress,
       });
 
