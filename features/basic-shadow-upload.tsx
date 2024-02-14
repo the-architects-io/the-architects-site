@@ -99,7 +99,7 @@ export default function ShadowUpload({
     // setTxnSig(upload.transaction_signature);
   };
 
-  if (!isAdmin) return <NotAdminBlocker />;
+  // if (!isAdmin) return <NotAdminBlocker />;
 
   return (
     <div>
