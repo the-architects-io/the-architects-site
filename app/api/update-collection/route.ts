@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
     maxBufferSize,
     canopyDepth,
     collectionBuildSourceId,
+    tokenImagesSizeInBytes,
   } = await req.json();
 
   if (!id) {
@@ -124,6 +125,7 @@ export async function POST(req: NextRequest) {
           ...(maxBufferSize && { maxBufferSize }),
           ...(canopyDepth !== undefined && { canopyDepth: canopyDepth }),
           ...(collectionBuildSourceId && { collectionBuildSourceId }),
+          ...(tokenImagesSizeInBytes && { tokenImagesSizeInBytes }),
         },
       }
     );

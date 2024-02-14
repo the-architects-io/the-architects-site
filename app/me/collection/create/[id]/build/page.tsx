@@ -127,7 +127,7 @@ export default function BuildCollectionPage({
       }
 
       const collectionImageSizeInBytes = collection.imageSizeInBytes || 0;
-      const tokenImageSizesInBytes = tokenData.tokens.reduce(
+      const tokenImagesSizeInBytes = tokenData.tokens.reduce(
         (acc: number, token: Token) =>
           acc + (Number(token?.imageSizeInBytes) || 0),
         0
@@ -144,13 +144,13 @@ export default function BuildCollectionPage({
 
       const sizeInKb =
         Math.ceil(
-          (collectionImageSizeInBytes + tokenImageSizesInBytes) / 1024
+          (collectionImageSizeInBytes + tokenImagesSizeInBytes) / 1024
         ) + 1000;
 
       console.log({
         sizeInKb,
         collectionImageSizeInBytes,
-        tokenImageSizesInBytes,
+        tokenImagesSizeInBytes,
       });
       debugger;
 
@@ -279,6 +279,7 @@ export default function BuildCollectionPage({
         await blueprint.collections.updateCollection({
           id: params.id,
           driveAddress,
+          tokenImagesSizeInBytes,
           tokenCount: values.tokens.reduce(
             (acc: number, token: Token) =>
               acc + (Number(token?.amountToMint) || 0),

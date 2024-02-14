@@ -47,6 +47,8 @@ export default function DrivePage() {
         const drive = await new ShdwDrive(connection, wallet).init();
         setShadowDrive(drive);
         fetchStorageAccounts(drive);
+      } else {
+        setIsLoading(false);
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,7 +58,7 @@ export default function DrivePage() {
     return (
       <ContentWrapper className="w-full flex justify-center pt-64">
         {isLoading && <Spinner />}
-        {!isLoading && !wallet?.publicKey && <WalletButton />}
+        {!isLoading && <WalletButton />}
       </ContentWrapper>
     );
 

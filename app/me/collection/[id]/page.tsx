@@ -10,6 +10,7 @@ import { useQuery } from "@apollo/client";
 import { useUserData } from "@nhost/nextjs";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { CollectionCreateMintPriceDetails } from "@/features/pricing/collection-create-mint-price-details";
 
 export default function CollectionDetailsPage({ params }: { params: any }) {
   const user = useUserData();
@@ -88,6 +89,8 @@ export default function CollectionDetailsPage({ params }: { params: any }) {
               </div>
             </div>
           )}
+
+          <CollectionCreateMintPriceDetails collection={collection} />
 
           <CollectionPreview collection={collection} />
         </>

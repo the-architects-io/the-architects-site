@@ -14,6 +14,7 @@ import showToast from "@/features/toasts/show-toast";
 import { useCluster } from "@/hooks/cluster";
 import { handleError } from "@/utils/errors/log-error";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import Image from "next/image";
 import { useCallback, useState } from "react";
 
@@ -59,32 +60,40 @@ export default function Page() {
     }
   }, [wallet, cluster]);
 
-  const handleSolPayment = useCallback(async () => {
-    setIsLoading(true);
-    const blueprint = createBlueprintClient({ cluster });
+  const handleSolPayment = useCallback(
+    async (amountInSol: number) => {
+      setIsLoading(true);
+      const blueprint = createBlueprintClient({ cluster });
 
-    try {
-      const { txId } = await blueprint.payments.takePayment({
-        wallet,
-        mintAddress: SOL_MINT_ADDRESS,
-        baseAmount: 100000000,
-        cluster,
-      });
-      if (txId) {
-        showToast({
-          primaryMessage: "Payment successful",
-          link: {
-            url: `https://explorer.solana.com/tx/${txId}?cluster=${cluster}`,
-            title: "View transaction",
-          },
+      try {
+        const { txId } = await blueprint.payments.takePayment({
+          wallet,
+          mintAddress: SOL_MINT_ADDRESS,
+          baseAmount: amountInSol * LAMPORTS_PER_SOL,
+          cluster,
         });
+        if (txId) {
+          showToast({
+            primaryMessage: "Payment successful",
+            link: {
+              url: `https://explorer.solana.com/tx/${txId}?cluster=${cluster}`,
+              title: "View transaction",
+            },
+          });
+        } else {
+          showToast({
+            primaryMessage: "Payment failed",
+            secondaryMessage: "Please try again",
+          });
+        }
+      } catch (error) {
+        handleError(error as Error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      handleError(error as Error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [wallet, cluster]);
+    },
+    [wallet, cluster]
+  );
 
   return (
     <ContentWrapper>
@@ -111,7 +120,7 @@ export default function Page() {
               ) : (
                 <>
                   <SubmitButton
-                    onClick={handleSolPayment}
+                    onClick={() => handleSolPayment(0.1)}
                     isSubmitting={isLoading}
                   >
                     Pay in SOL

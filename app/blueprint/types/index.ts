@@ -732,6 +732,7 @@ export type Collection = {
   maxDepth?: number;
   maxBufferSize?: number;
   canopyDepth?: number;
+  tokenImagesSizeInBytes?: number;
 };
 
 export type CreateCollectionResponse = BaseBlueprintResponse & {
@@ -767,6 +768,7 @@ export type UpdateCollectionInput = {
   maxBufferSize?: number;
   canopyDepth?: number;
   collectionBuildSourceId?: string;
+  tokenImagesSizeInBytes?: number;
 };
 
 export type UpdateCollectionResponse = BaseBlueprintResponse & {
